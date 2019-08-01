@@ -224,92 +224,95 @@ def load_actor_select(workflow_param):
         fr_top.grid(row = 0, column =1, sticky = 'ew')
         cparm_dict = {}
 
+
+
         for sys in maindict['systems']:
             for cat in maindict['systems'][sys]:
                 if int(maindict['systems'][sys][cat][1]) is not 0:
                     curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
                     Button(fr_ab, text = curval, bg = c2, command = lambda sys = sys, cat = cat: make_frame(sys,cat, prev_frame) ).grid(padx = 5, pady = 5, sticky = 'ew')
 
-    def make_frame(sys,cat, prev_frame):
-        prev_frame.grid_remove()
-        prev_frame.grid_forget()
-        fr = Frame(cp_top, width = 500, height = 1500, bg = c1)
-        prev_frame = fr
-        fr.grid(row = 1, column =1, sticky = 'nswe')
-        fr.grid_propagate(0)
-        
-        instr = StringVar()
-        curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
-        instr_xsd = StringVar()
-    
-        
-        instr.trace('w', lambda name, index, mode, fr = fr: changed_val(fr, instr.get(), instr_xsd.get(), curval))
-    #    instr_xsd.trace('w', lambda name, index, mode, fr=fr: changed_val(fr, instr.get(), instr_xsd.get(), curval))
-        
+        def make_frame(sys,cat, prev_frame):
+            prev_frame.grid_remove()
+            prev_frame.grid_forget()
+            fr = Frame(cp_top, width = 500, height = 1500, bg = c1)
+            prev_frame = fr
+            fr.grid(row = 1, column =1, sticky = 'nswe')
+            fr.grid_propagate(0)
 
-        for file in os.listdir(actor_path+'/'+curval ):
-            if file.endswith(".xml") and (not 'default' in file):
-                instr.set(os.path.join(actor_path+'/'+curval, file))
-            if file.endswith('.xsd'):
-                instr_xsd.set(os.path.join(actor_path+'/'+curval, file))
+            instr = StringVar()
+            curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
+            instr_xsd = StringVar()
 
 
-    def changed_val(fra, cpar, xsdpath, curval):
-        try:
-            xmlschema_doc = etree.parse(xsdpath)
-            root_xsd = xmlschema_doc.getroot()
-            xmlschema = etree.XMLSchema(xmlschema_doc)
-            docum_dict = {}
-            for elem in root_xsd.iter():
-                if elem.tag ==  '{http://www.w3.org/2001/XMLSchema}element':
-                    for i in elem.iter():
-                        if i.tag ==  '{http://www.w3.org/2001/XMLSchema}documentation':
-                            docum_dict[elem.attrib.values()[0]] = i.text
-        except:
-            docum_dict = {}
+            instr.trace('w', lambda name, index, mode, fr = fr: changed_val(fr, instr.get(), instr_xsd.get(), curval))
+        #    instr_xsd.trace('w', lambda name, index, mode, fr=fr: changed_val(fr, instr.get(), instr_xsd.get(), curval))
 
-        fra.grid_remove()
-        fra.grid_forget()
-        fra = Frame(cp_top, width = 500, height = 1500, bg = c1)
-        fra.grid(row = 1, column = 1, sticky = 'nswe')
-        fra.grid_propagate(0)
 
-        tree = etree.parse(cpar)        
-        root = tree.getroot()
-        rrow = 1
-        ccolumn = 0
-        
-        for elem in root.iter():
-            if ((elem.tag is not etree.Comment) and (len(elem) == 0)):
-                l = Label(fra, text = elem.tag.strip(), bg = c1)
-                l.grid(row = rrow, column = ccolumn)
-                evar = StringVar()
-                evar.set(elem.text.strip())
-                e = Entry(fra, textvar = evar, bg = c1)
-                e.grid(row = rrow, column = ccolumn+1, padx = 3, pady = 3)
+            for file in os.listdir(actor_path+'/'+curval ):
+                if file.endswith(".xml") and (not 'default' in file):
+                    instr.set(os.path.join(actor_path+'/'+curval, file))
+                if file.endswith('.xsd'):
+                    instr_xsd.set(os.path.join(actor_path+'/'+curval, file))
 
-                cparm_dict[elem.tag] = evar.get()
 
-                evar.trace('w', lambda name, index, mode, elem = elem.tag, evar = evar: change_in_par(cparm_dict, elem, evar))
-                
-                try:
-                    CreateToolTip(l, docum_dict[l.cget('text')])
-                except:
-                    pass 
-                
-                rrow +=1 
-                if rrow > 30:
-                    ccolumn += 2
-                    rrow = 1
-                    fra.grid_propagate(1)
-    
-        Button(fr_top, text = 'save', command = lambda: save_codeparam(cparm_dict, tree, root, curval)).grid()
+        def changed_val(fra, cpar, xsdpath, curval):
+            try:
+                xmlschema_doc = etree.parse(xsdpath)
+                root_xsd = xmlschema_doc.getroot()
+                xmlschema = etree.XMLSchema(xmlschema_doc)
+                docum_dict = {}
+                for elem in root_xsd.iter():
+                    if elem.tag ==  '{http://www.w3.org/2001/XMLSchema}element':
+                        for i in elem.iter():
+                            if i.tag ==  '{http://www.w3.org/2001/XMLSchema}documentation':
+                                docum_dict[elem.attrib.values()[0]] = i.text
+            except:
+                docum_dict = {}
+
+            fra.grid_remove()
+            fra.grid_forget()
+            fra = Frame(cp_top, width = 500, height = 1500, bg = c1)
+            fra.grid(row = 1, column = 1, sticky = 'nswe')
+            fra.grid_propagate(0)
+
+            tree = etree.parse(cpar)        
+            root = tree.getroot()
+            rrow = 1
+            ccolumn = 0
+
+            for elem in root.iter():
+                if ((elem.tag is not etree.Comment) and (len(elem) == 0)):
+                    l = Label(fra, text = elem.tag.strip(), bg = c1)
+                    l.grid(row = rrow, column = ccolumn)
+                    evar = StringVar()
+                    evar.set(elem.text.strip())
+                    e = Entry(fra, textvar = evar, bg = c1)
+                    e.grid(row = rrow, column = ccolumn+1, padx = 3, pady = 3)
+
+                    cparm_dict[elem.tag] = evar.get()
+
+                    evar.trace('w', lambda name, index, mode, elem = elem.tag, evar = evar: change_in_par(cparm_dict, elem, evar))
+
+                    try:
+                        CreateToolTip(l, docum_dict[l.cget('text')])
+                    except:
+                        pass 
+
+                    rrow +=1 
+                    if rrow > 30:
+                        ccolumn += 2
+                        rrow = 1
+                        fra.grid_propagate(1)
+
+            Button(fr_top, text = 'save', command = lambda: save_codeparam(cparm_dict, tree, root, curval)).grid(row = 1, column = 1, padx = 5, pady = 5, columnspan = 5)
+
+
         def change_in_par(cparm_dict, elem, evar):
             cparm_dict[elem] = evar.get()
 
     def save_codeparam(cparm_dict, tree, root, curval):
-        print('hola')
-        print(cparm_dict)
+
         
         for elem in root.iter():
             if((elem.tag is not etree.Comment) and (len(elem) == 0)):
@@ -351,8 +354,8 @@ def load_actor_select(workflow_param):
   #  for sys in maindict['make']
 
     Button(fr_as, text = 'edit codeparameters',bg = c2, command = lambda: call_edit_codeparam()).grid(row = rrow, columnspan = 2, pady = 5) 
-    Button(fr_as, text = 'create flowchart', bg = c2).grid(row = rrow +1, columnspan = 2, pady = 5)
-  #   Button(fr_as, text = 'create flowchart', bg = c2, command = lambda: make_flowchart(old_fr, window, maindict, c1, c2, c3, c4,c5)).grid(row = rrow +1, columnspan = 2, pady = 5)
+  #  Button(fr_as, text = 'create flowchart', bg = c2).grid(row = rrow +1, columnspan = 2, pady = 5)
+    Button(fr_as, text = 'create flowchart', bg = c2, command = lambda: make_flowchart(old_fr, window, maindict, c1, c2, c3, c4,c5)).grid(row = rrow +1, columnspan = 2, pady = 5)
 
 
 
