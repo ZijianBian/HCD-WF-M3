@@ -1,0 +1,69 @@
+import os, imas, sys, copy
+from set_md_from_pulse_schedule import set_md_from_pulse_schedule
+import hcd_actors as act
+
+actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
+list_of_actors = ['merge_waves', 'merge_distributions', 'merge_distribution_sources', 'hcd2core_sources_mireille']
+
+for name in list_of_actors:
+    sys.path[:0] = [os.path.join(actor_path,name)]
+    globals()[name] = getattr(__import__(name), name)
+#--------------------------------------------------------------------------------------------------------------------
+
+def hcd_workflow(IDS_BUNDLE_in, parameters):
+
+    ## STEP 0: preparation - modified IDSs will be stored in their respective bundles, IDS_BUNDLE_out will hold the final information:
+    IDS_BUNDLE_nbi   = copy.deepcopy(IDS_BUNDLE_in)
+    IDS_BUNDLE_alpha = copy.deepcopy(IDS_BUNDLE_in)
+    IDS_BUNDLE_ic    = copy.deepcopy(IDS_BUNDLE_in)
+    IDS_BUNDLE_ec    = copy.deepcopy(IDS_BUNDLE_in)
+    IDS_BUNDLE_out   = copy.deepcopy(IDS_BUNDLE_in)
+
+
+    ## STEP 1:  SOURCE CODES and WAVE SOLVER (and ICCOUP) :
+
+    IDS_BUNDLE_nbi['distribution_sources']      = act.source_code_nbi(IDS_BUNDLE_nbi, parameters)
+    IDS_BUNDLE_alpha['distribution_sources']    = act.source_code_alpha(IDS_BUNDLE_alpha, parameters)
+    IDS_BUNDLE_ic['waves']                      = act.iccoup(IDS_BUNDLE_ic, parameters) 
+    IDS_BUNDLE_ic['waves']                      = act.wave_solver_ic(IDS_BUNDLE_ic, parameters)
+    IDS_BUNDLE_ec['waves']                      = act.wave_solver_ec(IDS_BUNDLE_ec, parameters)
+
+
+    ## STEP 2: FOKKER PLANK SOLVERS and creating a common nbi_ic distributions IDS
+    IDS_BUNDLE_alpha['distributions']        = act.fokker_plank_alpha(IDS_BUNDLE_alpha, parameters)
+
+    if(parameters['nbi_fp'] == 9 and parameters['ic_fp'] == 9):
+        distributions_nbi_ic    =   act.fokker_plank_nbi_ic_synergy(IDS_BUNDLE_nbi, IDS_BUNDLE_ic, parameters)
+    else:
+        IDS_BUNDLE_nbi['distributions']    =   act.fokker_plank_nbi(IDS_BUNDLE_nbi, parameters)
+        IDS_BUNDLE_ic['distributions']     =   act.fokker_plank_ic(IDS_BUNDLE_ic, parameters)
+
+        distributions_nbi_ic =   merge_distributions(IDS_BUNDLE_nbi['distributions'], IDS_BUNDLE_ic['distributions'])
+
+
+    ## STEP 4: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION SOURCES and WAVES
+    distributions_final        = merge_distributions(IDS_BUNDLE_alpha['distributions'], distributions_nbi_ic)
+    waves_final                = merge_waves(IDS_BUNDLE_ec['waves'], IDS_BUNDLE_ic['waves'])
+    distribution_sources_final = merge_distribution_sources(IDS_BUNDLE_nbi['distribution_sources'], IDS_BUNDLE_alpha['distribution_sources'])
+
+    ## STEP 5: MAKE CORE IDS:
+    if parameters['hcd2core_sources'] == 1:
+        core_sources_final  = hcd2core_sources_mireille(distributions_final, distribution_sources_final, waves_final, IDS_BUNDLE_in['core_profiles'])
+    else:
+        pass
+    if parameters['hcd2core_profiles'] == 1:
+        core_profiles_final = hcd2core_profiles(distributions_final, distribution_sources_final, waves_final, IDS_BUNDLE_in['core_profiles'])
+    else:
+        pass
+
+
+
+
+    IDS_BUNDLE_out['distributions']        = distributions_final
+    IDS_BUNDLE_out['waves']                = waves_final
+    IDS_BUNDLE_out['distribution_sources'] = distribution_sources_final 
+ #   IDS_BUNDLE_out['core_sources']         = core_sources_final
+
+    return IDS_BUNDLE_out
+
+    
