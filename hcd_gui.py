@@ -1,6 +1,7 @@
-import sys 
+import sys, os
 sys.path.append('interface')
 sys.path.append('workflow')
+sys.path.append(os.getcwd())
 from tkinter import *
 from tkinter import filedialog, messagebox, ttk
 from shutil import copy2, rmtree
@@ -8,7 +9,6 @@ from lxml import *
 from lxml import etree
 from hcd_wrapper import hcd_wrapper 
 from hover_class import *
-import os
 from datetime import datetime
 from make_flowchart import make_flowchart
 
@@ -19,7 +19,7 @@ run_config_folder = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime
 workflow_param = run_config_folder+ '/input_workflow.xml'
 
 os.makedirs(run_config_folder)
-copy2('interface/input_workflow_default.xml', run_config_folder+'/input_workflow.xml', follow_symlinks=True)
+copy2('input_workflow_default.xml', run_config_folder+'/input_workflow.xml', follow_symlinks=True)
         
 
 
@@ -27,15 +27,10 @@ copy2('interface/input_workflow_default.xml', run_config_folder+'/input_workflow
 ##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
 
 actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
-list_of_actors = ['nemo', 'bbnbi','afsi', 
-                  'iccoup', 'Cyrano','lion', 'tomcat', 'genray', 'gray', 
-                  'StixReDist', 'risk', 'spot', 'ascot4serial', 'ascot4parallel', 
-                  'hcd2core_sources_mireille', 'hcd2core_profiles']
 
-inoutdict = {}
 ids_list = ['core_profiles','core_sourcres','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
 
-for name in list_of_actors:
+def read_inputoutput(name):
 
     in_l = []
     out_l = []
@@ -53,9 +48,10 @@ for name in list_of_actors:
     except:
         print(name, 'not compiled')
 
-    inoutdict[name] = [in_l, out_l]
 
-tree = etree.parse('interface/input_workflow_default.xml')
+    return(in_l, out_l)
+
+tree = etree.parse('input_workflow_default.xml')
 root = tree.getroot()
 
 maindict = {}
@@ -68,7 +64,8 @@ for step in root[2]:
             dict1 = {}
             if icat.tag is not etree.Comment:
                 for icode in icat.attrib['list'].split():
-                        dict1[icode] = inoutdict[icode]
+                    (in_l, out_l) = read_inputoutput(icode)
+                    dict1[icode] = [in_l, out_l]
                 dict2[icat.tag] = [dict1, icat.text]
         dict3[isys.tag] = dict2
     maindict[step.tag] = dict3
@@ -158,7 +155,7 @@ def load_wf_param(workflow_param):
                             if not os.path.exists(dest_file):
                                 copy2(src_file, dest_file, follow_symlinks=True)
 
-        copy2(run_config_folder+'/input_workflow.xml','interface/input_workflow_default.xml', follow_symlinks=True)
+        copy2(run_config_folder+'/input_workflow.xml','input_workflow_default.xml', follow_symlinks=True)
                             
     def save_wfp_and_run(tree, root, workflow_param, save_yn):
         save_wfp_to_file(tree, root, workflow_param)

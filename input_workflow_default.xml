@@ -1,5 +1,5 @@
 <root>
-  <workflow_parameters display="WORKFLOW PARAMETERS">
+  <workflow_parameters display="WORKFLOW PARAMETERS (STANDALONE)">
     <machine>iter</machine>
     <shot_nr>7897</shot_nr>
     <run_in>1</run_in>
@@ -8,46 +8,46 @@
     <tbegin>200</tbegin>
     <tend>200.5</tend>
     <dt_required>0.2</dt_required>
+    <run_simpletrans>False</run_simpletrans>
   </workflow_parameters>
 
   <further_settings display="FURTHER SETTINGS">
-    <mpi_local>'mpi_local'</mpi_local>
     <fokker_flag>0</fokker_flag>
     <nmarker>10000</nmarker>
     <nbi_markers_in>32</nbi_markers_in>
     <ic_wave_nr_toroidal_modes>1</ic_wave_nr_toroidal_modes> 
-    <input_path>/home/ITER/mitterv/codes/pyworkflow/</input_path>
+
   </further_settings>
 
   <actor_selection>
     <systems>
       <ECRH>
-	<ec_wave_solver list="genray gray">0</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
+	<ec_wave_solver list="genray gray">2</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
 	<!--ec_wave_fp list = ''>     0 </ec_wave_fp-->             <!-- 0: none -->
       </ECRH>
 
       <ICRH>
-	<ic_coup list="iccoup">1</ic_coup> 
-	<ic_wave_solver list="Cyrano tomcat lion">1</ic_wave_solver>         <!-- 0: none 1: CYRANO  2: TOMCAT, 3: LION  -->
-	<ic_wave_fp list="StixReDist">1</ic_wave_fp>             <!-- 0: none 1: StixReDist 9: FP WITH NBI/IC SYNERGY -->
+	<ic_coup list="iccoup">0</ic_coup> 
+	<ic_wave_solver list="Cyrano tomcat lion">0</ic_wave_solver>         <!-- 0: none 1: CYRANO  2: TOMCAT, 3: LION  -->
+	<ic_wave_fp list="StixReDist">0</ic_wave_fp>             <!-- 0: none 1: StixReDist 9: FP WITH NBI/IC SYNERGY -->
       </ICRH>
     
 
       <NBI>
-	<nbi_source list="nemo bbnbi">2</nbi_source>                <!-- 0: none 1: NEMO 2: BBNBI -->
+	<nbi_source list="nemo bbnbi">0</nbi_source>                <!-- 0: none 1: NEMO 2: BBNBI -->
 	<nbi_fp list="risk spot ascot4serial ascot4parallel">0</nbi_fp>                    <!-- 0: none 1: RISK 2: SPOT  3: ASCOT4SERIAL 4: ASCOT4PARALLEL  9: FP WITH NBI/IC SYNERGY-->
       </NBI>
     
 
       <ALPHA>
-	<alpha_source list="afsi">1</alpha_source>             <!-- 0: none 1: AFSI -->
+	<alpha_source list="afsi">0</alpha_source>             <!-- 0: none 1: AFSI -->
 	<alpha_fp list="spot ascot4serial ascot4parallel">0</alpha_fp>                 <!-- 0: none 2: SPOT  3: ASCOT4SERIAL 4: ASCOT4PARALLEL  5: SPOT WITHOUT SOURCE-->
       </ALPHA>
     </systems> 
 
     <post_process>
       <source>
-	<hcd2core_sources list="hcd2core_sources_mireille">0</hcd2core_sources> 
+	<hcd2core_sources list="hcd2core_sources">0</hcd2core_sources> 
       </source>
       <profiles>
 	<hcd2core_profiles list="hcd2core_profiles">0</hcd2core_profiles>

@@ -1,13 +1,17 @@
 import os, imas, sys, copy
 from set_md_from_pulse_schedule import set_md_from_pulse_schedule
-import hcd_actors as act
+import generate_actors
+import auto_hcd_actors as act
 
 actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
-list_of_actors = ['merge_waves', 'merge_distributions', 'merge_distribution_sources', 'hcd2core_sources_mireille']
+list_of_actors = ['merge_waves', 'merge_distributions', 'merge_distribution_sources', 'hcd2core_sources']
 
 for name in list_of_actors:
-    sys.path[:0] = [os.path.join(actor_path,name)]
-    globals()[name] = getattr(__import__(name), name)
+    try:
+        sys.path[:0] = [os.path.join(actor_path,name)]
+        globals()[name] = getattr(__import__(name), name)
+    except:
+        print(name, 'not compiled')
 #--------------------------------------------------------------------------------------------------------------------
 
 def hcd_workflow(IDS_BUNDLE_in, parameters):
@@ -22,21 +26,21 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
 
     ## STEP 1:  SOURCE CODES and WAVE SOLVER (and ICCOUP) :
 
-    IDS_BUNDLE_nbi['distribution_sources']      = act.source_code_nbi(IDS_BUNDLE_nbi, parameters)
-    IDS_BUNDLE_alpha['distribution_sources']    = act.source_code_alpha(IDS_BUNDLE_alpha, parameters)
-    IDS_BUNDLE_ic['waves']                      = act.iccoup(IDS_BUNDLE_ic, parameters) 
-    IDS_BUNDLE_ic['waves']                      = act.wave_solver_ic(IDS_BUNDLE_ic, parameters)
-    IDS_BUNDLE_ec['waves']                      = act.wave_solver_ec(IDS_BUNDLE_ec, parameters)
+    IDS_BUNDLE_nbi['distribution_sources']      = act.nbi_source(IDS_BUNDLE_nbi, parameters)
+    IDS_BUNDLE_alpha['distribution_sources']    = act.alpha_source(IDS_BUNDLE_alpha, parameters)
+    IDS_BUNDLE_ic['waves']                      = act.ic_coup(IDS_BUNDLE_ic, parameters) 
+    IDS_BUNDLE_ic['waves']                      = act.ic_wave_solver(IDS_BUNDLE_ic, parameters)
+    IDS_BUNDLE_ec['waves']                      = act.ec_wave_solver(IDS_BUNDLE_ec, parameters)
 
 
     ## STEP 2: FOKKER PLANK SOLVERS and creating a common nbi_ic distributions IDS
-    IDS_BUNDLE_alpha['distributions']        = act.fokker_plank_alpha(IDS_BUNDLE_alpha, parameters)
+    IDS_BUNDLE_alpha['distributions']        = act.alpha_fp(IDS_BUNDLE_alpha, parameters)
 
     if(parameters['nbi_fp'] == 9 and parameters['ic_fp'] == 9):
-        distributions_nbi_ic    =   act.fokker_plank_nbi_ic_synergy(IDS_BUNDLE_nbi, IDS_BUNDLE_ic, parameters)
+        distributions_nbi_ic    =   act.synergy_fp(IDS_BUNDLE_nbi, IDS_BUNDLE_ic, parameters)
     else:
-        IDS_BUNDLE_nbi['distributions']    =   act.fokker_plank_nbi(IDS_BUNDLE_nbi, parameters)
-        IDS_BUNDLE_ic['distributions']     =   act.fokker_plank_ic(IDS_BUNDLE_ic, parameters)
+        IDS_BUNDLE_nbi['distributions']    =   act.nbi_fp(IDS_BUNDLE_nbi, parameters)
+        IDS_BUNDLE_ic['distributions']     =   act.ic_wave_fp(IDS_BUNDLE_ic, parameters)
 
         distributions_nbi_ic =   merge_distributions(IDS_BUNDLE_nbi['distributions'], IDS_BUNDLE_ic['distributions'])
 
@@ -48,7 +52,7 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
 
     ## STEP 5: MAKE CORE IDS:
     if parameters['hcd2core_sources'] == 1:
-        core_sources_final  = hcd2core_sources_mireille(distributions_final, distribution_sources_final, waves_final, IDS_BUNDLE_in['core_profiles'])
+        core_sources_final  = hcd2core_sources(distributions_final, distribution_sources_final, waves_final, IDS_BUNDLE_in['core_profiles'])
     else:
         pass
     if parameters['hcd2core_profiles'] == 1:

@@ -92,16 +92,15 @@ def hcd_wrapper(par_path):
 
       ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
       
- #     ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
-
-
-      ## Prepare Bundle for next timestep ( COMBINE updated bundle with the others (with all timesteps))
+#      if param['run_simpletrans']:
+#           ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
 
 
       print('prepare ids bundle for next timestep')
+      timenow += param['dt_required']
+
 
       ids_bundle_work = copy.deepcopy(ids_bundle_initial)
-
       for elem in ids_bundle_work: 
           ids_bundle_work[elem].getSlice(timenow,1)
       
@@ -111,8 +110,8 @@ def hcd_wrapper(par_path):
       ids_bundle_work['core_sources']         =  copy.deepcopy(ids_bundle_updated['core_sources'])
       ids_bundle_work['core_profiles']        =  copy.deepcopy(ids_bundle_updated['core_profiles'])
 
-      
 
+      
 
       print('set output')
       for elem in ids_bundle_work:    # not sure if this should be work or updated
@@ -121,4 +120,5 @@ def hcd_wrapper(par_path):
         ids_bundle_work[elem].putNonTimed()
         ids_bundle_work[elem].putSlice()
 
-      timenow += param['dt_required']
+      
+        
