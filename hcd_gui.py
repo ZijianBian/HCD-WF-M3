@@ -12,13 +12,16 @@ from hover_class import *
 from datetime import datetime
 from make_flowchart import make_flowchart
 
-
+from developer_file import load_code_dependencies
 
 
 run_config_folder = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
 workflow_param = run_config_folder+ '/input_workflow.xml'
 
 os.makedirs(run_config_folder)
+for systemname in ['ECRH', 'ICRH', 'NBI', 'NUCLEAR']:
+    os.makedirs(run_config_folder+'/'+systemname)
+
 copy2('input_workflow_default.xml', run_config_folder+'/input_workflow.xml', follow_symlinks=True)
         
 
@@ -47,8 +50,7 @@ def read_inputoutput(name):
                 out_l.append(iids)
     except:
         print(name, 'not compiled')
-
-
+        
     return(in_l, out_l)
 
 tree = etree.parse('input_workflow_default.xml')
@@ -69,6 +71,10 @@ for step in root[2]:
                 dict2[icat.tag] = [dict1, icat.text]
         dict3[isys.tag] = dict2
     maindict[step.tag] = dict3
+
+
+    
+
 
 ## ------------------------------------------------------------------------------------------
 ## set a few standard colors to call later
@@ -105,7 +111,7 @@ old_fr = fr_fc
 wfpdict = {}
 codedict = {}
 
-## putting this in a function makes sense, because this way the other functions can be defined after wards. the load_parameters() function is called at the very end of the script. 
+## the load_parameters() function is called at the very end of the script. 
 def load_parameters(workflow_param):
     load_wf_param(workflow_param)      
     load_actor_select(workflow_param)
@@ -134,6 +140,7 @@ def load_wf_param(workflow_param):
         for elem in root[2][0].iter():
             if((elem.tag is not etree.Comment) and (len(elem) == 0)):
                 elem.text = str(codedict[elem.tag])
+        
 
         tree.write(workflow_param)
  
@@ -143,26 +150,83 @@ def load_wf_param(workflow_param):
 
 
         #COPY ALL XML FILES THAT WILL BE USED TO THE LOCAL FOLDER TO CALL THEM FROM THERE DURING THE RUN
-        for sys in maindict['systems']:
-            for cat in maindict['systems'][sys]:
-                if int(maindict['systems'][sys][cat][1]) is not 0:
-                    curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
+        for cursys in maindict['systems']:
+            for cat in maindict['systems'][cursys]:
+                if int(maindict['systems'][cursys][cat][1]) is not 0:
+                    curval = list(maindict['systems'][cursys][cat][0])[int(maindict['systems'][cursys][cat][1])-1]
+                    
+                    try:
+                        for file in os.listdir(actor_path+'/'+curval ):
+                            if file.endswith(".xml") and (not 'default' in file):
+                                src_file = os.path.join(actor_path+'/'+curval, file)
+                                dest_file = os.path.join(run_config_folder+'/'+cursys+'/input_'+curval+'.xml')
 
-                    for file in os.listdir(actor_path+'/'+curval ):
-                        if file.endswith(".xml") and (not 'default' in file):
-                            src_file = os.path.join(actor_path+'/'+curval, file)
-                            dest_file = os.path.join(run_config_folder+'/input_'+curval+'.xml')
-                            if not os.path.exists(dest_file):
-                                copy2(src_file, dest_file, follow_symlinks=True)
+                                if not os.path.exists(dest_file):
+                                    copy2(src_file, dest_file, follow_symlinks=True)
+                    except:
+                        print('You selected '+ curval +', but it seems this actor is not compiled. Please change your selection or compile '+ curval +' before running!')
+                        sys.exit(1)
 
         copy2(run_config_folder+'/input_workflow.xml','input_workflow_default.xml', follow_symlinks=True)
                             
     def save_wfp_and_run(tree, root, workflow_param, save_yn):
+        
+        def check_if_code_fulfills_configuration(cat, code):
+            if dependencies[cat] is not None and code in dependencies[cat]: 
+                
+                    fulfills_all_dependencies = [1] * (len(dependencies[cat][code]))
+                    j = 0
+
+                    for dep in dependencies[cat][code]:
+
+                        
+                        for i in dep.keys():
+
+
+                            if 'any'in str(dep[i]) and codedict_names[i] is not None:
+                                pass
+                            elif str(dep[i]).find(str(codedict_names[i]))is not -1:
+                                pass
+                            else:
+                                print('this is not a valid configuration for '+ code.upper() + ' please change the selection of your actors and try again')
+                                sys.exit()
+                                
+
+        #---- end of check if code fulfills configuration 
+
+
+        ## load the list of codedependencies from the developer file
+        dependencies = load_code_dependencies()
+        
+        ## get code name here - the codedict only contains the assigned numbers, but here it will be easier to deal with the actual names of the code 
+
+
+        codedict_names = codedict.copy()
+
+        for n in codedict: 
+            for j in maindict:
+                for jj  in maindict[j]: 
+  
+                    try:
+                        codelist = [None] + list(maindict[j][jj][n][0])
+                        curval = codelist[codedict[n]]
+                        codedict_names[n] = curval
+                        
+                    except:
+                        pass
+
+
+        for entry in codedict_names:
+            if codedict_names is not None:
+                check_if_code_fulfills_configuration(entry, codedict_names[entry])
+        
+                        
         save_wfp_to_file(tree, root, workflow_param)
         window.destroy()
         hcd_wrapper(run_config_folder)
         if save_yn == 0:
             rmtree(run_config_folder)
+            
         
 
     # BEGINNING OF THE ACTUAL LOAD_WF_PARAM FUNCTION
@@ -224,8 +288,10 @@ def load_actor_select(workflow_param):
 
 
         for sys in maindict['systems']:
+            lsys = Label(fr_ab, text = sys, bg = c4)
             for cat in maindict['systems'][sys]:
                 if int(maindict['systems'][sys][cat][1]) is not 0:
+                    lsys.grid(padx = 5, pady = 5, sticky = 'ew')
                     curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
                     Button(fr_ab, text = curval, bg = c2, command = lambda sys = sys, cat = cat: make_frame(sys,cat, prev_frame) ).grid(padx = 5, pady = 5, sticky = 'ew')
 
@@ -277,7 +343,7 @@ def load_actor_select(workflow_param):
             root = tree.getroot()
             rrow = 1
             ccolumn = 0
-
+            
             for elem in root.iter():
                 if ((elem.tag is not etree.Comment) and (len(elem) == 0)):
                     l = Label(fra, text = elem.tag.strip(), bg = c1)
@@ -315,7 +381,7 @@ def load_actor_select(workflow_param):
             if((elem.tag is not etree.Comment) and (len(elem) == 0)):
                 elem.text = cparm_dict[elem.tag]
 
-        tree.write(run_config_folder+'/input_'+curval+'.xml')
+        tree.write(run_config_folder+'/'+systemname+'/input_'+curval+'.xml')
 
 
     # BEGINNING OF THE ACTUAL ACTOR SELECT FUNCTION:

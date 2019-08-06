@@ -7,7 +7,7 @@
     <user>mitterv</user>
     <tbegin>200</tbegin>
     <tend>200.5</tend>
-    <dt_required>0.2</dt_required>
+    <dt_required>0.02</dt_required>
     <run_simpletrans>False</run_simpletrans>
   </workflow_parameters>
 
@@ -22,7 +22,7 @@
   <actor_selection>
     <systems>
       <ECRH>
-	<ec_wave_solver list="genray gray">2</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
+	<ec_wave_solver list="genray gray">0</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
 	<!--ec_wave_fp list = ''>     0 </ec_wave_fp-->             <!-- 0: none -->
       </ECRH>
 
@@ -34,15 +34,15 @@
     
 
       <NBI>
-	<nbi_source list="nemo bbnbi">0</nbi_source>                <!-- 0: none 1: NEMO 2: BBNBI -->
-	<nbi_fp list="risk spot ascot4serial ascot4parallel">0</nbi_fp>                    <!-- 0: none 1: RISK 2: SPOT  3: ASCOT4SERIAL 4: ASCOT4PARALLEL  9: FP WITH NBI/IC SYNERGY-->
+	<nbi_source list="nemo bbnbi">1</nbi_source>                <!-- 0: none 1: NEMO 2: BBNBI -->
+	<nbi_fp list="risk spot ascot4serial ascot4parallel">1</nbi_fp>                    <!-- 0: none 1: RISK 2: SPOT  3: ASCOT4SERIAL 4: ASCOT4PARALLEL  9: FP WITH NBI/IC SYNERGY-->
       </NBI>
     
 
-      <ALPHA>
-	<alpha_source list="afsi">0</alpha_source>             <!-- 0: none 1: AFSI -->
-	<alpha_fp list="spot ascot4serial ascot4parallel">0</alpha_fp>                 <!-- 0: none 2: SPOT  3: ASCOT4SERIAL 4: ASCOT4PARALLEL  5: SPOT WITHOUT SOURCE-->
-      </ALPHA>
+      <NUCLEAR>
+	<nuclear_source list="afsi">0</nuclear_source>             <!-- 0: none 1: AFSI -->
+	<nuclear_fp list="spot ascot4serial ascot4parallel">0</nuclear_fp>                 <!-- 0: none 2: SPOT  3: ASCOT4SERIAL 4: ASCOT4PARALLEL  5: SPOT WITHOUT SOURCE-->
+      </NUCLEAR>
     </systems> 
 
     <post_process>

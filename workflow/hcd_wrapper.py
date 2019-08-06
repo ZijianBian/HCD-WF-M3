@@ -14,6 +14,7 @@ def hcd_wrapper(par_path):
 
   param = {}
   
+  print('----- WORKFLOW PARAMETERS ----')
 
   for elem in root.iter():
     if len(elem) == 0:

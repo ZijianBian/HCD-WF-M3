@@ -2,6 +2,7 @@ import os, imas,sys,copy
 import lxml
 from lxml import etree
 import check_for_mpi as cfmpi
+from developer_file import load_add_arg 
 
 tree = etree.parse('input_workflow_default.xml')
 root = tree.getroot()
@@ -11,8 +12,7 @@ actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
 
 ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
 
-
-add_arg = {'risk': ['dt_required'], 'spot': ['dt_required'],  'iccoup': ['ic_wave_nr_toroidal_modes'], 'nemo': ['fokker_flag','nmarker'], 'bbnbi':['fokker_flag']}
+add_arg = load_add_arg()
 
 list_of_actors = []
 
@@ -85,9 +85,13 @@ with open('auto_hcd_actors.py', 'w') as file:
 
                 file.write('def '+ cat + '(bundle, parameters): \n')
                 i = 0
+                
                 for code in maindict[proc][sys][cat]: 
                     i +=1 
-                    file.write('   if parameters["'+cat +'"] == '+str(i)+':\n')
+                    if i == 1:
+                        file.write('   if parameters["'+cat +'"] == '+str(i)+':\n')
+                    else: 
+                        file.write('   elif parameters["'+cat +'"] == '+str(i)+':\n')
                     file.write('       print("--'+code.upper()+'--")\n')
                     if len(maindict[proc][sys][cat][code][1]) > 0:
                         file.write('       '+maindict[proc][sys][cat][code][1][0]+'_temp = '+code+'(')
@@ -100,7 +104,7 @@ with open('auto_hcd_actors.py', 'w') as file:
                             if ids_in.find('add_arg') is not -1:
                                 file.write('parameters["'+add_arg[code][0]+'"]')
                             elif ids_in.find('codeparam') is not -1:
-                                file.write('(parameters["input_path"]+"/input_'+code+'.xml")')
+                                file.write('(parameters["input_path"]+"/'+sys+'/input_'+code+'.xml")')
                             else:
                                 file.write('bundle["'+ids_in+'"]')
                             first_in = False
