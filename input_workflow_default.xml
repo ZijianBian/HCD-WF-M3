@@ -6,8 +6,8 @@
     <run_out>301</run_out>
     <user>mitterv</user>
     <tbegin>200</tbegin>
-    <tend>200.5</tend>
-    <dt_required>0.02</dt_required>
+    <tend>203</tend>
+    <dt_required>2</dt_required>
     <run_simpletrans>False</run_simpletrans>
   </workflow_parameters>
 
@@ -22,13 +22,13 @@
   <actor_selection>
     <systems>
       <ECRH>
-	<ec_wave_solver list="genray gray">0</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
+	<ec_wave_solver list="genray gray">1</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
 	<!--ec_wave_fp list = ''>     0 </ec_wave_fp-->             <!-- 0: none -->
       </ECRH>
 
       <ICRH>
-	<ic_coup list="iccoup">0</ic_coup> 
-	<ic_wave_solver list="Cyrano tomcat lion">0</ic_wave_solver>         <!-- 0: none 1: CYRANO  2: TOMCAT, 3: LION  -->
+	<ic_coup list="iccoup">1</ic_coup> 
+	<ic_wave_solver list="Cyrano tomcat lion">1</ic_wave_solver>         <!-- 0: none 1: CYRANO  2: TOMCAT, 3: LION  -->
 	<ic_wave_fp list="StixReDist">0</ic_wave_fp>             <!-- 0: none 1: StixReDist 9: FP WITH NBI/IC SYNERGY -->
       </ICRH>
     

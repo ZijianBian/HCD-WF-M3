@@ -10,21 +10,9 @@ from lxml import etree
 from hcd_wrapper import hcd_wrapper 
 from hover_class import *
 from datetime import datetime
-from make_flowchart import make_flowchart
+from simple_flowchart import make_flowchart
 
 from developer_file import load_code_dependencies
-
-
-run_config_folder = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
-workflow_param = run_config_folder+ '/input_workflow.xml'
-
-os.makedirs(run_config_folder)
-for systemname in ['ECRH', 'ICRH', 'NBI', 'NUCLEAR']:
-    os.makedirs(run_config_folder+'/'+systemname)
-
-copy2('input_workflow_default.xml', run_config_folder+'/input_workflow.xml', follow_symlinks=True)
-        
-
 
 #---------------------------------------------------------------------------------------------
 ##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
@@ -72,9 +60,18 @@ for step in root[2]:
         dict3[isys.tag] = dict2
     maindict[step.tag] = dict3
 
-
+# ---------------------------------------------------------------------------------------------
+# set the path to the folders where the configuration and codeparameters are stored
     
+run_config_folder = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
+workflow_param = run_config_folder+ '/input_workflow.xml'
 
+os.makedirs(run_config_folder)
+for systemname in maindict['systems']:
+    os.makedirs(run_config_folder+'/'+systemname)
+
+copy2('input_workflow_default.xml', run_config_folder+'/input_workflow.xml', follow_symlinks=True)
+        
 
 ## ------------------------------------------------------------------------------------------
 ## set a few standard colors to call later

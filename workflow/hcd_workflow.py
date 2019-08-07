@@ -1,6 +1,6 @@
 import os, imas, sys, copy
 from set_md_from_pulse_schedule import set_md_from_pulse_schedule
-import generate_actors
+#import generate_actors
 import auto_hcd_actors as act
 
 actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
@@ -25,24 +25,21 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
 
 
     ## STEP 1:  SOURCE CODES and WAVE SOLVER (and ICCOUP) :
-    #print(IDS_BUNDLE_nbi['distribution_sources'].source[1].profiles1d[0].energy())
-    IDS_BUNDLE_nbi['distribution_sources']      = act.nbi_source(IDS_BUNDLE_nbi, parameters)
-    #print(IDS_BUNDLE_nbi['distribution_sources'].source[1].profiles1d[0].energy())
-    IDS_BUNDLE_nuclear['distribution_sources']  = act.nuclear_source(IDS_BUNDLE_nuclear, parameters)
-    IDS_BUNDLE_ic['waves']                      = act.ic_coup(IDS_BUNDLE_ic, parameters) 
-    IDS_BUNDLE_ic['waves']                      = act.ic_wave_solver(IDS_BUNDLE_ic, parameters)
-    IDS_BUNDLE_ec['waves']                      = act.ec_wave_solver(IDS_BUNDLE_ec, parameters)
+    IDS_BUNDLE_nbi['distribution_sources']      = copy.deepcopy(act.nbi_source(IDS_BUNDLE_nbi, parameters))
+    IDS_BUNDLE_nuclear['distribution_sources']  = copy.deepcopy(act.nuclear_source(IDS_BUNDLE_nuclear, parameters))
+    IDS_BUNDLE_ic['waves']                      = copy.deepcopy(act.ic_coup(IDS_BUNDLE_ic, parameters))
+    IDS_BUNDLE_ic['waves']                      = copy.deepcopy(act.ic_wave_solver(IDS_BUNDLE_ic, parameters))
+    IDS_BUNDLE_ec['waves']                      = copy.deepcopy(act.ec_wave_solver(IDS_BUNDLE_ec, parameters))
 
 
     ## STEP 2: FOKKER PLANK SOLVERS and creating a common nbi_ic distributions IDS
-    IDS_BUNDLE_nuclear['distributions']        = act.nuclear_fp(IDS_BUNDLE_nuclear, parameters)
+    IDS_BUNDLE_nuclear['distributions']        = copy.deepcopy(act.nuclear_fp(IDS_BUNDLE_nuclear, parameters))
 
     if(parameters['nbi_fp'] == 9 and parameters['ic_fp'] == 9):
-        distributions_nbi_ic    =   act.synergy_fp(IDS_BUNDLE_nbi, IDS_BUNDLE_ic, parameters)
+        distributions_nbi_ic    =   copy.deepcopy(act.synergy_fp(IDS_BUNDLE_nbi, IDS_BUNDLE_ic, parameters))
     else:
-        print(IDS_BUNDLE_nbi['distribution_sources'])
-        IDS_BUNDLE_nbi['distributions']    =   act.nbi_fp(IDS_BUNDLE_nbi, parameters)
-        IDS_BUNDLE_ic['distributions']     =   act.ic_wave_fp(IDS_BUNDLE_ic, parameters)
+        IDS_BUNDLE_nbi['distributions']    =   copy.deepcopy(act.nbi_fp(IDS_BUNDLE_nbi, parameters))
+        IDS_BUNDLE_ic['distributions']     =   copy.deepcopy(act.ic_wave_fp(IDS_BUNDLE_ic, parameters))
 
         distributions_nbi_ic =   merge_distributions(IDS_BUNDLE_nbi['distributions'], IDS_BUNDLE_ic['distributions'])
 

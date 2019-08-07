@@ -26,6 +26,7 @@ def read_inputoutput(name):
 
         
         for elem in parstr.split('\n'):
+            
             for iids in ids_list:
                 if elem.find(':param '+iids) is not -1:
                     in_l.append(iids)
@@ -68,7 +69,8 @@ for step in root[2]:
 #print(maindict)
 
 
-with open('auto_hcd_actors.py', 'w') as file:
+
+with open('workflow/auto_hcd_actors.py', 'w') as file:
 
     file.write('import os, imas, sys, copy\n\n')
     file.write('actor_path = os.path.join(os.getenv("KEPLER"), "imas/src/org/iter/imas/python")\n')
@@ -87,6 +89,7 @@ with open('auto_hcd_actors.py', 'w') as file:
                 i = 0
                 
                 for code in maindict[proc][sys][cat]: 
+                    add_arg_nr = 0
                     i +=1 
                     if i == 1:
                         file.write('   if parameters["'+cat +'"] == '+str(i)+':\n')
@@ -102,7 +105,8 @@ with open('auto_hcd_actors.py', 'w') as file:
                                 file.write(', ')
                             
                             if ids_in.find('add_arg') is not -1:
-                                file.write('parameters["'+add_arg[code][0]+'"]')
+                                file.write('parameters["'+add_arg[code][add_arg_nr]+'"]')
+                                add_arg_nr += 1
                             elif ids_in.find('codeparam') is not -1:
                                 file.write('(parameters["input_path"]+"/'+sys+'/input_'+code+'.xml")')
                             else:
