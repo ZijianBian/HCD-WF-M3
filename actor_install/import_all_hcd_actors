@@ -15,7 +15,6 @@ args = vars(parser.parse_args())
 # Actor pool folder
 actor_pool_folder = args["actor_pool_folder"]
 os.popen('mkdir -p '+actor_pool_folder).read()
-os.popen('rm -f  '+actor_pool_folder+'/*.tar.gz').read()
 
 # MINIMAL LIST FOR PYTHON WORKFLOW
 minimal_list = ['empty_distribution_sources','empty_distributions','empty_waves','empty_core_sources','merge_distribution_sources','merge_distributions','merge_waves']
@@ -26,36 +25,47 @@ hcd_list = ['genray','iccoup','gray','tomcat','StixReDist','lion','Cyrano','nemo
 # EXTRA LIST FOR KEPLER WORKFLOW: ALL ACTORS HAVE TO BE COMPILED
 extra_list_for_kepler = ['core_sources_combiner','empty_core_profiles','merge_core_sources']
 
-sep = '-'*(26+len(actor_pool_folder))
+# 1) Minimal list
+sep = '-'*(28+len(actor_pool_folder))
 print(sep)
-print('Import actors to folder '+actor_pool_folder)
+print('Import actors from folder '+actor_pool_folder)
 print(sep)
 os.chdir(actor_pool_folder)
 print('--- Import minimal list of actors ---')
 print('---')
 for actor in minimal_list:
     print('--> Import '+actor)
+    os.popen('kepler_actor_rm '+actor).read()
     os.popen('kepler_actor_import '+actor+'.tar.gz').read()
 print('---')
 print('------> Minimal list of actors complete.')
 print(sep)
 
+# 2) HCD list
 print('--- Import list of H&CD actors ---')
 print('---')
 for actor in hcd_list:
     print('--> Import '+actor)
+    os.popen('kepler_actor_rm '+actor).read()
     os.popen('kepler_actor_import '+actor+'.tar.gz').read()
 print('---')
 print('------> List of H&CD actors complete.')
 print(sep)
 
+# 3 Kepler extra list
 print('--- Import extra actors needed for Kepler ---')
 print('---')
 for actor in extra_list_for_kepler:
     print('--> Import '+actor)
+    os.popen('kepler_actor_rm '+actor).read()
     os.popen('kepler_actor_import '+actor+'.tar.gz').read()
 print('---')
 print('------> List of extra actors needed for Kepler complete.')
 print(sep)
 
-print('ACTOR IMPORT COMPLETE.')
+print('Actor import complete.')
+
+print('... Now recompilating Kepler....')
+os.popen('kepler_recompile').read()
+
+print('Everything complete.')
