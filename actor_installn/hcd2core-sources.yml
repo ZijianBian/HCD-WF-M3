@@ -1,0 +1,20 @@
+#example
+---
+SOURCES:
+  - VCS:     git
+    REPO:    ssh://git@git.iter.org/heat/hcd2core-sources.git
+    VERSION: feature/disable_diag_info
+    DIR:     hcd2core-sources
+
+MODULES: []
+
+BUILDS: 
+  - DIR: hcd2core-sources
+    CMD: ./build.csh
+
+ACTORS: 
+  - DIR: hcd2core-sources
+    XML: fc2k/hcd2core_sources_nodiag.xml
+
+#COMMENTS:  
+...

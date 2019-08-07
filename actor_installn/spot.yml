@@ -1,0 +1,20 @@
+#example
+---
+SOURCES:
+  - VCS:     git
+    REPO:    ssh://git@git.iter.org/heat/spot.git
+    VERSION: hcd_python
+    DIR:     spot
+
+MODULES: [FRUIT/3.4.3-intel-2018a-Ruby-2.5.1, FRUIT_processor/3.4.3-intel-2018a-Ruby-2.5.1, interpos/8.2.1-ifort, PSPLINE/20181008-intel-2018a]
+
+BUILDS: 
+  - DIR: spot
+    CMD: ./build.sh
+
+ACTORS: 
+  - DIR: spot
+    XML: fc2k/spot_ids.xml
+
+#COMMENTS:  
+...

@@ -1,0 +1,20 @@
+#example
+---
+SOURCES:
+  - VCS:     git
+    REPO:    ssh://git@git.iter.org/heat/tomcat.git
+    VERSION: develop
+    DIR:     tomcat
+
+MODULES: [XMLlib/3.1.0-intel-2018a]
+
+BUILDS: 
+  - DIR: tomcat
+    CMD: ./build_imas.sh
+
+ACTORS: 
+  - DIR: tomcat
+    XML: fc2k/tomcat_ifort.xml
+
+#COMMENTS:  
+...

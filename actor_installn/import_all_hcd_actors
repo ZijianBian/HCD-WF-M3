@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+
+# ------------------------------------------------
+# PURPOSE: IMPORT ALL ACTORS OF THE H&CD WORKFLOW
+# ------------------------------------------------
+
+import os,argparse
+
+# Management of input arguments
+parser = argparse.ArgumentParser(description=\
+	 '---- Import all actors necessary to run the H&CD workflow')
+parser.add_argument('-d','--actor_pool_folder',help='folder where to store the imported actors', required=True)
+args = vars(parser.parse_args())
+
+# Actor pool folder
+actor_pool_folder = args["actor_pool_folder"]
+os.popen('mkdir -p '+actor_pool_folder).read()
+os.popen('rm -f  '+actor_pool_folder+'/*.tar.gz').read()
+
+# MINIMAL LIST FOR PYTHON WORKFLOW
+minimal_list = ['empty_distribution_sources','empty_distributions','empty_waves','empty_core_sources','merge_distribution_sources','merge_distributions','merge_waves']
+
+# LIST OF H&CD ACTORS FOR PYTHON WORKFLOW
+hcd_list = ['genray','iccoup','gray','tomcat','StixReDist','lion','Cyrano','nemo','bbnbi','spot','risk','ascot4serial','ascot4parallel','hcd2core_sources','hcd2core_profiles','afsi']
+
+# EXTRA LIST FOR KEPLER WORKFLOW: ALL ACTORS HAVE TO BE COMPILED
+extra_list_for_kepler = ['core_sources_combiner','empty_core_profiles','merge_core_sources']
+
+sep = '-'*(26+len(actor_pool_folder))
+print(sep)
+print('Import actors to folder '+actor_pool_folder)
+print(sep)
+os.chdir(actor_pool_folder)
+print('--- Import minimal list of actors ---')
+print('---')
+for actor in minimal_list:
+    print('--> Import '+actor)
+    os.popen('kepler_actor_import '+actor+'.tar.gz').read()
+print('---')
+print('------> Minimal list of actors complete.')
+print(sep)
+
+print('--- Import list of H&CD actors ---')
+print('---')
+for actor in hcd_list:
+    print('--> Import '+actor)
+    os.popen('kepler_actor_import '+actor+'.tar.gz').read()
+print('---')
+print('------> List of H&CD actors complete.')
+print(sep)
+
+print('--- Import extra actors needed for Kepler ---')
+print('---')
+for actor in extra_list_for_kepler:
+    print('--> Import '+actor)
+    os.popen('kepler_actor_import '+actor+'.tar.gz').read()
+print('---')
+print('------> List of extra actors needed for Kepler complete.')
+print(sep)
+
+print('ACTOR IMPORT COMPLETE.')

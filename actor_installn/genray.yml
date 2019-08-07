@@ -1,0 +1,21 @@
+#example
+---
+SOURCES:
+  - VCS:  git
+    REPO: ssh://git@git.iter.org/heat/genray.git
+    VERSION: hcd_python
+    DIR: genray
+
+MODULES: [interpos/8.2.1-ifort, XMLlib/3.1.0-intel-2018a]
+
+BUILDS: 
+  - DIR: genray
+    CMD: ./build.sh
+
+ACTORS: 
+  - DIR: genray
+    XML: fc2k_genray.xml
+
+#COMMENTS:  
+...
+  

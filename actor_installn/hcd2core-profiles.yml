@@ -1,0 +1,20 @@
+#example
+---
+SOURCES:
+  - VCS:     git
+    REPO:    ssh://git@git.iter.org/heat/hcd2core-profiles.git
+    VERSION: develop
+    DIR:     hcd2core-profiles
+
+MODULES: []
+
+BUILDS: 
+  - DIR: hcd2core-profiles
+    CMD: ./build.csh
+
+ACTORS: 
+  - DIR: hcd2core-profiles
+    XML: fc2k/hcd2core_profiles.xml
+
+#COMMENTS:  
+...

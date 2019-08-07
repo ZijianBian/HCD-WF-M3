@@ -1,0 +1,20 @@
+#example
+---
+SOURCES:
+  - VCS:  git
+    REPO: ssh://git@git.iter.org/heat/cyrano.git
+    VERSION: develop
+    DIR: cyrano
+
+MODULES: []
+
+BUILDS: 
+  - DIR: cyrano
+    CMD: ./build_imas.sh
+
+ACTORS: 
+  - DIR: cyrano
+    XML: fc2k/Cyrano_imas.xml
+
+#COMMENTS:  
+...

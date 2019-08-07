@@ -1,0 +1,25 @@
+#example
+---
+SOURCES:
+  - VCS:     git
+    REPO:    ssh://git@git.iter.org/traj/ascot.git
+    VERSION: develop
+    DIR:     ascot
+
+MODULES: [XMLlib/3.1.0-intel-2018a]
+
+BUILDS: 
+  - DIR: ascot
+    CMD: ./build_imas.sh
+
+ACTORS: 
+  - DIR: ascot
+    XML: 
+      - fc2k_imas/afsi.xml
+      - fc2k_imas/ascot4parallel.xml
+      - fc2k_imas/ascot4serial.xml
+      - fc2k_imas/bbnbi.xml
+
+#COMMENTS:  
+...
+

@@ -1,0 +1,29 @@
+#example
+---
+SOURCES:
+  - VCS:     git
+    REPO:    ssh://git@git.iter.org/imex/ids-tools.git
+    VERSION: develop
+    DIR:    ids-tools
+
+MODULES: []
+
+BUILDS: 
+  - DIR: ids-tools
+    CMD: ./build.sh
+
+ACTORS: 
+  - DIR: ids-tools
+    XML: 
+      - empty_IDSs/fc2k/empty_core_profiles.xml
+      - empty_IDSs/fc2k/empty_core_sources.xml
+      - empty_IDSs/fc2k/empty_distributions.xml
+      - empty_IDSs/fc2k/empty_distribution_sources.xml
+      - empty_IDSs/fc2k/empty_waves.xml
+      - mergers/fc2k/merge_core_sources.xml
+      - mergers/fc2k/merge_distribution_sources.xml
+      - mergers/fc2k/merge_distributions.xml
+      - mergers/fc2k/merge_waves.xml
+
+#COMMENTS: |
+...
