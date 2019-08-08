@@ -1,6 +1,6 @@
 import os, imas, sys, copy
 from set_md_from_pulse_schedule import set_md_from_pulse_schedule
-#import generate_actors
+import generate_actors
 import auto_hcd_actors as act
 
 actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
