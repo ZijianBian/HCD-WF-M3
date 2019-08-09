@@ -1,278 +1,160 @@
-import sys, os
+import os, sys
 sys.path.append('interface')
 sys.path.append('workflow')
 sys.path.append(os.getcwd())
-from tkinter import *
-from tkinter import filedialog, messagebox, ttk
-from shutil import copy2, rmtree
-from lxml import *
+
+from tkinter import * 
+from tkinter import filedialog, ttk
 from lxml import etree
-from hcd_wrapper import hcd_wrapper 
-from hover_class import *
 from datetime import datetime
+from create_maindict import create_maindict
+from create_workflow_param import create_workflow_param_from_file
+from hover_class import *
+from hcd_wrapper import hcd_wrapper
+from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
 
-from developer_file import load_code_dependencies
-
-#---------------------------------------------------------------------------------------------
-##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
-
-actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
-
-ids_list = ['core_profiles','core_sourcres','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
-
-def read_inputoutput(name):
-
-    in_l = []
-    out_l = []
-    try:
-        sys.path[:0] = [os.path.join(actor_path,name)]
-        globals()[name] = getattr(__import__(name), name)
-        
-        parstr = globals()[name].__doc__
-        
-        for iids in ids_list:
-            if parstr.find(':param '+iids) is not -1:
-                in_l.append(iids)
-            if parstr.find(':param result: '+iids) is not -1:
-                out_l.append(iids)
-    except:
-        print(name, 'not compiled')
-        
-    return(in_l, out_l)
-
-tree = etree.parse('input_workflow_default.xml')
-root = tree.getroot()
-
-maindict = {}
-
-for step in root[2]:
-    dict3 = {}
-    for isys in step:
-        dict2 = {}
-        for icat in isys:
-            dict1 = {}
-            if icat.tag is not etree.Comment:
-                for icode in icat.attrib['list'].split():
-                    (in_l, out_l) = read_inputoutput(icode)
-                    dict1[icode] = [in_l, out_l]
-                dict2[icat.tag] = [dict1, icat.text]
-        dict3[isys.tag] = dict2
-    maindict[step.tag] = dict3
-
-# ---------------------------------------------------------------------------------------------
-# set the path to the folders where the configuration and codeparameters are stored
-    
-run_config_folder = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
-workflow_param = run_config_folder+ '/input_workflow.xml'
-
-os.makedirs(run_config_folder)
-for systemname in maindict['systems']:
-    os.makedirs(run_config_folder+'/'+systemname)
-
-copy2('input_workflow_default.xml', run_config_folder+'/input_workflow.xml', follow_symlinks=True)
-        
-
-## ------------------------------------------------------------------------------------------
 ## set a few standard colors to call later
 c1 = 'white'
 c2 = 'white smoke'
-c3 = 'navajo white'
+c3 = 'azure2'
 c4 = 'ghost white'
 c5 = 'azure4'
-
 cb = 'LavenderBlush3'
-c_arr=['red', 'blue','yellow','green']
 
-##---------------------------------------------------------------------------------------------
-## CREATE BASIC GUI to be filled later: 
 
+default_workflow_param_path = 'input_workflow_default.xml'
+
+## create mainwindow
 window = Tk()
 window.title('HCD WORKFLOW')
 window.configure(bg = c1)
 #window.geometry("1300x800")
 #window.resizable(0,1)
 
-fr_wfp = Frame(window, width = 300, height = 10000, background = c3)
-fr_wfp.grid(row = 0, column = 0, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
-
-fr_as = Frame(window, width = 10000, height = 10000, background = c1)
-fr_as.grid(row = 0, column = 1, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
-
-fr_fc = Frame(window, width = 100, height = 100, background = c1)
-fr_fc.grid(row = 0, column = 2, sticky = 'news', padx = 3, pady = 3)
-fr_fc.grid_remove()
-
-old_fr = fr_fc
-
-wfpdict = {}
-codedict = {}
-
-## the load_parameters() function is called at the very end of the script. 
-def load_parameters(workflow_param):
-    load_wf_param(workflow_param)      
-    load_actor_select(workflow_param)
 
 
-#_________________________________________________________________________________________________________________________________________
+def open_gui(input_filepath):
 
+    run_config_folder_path  = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
+    run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
 
-def load_wf_param(workflow_param):
+    (maindict, actor_path) = create_maindict(input_filepath)
+    workflow_param = create_workflow_param_from_file(input_filepath)
 
-    # DEFINE THE FUNCTIONS WHICH WILL BE USED IN THE REST OF LOAD_WF_PARAM:
-    def savechanges(pval, ptag):   #saves a new value of one of the workflow parameters to the workflow-parameter dictionary
-        wfpdict[ptag] = pval.get()
-
-
-
-    def save_wfp_to_file(tree, root, workflow_param):
+    ### setup 
+    if not os.path.exists(run_config_folder_path):
+        for systemname in maindict[list(maindict.keys())[0]]:
+            os.makedirs(run_config_folder_path+'/'+systemname)
+            copy2(input_filepath, run_workflow_param_path, follow_symlinks=True)
  
-        i = 0
-        for iroot in range(2):
-            for elem in root[iroot].iter():
-                if((elem.tag is not etree.Comment) and (len(elem) == 0)):
-                    elem.text = wfpdict[elem.tag]
-                    i = i+1  
+    fr_wfp = Frame(window, width = 300, height = 10000, background = c3)
+    fr_wfp.grid(row = 0, column = 0, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
 
-        for elem in root[2][0].iter():
-            if((elem.tag is not etree.Comment) and (len(elem) == 0)):
-                elem.text = str(codedict[elem.tag])
+    fr_as = Frame(window, width = 10000, height = 10000, background = c1)
+    fr_as.grid(row = 0, column = 1, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
+
+    fr_fc = Frame(window, width = 100, height = 100, background = c1)
+    fr_fc.grid(row = 0, column = 2, sticky = 'news', padx = 3, pady = 3)
+    fr_fc.grid_remove()
+    
+    old_Fr = fr_fc
+
+    ## abbreviations for the keys - makes it easier to change them in the xml file
+    wfp_ref = list(workflow_param.keys())[0]
+    fur_ref = list(workflow_param.keys())[1]
+    cod_ref = list(workflow_param.keys())[2]
+
+    actors_ref = list(maindict.keys())[0]
+    make_core_ref = list(maindict.keys())[1]
+
+
+    ## LEFT - CONFIGURING THE WORKFLOW PARAMETERS
+    irow = 0
+    for ref in [wfp_ref, fur_ref]:
         
+        Label(fr_wfp, text = ref, bg = c3, font = '15').grid(row = irow, column = 0, columnspan = 3, pady = 10, padx = 5, sticky = 'we')
+        irow += 1
 
-        tree.write(workflow_param)
- 
-        
-        ## ---------------------- create_directories()
-
-
-
-        #COPY ALL XML FILES THAT WILL BE USED TO THE LOCAL FOLDER TO CALL THEM FROM THERE DURING THE RUN
-        for cursys in maindict['systems']:
-            for cat in maindict['systems'][cursys]:
-                if int(maindict['systems'][cursys][cat][1]) is not 0:
-                    curval = list(maindict['systems'][cursys][cat][0])[int(maindict['systems'][cursys][cat][1])-1]
-                    
-                    try:
-                        for file in os.listdir(actor_path+'/'+curval ):
-                            if file.endswith(".xml") and (not 'default' in file):
-                                src_file = os.path.join(actor_path+'/'+curval, file)
-                                dest_file = os.path.join(run_config_folder+'/'+cursys+'/input_'+curval+'.xml')
-
-                                if not os.path.exists(dest_file):
-                                    copy2(src_file, dest_file, follow_symlinks=True)
-                    except:
-                        print('You selected '+ curval +', but it seems this actor is not compiled. Please change your selection or compile '+ curval +' before running!')
-                        sys.exit(1)
-
-        copy2(run_config_folder+'/input_workflow.xml','input_workflow_default.xml', follow_symlinks=True)
-                            
-    def save_wfp_and_run(tree, root, workflow_param, save_yn):
-        
-        def check_if_code_fulfills_configuration(cat, code):
-            if dependencies[cat] is not None and code in dependencies[cat]: 
-                
-                    fulfills_all_dependencies = [1] * (len(dependencies[cat][code]))
-                    j = 0
-
-                    for dep in dependencies[cat][code]:
-
-                        
-                        for i in dep.keys():
-
-
-                            if 'any'in str(dep[i]) and codedict_names[i] is not None:
-                                pass
-                            elif str(dep[i]).find(str(codedict_names[i]))is not -1:
-                                pass
-                            else:
-                                print('this is not a valid configuration for '+ code.upper() + ' please change the selection of your actors and try again')
-                                sys.exit()
-                                
-
-        #---- end of check if code fulfills configuration 
-
-
-        ## load the list of codedependencies from the developer file
-        dependencies = load_code_dependencies()
-        
-        ## get code name here - the codedict only contains the assigned numbers, but here it will be easier to deal with the actual names of the code 
-
-
-        codedict_names = codedict.copy()
-
-        for n in codedict: 
-            for j in maindict:
-                for jj  in maindict[j]: 
-  
-                    try:
-                        codelist = [None] + list(maindict[j][jj][n][0])
-                        curval = codelist[codedict[n]]
-                        codedict_names[n] = curval
-                        
-                    except:
-                        pass
-
-
-        for entry in codedict_names:
-            if codedict_names is not None:
-                check_if_code_fulfills_configuration(entry, codedict_names[entry])
-        
-                        
-        save_wfp_to_file(tree, root, workflow_param)
-        window.destroy()
-        hcd_wrapper(run_config_folder)
-        if save_yn == 0:
-            rmtree(run_config_folder)
+        for elem in workflow_param[ref]:        
             
-        
+            Label(fr_wfp, text = elem, bg = c3).grid(row = irow,  column = 0, padx = 3, pady = 2, sticky = 'w')
 
-    # BEGINNING OF THE ACTUAL LOAD_WF_PARAM FUNCTION
-    tree = etree.parse(workflow_param)
-    root = tree.getroot()
+            entrystring = StringVar()
+            entrystring.set(workflow_param[ref][elem])
+            entrystring.trace('w', lambda name, index, mode, elem = elem, entrystring = entrystring, ref = ref: update_workflow_param(ref, elem, entrystring.get()))                      # if an entry is changed, the new values should immediately be changed in the workflow_param dictionary
+            Entry(fr_wfp, textvariable = entrystring, bg = c1).grid(row = irow, column = 1, padx = 3, pady = 2, sticky = 'e')
+            irow += 1
+
+
+    ## MIDDLE - SELECTING THE ACTORS
     rrow = 0
 
-    for root_nr in range(2):
-        lf = Label(fr_wfp, text = root[root_nr].attrib['display'], bg = c3 , font = '15')
-        lf.grid(row = rrow, column = 0, columnspan = 3, pady = 10, padx = 5, sticky = 'we')
-        rrow += 1
-            
-        for param in root[root_nr].iter():
-            if param.tag is not etree.Comment and len(param) == 0:
+    for ref in [actors_ref, make_core_ref]:
+        
+        for hsys in maindict[ref]:
+            Label(fr_as, text = hsys, bg = c1, font = '15').grid(row = rrow, column = 0, columnspan = 2, sticky = 'ew')
+            rrow += 1
 
-                wfpdict[param.tag.strip()] = param.text.strip()
-               
-                Label(fr_wfp,text = param.tag.strip(), bg = c3).grid(row = rrow, column = 0, padx = 10, sticky = 'w')
-                pval = StringVar()
-                pval.set(param.text.strip())
-
-                if param.tag.find('input_path') is not -1:
-                    pval.set(run_config_folder)
-
-
-                e=Entry(fr_wfp,textvariable = pval, bg = c1)
-                e.grid(row = rrow, column = 1, padx = 10, sticky = 'e')
-                pval.trace('w', lambda name, index, mode, ptag = param.tag.strip(), pval = pval: savechanges(pval, ptag))
+            for cat in maindict[ref][hsys]:
+                Label(fr_as, text = cat, bg = c1,anchor=W, justify=LEFT).grid(row = rrow, column = 0, sticky = W)
+                cb = ttk.Combobox(fr_as, value = ['']+list(maindict[ref][hsys][cat]))
+                cb.grid(row = rrow, column = 1, padx = 20, pady = 5, sticky = 'ew')
+                cb.current(workflow_param[cod_ref][cat])
+                cb.bind('<<ComboboxSelected>>', lambda event, cat = cat, cb = cb: update_workflow_param(cod_ref, cat, str(cb.current())))
                 rrow += 1
 
-                
-                
-    Button(fr_wfp, text = 'Save Changes', bg = c2, command = lambda root = root: save_wfp_to_file(tree, root,workflow_param)).grid(row = rrow+10, column = 0, pady =(20,3), padx = 5, sticky = 'ew')
-    Button(fr_wfp, text = 'Load Parameters',bg = c2, command = lambda: load_parameters(filedialog.askdirectory()+'/input_workflow.xml')).grid(row = rrow+10, column = 1, pady = (20,3), padx = 5, sticky = 'ew')
-    Button(fr_wfp, text = 'Save and Run',bg = c2, command = lambda root = root, save_yn = 1: save_wfp_and_run(tree, root, workflow_param, save_yn)).grid(row = rrow+ 11, column = 0, pady = (3,10), padx = 5, sticky = 'ew')
-    Button(fr_wfp, text = 'Run (without saving configuration)', bg = c2 , command = lambda root = root, save_yn = 0: save_wfp_and_run(tree, root, workflow_param, save_yn)).grid(row = rrow+ 11, column = 1, pady = (3,10), padx = 5, sticky = 'ew')
+
+            
+
+
+    ## RIGHT - FLOWCHART 
+    
+
+
+    ## BUTTONS 
+    
+    # left: 
+    button_saveconfig = Button(fr_wfp, text = 'Save Configuration', bg = c2)
+    button_saveconfig.grid(row = 52, column = 0, padx = 5, pady = 5, sticky = 'ew')
+    button_saveconfig.configure(command = lambda: save_workflow_param_to_file(run_workflow_param_path))
+    # save xml to the run folder
+    button_loadconfig = Button(fr_wfp, text = 'Load Configuration', bg = c2)
+    button_loadconfig.grid(row = 52, column = 1, padx = 5, pady = 5, sticky = 'ew')
+    button_loadconfig.configure(command = lambda: load_configuration_from_file(filedialog.askopenfilename()))
+
+    button_saveandrun = Button(fr_wfp, text = 'Save and Run', bg = c2)
+    button_saveandrun.grid(row = 51, column = 0, padx = 5, pady = 5, sticky = 'ew')
+    button_saveandrun.configure(command = lambda: save_and_run(run_workflow_param_path, True))
+
+
+    button_run_nosave = Button(fr_wfp, text = 'Run (without Saving)', bg = c2)
+    button_run_nosave.grid(row = 51, column = 1, padx = 5, pady = 5, sticky = 'ew')
+    button_run_nosave.configure(command = lambda: save_and_run(run_workflow_param_path, False))
+
+    button_save_asdef = Button(fr_wfp, text = 'Save Configuration as Default', bg = c2)
+    button_save_asdef.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
+    button_save_asdef.configure(command = lambda: save_workflow_param_to_file('input_workflow_default.xml'))
+
+    # middle: 
+    button_create_flowchart = Button(fr_as, text = 'Show Flowchart', bg = c2)
+    button_create_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
+    old_fr = fr_fc
+    button_create_flowchart.configure(command = lambda: make_flowchart(old_fr, window, maindict, c1, c2, c3, c4,c5))
+
+    button_edit_codeparameters = Button(fr_as, text = 'Edit Codeparameters', bg = c2)
+    button_edit_codeparameters.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
+    button_edit_codeparameters.configure(command = lambda: edit_codeparam())
 
 
 
-def updatevalue(choice, sys, cat, cb):  #saves the actor selection in e maindict
-    maindict[choice][sys][cat][1] = cb.current()
-    codedict[cat] = cb.current()
 
-def load_actor_select(workflow_param): 
-    def call_edit_codeparam():
+    ## MANAGE XML FILES
+    def edit_codeparam():
         cp_top = Toplevel()
         cp_top.title('Edit Code Parameters')
         cp_top.geometry('500x700')
-    
+
         fr_ab = Frame(cp_top, width = 200, height = 500, bg = c4)
         fr_ab.grid(row = 0, column = 0, rowspan = 2, sticky = 'ns')
         fr_main = Frame(cp_top, width = 500, height = 1500, bg = c1)
@@ -280,45 +162,64 @@ def load_actor_select(workflow_param):
         prev_frame = fr_main
         fr_top = Frame(cp_top, width = 500, height = 50, bg = c2) 
         fr_top.grid(row = 0, column =1, sticky = 'ew')
-        cparm_dict = {}
+        
+        for hsys in maindict[actors_ref]:
+            la_sys = Label(fr_ab, text = hsys, bg = c4)
+            for cat in maindict[actors_ref][hsys]:
+                if int(workflow_param[cod_ref][cat]) is not 0:
+                    la_sys.grid(padx = 5, pady = 5, sticky = 'ew')
 
-
-
-        for sys in maindict['systems']:
-            lsys = Label(fr_ab, text = sys, bg = c4)
-            for cat in maindict['systems'][sys]:
-                if int(maindict['systems'][sys][cat][1]) is not 0:
-                    lsys.grid(padx = 5, pady = 5, sticky = 'ew')
-                    curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
-                    Button(fr_ab, text = curval, bg = c2, command = lambda sys = sys, cat = cat: make_frame(sys,cat, prev_frame) ).grid(padx = 5, pady = 5, sticky = 'ew')
-
-        def make_frame(sys,cat, prev_frame):
+                    
+                    curval = list(maindict[actors_ref][hsys][cat].keys())[int(workflow_param[cod_ref][cat])-1]
+                    Button(fr_ab, text = curval, bg = c2, command = lambda actor_name = curval, hsys = hsys: make_frame(hsys, actor_name, prev_frame, False) ).grid(padx = 5, pady = 5, sticky = 'ew')                                                             
+                                                                    
+        def make_frame(hsys, actor_name,  prev_frame, is_load_default_from_kepler):
             prev_frame.grid_remove()
             prev_frame.grid_forget()
+
             fr = Frame(cp_top, width = 500, height = 1500, bg = c1)
             prev_frame = fr
             fr.grid(row = 1, column =1, sticky = 'nswe')
             fr.grid_propagate(0)
 
-            instr = StringVar()
-            curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
-            instr_xsd = StringVar()
+            codeparam_xml_path = StringVar()
+            codeparam_xsd_path = StringVar()
+        
+            ## name of the codeparam file in the run_config_folder
+            dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')
+            
+            actor_python_script = actor_path+'/'+actor_name+'/'+actor_name+'.py'
+            found_xml = False
+            found_xsd = False
 
 
-            instr.trace('w', lambda name, index, mode, fr = fr: changed_val(fr, instr.get(), instr_xsd.get(), curval))
-        #    instr_xsd.trace('w', lambda name, index, mode, fr=fr: changed_val(fr, instr.get(), instr_xsd.get(), curval))
+
+            with open(actor_python_script) as pfile:
+
+                for iline in pfile:
+                    if ('xml_location = ' in iline) and ('_default_xml_location' not in iline):
+                        ## check if there already is a version of the xml file for this actor - this could be put outside of the loop for reading the file, but the code is shorter this way, it shouldnt be too confusing i hope 
+                        if os.path.exists(dest_file) and is_load_default_from_kepler is False: 
+                            ## if yes, use that one as xml 
+                            codeparam_xml_path.set(dest_file)
+                        else:
+                            ## if not, OR it is supposed to load the default, use the one we just found 
+                            codeparam_xml_path.set(iline[17:-2])
+                            copy2(codeparam_xml_path.get(), dest_file, follow_symlinks=True) # copy the one stored in the kepler folder to the current runfolder necessary for saving the changes later
+                        found_xml = True
+
+                    if 'xsd_location = ' in iline:
+                        codeparam_xsd_path.set(iline[17:-2])
+                        found_xsd = True
+                    if found_xml == True and found_xsd == True:
+                        break
+
+            
 
 
-            for file in os.listdir(actor_path+'/'+curval ):
-                if file.endswith(".xml") and (not 'default' in file):
-                    instr.set(os.path.join(actor_path+'/'+curval, file))
-                if file.endswith('.xsd'):
-                    instr_xsd.set(os.path.join(actor_path+'/'+curval, file))
-
-
-        def changed_val(fra, cpar, xsdpath, curval):
+            #### read the additional information from the xsd file 
             try:
-                xmlschema_doc = etree.parse(xsdpath)
+                xmlschema_doc = etree.parse(codeparam_xsd_path.get())
                 root_xsd = xmlschema_doc.getroot()
                 xmlschema = etree.XMLSchema(xmlschema_doc)
                 docum_dict = {}
@@ -330,98 +231,132 @@ def load_actor_select(workflow_param):
             except:
                 docum_dict = {}
 
-            fra.grid_remove()
-            fra.grid_forget()
-            fra = Frame(cp_top, width = 500, height = 1500, bg = c1)
-            fra.grid(row = 1, column = 1, sticky = 'nswe')
-            fra.grid_propagate(0)
-
-            tree = etree.parse(cpar)        
+            ### load the list of code parameters, create the labels and entries
+            tree = etree.parse(codeparam_xml_path.get())        
             root = tree.getroot()
+       #     fr.grid_remove()
+       #     fr.grid_forget()
+       #     fr = Frame(cp_top, width = 500, height = 1500, bg = c1)
+       #     fr.grid(row = 1, column = 1, sticky = 'nswe')
+       #     fr.grid_propagate(0)
+
             rrow = 1
             ccolumn = 0
-            
+            codeparam_dict = {}
+
             for elem in root.iter():
                 if ((elem.tag is not etree.Comment) and (len(elem) == 0)):
-                    l = Label(fra, text = elem.tag.strip(), bg = c1)
+                    l = Label(fr, text = elem.tag.strip(), bg = c1)
                     l.grid(row = rrow, column = ccolumn)
-                    evar = StringVar()
-                    evar.set(elem.text.strip())
-                    e = Entry(fra, textvar = evar, bg = c1)
+
+                    entrystring = StringVar()
+                    entrystring.set(elem.text.strip())
+                    e = Entry(fr, textvar = entrystring, bg = c1)
                     e.grid(row = rrow, column = ccolumn+1, padx = 3, pady = 3)
-
-                    cparm_dict[elem.tag] = evar.get()
-
-                    evar.trace('w', lambda name, index, mode, elem = elem.tag, evar = evar: change_in_par(cparm_dict, elem, evar))
-
+                    codeparam_dict[elem.tag] = entrystring.get()
+                    
+                    entrystring.trace('w', lambda name, index, mode, elem = elem.tag, entrystring = entrystring: update_codeparam_dict(elem, entrystring.get()))
+    
+                   
                     try:
-                        CreateToolTip(l, docum_dict[l.cget('text')])
+                         CreateToolTip(l, docum_dict[l.cget('text')])
                     except:
                         pass 
 
+                    def update_codeparam_dict(elem, newvalue): 
+                        codeparam_dict[elem] = newvalue
+                       
+                    
                     rrow +=1 
-                    if rrow > 30:
+                    if rrow > 30:  ## if there are more than 30 entries start a new column
                         ccolumn += 2
                         rrow = 1
-                        fra.grid_propagate(1)
+                        fr.grid_propagate(1)
 
-            Button(fr_top, text = 'save', command = lambda: save_codeparam(cparm_dict, tree, root, curval)).grid(row = 1, column = 1, padx = 5, pady = 5, columnspan = 5)
+            Button(fr_top, text = 'save', bg = c2,  command = lambda: save_codeparam_to_file(dest_file, codeparam_dict)).grid(row = 0 ,column = 1, padx = 5, pady = 5)
+            Button(fr_top, text = 'load default', bg = c2, command = lambda: make_frame(hsys, actor_name,  prev_frame, True)).grid(row = 0, column =2, padx = 5, pady = 5)
+                    
 
 
-        def change_in_par(cparm_dict, elem, evar):
-            cparm_dict[elem] = evar.get()
+    ## FUNCTIONS - SAVING & UPDATING
 
-    def save_codeparam(cparm_dict, tree, root, curval):
 
+    def update_workflow_param(ref, elem, newvalue):
+        workflow_param[ref][elem] = newvalue
+      
+        
+    def save_workflow_param_to_file(filepath):
+
+       ## COPY 
+        ## for all the active actors
+        for hsys in maindict[actors_ref]:
+            for cat in maindict[actors_ref][hsys]:
+                if int(workflow_param[cod_ref][cat]) is not 0:
+                    actor_name = list(maindict[actors_ref][hsys][cat].keys())[int(workflow_param[cod_ref][cat])-1]
+                    # get xml path from actor.py 
+                    
+                    dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')
+                    if not os.path.exists(dest_file):
+                        actor_python_script = actor_path+'/'+actor_name+'/'+actor_name+'.py'
+                        found_xml = False
+                        found_xsd = False
+
+                        with open(actor_python_script) as pfile:
+
+                            for iline in pfile:
+                                if ('xml_location = ' in iline) and ('_default_xml_location' not in iline):
+                                    path_to_kepler_xml_location = iline[17:-2]
+                                    copy2(path_to_kepler_xml_location, dest_file, follow_symlinks=True)
+              
+                                    break
+
+
+        tree = etree.parse(filepath)
+        root = tree.getroot()
+        
+        rl = [wfp_ref, fur_ref, cod_ref]
+        
+        for iroot in range(3):
+            for elem in root[iroot].iter():
+                if((elem.tag is not etree.Comment) and (len(elem) == 0)):
+
+                   elem.text = workflow_param[rl[iroot]][elem.tag]
+                   
+        tree.write(filepath)
+
+    def save_and_run(filepath, save_yn):
+                
+        save_workflow_param_to_file(filepath)
+        window.destroy()
+        hcd_wrapper(run_config_folder_path)
+
+        if save_yn == 0:
+            rmtree(run_config_folder)
+
+    def load_configuration_from_file(filepath):
+
+        source_folder = filepath[:-19]
+
+        rmtree(run_config_folder_path)
+        copytree(source_folder, run_config_folder_path)
+
+        open_gui(filepath)
+
+        
+
+    def save_codeparam_to_file(filepath, codeparam_dict):
+
+        tree = etree.parse(filepath)
+        root = tree.getroot()
         
         for elem in root.iter():
             if((elem.tag is not etree.Comment) and (len(elem) == 0)):
-                elem.text = cparm_dict[elem.tag]
+               elem.text = codeparam_dict[elem.tag]
+        pass
+        
+        tree.write(filepath)
 
-        tree.write(run_config_folder+'/'+systemname+'/input_'+curval+'.xml')
-
-
-    # BEGINNING OF THE ACTUAL ACTOR SELECT FUNCTION:
-    tree = etree.parse(workflow_param)
-    root = tree.getroot()
-    rrow = 0
-
-    for sys in maindict['systems']:
-        Label(fr_as, text = sys, bg = c1, font = '15').grid(row = rrow, column = 0, columnspan =2, sticky = 'ew')
-        rrow += 1
-        for cat in maindict['systems'][sys]:
-            Label(fr_as, text = cat, bg = c1,anchor=W, justify=LEFT).grid(row = rrow, column = 0, sticky = W)
-            cb = ttk.Combobox(fr_as, value = ['']+list(maindict['systems'][sys][cat][0]))
-            cb.current(int(maindict['systems'][sys][cat][1]))
-            codedict[cat] = cb.current()
-            cb.grid(row = rrow, column = 1, padx = 20, pady = 5, sticky = 'we')
-            cb.bind('<<ComboboxSelected>>', lambda event, sys = sys, cat = cat, cb = cb: updatevalue('systems', sys, cat, cb))
-            rrow += 1
-
-    for sys in maindict['post_process']:
-        Label(fr_as, text = sys, bg = c1, font = '15').grid(row = rrow, column = 0, columnspan =2, sticky = 'ew')
-        rrow += 1
-        for cat in maindict['post_process'][sys]:
-            Label(fr_as, text = cat, bg = c1,anchor=W, justify=LEFT).grid(row = rrow, column = 0, sticky = W)
-            cb = ttk.Combobox(fr_as, value = ['']+list(maindict['post_process'][sys][cat][0]))
-            cb.current(int(maindict['post_process'][sys][cat][1]))
-            codedict[cat] = cb.current()
-            cb.grid(row = rrow, column = 1, padx = 20, pady = 5, sticky = 'we')
-            cb.bind('<<ComboboxSelected>>', lambda event, sys = sys, cat = cat, cb = cb: updatevalue('post_process', sys, cat, cb))
-            rrow += 1
-    
-
-  #  for sys in maindict['make']
-
-    Button(fr_as, text = 'edit codeparameters',bg = c2, command = lambda: call_edit_codeparam()).grid(row = rrow, columnspan = 2, pady = 5) 
-  #  Button(fr_as, text = 'create flowchart', bg = c2).grid(row = rrow +1, columnspan = 2, pady = 5)
-    Button(fr_as, text = 'create flowchart', bg = c2, command = lambda: make_flowchart(old_fr, window, maindict, c1, c2, c3, c4,c5)).grid(row = rrow +1, columnspan = 2, pady = 5)
+    window.mainloop()
 
 
-
-#--------------------------------------------------------------------------------------------------------------------------
-
-load_parameters(workflow_param)
-
-
-window.mainloop()
+open_gui(default_workflow_param_path)

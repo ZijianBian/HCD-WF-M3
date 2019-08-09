@@ -2,8 +2,14 @@
 def hcd_wrapper(par_path):
 
   import os,imas,sys, copy
+  sys.path.append('interface')
+  sys.path.append('workflow')
+  sys.path.append(os.getcwd())
   from hcd_workflow  import hcd_workflow
   import xml.etree.ElementTree as ET
+  from developer_file import load_code_dependencies
+  from check_for_dependencies import check_for_dependencies
+
 
   # IMPORT PARAMETERS FROM XML --------------------------------------
   
@@ -32,6 +38,10 @@ def hcd_wrapper(par_path):
   timearr = []
   if param['tbegin'] == 0:   
     timearr = core_profiles0.time
+
+  ## CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
+  dependencies = load_code_dependencies()
+  check_for_dependencies(root, dependencies)
 
 
   # MAKE IDS BUNDLE --------------------------------------------------
@@ -87,14 +97,17 @@ def hcd_wrapper(par_path):
      
       print('Time =         ', timenow, 's')
       print('dt =           ', param['dt_required'], 's')
-      
+
+           
       
       print('entering heating & current drive workflow')
-
       ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
+
+
       
-#      if param['run_simpletrans']:
-#           ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
+      if param['run_simpletrans']:
+           ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
+    
 
 
       print('prepare ids bundle for next timestep')

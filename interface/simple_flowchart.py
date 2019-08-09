@@ -9,8 +9,6 @@ cb = 'LavenderBlush3'
 c_arr=['red', 'blue','yellow','green']
 
 
-
-
 def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
 #--------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------
@@ -126,17 +124,17 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
 
 
     ## CREATE BASIC LAYOUT FOR THE FLOWCHART)
-    initla = Label(base, bg = c2, text = 'INITIALIZING', font = '16')
+    initla = Label(base, bg = c2, text = 'INITIALIZING', font = '14', relief = 'solid', pady = 5, width = 25)
     initfr = Canvas(base, bg = c1, height = 1)
-    hcdla  = Label(base, bg = c2, text = 'H&CD', font = '16')
+    hcdla  = Label(base, bg = c2, text = 'H&CD', font = '14', relief = 'solid', pady = 5)
     hcdfr  = Canvas(base, bg = c1, height = 1)
-    mergela = Label(base, bg = c2, text = 'MERGING', font = '16')
+    mergela = Label(base, bg = c2, text = 'MERGING', font = '14', relief = 'solid', pady = 5)
     mergefr = Canvas(base, bg = c1, height = 1)
-    corela  = Label(base, bg = c2, text = 'MAKE CORE IDS', font = '16')
+    corela  = Label(base, bg = c2, text = 'MAKE CORE IDS', font = '14', relief = 'solid', pady = 5)
     corefr  = Canvas(base, bg = c1, height = 1)
-    tcontla = Label(base, bg = c2, text = 'CONTROL BLOCK FOR TIMELOOP', font = '16')
+    tcontla = Label(base, bg = c2, text = 'CONTROL BLOCK FOR TIMELOOP', font = '14', relief = 'solid', pady = 5)
     tcontfr = Canvas(base, bg = c1, height = 1)
-    finalla = Label(base, bg = c2, text = 'FINALISING', font = '16')
+    finalla = Label(base, bg = c2, text = 'FINALISING', font = '14', relief = 'solid', pady = 5)
     finalfr = Canvas(base, bg = c1, height = 1)
 
     conn_list.append([initla, 's', hcdla, 'n', False,  1, 1])
@@ -158,7 +156,7 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     mergefr.grid(row = 8, column = 1)
     mergela.bind('<Button-1>', lambda event: click_labels('l', mergela, mergefr, base, conn_list))
     mergefr.bind('<Button-1>', lambda event: click_labels('f',mergela, mergefr, base, conn_list))
-        
+    mergefr.grid_remove()    
     base.rowconfigure(9, minsize = 20)
     corela.grid(row = 10, column = 1, sticky = 'ew')
     corefr.grid(row = 11, column = 1)
@@ -168,6 +166,9 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     base.rowconfigure(12, minsize = 20)
     tcontla.grid(row = 13, column = 1, sticky = 'ew')
     tcontfr.grid(row = 14, column = 1, sticky = 'ew')
+    tcontla.bind('<Button-1>', lambda event: click_labels('l', tcontla,tcontfr,  base, conn_list))
+    tcontfr.bind('<Button-1>', lambda event: click_labels('f',  tcontla,tcontfr, base, conn_list))
+    tcontfr.grid_remove()
     base.rowconfigure(15, minsize = 20)
     finalla.grid(row = 16, column = 1, sticky = 'ew')
     finalfr.grid(row = 17, column = 1, sticky = 'ew')
@@ -254,12 +255,15 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     merge_distribution_sources = 0
 
     conn_list_merge = []
+    conn_list_merge_others = []
     ccol = 1
     inv = {}
 
     invrow = Frame(mergefr, bg = c1)
     invrow.grid(row = 1, column = 1)
     isys = -1
+    inv_bot = Frame(mergefr, height = 1, width = 1, bg = c1)
+    inv_bot.grid(row = 50, column = 0, columnspan = 50)
 
     for sys in maindict['systems']:
         if sum([int(maindict['systems'][sys][i][1]) for i in maindict['systems'][sys]]) is not 0:
@@ -303,6 +307,9 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
             conn_list_merge.append([inv['NUCLEAR'], mdist])
         if 'ICRH' in inv:
             conn_list_merge.append([inv['ICRH'], mdist])
+        
+        conn_list_merge.append([mdist, inv_bot])
+      #  conn_list_merge_others.append([mdist, 's', inv_bot, 'n',True, 1, 1])
 
     if merge_distribution_sources > 1:
         msour = Label(labelrow, text = 'merge sources', bg = c4, relief = 'solid')
@@ -310,6 +317,10 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
 
         conn_list_merge.append([inv['NBI'], msour])
         conn_list_merge.append([inv['NUCLEAR'], msour])
+        
+        conn_list_merge.append([msour, inv_bot])
+     #   conn_list_merge_others.append([msour, 's', inv_bot, 'n',True, 1, 1])
+    
 
     if merge_waves > 1:
         mwave = Label(labelrow, text = 'merge waves', bg = c4, relief = 'solid')
@@ -318,21 +329,19 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
         conn_list_merge.append([inv['ECRH'], mwave])
         conn_list_merge.append([inv['ICRH'], mwave])
 
+        conn_list_merge.append([mwave, inv_bot])
         #  ---  connect lines on the mergefr canvas
-
         
+  #      conn_list_merge_others.append([mwave, 's', inv_bot, 'n',True, 1, 1])
 
     def mergefr_draw_lines(inv_n, label_n):
         mergefr.update()
         
 
-
         line_start_x = inv_n.winfo_x() + inv_n.winfo_width()/2
         line_start_y = inv_n.winfo_y()
         line_end_x   = label_n.winfo_x() + label_n.winfo_width()/2 + labelrow.winfo_x()
         line_end_y   = label_n.winfo_y() + labelrow.winfo_y()
-
-   
         
         mergefr.create_line(line_start_x, line_start_y, line_end_x, line_end_y, width = 2, arrow = None, fill = c5)
 
@@ -340,7 +349,12 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     for elem in conn_list_merge:
         mergefr_draw_lines(elem[0], elem[1])
 
-       # --- draw the rem
+       # --- draw the remaining lines
+
+    for elem in conn_list_merge_others:
+        connect_labels(mergefr, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5], elem[6])
+   
+    
     
 
     #MAKE CORE IDS: ------------------------------------------------------------------------------------
@@ -424,7 +438,9 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     conn_list.append([inv, 'n', inv1, 's', False, 1, 1])
     conn_list.append([inv1, 'w', inv2, 'e', True, 1, 1])
 
-    
+    Label(tcontfr, text = 'time++ \n if time < tend')
+
+
 
     ### CONNECT LINE BASELEVEL
     for elem in conn_list:
