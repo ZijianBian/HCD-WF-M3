@@ -12,6 +12,10 @@ module load UDA/2.2.5-foss-2018a IDStools/1.0.9-Python-3.6.4 Python/3.6.4-foss-2
 # For actor release procedure
 module load sh/1.12.14-foss-2018a-Python-3.6.4
 
+# Compile actors without diagnostic information
+# (not compatible with Python for this old version of FC2K)
+export DIAG_INFO=-DNO_DIAG_INFO
+
 # Library to process xml with Python
 module load lxml/4.2.0-foss-2018a-Python-3.6.4
 
