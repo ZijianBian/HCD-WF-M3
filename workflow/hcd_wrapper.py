@@ -110,8 +110,8 @@ def hcd_wrapper(par_path):
 
 
       
-      if param['run_simpletrans']:
-           ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
+     # if param['run_simpletrans']:
+          # ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
     
 
 
