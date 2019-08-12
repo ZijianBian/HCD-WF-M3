@@ -134,9 +134,9 @@ def hcd_wrapper(par_path):
 
       print('set output')
       for elem in ids_bundle_work:    # not sure if this should be work or updated
-
+        
         ids_bundle_work[elem].setExpIdx(idx_out)
-        if timenow ==  param['tbegin']+= param['dt_required']:
+        if timenow ==  (param['tbegin']+ param['dt_required']):
           ids_bundle_work[elem].putNonTimed()
         ids_bundle_work[elem].putSlice()
 
