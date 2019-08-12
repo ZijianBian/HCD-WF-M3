@@ -65,18 +65,18 @@ for step in root[2]:
 # ---------------------------------------------------------------------------------------------
 # set the path to the folders where the configuration and codeparameters are stored
     
-run_config_folder = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
-workflow_param = run_config_folder+ '/input_workflow.xml'
+run_config_folder_path = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
+print(run_config_folder_path)
+workflow_param = run_config_folder_path+ '/input_workflow.xml'
 
-os.makedirs(run_config_folder)
+os.makedirs(run_config_folder_path)
 for systemname in maindict['systems']:
-    os.makedirs(run_config_folder+'/'+systemname)
+    os.makedirs(run_config_folder_path+'/'+systemname)
 
-copy2('input_workflow_default.xml', run_config_folder+'/input_workflow.xml', follow_symlinks=True)
+copy2('input_workflow_default.xml', run_config_folder_path+'/input_workflow.xml', follow_symlinks=True)
         
 
 ## ------------------------------------------------------------------------------------------
-#>>>>>>> b39816df14f79a9d8924bbeb5e233c3afb5546f4
 ## set a few standard colors to call later
 c1 = 'white'
 c2 = 'white smoke'
@@ -84,7 +84,6 @@ c3 = 'azure2'
 c4 = 'ghost white'
 c5 = 'azure4'
 cb = 'LavenderBlush3'
-
 
 default_workflow_param_path = 'input_workflow_default.xml'
 
@@ -388,22 +387,35 @@ def open_gui(input_filepath):
         tree.write(filepath)
 
     def save_and_run(filepath, save_yn):
-                
+        print(filepath)
         save_workflow_param_to_file(filepath)
-        window.destroy()
+        
+        #window.destroy()
         hcd_wrapper(run_config_folder_path)
 
         if save_yn == 0:
-            rmtree(run_config_folder)
+            rmtree(run_config_folder_path)
 
     def load_configuration_from_file(filepath):
 
         source_folder = filepath[:-19]
 
-        rmtree(run_config_folder_path)
-        copytree(source_folder, run_config_folder_path)
+    #    rmtree(run_config_folder_path)
+        if source_folder.find(run_config_folder_path) is -1:
+            try:
+                copytree(source_folder, run_config_folder_path)
+            except:
+                rmtree(run_config_folder_path)
+                copytree(source_folder, run_config_folder_path)
 
-        open_gui(filepath)
+            
+            open_gui(run_config_folder_path+ '/input_workflow.xml')
+            
+        else:
+            print('this folder is the current folder. it is not possible to load the current configuration')
+            
+
+   
 
         
 

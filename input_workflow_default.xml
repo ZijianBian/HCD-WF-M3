@@ -4,7 +4,7 @@
     <shot_nr>7897</shot_nr>
     <run_in>1</run_in>
     <run_out>301</run_out>
-    <user>mitterv</user>
+    <user>public</user>
     <tbegin>200</tbegin>
     <tend>203</tend>
     <dt_required>2</dt_required>
@@ -19,23 +19,23 @@
 
   </further_settings>
 
-  <actor_selection display= 'ACTOR SELECTION'>
+  <actor_selection display="ACTOR SELECTION">
     <systems>
       <ECRH>
-	<ec_wave_solver list="genray gray">1</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
-	<!--ec_wave_fp list = ''>     0 </ec_wave_fp-->             <!-- 0: none -->
+	<ec_wave_solver list="genray gray">0</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
+
       </ECRH>
 
       <ICRH>
-	<ic_coup list="iccoup">1</ic_coup> 
-	<ic_wave_solver list="Cyrano tomcat lion">1</ic_wave_solver>         <!-- 0: none 1: CYRANO  2: TOMCAT, 3: LION  -->
+	<ic_coup list="iccoup">0</ic_coup> 
+	<ic_wave_solver list="Cyrano tomcat lion">0</ic_wave_solver>         <!-- 0: none 1: CYRANO  2: TOMCAT, 3: LION  -->
 	<ic_wave_fp list="StixReDist">0</ic_wave_fp>             <!-- 0: none 1: StixReDist 9: FP WITH NBI/IC SYNERGY -->
       </ICRH>
     
 
       <NBI>
-	<nbi_source list="nemo bbnbi">1</nbi_source>                <!-- 0: none 1: NEMO 2: BBNBI -->
-	<nbi_fp list="risk spot ascot4serial ascot4parallel">1</nbi_fp>                    <!-- 0: none 1: RISK 2: SPOT  3: ASCOT4SERIAL 4: ASCOT4PARALLEL  9: FP WITH NBI/IC SYNERGY-->
+	<nbi_source list="nemo bbnbi">0</nbi_source>                <!-- 0: none 1: NEMO 2: BBNBI -->
+	<nbi_fp list="risk spot ascot4serial ascot4parallel">0</nbi_fp>                    <!-- 0: none 1: RISK 2: SPOT  3: ASCOT4SERIAL 4: ASCOT4PARALLEL  9: FP WITH NBI/IC SYNERGY-->
       </NBI>
     
 
