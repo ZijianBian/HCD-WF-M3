@@ -50,17 +50,22 @@ def hcd_wrapper(par_path):
   # ids_bundle_work:      input idss of the current timestep, only one timeslice
   # ids_bundle_updated:   output idss of the curren timestep, only one timeslice
 
-  # local database environment
+  # remote and local database environment
+  user_in     = param['user']
+  local_user  = os.getenv('USER')
+  tokamakname = param['machine'] # assumed to be the same for remote/local DB
+  version     = os.getenv('IMAS_VERSION')[0]
 
-  user = os.getenv('USER')
-  tokamakname = 'iter'
-  version = os.getenv('IMAS_VERSION')[0]
+  # If the local database for the required tokamak does not exist yet: create it
+  if not os.path.exists(os.getenv('HOME')+'/public/imasdb/'+tokamakname):
+    print('--> Create local database '+os.getenv('HOME')+'/public/imasdb/'+tokamakname)
+    os.popen("imasdb "+tokamakname).read()
 
   print('open input and output file')
   input = imas.ids(param['shot_nr'], param['run_in'], 0,0)
-  input.open_env(user,tokamakname,'3')
+  input.open_env(user_in,tokamakname,version)
   output = imas.ids(param["shot_nr"], param["run_out"], 0,0)
-  output.create_env(user,tokamakname, version)
+  output.create_env(local_user,tokamakname, version)
   idx_out = output.core_profiles.idx
 
   ids_bundle_initial = {'core_profiles': input.core_profiles, 

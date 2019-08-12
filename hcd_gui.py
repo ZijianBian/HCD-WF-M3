@@ -14,6 +14,69 @@ from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
 
+from developer_file import load_code_dependencies
+
+#---------------------------------------------------------------------------------------------
+##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
+
+actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
+
+ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
+
+def read_inputoutput(name):
+
+    in_l = []
+    out_l = []
+    try:
+        sys.path[:0] = [os.path.join(actor_path,name)]
+        globals()[name] = getattr(__import__(name), name)
+        
+        parstr = globals()[name].__doc__
+        
+        for iids in ids_list:
+            if parstr.find(':param '+iids) is not -1:
+                in_l.append(iids)
+            if parstr.find(':param result: '+iids) is not -1:
+                out_l.append(iids)
+    except:
+        print(name, 'not compiled')
+        
+    return(in_l, out_l)
+
+tree = etree.parse('input_workflow_default.xml')
+root = tree.getroot()
+
+maindict = {}
+
+for step in root[2]:
+    dict3 = {}
+    for isys in step:
+        dict2 = {}
+        for icat in isys:
+            dict1 = {}
+            if icat.tag is not etree.Comment:
+                for icode in icat.attrib['list'].split():
+                    (in_l, out_l) = read_inputoutput(icode)
+                    dict1[icode] = [in_l, out_l]
+                dict2[icat.tag] = [dict1, icat.text]
+        dict3[isys.tag] = dict2
+    maindict[step.tag] = dict3
+
+# ---------------------------------------------------------------------------------------------
+# set the path to the folders where the configuration and codeparameters are stored
+    
+run_config_folder = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
+workflow_param = run_config_folder+ '/input_workflow.xml'
+
+os.makedirs(run_config_folder)
+for systemname in maindict['systems']:
+    os.makedirs(run_config_folder+'/'+systemname)
+
+copy2('input_workflow_default.xml', run_config_folder+'/input_workflow.xml', follow_symlinks=True)
+        
+
+## ------------------------------------------------------------------------------------------
+#>>>>>>> b39816df14f79a9d8924bbeb5e233c3afb5546f4
 ## set a few standard colors to call later
 c1 = 'white'
 c2 = 'white smoke'
@@ -140,7 +203,7 @@ def open_gui(input_filepath):
     button_create_flowchart = Button(fr_as, text = 'Show Flowchart', bg = c2)
     button_create_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
     old_fr = fr_fc
-    button_create_flowchart.configure(command = lambda: make_flowchart(old_fr, window, maindict, c1, c2, c3, c4,c5))
+    button_create_flowchart.configure(command = lambda: make_flowchart(old_fr, window, maindict, workflow_param, c1, c2, c3, c4,c5))
 
     button_edit_codeparameters = Button(fr_as, text = 'Edit Codeparameters', bg = c2)
     button_edit_codeparameters.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')

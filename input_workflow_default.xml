@@ -19,7 +19,7 @@
 
   </further_settings>
 
-  <actor_selection>
+  <actor_selection display= 'ACTOR SELECTION'>
     <systems>
       <ECRH>
 	<ec_wave_solver list="genray gray">1</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
