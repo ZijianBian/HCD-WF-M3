@@ -19,6 +19,7 @@ from developer_file import load_code_dependencies
 #---------------------------------------------------------------------------------------------
 ##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
 
+print(os.getenv('KEPLER'))
 actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
 
 ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
@@ -67,7 +68,7 @@ for step in root[2]:
     
 run_config_folder_path = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
 print(run_config_folder_path)
-workflow_param = run_config_folder_path+ '/input_workflow.xml'
+run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
 
 os.makedirs(run_config_folder_path)
 for systemname in maindict['systems']:
@@ -97,9 +98,6 @@ window.configure(bg = c1)
 
 
 def open_gui(input_filepath):
-
-    run_config_folder_path  = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
-    run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
 
     (maindict, actor_path) = create_maindict(input_filepath)
     workflow_param = create_workflow_param_from_file(input_filepath)
@@ -183,7 +181,7 @@ def open_gui(input_filepath):
     # save xml to the run folder
     button_loadconfig = Button(fr_wfp, text = 'Load Configuration', bg = c2)
     button_loadconfig.grid(row = 52, column = 1, padx = 5, pady = 5, sticky = 'ew')
-    button_loadconfig.configure(command = lambda: load_configuration_from_file(filedialog.askopenfilename()))
+    button_loadconfig.configure(command = lambda: load_configuration_from_file(filedialog.askopenfilename(initialdir =  os.path.join(os.getcwd(), 'run_configurations'))))
 
     button_saveandrun = Button(fr_wfp, text = 'Save and Run', bg = c2)
     button_saveandrun.grid(row = 51, column = 0, padx = 5, pady = 5, sticky = 'ew')
@@ -397,25 +395,27 @@ def open_gui(input_filepath):
             rmtree(run_config_folder_path)
 
     def load_configuration_from_file(filepath):
+        print(filepath)
+        if filepath is not (): 
+            source_folder = filepath[:-19]
 
-        source_folder = filepath[:-19]
-
-    #    rmtree(run_config_folder_path)
-        if source_folder.find(run_config_folder_path) is -1:
-            try:
-                copytree(source_folder, run_config_folder_path)
-            except:
-                rmtree(run_config_folder_path)
-                copytree(source_folder, run_config_folder_path)
+            #    rmtree(run_config_folder_path)
+            if source_folder.find(run_config_folder_path) is -1:
+                try:
+                    copytree(source_folder, run_config_folder_path)
+                except:
+                    rmtree(run_config_folder_path)
+                    copytree(source_folder, run_config_folder_path)
 
             
-            open_gui(run_config_folder_path+ '/input_workflow.xml')
+                open_gui(run_config_folder_path+ '/input_workflow.xml')
             
+            else:
+                print('this folder is the current folder. it is not possible to load the current configuration')
+            
+
         else:
-            print('this folder is the current folder. it is not possible to load the current configuration')
-            
-
-   
+            print('no file selected')
 
         
 
