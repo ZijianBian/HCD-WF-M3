@@ -6,16 +6,17 @@ def hcd_wrapper(par_path):
   sys.path.append('workflow')
   sys.path.append(os.getcwd())
   from hcd_workflow  import hcd_workflow
+  from lxml import etree
   import xml.etree.ElementTree as ET
   from developer_file import load_code_dependencies
   from check_for_dependencies import check_for_dependencies
 
 
+
+
   # IMPORT PARAMETERS FROM XML --------------------------------------
   
   tree = ET.parse(par_path+'/input_workflow.xml')
-  print(par_path+'/input_workflow.xml')
-
   root = tree.getroot()
 
   param = {}
@@ -38,6 +39,51 @@ def hcd_wrapper(par_path):
   timearr = []
   if param['tbegin'] == 0:   
     timearr = core_profiles0.time
+
+  list_of_actors = ['simpletrans'] ## 
+
+  for elem in root[2].iter():
+      if elem.tag is not etree.Comment and len(elem)== 0:
+          if int(elem.text) is not 0:
+            
+            list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
+          
+  if len(list_of_actors) == 0:
+     print('no actors selected - heating & current drive workflow will not be executed')
+     sys.exit()
+
+
+  ##----------------------------------------------------------------------------------
+  # make a list of input and output idss 
+  print(os.getenv('KEPLER'))
+  actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
+
+  ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
+
+
+  in_l = []
+  out_l = []
+
+  
+
+  for name in list_of_actors:
+    try:
+      sys.path[:0] = [os.path.join(actor_path,name)]
+      globals()[name] = getattr(__import__(name), name)
+  
+      parstr = globals()[name].__doc__
+        
+      for iids in ids_list:
+        # append to list only if the name of ids is in the paramters string AND if it's not already on the input (output) list - because we are looking to find the input and output ids of the whole workflow
+        if parstr.find(':param '+iids) is not -1  and iids not in in_l:
+                in_l.append(iids)
+        if parstr.find(':param result: '+iids) is not -1 and iids not in out_l:
+                out_l.append(iids)
+    except:
+      print(name, 'not compiled')
+
+
+        
 
   ## CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
@@ -81,13 +127,36 @@ def hcd_wrapper(par_path):
                         'waves': input.waves
                         }
 
+
+  delete_list = []
+  for ids in ids_bundle_initial: 
+      if ids in in_l or ids in out_l:
+         pass
+      else:
+          delete_list.append(ids)
+
+  for ids in delete_list:
+      del ids_bundle_initial[ids]
+
+ 
+
   ids_bundle_work = copy.deepcopy(ids_bundle_initial)  
 
   for elem in ids_bundle_initial: 
-    ids_bundle_initial[elem].get()
+    if elem in in_l or elem in out_l:
+      print('get ', elem)
+      ids_bundle_initial[elem].get()
 
+  oldtime = {}
   for elem in ids_bundle_work: 
-    ids_bundle_work[elem].getSlice(param['tbegin'],1)
+      if elem in in_l or elem in out_l:
+         print('get slice ', elem)
+         ids_bundle_work[elem].getSlice(param['tbegin'],1)
+         
+         oldtime[elem] = [ids_bundle_work[elem].time, True]
+         
+
+ 
 
   
   #########################################################################
@@ -98,48 +167,78 @@ def hcd_wrapper(par_path):
 
 
   timenow = param['tbegin']
+
+
   while timenow < param['tend']:
      
       print('Time =         ', timenow, 's')
       print('dt =           ', param['dt_required'], 's')
 
- 
+           
       
       print('entering heating & current drive workflow')
-      ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
+   #   ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
+      ids_bundle_updated = copy.deepcopy(ids_bundle_work)
 
- 
       
-     # if param['run_simpletrans']:
-          # ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
-     
+      if param['run_simpletrans']:
+        ## import simpletrans
+        try:
+             ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
+        except: 
+             print('FAILED TO LOAD OR RUN SIMPLETRANS')
+             print('WARNING - skipping simpletrans even though it has been choosen in the configuration!')
+          
 
       print('set output')
-      for elem in ids_bundle_work:    # not sure if this should be work or updated
+      for elem in ids_bundle_updated:    # not sure if this should be workbundle or updatedbundle
+          print(elem+': ')
+          print('-- setExpIdx')
+          ids_bundle_updated[elem].setExpIdx(idx_out)
+          if timenow ==  (param['tbegin']):
+               print('-- set static variables')
+               ids_bundle_updated[elem].putNonTimed()
+
+          ## if the ids has been modified - change the time to the workflow time - and definitely put to database
+          #  elif the ids has not been modified AND the time has changed - put to database
+          #  else (the ids has not been modified AND the time has not changed) - don't put
         
-        ids_bundle_work[elem].setExpIdx(idx_out)
-        if timenow ==  (param['tbegin']+ param['dt_required']):
-          ids_bundle_work[elem].putNonTimed()
-        ids_bundle_work[elem].putSlice()
+          if elem in out_l: 
+                 print('setting time of ', elem, 'to the workflow time (', timenow, ')')
+                 print(ids_bundle_updated[elem].time)
+                 ids_bundle_updated[elem].time = [timenow]
+                 print(ids_bundle_updated[elem].time)
+                 print('-- putSlice')
+                 ids_bundle_work[elem].putSlice()
+          elif oldtime[elem][0]:
+                 print('-- putSlice')
+                 ids_bundle_updated[elem].putSlice()
+          else:
+                 print('-- not putting Slice to avoid duplicate')
+
 
 
       print('prepare ids bundle for next timestep')
       timenow += param['dt_required']
 
       ids_bundle_work = copy.deepcopy(ids_bundle_initial)
- 
       for elem in ids_bundle_work: 
+        if elem in in_l or elem in out_l:
+          print('get slice ', elem)
           ids_bundle_work[elem].getSlice(timenow,1)
-     
-
+          
+          ## does this new Slice have a different time than the old Slice? 
+          if oldtime[elem][0] == ids_bundle_work[elem].time:
+                oldtime[elem][1] = False
+          else:
+                oldtime[elem][1] = True
+          oldtime[elem][0] =  ids_bundle_work[elem].time
+      
       ids_bundle_work['distribution_sources'] =  copy.deepcopy(ids_bundle_updated['distribution_sources'])
       ids_bundle_work['distributions']        =  copy.deepcopy(ids_bundle_updated['distributions'])
       ids_bundle_work['waves']                =  copy.deepcopy(ids_bundle_updated['waves'])
       ids_bundle_work['core_sources']         =  copy.deepcopy(ids_bundle_updated['core_sources'])
-      print(param['run_simpletrans'])
-      if False:
-        
-          ids_bundle_work['core_profiles']        =  copy.deepcopy(ids_bundle_updated['core_profiles'])
+      ids_bundle_work['core_profiles']        =  copy.deepcopy(ids_bundle_updated['core_profiles'])
 
 
       
