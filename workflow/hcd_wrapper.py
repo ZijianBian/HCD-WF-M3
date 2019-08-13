@@ -127,7 +127,8 @@ def hcd_wrapper(par_path):
       ids_bundle_work['distributions']        =  copy.deepcopy(ids_bundle_updated['distributions'])
       ids_bundle_work['waves']                =  copy.deepcopy(ids_bundle_updated['waves'])
       ids_bundle_work['core_sources']         =  copy.deepcopy(ids_bundle_updated['core_sources'])
-      ids_bundle_work['core_profiles']        =  copy.deepcopy(ids_bundle_updated['core_profiles'])
+      if param['run_simpletrans']:
+          ids_bundle_work['core_profiles']        =  copy.deepcopy(ids_bundle_updated['core_profiles'])
 
 
       
