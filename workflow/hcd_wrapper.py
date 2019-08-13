@@ -103,12 +103,12 @@ def hcd_wrapper(par_path):
       print('Time =         ', timenow, 's')
       print('dt =           ', param['dt_required'], 's')
 
-      print(ids_bundle_work['core_profiles'].time)
+ 
       
       print('entering heating & current drive workflow')
       ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
 
-      print(ids_bundle_work['core_profiles'].time)
+ 
       
      # if param['run_simpletrans']:
           # ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
@@ -127,11 +127,10 @@ def hcd_wrapper(par_path):
       timenow += param['dt_required']
 
       ids_bundle_work = copy.deepcopy(ids_bundle_initial)
-      print(ids_bundle_work['core_profiles'].time)
+ 
       for elem in ids_bundle_work: 
           ids_bundle_work[elem].getSlice(timenow,1)
-      print(ids_bundle_work['core_profiles'].time)      
-
+     
 
       ids_bundle_work['distribution_sources'] =  copy.deepcopy(ids_bundle_updated['distribution_sources'])
       ids_bundle_work['distributions']        =  copy.deepcopy(ids_bundle_updated['distributions'])
@@ -139,11 +138,9 @@ def hcd_wrapper(par_path):
       ids_bundle_work['core_sources']         =  copy.deepcopy(ids_bundle_updated['core_sources'])
       print(param['run_simpletrans'])
       if False:
-          print('in the if statement', ids_bundle_work['core_profiles'].time)
+        
           ids_bundle_work['core_profiles']        =  copy.deepcopy(ids_bundle_updated['core_profiles'])
 
-
-      print(ids_bundle_work['core_profiles'].time)
 
       
         
