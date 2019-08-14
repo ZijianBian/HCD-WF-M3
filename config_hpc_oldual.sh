@@ -26,4 +26,13 @@ module load interpos/8.2.1-ifort
 module load XMLlib/3.1.0-intel-2018a
 module load PSPLINE/20181008-intel-2018a
 
+# To read Machine Description data
+DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"//"m-machine-description"
+if [ -d $DIR/modules ]; then
+  module use --append $DIR/modules
+fi
+if [ -d $DIR/src/main/Environment/HPC/modules ]; then
+  module use --append $DIR/src/main/Environment/HPC/modules
+fi
+module load m-machine-description
 
