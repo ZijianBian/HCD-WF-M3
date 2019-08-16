@@ -1,0 +1,166 @@
+<ec_antennas>
+
+  <comment>Filled by hand from ITER EC geometry sent by L. Figini</comment>
+  <n_time_slices> 175     </n_time_slices> <!-- Number of time slices for which the ec_antennas IDS should be defined -->
+  <t_begin>       1.5     </t_begin>       <!-- Starting value of the time array -->
+  <t_end>         647.428 </t_end>         <!-- Final value of the time array -->
+  
+  <n_antennas> 5 </n_antennas>
+
+  <antenna1>
+    <name>EL/TSM</name>
+    <power_launched_time>         0. 30.   500. 500.01 520. 520.01 </power_launched_time> <!-- Time array for power waveform (s) -->
+    <power_launched>              0  6.e6  6.e6 3.e6   3.e6 0.     </power_launched>      <!-- Waveform of launched power (W) -->
+    <frequency>                   170.e9  </frequency> <!-- Launcher frequency (Hz) -->
+    <mode_time>                   0.      </mode_time>
+    <mode>                        1       </mode> <!-- Polarization: +1 = O-mode, -1 = X-mode -->
+    <launching_position_r_time>   0.      </launching_position_r_time>
+    <launching_position_r>        9.3940  </launching_position_r>
+    <launching_position_z_time>   0.      </launching_position_z_time>
+    <launching_position_z>        1.1920  </launching_position_z>
+    <launching_position_phi_time> 0.      </launching_position_phi_time>
+    <launching_position_phi>      0.      </launching_position_phi>
+    <launching_angle_pol_time>    0.      </launching_angle_pol_time>
+    <launching_angle_pol>         0.2618  </launching_angle_pol>
+    <launching_angle_tor_time>    0.      </launching_angle_tor_time>
+    <launching_angle_tor>        -0.3491  </launching_angle_tor>
+    <beam_spot_size_time>         0.      </beam_spot_size_time>
+    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
+    <beam_spot_size1>             0.03    </beam_spot_size1>
+    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_angle_time>        0.      </beam_spot_angle_time>
+    <beam_spot_angle>             0.      </beam_spot_angle>
+    <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
+    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
+    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
+    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_angle_time>       0.      </beam_phase_angle_time>
+    <beam_phase_angle>            0.      </beam_phase_angle>
+  </antenna1>
+
+  <antenna2>
+    <name>EL/MSM</name>
+    <power_launched_time>         0. 30.   500. 500.01 520. 520.01 </power_launched_time> <!-- Time array for power waveform (s) -->
+    <power_launched>              0  6.e6  6.e6 3.e6   3.e6 0.     </power_launched>      <!-- Waveform of launched power (W) -->
+    <frequency>                   170.e9  </frequency> <!-- Launcher frequency (Hz) -->
+    <mode_time>                   0.      </mode_time>
+    <mode>                        1       </mode> <!-- Polarization: +1 = O-mode, -1 = X-mode -->
+    <launching_position_r_time>   0.      </launching_position_r_time>
+    <launching_position_r>        9.3940  </launching_position_r>
+    <launching_position_z_time>   0.      </launching_position_z_time>
+    <launching_position_z>        0.62    </launching_position_z>
+    <launching_position_phi_time> 0.      </launching_position_phi_time>
+    <launching_position_phi>      0.      </launching_position_phi>
+    <launching_angle_pol_time>    0.      </launching_angle_pol_time>
+    <launching_angle_pol>         0.      </launching_angle_pol>
+    <launching_angle_tor_time>    0.      </launching_angle_tor_time>
+    <launching_angle_tor>         0.4363  </launching_angle_tor>
+    <beam_spot_size_time>         0.      </beam_spot_size_time>
+    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
+    <beam_spot_size1>             0.03    </beam_spot_size1>
+    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_angle_time>        0.      </beam_spot_angle_time>
+    <beam_spot_angle>             0.      </beam_spot_angle>
+    <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
+    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
+    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
+    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_angle_time>       0.      </beam_phase_angle_time>
+    <beam_phase_angle>            0.      </beam_phase_angle>
+  </antenna2>
+
+  <antenna3>
+    <name>EL/BSM</name>
+    <power_launched_time>         0. 30.   500. 500.01 520. 520.01 </power_launched_time> <!-- Time array for power waveform (s) -->
+    <power_launched>              0  6.e6  6.e6 3.e6   3.e6 0.     </power_launched>      <!-- Waveform of launched power (W) -->
+    <frequency>                   170.e9  </frequency> <!-- Launcher frequency (Hz) -->
+    <mode_time>                   0.      </mode_time>
+    <mode>                        1       </mode> <!-- Polarization: +1 = O-mode, -1 = X-mode -->
+    <launching_position_r_time>   0.      </launching_position_r_time>
+    <launching_position_r>        9.3940  </launching_position_r>
+    <launching_position_z_time>   0.      </launching_position_z_time>
+    <launching_position_z>        -0.0040 </launching_position_z>
+    <launching_position_phi_time> 0.      </launching_position_phi_time>
+    <launching_position_phi>      0.      </launching_position_phi>
+    <launching_angle_pol_time>    0.      </launching_angle_pol_time>
+    <launching_angle_pol>         -0.1745 </launching_angle_pol>
+    <launching_angle_tor_time>    0.      </launching_angle_tor_time>
+    <launching_angle_tor>         0.4363  </launching_angle_tor>
+    <beam_spot_size_time>         0.      </beam_spot_size_time>
+    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
+    <beam_spot_size1>             0.03    </beam_spot_size1>
+    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_angle_time>        0.      </beam_spot_angle_time>
+    <beam_spot_angle>             0.      </beam_spot_angle>
+    <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
+    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
+    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
+    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_angle_time>       0.      </beam_phase_angle_time>
+    <beam_phase_angle>            0.      </beam_phase_angle>
+  </antenna3>
+
+  <antenna4>
+    <name>UL/USM</name>
+    <power_launched_time>         0. 30.   500. 500.01 520. 520.01 </power_launched_time> <!-- Time array for power waveform (s) -->
+    <power_launched>              0  6.e6  6.e6 3.e6   3.e6 0.     </power_launched>      <!-- Waveform of launched power (W) -->
+    <frequency>                   170.e9  </frequency> <!-- Launcher frequency (Hz) -->
+    <mode_time>                   0.      </mode_time>
+    <mode>                        1       </mode> <!-- Polarization: +1 = O-mode, -1 = X-mode -->
+    <launching_position_r_time>   0.      </launching_position_r_time>
+    <launching_position_r>        6.999   </launching_position_r>
+    <launching_position_z_time>   0.      </launching_position_z_time>
+    <launching_position_z>        4.414   </launching_position_z>
+    <launching_position_phi_time> 0.      </launching_position_phi_time>
+    <launching_position_phi>      0.      </launching_position_phi>
+    <launching_angle_pol_time>    0.      </launching_angle_pol_time>
+    <launching_angle_pol>         1.1345  </launching_angle_pol>
+    <launching_angle_tor_time>    0.      </launching_angle_tor_time>
+    <launching_angle_tor>         0.3491  </launching_angle_tor>
+    <beam_spot_size_time>         0.      </beam_spot_size_time>
+    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
+    <beam_spot_size1>             0.03    </beam_spot_size1>
+    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_angle_time>        0.      </beam_spot_angle_time>
+    <beam_spot_angle>             0.      </beam_spot_angle>
+    <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
+    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
+    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
+    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_angle_time>       0.      </beam_phase_angle_time>
+    <beam_phase_angle>            0.      </beam_phase_angle>
+  </antenna4>
+
+  <antenna5>
+    <name>UL/LSM</name>
+    <power_launched_time>         0. 30.   500. 500.01 520. 520.01 </power_launched_time> <!-- Time array for power waveform (s) -->
+    <power_launched>              0  6.e6  6.e6 3.e6   3.e6 0.     </power_launched>      <!-- Waveform of launched power (W) -->
+    <frequency>                   170.e9  </frequency> <!-- Launcher frequency (Hz) -->
+    <mode_time>                   0.      </mode_time>
+    <mode>                        1       </mode> <!-- Polarization: +1 = O-mode, -1 = X-mode -->
+    <launching_position_r_time>   0.      </launching_position_r_time>
+    <launching_position_r>        7.054   </launching_position_r>
+    <launching_position_z_time>   0.      </launching_position_z_time>
+    <launching_position_z>        4.178   </launching_position_z>
+    <launching_position_phi_time> 0.      </launching_position_phi_time>
+    <launching_position_phi>      0.      </launching_position_phi>
+    <launching_angle_pol_time>    0.      </launching_angle_pol_time>
+    <launching_angle_pol>         0.9599  </launching_angle_pol>
+    <launching_angle_tor_time>    0.      </launching_angle_tor_time>
+    <launching_angle_tor>         0.3491  </launching_angle_tor>
+    <beam_spot_size_time>         0.      </beam_spot_size_time>
+    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
+    <beam_spot_size1>             0.03    </beam_spot_size1>
+    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_angle_time>        0.      </beam_spot_angle_time>
+    <beam_spot_angle>             0.      </beam_spot_angle>
+    <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
+    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
+    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
+    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_angle_time>       0.      </beam_phase_angle_time>
+    <beam_phase_angle>            0.      </beam_phase_angle>
+  </antenna5>
+
+ </ec_antennas>
+
