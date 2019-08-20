@@ -5,9 +5,12 @@ module load IMAS/3.21.0-3.8.11
 module load Kepler/2.5p4-2.1.5
 module load FC2K/4.4.0
 
+# To read Machine Description data
+module use --append m-machine-description/src/main/Environment/HPC/modules
+module load m-machine-description
+
 # Switch from Python 2.7 to Python 3
-module unload Python matplotlib PyYAML Tkinter PostgreSQL SWIG MDSplus-Python UDA Boost Anaconda3 IDStools PyUAL
-module load UDA/2.2.5-foss-2018a IDStools/1.0.9-Python-3.6.4 Python/3.6.4-foss-2018a PyYAML/3.12-foss-2018a-Python-3.6.4 matplotlib/2.1.2-foss-2018a-Python-3.6.4 PyUAL/1.0.0-foss-2018a-Python-3.6.4
+source m-machine-description/src/main/Environment/HPC/switch_python_ITER_HPC.sh
 
 # For actor release procedure
 module load sh/1.12.14-foss-2018a-Python-3.6.4
@@ -25,14 +28,4 @@ module load FRUIT_processor/3.4.3-intel-2018a-Ruby-2.5.1
 module load interpos/8.2.1-ifort
 module load XMLlib/3.1.0-intel-2018a
 module load PSPLINE/20181008-intel-2018a
-
-# To read Machine Description data
-DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"//"m-machine-description"
-if [ -d $DIR/modules ]; then
-  module use --append $DIR/modules
-fi
-if [ -d $DIR/src/main/Environment/HPC/modules ]; then
-  module use --append $DIR/src/main/Environment/HPC/modules
-fi
-module load m-machine-description
 
