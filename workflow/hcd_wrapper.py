@@ -9,6 +9,7 @@ def hcd_wrapper(par_path):
   import xml.etree.ElementTree as ET
   from developer_file import load_code_dependencies
   from check_for_dependencies import check_for_dependencies
+  import numpy as np 
 
 
   # IMPORT PARAMETERS FROM XML --------------------------------------
@@ -40,9 +41,8 @@ def hcd_wrapper(par_path):
 
   for elem in root[2].iter():
       if elem.tag is not etree.Comment and len(elem)== 0:
-       #   if int(elem.text) is not 0:
-            
-            list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
+          if int(elem.text) is not 0:
+               list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
           
   if len(list_of_actors) == 0:
      print('ERROR: no actors selected - heating & current drive workflow will not be executed')
@@ -53,7 +53,7 @@ def hcd_wrapper(par_path):
 
   ##----------------------------------------------------------------------------------
   # make a list of input and output idss 
-  print(os.getenv('KEPLER'))
+
   actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
 
   ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
@@ -78,7 +78,7 @@ def hcd_wrapper(par_path):
         if parstr.find(':param result: '+iids) is not -1 and iids not in out_l:
                 out_l.append(iids)
     except:
-        print(name, 'is not compiled!')
+        print(name, ' not found!')
 
 
         
@@ -102,8 +102,8 @@ def hcd_wrapper(par_path):
 
   # If the local database for the required tokamak does not exist yet: create it
   if not os.path.exists(os.getenv('HOME')+'/public/imasdb/'+tokamakname):
-    print('--> Create local database '+os.getenv('HOME')+'/public/imasdb/'+tokamakname)
-    os.popen("imasdb "+tokamakname).read()
+       print('--> Create local database '+os.getenv('HOME')+'/public/imasdb/'+tokamakname)
+       os.popen("imasdb "+tokamakname).read()
 
   print('open input and output file')
   input = imas.ids(param['shot_nr'], param['run_in'], 0,0)
@@ -126,24 +126,11 @@ def hcd_wrapper(par_path):
                         }
 
 
-  delete_list = []
-  for ids in ids_bundle_initial: 
-      if ids in in_l or ids in out_l:
-         pass
-      else:
-          delete_list.append(ids)
-
-  for ids in delete_list:
-      del ids_bundle_initial[ids]
-
- 
-
   ids_bundle_work = copy.deepcopy(ids_bundle_initial)  
 
   for elem in ids_bundle_initial: 
-    if elem in in_l or elem in out_l:
-      print('get ', elem)
-      ids_bundle_initial[elem].get()
+      if  elem in in_l or elem in out_l:
+           ids_bundle_initial[elem].get()
 
 
   ## CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY:
@@ -151,32 +138,27 @@ def hcd_wrapper(par_path):
      print('ERROR: tbegin out of range (smaller than first time of core_profiles)')
      sys.exit()
   
-  print(ids_bundle_initial['core_profiles'].time[-1])
   if param['tend'] > 0 and param['tend'] > ids_bundle_initial['core_profiles'].time[-1]:
      print('ERROR: tend out of range (bigger than last time of core_profiles)')
      sys.exit()
 
   if param['tbegin'] < 0:
-      print(ids_bundle_initial['core_profiles'].time[0])
       param['tbegin'] = ids_bundle_initial['core_profiles'].time[0]
-      
       print('tbegin set to time of first core_profiles timeslice. tbegin = ', param['tbegin'])
 
   if param['tend'] < 0:
-      param['tend'] = ids_bundle_initial['core_profiles'].time[-1] 
+      param['tend'] = ids_bundle_initial['core_profiles'].time[-1]
       print('tend set to time of last core_profiles timeslice, tend = ', param['tend'])
+
 
   oldtime = {}
   for elem in ids_bundle_work: 
-      if elem in in_l or elem in out_l:
-         print('get slice ', elem)
-         ids_bundle_work[elem].getSlice(param['tbegin'],1)
-         
-         oldtime[elem] = [ids_bundle_work[elem].time, True]
+
+           ids_bundle_work[elem].getSlice(param['tbegin'],1)
+           oldtime[elem] = [ids_bundle_work[elem].time, True]
          
     
- 
-  print('enter timeloop')
+  print('---- enter timeloop ----')
   
   #########################################################################
   #-----------------------------------------------------------------------
@@ -194,10 +176,10 @@ def hcd_wrapper(par_path):
       print('dt =           ', param['dt_required'], 's')
 
            
-      
+    
       print('entering heating & current drive workflow')
       ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
-   
+    #  ids_bundle_updated = copy.deepcopy(ids_bundle_work)
       
       if param['run_simpletrans'] == 1:
         ## import simpletrans
@@ -210,28 +192,43 @@ def hcd_wrapper(par_path):
 
       print('set output')
        
-      for elem in ids_bundle_updated:    # not sure if this should be workbundle or updatedbundle
-        if elem in oldtime:
-          print(elem+': ')
-          print('-- setExpIdx')
-          ids_bundle_updated[elem].setExpIdx(idx_out)
-          if timenow ==  (param['tbegin']):
-               print('-- set static variables')
-               ids_bundle_updated[elem].putNonTimed()
+
+
+      for elem in ids_bundle_updated:   
+           print(elem+': ')
+           print('-- setExpIdx')
+           ids_bundle_updated[elem].setExpIdx(idx_out)
+           if timenow ==  (param['tbegin']):
+               
+               if ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or ids_bundle_updated[elem].ids_properties.homogeneous_time == 0:
+                 print('-- set static variables')
+                 ids_bundle_updated[elem].putNonTimed()
+               else:
+                 print('-- ids is empty, not putNonTimed quits with no action')
 
           ## if the ids has been modified - change the time to the workflow time - and definitely put to database
           #  elif the ids has not been modified AND the time has changed - put to database
           #  else (the ids has not been modified AND the time has not changed) - don't put
         
-          if elem in out_l: 
-                 print('setting time of ', elem, 'to the workflow time (', timenow, ')')
-                 ids_bundle_updated[elem].time = [timenow]
+           if elem in out_l: 
+                 print('-- setting time to the workflow time ('+str(timenow)+' s)')
+                 print(np.array([timenow]))
+
+                 ids_bundle_updated[elem].time = np.array([[timenow]])
+
+                 print(type(ids_bundle_updated[elem].time))
+
+
                  print('-- putSlice')
                  ids_bundle_work[elem].putSlice()
-          elif oldtime[elem][0]:
-                 print('-- putSlice')
-                 ids_bundle_updated[elem].putSlice()
-          else:
+           elif oldtime[elem][1]:
+                 print(ids_bundle_updated[elem].ids_properties.homogeneous_time)
+                 if ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or ids_bundle_updated[elem].ids_properties.homogeneous_time == 0:
+                     print('-- putSlice')
+                     ids_bundle_updated[elem].putSlice()
+                 else: 
+                  print('-- ids is empty -> no putSlice')
+           else:
                  print('-- not putting Slice to avoid duplicate')
 
 
@@ -241,7 +238,6 @@ def hcd_wrapper(par_path):
 
       ids_bundle_work = copy.deepcopy(ids_bundle_initial)
       for elem in ids_bundle_work: 
-        if elem in in_l or elem in out_l:
           print('get slice ', elem)
           ids_bundle_work[elem].getSlice(timenow,1)
           
@@ -252,11 +248,10 @@ def hcd_wrapper(par_path):
                 oldtime[elem][1] = True
           oldtime[elem][0] =  ids_bundle_work[elem].time
       
-      ids_bundle_work['distribution_sources'] =  copy.deepcopy(ids_bundle_updated['distribution_sources'])
-      ids_bundle_work['distributions']        =  copy.deepcopy(ids_bundle_updated['distributions'])
-      ids_bundle_work['waves']                =  copy.deepcopy(ids_bundle_updated['waves'])
-      ids_bundle_work['core_sources']         =  copy.deepcopy(ids_bundle_updated['core_sources'])
-      ids_bundle_work['core_profiles']        =  copy.deepcopy(ids_bundle_updated['core_profiles'])
+
+          if elem in out_l: 
+              ids_bundle_work[elem] =  copy.deepcopy(ids_bundle_updated[elem])
+              print('using the '+ elem+ 'output as input for the next timeslice')
 
 
       
