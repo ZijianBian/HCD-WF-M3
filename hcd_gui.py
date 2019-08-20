@@ -213,6 +213,9 @@ def open_gui(input_filepath):
     button_restore_def.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
     button_restore_def.configure(command = lambda: open_gui('input_workflow_default.xml'))
 
+    button_exit = Button(fr_wfp, text = 'Exit', bg = 'light grey')
+    button_exit.grid(row = 54, column = 0, padx = 5, pady = 5, sticky = 'e')
+    button_exit.configure(command = lambda: sys.exit())
 
     # middle: 
     button_create_flowchart = Button(fr_as, text = 'Show Flowchart', bg = c2)
@@ -333,17 +336,27 @@ def open_gui(input_filepath):
                     e.grid(row = rrow, column = ccolumn+1, padx = 3, pady = 3)
                     codeparam_dict[elem.tag] = entrystring.get()
                     
-                    entrystring.trace('w', lambda name, index, mode, elem = elem.tag, entrystring = entrystring: update_codeparam_dict(elem, entrystring.get()))
-    
+                    entrystring.trace('w', lambda name, index, mode, elem = elem.tag, entrystring = entrystring, e = e: update_codeparam_dict(elem, entrystring.get(), e))
+              
                    
                     try:
                          CreateToolTip(l, docum_dict[l.cget('text')])
                     except:
                         pass 
 
-                    def update_codeparam_dict(elem, newvalue): 
+                    def update_codeparam_dict(elem, newvalue, entry1): 
                         codeparam_dict[elem] = newvalue
-                       
+                        for i in root.iter():
+                            if (elem in [str(i.tag)]) and (i.tag is not etree.Comment): 
+                                i.text = newvalue
+
+
+                        if xmlschema.validate(root): 
+                            entry1.config(bg = c1)
+                        else:
+                            entry1.config(bg = 'salmon1')
+
+
                     
                     rrow +=1 
                     if rrow > 30:  ## if there are more than 30 entries start a new column
@@ -353,6 +366,7 @@ def open_gui(input_filepath):
 
             Button(fr_top, text = 'save', bg = c2,  command = lambda: save_codeparam_to_file(dest_file, codeparam_dict)).grid(row = 0 ,column = 1, padx = 5, pady = 5)
             Button(fr_top, text = 'load default', bg = c2, command = lambda: make_frame(hsys, actor_name,  prev_frame, True)).grid(row = 0, column =2, padx = 5, pady = 5)
+            Button(fr_top, text = 'exit', bg = c2, command = lambda: cp_top.destroy()).grid(row = 0, column = 4, padx = (20, 5), pady = 5)
                     
 
 
@@ -432,6 +446,7 @@ def open_gui(input_filepath):
                     rmtree(run_config_folder_path)
                     copytree(source_folder, run_config_folder_path)
 
+                    
 
                 open_gui(run_config_folder_path+ '/input_workflow.xml')
 
