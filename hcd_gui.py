@@ -91,17 +91,26 @@ c5 = 'azure4'
 cb = 'LavenderBlush3'
 
 default_workflow_param_path = 'input_workflow_default.xml'
-
-## create mainwindow
 window = Tk()
+## create mainwindow
+      
 window.title('HCD WORKFLOW')
 window.configure(bg = c1)
-#window.geometry("1300x800")
-#window.resizable(0,1)
-
 
 
 def open_gui(input_filepath):
+
+    try:
+        wh = window.winfo_reqheight()
+        ww = window.winfo_reqwidth()
+        wx = window.winfo_x()
+        wy = window.winfo_y()
+        window.geometry("+%d+%d" %(wx, wy))
+        
+    except: 
+
+        pass
+
 
     (maindict, actor_path) = create_maindict(input_filepath)
     workflow_param = create_workflow_param_from_file(input_filepath)
@@ -112,10 +121,10 @@ def open_gui(input_filepath):
             os.makedirs(run_config_folder_path+'/'+systemname)
             copy2(input_filepath, run_workflow_param_path, follow_symlinks=True)
  
-    fr_wfp = Frame(window, width = 300, height = 10000, background = c3)
+    fr_wfp = Frame(window, width = 300, height = 500, background = c3)
     fr_wfp.grid(row = 0, column = 0, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
 
-    fr_as = Frame(window, width = 10000, height = 10000, background = c1)
+    fr_as = Frame(window, width = 500, height = 500, background = c1)
     fr_as.grid(row = 0, column = 1, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
 
     fr_fc = Frame(window, width = 100, height = 100, background = c1)
