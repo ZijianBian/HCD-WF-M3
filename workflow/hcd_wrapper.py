@@ -81,7 +81,7 @@ def hcd_wrapper(par_path):
         print(name, ' not found!')
 
 
-        
+
 
   ## CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
@@ -157,7 +157,9 @@ def hcd_wrapper(par_path):
            ids_bundle_work[elem].getSlice(param['tbegin'],1)
            oldtime[elem] = [ids_bundle_work[elem].time, True]
          
-    
+  print(out_l)
+  print(oldtime)
+
   print('---- enter timeloop ----')
   
   #########################################################################
@@ -178,8 +180,8 @@ def hcd_wrapper(par_path):
            
     
       print('entering heating & current drive workflow')
-      ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
-    #  ids_bundle_updated = copy.deepcopy(ids_bundle_work)
+   #   ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
+      ids_bundle_updated = copy.deepcopy(ids_bundle_work)
       
       if param['run_simpletrans'] == 1:
         ## import simpletrans
@@ -192,7 +194,7 @@ def hcd_wrapper(par_path):
 
       print('set output')
        
-
+     
 
       for elem in ids_bundle_updated:   
            print(elem+': ')
@@ -209,12 +211,17 @@ def hcd_wrapper(par_path):
           ## if the ids has been modified - change the time to the workflow time - and definitely put to database
           #  elif the ids has not been modified AND the time has changed - put to database
           #  else (the ids has not been modified AND the time has not changed) - don't put
-        
+
            if elem in out_l: 
                  print('-- setting time to the workflow time ('+str(timenow)+' s)')
-                 print(np.array([timenow]))
+                 
 
-                 ids_bundle_updated[elem].time = np.array([[timenow]])
+                 m = ids_bundle_updated['core_profiles'].time
+                 print(m)
+                 m[0] = float(timenow)
+
+                 ids_bundle_updated[elem].time = m
+
 
                  print(type(ids_bundle_updated[elem].time))
 
@@ -232,9 +239,9 @@ def hcd_wrapper(par_path):
                  print('-- not putting Slice to avoid duplicate')
 
 
-
       print('prepare ids bundle for next timestep')
       timenow += param['dt_required']
+      
 
       ids_bundle_work = copy.deepcopy(ids_bundle_initial)
       for elem in ids_bundle_work: 
