@@ -19,7 +19,11 @@ from developer_file import load_code_dependencies
 #---------------------------------------------------------------------------------------------
 ##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
 
-print(os.getenv('KEPLER'))
+if (os.getenv('KEPLER') is None)  or ('/work/imas/extra' in os.getenv('KEPLER')):
+    print('ERROR: the local version of Kepler is not loaded')
+    sys.exit()
+
+
 actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
 
 ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
@@ -40,7 +44,7 @@ def read_inputoutput(name):
             if parstr.find(':param result: '+iids) is not -1:
                 out_l.append(iids)
     except:
-        print(name, 'not compiled')
+        pass
         
     return(in_l, out_l)
 
@@ -67,7 +71,7 @@ for step in root[2]:
 # set the path to the folders where the configuration and codeparameters are stored
     
 run_config_folder_path = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
-print(run_config_folder_path)
+
 run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
 
 os.makedirs(run_config_folder_path)
@@ -196,6 +200,11 @@ def open_gui(input_filepath):
     button_save_asdef.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
     button_save_asdef.configure(command = lambda: save_workflow_param_to_file('input_workflow_default.xml'))
 
+    button_restore_def = Button(fr_wfp, text = 'Restore Default', bg =c2)
+    button_restore_def.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
+    button_restore_def.configure(command = lambda: open_gui('input_workflow_default.xml'))
+
+
     # middle: 
     button_create_flowchart = Button(fr_as, text = 'Show Flowchart', bg = c2)
     button_create_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
@@ -206,7 +215,7 @@ def open_gui(input_filepath):
     button_edit_codeparameters.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
     button_edit_codeparameters.configure(command = lambda: edit_codeparam())
 
-
+    
 
 
     ## MANAGE XML FILES
@@ -385,7 +394,7 @@ def open_gui(input_filepath):
         tree.write(filepath)
 
     def save_and_run(filepath, save_yn):
-        print(filepath)
+        
         save_workflow_param_to_file(filepath)
         
         #window.destroy()
@@ -395,7 +404,14 @@ def open_gui(input_filepath):
             rmtree(run_config_folder_path)
 
     def load_configuration_from_file(filepath):
-        print(filepath)
+        if 'input_workflow_default.xml' in filepath:
+            print('if you want to load the default configuration please choose load default')
+            filepath = ()
+        elif 'input_workflow.xml' not in filepath: 
+            print('please choose an input_workflow.xml file')
+            filepath = ()
+       
+
         if filepath is not (): 
             source_folder = filepath[:-19]
 
@@ -407,12 +423,12 @@ def open_gui(input_filepath):
                     rmtree(run_config_folder_path)
                     copytree(source_folder, run_config_folder_path)
 
-            
+
                 open_gui(run_config_folder_path+ '/input_workflow.xml')
-            
+
             else:
                 print('this folder is the current folder. it is not possible to load the current configuration')
-            
+
 
         else:
             print('no file selected')

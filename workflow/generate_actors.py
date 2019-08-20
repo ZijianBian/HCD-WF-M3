@@ -15,6 +15,7 @@ ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi
 add_arg = load_add_arg()
 
 list_of_actors = []
+list_of_uncompiled_actors = []
 
 def read_inputoutput(name):
     in_l = []
@@ -48,7 +49,10 @@ def read_inputoutput(name):
 
         
     except:
-        print('warning: ', name, ' is not compiled')
+        if name not in list_of_uncompiled_actors:
+            print('warning: ', name, ' is not compiled')
+        list_of_uncompiled_actors.append(name)
+
     return(in_l, out_l)
 
 
@@ -119,7 +123,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                             
                         if cfmpi.is_compiled_for_mpi(libmpi_path, 'libmpi'):
                             file.write(',  "mpi_local"')
-                            print(code + ' will use MPI Methods')
+                            
 
 
                         file.write(')\n\n')

@@ -9,10 +9,16 @@ cb = 'LavenderBlush3'
 c_arr=['red', 'blue','yellow','green']
 
 
-def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
+def make_flowchart(old_frame, window,  maindict,workflow_param,  c1, c2, c3, c4, c5):
 #--------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------
+    actors_ref = list(maindict.keys())[0]
+    make_core_ids_ref = list(maindict.keys())[1]
+
+    cod_ref = list(workflow_param.keys())[2]
+    print(workflow_param)
+
     def click_actors(l0, l1, l2, conn_list_cur, fr):
         if l1.grid_info():
             l1.grid_remove()
@@ -132,7 +138,7 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     mergefr = Canvas(base, bg = c1, height = 1)
     corela  = Label(base, bg = c2, text = 'MAKE CORE IDS', font = '14', relief = 'solid', pady = 5)
     corefr  = Canvas(base, bg = c1, height = 1)
-    tcontla = Label(base, bg = c2, text = 'CONTROL BLOCK FOR TIMELOOP', font = '14', relief = 'solid', pady = 5)
+    tcontla = Label(base, bg = c2, text = 'CONTROL BLOCK FOR TIMELOOP', font = '14', relief = 'solid', pady = 0)
     tcontfr = Canvas(base, bg = c1, height = 1)
     finalla = Label(base, bg = c2, text = 'FINALISING', font = '14', relief = 'solid', pady = 5)
     finalfr = Canvas(base, bg = c1, height = 1)
@@ -165,7 +171,7 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     corefr.bind('<Button-1>', lambda event: click_labels('f', corela, corefr, base, conn_list))
     base.rowconfigure(12, minsize = 20)
     tcontla.grid(row = 13, column = 1, sticky = 'ew')
-    tcontfr.grid(row = 14, column = 1, sticky = 'ew')
+    tcontfr.grid(row = 14, column = 1)
     tcontla.bind('<Button-1>', lambda event: click_labels('l', tcontla,tcontfr,  base, conn_list))
     tcontfr.bind('<Button-1>', lambda event: click_labels('f',  tcontla,tcontfr, base, conn_list))
     tcontfr.grid_remove()
@@ -187,22 +193,22 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     inv.grid(row = 0, columnspan = 50, pady = 0)
     inv1 = []
 
-    for sys in maindict['systems']:
+    for hsys in maindict[actors_ref]:
         rrow = 1
  
-        if sum([int(maindict['systems'][sys][i][1]) for i in maindict['systems'][sys]]) is not 0:
+        if sum([int(workflow_param[cod_ref][i]) for i in maindict[actors_ref][hsys]]) is not 0:
             isys += 1
             oldlabel = hcdla
 
             inv1.append(Frame(hcdfr, height = 1, width = 1, bg = c5))
             inv1[-1].grid(row = 50, column = ccol, pady = (50,0))
 
-            for cat in maindict['systems'][sys]:
+            for cat in maindict[actors_ref][hsys]:
                 icat = 0
-                if int(maindict['systems'][sys][cat][1]) is not 0:
-                    curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
-                    input_text = "\n - ".join([strv for strv in maindict['systems'][sys][cat][0][curval][0]])
-                    output_text = "\n - ".join([strv for strv in maindict['systems'][sys][cat][0][curval][1]])
+                if int(workflow_param[cod_ref][cat]) is not 0:
+                    curval = list(maindict[actors_ref][hsys][cat])[int(workflow_param[cod_ref][cat])-1]
+                    input_text = "\n - ".join([strv for strv in maindict[actors_ref][hsys][cat][curval][0]])
+                    output_text = "\n - ".join([strv for strv in maindict[actors_ref][hsys][cat][curval][1]])
 
                     hcdfr.rowconfigure(rrow, minsize = 30)
 
@@ -262,40 +268,49 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     invrow = Frame(mergefr, bg = c1)
     invrow.grid(row = 1, column = 1)
     isys = -1
-    inv_bot = Frame(mergefr, height = 1, width = 1, bg = c1)
+    inv_bot = Frame(mergefr, height = 10, width = 1, bg = c1)
     inv_bot.grid(row = 50, column = 0, columnspan = 50)
+    
 
-    for sys in maindict['systems']:
-        if sum([int(maindict['systems'][sys][i][1]) for i in maindict['systems'][sys]]) is not 0:
+    for hsys in maindict[actors_ref]:
+        if sum([int(workflow_param[cod_ref][i]) for i in maindict[actors_ref][hsys]]) is not 0:
             isys +=1 
             if ccol > 1:
                 invrow.columnconfigure(ccol, minsize = 20)
             invrow.columnconfigure(ccol+1, minsize = 120)
-            inv[sys] = Frame(invrow, height = 0, bg = c1)
-            inv[sys].grid(row = 1, column = ccol+1, sticky  = 'ew')
+            inv[hsys] = Frame(invrow, height = 3, width = 10, bg = c1 )
+            inv[hsys].grid(row = 1, column = ccol+1, sticky  = 'ew')
             ccol += 2
-            print(sys, isys)
+            print(hsys, isys)
+            
 
-    mergefr.rowconfigure(2, minsize = 40)
-    mergefr.rowconfigure(4, minsize = 40)
 
 
     labelrow = Frame(mergefr, bg = c1)
     labelrow.grid(row = 3, column = 1)
 
+    minsize_row = 40
 
-    for sys in maindict['systems']:
-        for cat in maindict['systems'][sys]:
-            curval = list(maindict['systems'][sys][cat][0])[int(maindict['systems'][sys][cat][1])-1]
+    for hsys in maindict[actors_ref]:
+        for cat in maindict[actors_ref][hsys]:
+            curval = list(maindict[actors_ref][hsys][cat])[int(workflow_param[cod_ref][cat])-1]
 
-            if((int(maindict['systems'][sys][cat][1]) is not 0) and (curval.find('iccoup') is -1)):
-                if ''.join(maindict['systems'][sys][cat][0][curval][1]).find('distributions') is not -1:
+            if((int(workflow_param[cod_ref][cat]) is not 0) and (curval.find('iccoup') is -1)):
+                if ''.join(maindict[actors_ref][hsys][cat][curval][1]).find('distributions') is not -1:
                     merge_distributions += 1
-                if ''.join(maindict['systems'][sys][cat][0][curval][1]).find('distribution_sources') is not -1:
+                    
+                if ''.join(maindict[actors_ref][hsys][cat][curval][1]).find('distribution_sources') is not -1:
                     merge_distribution_sources += 1
-                if ''.join(maindict['systems'][sys][cat][0][curval][1]).find('waves') is not -1:
+                    
+                if ''.join(maindict[actors_ref][hsys][cat][curval][1]).find('waves') is not -1:
                     merge_waves += 1
+            
 
+    no_merge_dist = False
+    no_merge_sources = False
+    no_merge_waves = False
+                    
+                    
     
     if merge_distributions > 1:
         mdist = Label(labelrow, text = 'merge distributions', bg = c4, relief = 'solid')
@@ -308,8 +323,11 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
         if 'ICRH' in inv:
             conn_list_merge.append([inv['ICRH'], mdist])
         
-        conn_list_merge.append([mdist, inv_bot])
-      #  conn_list_merge_others.append([mdist, 's', inv_bot, 'n',True, 1, 1])
+      #  conn_list_merge.append([mdist, inv_bot])
+        conn_list_merge_others.append([mdist, 's', inv_bot, 'n',True, 1, 1])
+        minsize_row += 40
+    else: 
+        no_merge_dist = True
 
     if merge_distribution_sources > 1:
         msour = Label(labelrow, text = 'merge sources', bg = c4, relief = 'solid')
@@ -317,9 +335,11 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
 
         conn_list_merge.append([inv['NBI'], msour])
         conn_list_merge.append([inv['NUCLEAR'], msour])
-        
-        conn_list_merge.append([msour, inv_bot])
-     #   conn_list_merge_others.append([msour, 's', inv_bot, 'n',True, 1, 1])
+        minsize_row += 40
+    #    conn_list_merge.append([msour, inv_bot])
+        conn_list_merge_others.append([msour, 's', inv_bot, 'n',True, 1, 1])
+    else:
+        no_merge_sources = True
     
 
     if merge_waves > 1:
@@ -328,22 +348,37 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
 
         conn_list_merge.append([inv['ECRH'], mwave])
         conn_list_merge.append([inv['ICRH'], mwave])
-
-        conn_list_merge.append([mwave, inv_bot])
+        minsize_row += 40
+     
+        #   conn_list_merge.append([mwave, inv_bot])
         #  ---  connect lines on the mergefr canvas
         
-  #      conn_list_merge_others.append([mwave, 's', inv_bot, 'n',True, 1, 1])
+
+    else: 
+        no_merge_waves = True
+       
+    
+    if no_merge_waves == True  and no_merge_sources == True and no_merge_dist == True: 
+        print('all false')
+        l = Label(mergefr, text = 'no merges necessary', bg = c2)
+        l.grid(row = 3, column = 0 , columnspan = 30, sticky = 'ns')
+        conn_list_merge_others.append([l, 's', inv_bot, 'n', False, 1, 1])
+    else:
+        mergefr.rowconfigure(2, minsize = minsize_row)
+        mergefr.rowconfigure(4, minsize = 40)
 
     def mergefr_draw_lines(inv_n, label_n):
         mergefr.update()
         
-
-        line_start_x = inv_n.winfo_x() + inv_n.winfo_width()/2
-        line_start_y = inv_n.winfo_y()
+        line_start_x = inv_n.winfo_x()+ inv_n.winfo_width()/2 
+        line_start_y = inv_n.winfo_y() + inv_n.winfo_height()
         line_end_x   = label_n.winfo_x() + label_n.winfo_width()/2 + labelrow.winfo_x()
         line_end_y   = label_n.winfo_y() + labelrow.winfo_y()
         
         mergefr.create_line(line_start_x, line_start_y, line_end_x, line_end_y, width = 2, arrow = None, fill = c5)
+
+    def mergefr_draw_lines_bottom(inv_n, label_n):
+            line_start_x = label_n.winfo_x() + label_n.winfo_width()/2 + labelrow.winfo_x()+labelrow.winfo_height()
 
 
     for elem in conn_list_merge:
@@ -373,18 +408,18 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
     bl.grid(row = 50, column = 0, columnspan = 50, padx = 10)
 
 
-    for sys in maindict['post_process']:
+    for hsys in maindict[make_core_ids_ref]:
         
         isys += 1
         rrow = 1
-        if sum([int(maindict['post_process'][sys][i][1]) for i in maindict['post_process'][sys]]) is not 0:
+        if sum([int(workflow_param[cod_ref][i]) for i in workflow_param[cod_ref]]) is not 0:
     
             oldlabel = l0
-            for cat in maindict['post_process'][sys]:
-                if int(maindict['post_process'][sys][cat][1]) is not 0:
-                    curval = list(maindict['post_process'][sys][cat][0])[int(maindict['post_process'][sys][cat][1])-1]
-                    input_text = "\n - ".join([strv for strv in maindict['post_process'][sys][cat][0][curval][0]])
-                    output_text = "\n - ".join([strv for strv in maindict['post_process'][sys][cat][0][curval][1]])
+            for cat in maindict[make_core_ids_ref][hsys]:
+                if int(workflow_param[cod_ref][cat]) is not 0:
+                    curval = list(maindict[make_core_ids_ref][hsys][cat])[int(workflow_param[cod_ref][cat])-1]
+                    input_text = "\n - ".join([strv for strv in maindict[make_core_ids_ref][hsys][cat][curval][0]])
+                    output_text = "\n - ".join([strv for strv in maindict[make_core_ids_ref][hsys][cat][curval][1]])
 
 
                     corefr.rowconfigure(rrow, minsize = 30)
@@ -406,18 +441,23 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
                     if ccol > 1:
                         corefr.columnconfigure(ccol-1, minsize = 30)
 
-                    l0.bind('<Button-1>', lambda event, l0 = l0, l1= l1, l2 = l2: click_actors(l0,l1,l2, conn_list_core, corefr))
+                    l0.bind('<Button-1>', lambda event, l0 = l0, l1= l1, l2 = l2: click_actors(l0,l1,l2, conn_list_core, corefr))            
+                    conn_list_core.append([inv, 's', l0, 'n', True, 1, 1])
+                    conn_list_core.append([l0,  's', bl, 'n', True, 1, 1])
 
             ccol += 2 
 
-            conn_list_core.append([inv, 's', l0, 'n', True, 1, 1])
-            conn_list_core.append([l0,  's', bl, 'n', True, 1, 1])
+
         corefr.rowconfigure(rrow, minsize = 50)
+        
+    print(len(conn_list_core))
 
-    if len(conn_list_core) == 0:
-        conn_list_core.append([inv, 's', bl, 'n', True, 1, 1])
-        Label(corefr, text = 'no actors selected', bg = c2).grid(row = rrow-1, sticky = 'ew')
-
+    if len(conn_list_core) ==0 :
+        
+        l = Label(corefr, text = 'no actors selected', bg = c2)
+        l.grid(row = rrow-1, sticky = 'ew')
+        conn_list_core.append([inv, 's', l, 'n', False, 1, 1])
+        conn_list_core.append([l, 's', bl, 'n', False, 1, 1])
     
     for elem in conn_list_core:
         connect_labels(corefr, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5], elem[6])
@@ -425,22 +465,41 @@ def make_flowchart(old_frame, window,  maindict, c1, c2, c3, c4, c5):
 
     #TIME CONTROL BLOCK WINDOW
 
+    conn_list_timec = []
 
     inv = Frame(base, height = 1, width = 1, bg = c1)
     inv1 = Frame(base, height = 1, width = 1, bg = c1)
     inv2 = Frame(base, height = 1, width = 1, bg = c1)
+    inv3 = Frame(base, height = 1, width = 1, bg = c1)
+
 
     inv.grid(row = 13,  column = 3)
-    inv1.grid(row = 3,  column = 3)
-    inv2.grid(row = 3, column = 1) #, columnspan = 50)
+    inv1.grid(row = 13, column = 2)
+    inv2.grid(row = 3,  column = 3)
+    inv3.grid(row = 3, column = 1) #, columnspan = 50)
 
-    conn_list.append([tcontla, 'e', inv, 'w', False, 1, 1])
-    conn_list.append([inv, 'n', inv1, 's', False, 1, 1])
-    conn_list.append([inv1, 'w', inv2, 'e', True, 1, 1])
-
-    Label(tcontfr, text = 'time++ \n if time < tend')
+    conn_list.append([inv, 'e', inv1, 'w', False, 1, 1])
+    conn_list.append([inv2, 'n', inv2, 's', False, 1, 1])
+    conn_list.append([inv2, 'w', inv3, 'e', True, 1, 1])
 
 
+
+    inv1 = Frame(tcontfr, height = 1, width = 1, bg = c1)
+    inv1.grid(row = 0)
+    inv2 = Frame(tcontfr, height = 1, width = 1, bg = c1)
+    inv2.grid(row = 50)
+    tla = Label(tcontfr, text = 'time++ \n if time < tend', bg = c2)
+    tla.grid(row = 1, columnspan = 50, sticky = 'ew')
+
+
+    conn_list_timec.append([inv1, 's', tla, 'n', False, 1, 1])
+    conn_list_timec.append([tla, 's',inv2, 'n', False, 1, 1])
+
+    tcontfr.rowconfigure(2, minsize = 20)
+
+    for elem in conn_list_timec:
+       connect_labels(base, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5],elem[6])
+       
 
     ### CONNECT LINE BASELEVEL
     for elem in conn_list:

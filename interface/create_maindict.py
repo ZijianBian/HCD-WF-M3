@@ -12,6 +12,8 @@ def create_maindict(default_workflow_parameters):
 
     ids_list = ['core_profiles','core_sourcres','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
 
+    not_compiled_list = []
+
     def read_inputoutput(name):
 
         in_l = []
@@ -28,7 +30,9 @@ def create_maindict(default_workflow_parameters):
                 if parstr.find(':param result: '+iids) is not -1:
                     out_l.append(iids)
         except:
-            print(name, 'not compiled')
+            if name not in not_compiled_list: 
+                print('WARNING:', name, 'not compiled')
+            not_compiled_list.append(name)
 
         return(in_l, out_l)
 

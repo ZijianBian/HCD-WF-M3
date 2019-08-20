@@ -34,7 +34,7 @@ def check_for_dependencies(root, dependencies):
                             elif str(dep[i]).find(str(codedict_names[i]))is not -1:
                                 pass
                             else:
-                                print('this is not a valid configuration for '+ code.upper() + ' please change the selection of your actors and try again')
+                                print('ERROR: this is not a valid configuration for '+ code.upper() + ' please change the selection of your actors and try again')
                                 sys.exit()
                                 
 

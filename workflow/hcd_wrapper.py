@@ -1,6 +1,5 @@
 
 def hcd_wrapper(par_path):
-
   import os,imas,sys, copy
   sys.path.append('interface')
   sys.path.append('workflow')
@@ -10,8 +9,6 @@ def hcd_wrapper(par_path):
   import xml.etree.ElementTree as ET
   from developer_file import load_code_dependencies
   from check_for_dependencies import check_for_dependencies
-
-
 
 
   # IMPORT PARAMETERS FROM XML --------------------------------------
@@ -36,21 +33,22 @@ def hcd_wrapper(par_path):
       param['input_path'] = par_path
       print(elem.tag, ' = ', param[elem.tag])
 
-  timearr = []
-  if param['tbegin'] == 0:   
-    timearr = core_profiles0.time
-
-  list_of_actors = ['simpletrans'] ## 
+  if param['run_simpletrans'] == 1:
+      list_of_actors = ['simpletrans'] ## 
+  else:
+      list_of_actors = []
 
   for elem in root[2].iter():
       if elem.tag is not etree.Comment and len(elem)== 0:
-          if int(elem.text) is not 0:
+       #   if int(elem.text) is not 0:
             
             list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
           
   if len(list_of_actors) == 0:
-     print('no actors selected - heating & current drive workflow will not be executed')
+     print('ERROR: no actors selected - heating & current drive workflow will not be executed')
      sys.exit()
+
+
 
 
   ##----------------------------------------------------------------------------------
@@ -80,7 +78,7 @@ def hcd_wrapper(par_path):
         if parstr.find(':param result: '+iids) is not -1 and iids not in out_l:
                 out_l.append(iids)
     except:
-      print(name, 'not compiled')
+        print(name, 'is not compiled!')
 
 
         
@@ -147,6 +145,27 @@ def hcd_wrapper(par_path):
       print('get ', elem)
       ids_bundle_initial[elem].get()
 
+
+  ## CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY:
+  if param['tbegin'] > 0 and param['tbegin'] < ids_bundle_initial['core_profiles'].time[0]:
+     print('ERROR: tbegin out of range (smaller than first time of core_profiles)')
+     sys.exit()
+  
+  print(ids_bundle_initial['core_profiles'].time[-1])
+  if param['tend'] > 0 and param['tend'] > ids_bundle_initial['core_profiles'].time[-1]:
+     print('ERROR: tend out of range (bigger than last time of core_profiles)')
+     sys.exit()
+
+  if param['tbegin'] < 0:
+      print(ids_bundle_initial['core_profiles'].time[0])
+      param['tbegin'] = ids_bundle_initial['core_profiles'].time[0]
+      
+      print('tbegin set to time of first core_profiles timeslice. tbegin = ', param['tbegin'])
+
+  if param['tend'] < 0:
+      param['tend'] = ids_bundle_initial['core_profiles'].time[-1] 
+      print('tend set to time of last core_profiles timeslice, tend = ', param['tend'])
+
   oldtime = {}
   for elem in ids_bundle_work: 
       if elem in in_l or elem in out_l:
@@ -155,9 +174,9 @@ def hcd_wrapper(par_path):
          
          oldtime[elem] = [ids_bundle_work[elem].time, True]
          
-
+    
  
-
+  print('enter timeloop')
   
   #########################################################################
   #-----------------------------------------------------------------------
@@ -177,11 +196,10 @@ def hcd_wrapper(par_path):
            
       
       print('entering heating & current drive workflow')
-   #   ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
-      ids_bundle_updated = copy.deepcopy(ids_bundle_work)
-
+      ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
+   
       
-      if param['run_simpletrans']:
+      if param['run_simpletrans'] == 1:
         ## import simpletrans
         try:
              ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
@@ -191,7 +209,9 @@ def hcd_wrapper(par_path):
           
 
       print('set output')
+       
       for elem in ids_bundle_updated:    # not sure if this should be workbundle or updatedbundle
+        if elem in oldtime:
           print(elem+': ')
           print('-- setExpIdx')
           ids_bundle_updated[elem].setExpIdx(idx_out)
@@ -205,9 +225,7 @@ def hcd_wrapper(par_path):
         
           if elem in out_l: 
                  print('setting time of ', elem, 'to the workflow time (', timenow, ')')
-                 print(ids_bundle_updated[elem].time)
                  ids_bundle_updated[elem].time = [timenow]
-                 print(ids_bundle_updated[elem].time)
                  print('-- putSlice')
                  ids_bundle_work[elem].putSlice()
           elif oldtime[elem][0]:
