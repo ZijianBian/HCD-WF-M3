@@ -14,58 +14,13 @@ from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
 
-from developer_file import load_code_dependencies
 
 #---------------------------------------------------------------------------------------------
-##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
+
 
 if (os.getenv('KEPLER') is None)  or ('/work/imas/extra' in os.getenv('KEPLER')):
     print('ERROR: the local version of Kepler is not loaded')
     sys.exit()
-
-
-actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
-
-ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
-
-def read_inputoutput(name):
-
-    in_l = []
-    out_l = []
-    try:
-        sys.path[:0] = [os.path.join(actor_path,name)]
-        globals()[name] = getattr(__import__(name), name)
-        
-        parstr = globals()[name].__doc__
-        
-        for iids in ids_list:
-            if parstr.find(':param '+iids) is not -1:
-                in_l.append(iids)
-            if parstr.find(':param result: '+iids) is not -1:
-                out_l.append(iids)
-    except:
-        pass
-        
-    return(in_l, out_l)
-
-tree = etree.parse('input_workflow_default.xml')
-root = tree.getroot()
-
-maindict = {}
-
-for step in root[2]:
-    dict3 = {}
-    for isys in step:
-        dict2 = {}
-        for icat in isys:
-            dict1 = {}
-            if icat.tag is not etree.Comment:
-                for icode in icat.attrib['list'].split():
-                    (in_l, out_l) = read_inputoutput(icode)
-                    dict1[icode] = [in_l, out_l]
-                dict2[icat.tag] = [dict1, icat.text]
-        dict3[isys.tag] = dict2
-    maindict[step.tag] = dict3
 
 # ---------------------------------------------------------------------------------------------
 # set the path to the folders where the configuration and codeparameters are stored
@@ -74,9 +29,11 @@ run_config_folder_path = os.path.join(os.getcwd(), 'run_configurations/run_'+dat
 
 run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
 
+root1 = etree.parse('input_workflow_default.xml').getroot()
+
 os.makedirs(run_config_folder_path)
-for systemname in maindict['systems']:
-    os.makedirs(run_config_folder_path+'/'+systemname)
+for systemname in root1[2][0]:
+    os.makedirs(run_config_folder_path+'/'+systemname.tag)
 
 copy2('input_workflow_default.xml', run_config_folder_path+'/input_workflow.xml', follow_symlinks=True)
         
@@ -111,8 +68,8 @@ def open_gui(input_filepath):
 
         pass
 
-
-    (maindict, actor_path) = create_maindict(input_filepath)
+    ##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
+    (maindict, actor_path, list_of_uncompiled_actors) = create_maindict(input_filepath)
     workflow_param = create_workflow_param_from_file(input_filepath)
 
     ### setup 
@@ -213,19 +170,32 @@ def open_gui(input_filepath):
     button_restore_def.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
     button_restore_def.configure(command = lambda: open_gui('input_workflow_default.xml'))
 
+    button_exit = Button(fr_wfp, text = 'Exit', bg = 'light grey')
+    button_exit.grid(row = 54, column = 0, padx = 5, pady = 5, sticky = 'w')
+    button_exit.configure(command = lambda: sys.exit())
 
     # middle: 
     button_create_flowchart = Button(fr_as, text = 'Show Flowchart', bg = c2)
     button_create_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
     old_fr = fr_fc
-    button_create_flowchart.configure(command = lambda: make_flowchart(old_fr, window, maindict, workflow_param, c1, c2, c3, c4,c5))
+    button_create_flowchart.configure(command = lambda: flowchart_and_hide_button(old_fr, window, maindict, workflow_param, c1, c2, c3, c4,c5))
 
     button_edit_codeparameters = Button(fr_as, text = 'Edit Codeparameters', bg = c2)
     button_edit_codeparameters.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
     button_edit_codeparameters.configure(command = lambda: edit_codeparam())
 
     
+    def flowchart_and_hide_button(old_fr, window, maindict, workflow_param, c1, c2, c3, c4,c5):
+        button_hide_flowchart = Button(fr_as, text = 'Hide Flowchart', bg = c2)
+        button_hide_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
+        button_hide_flowchart.configure(command = lambda: destroy_window_and_button())
+        new_old_fr = make_flowchart(old_fr, window, maindict, workflow_param, c1, c2, c3, c4,c5)
 
+        def destroy_window_and_button():
+            new_old_fr.grid_remove()
+            new_old_fr.grid_forget()
+            button_hide_flowchart.grid_remove()
+            button_hide_flowchart.grid_forget()
 
     ## MANAGE XML FILES
     def edit_codeparam():
@@ -333,17 +303,27 @@ def open_gui(input_filepath):
                     e.grid(row = rrow, column = ccolumn+1, padx = 3, pady = 3)
                     codeparam_dict[elem.tag] = entrystring.get()
                     
-                    entrystring.trace('w', lambda name, index, mode, elem = elem.tag, entrystring = entrystring: update_codeparam_dict(elem, entrystring.get()))
-    
+                    entrystring.trace('w', lambda name, index, mode, elem = elem.tag, entrystring = entrystring, e = e: update_codeparam_dict(elem, entrystring.get(), e))
+              
                    
                     try:
                          CreateToolTip(l, docum_dict[l.cget('text')])
                     except:
                         pass 
 
-                    def update_codeparam_dict(elem, newvalue): 
+                    def update_codeparam_dict(elem, newvalue, entry1): 
                         codeparam_dict[elem] = newvalue
-                       
+                        for i in root.iter():
+                            if (elem in [str(i.tag)]) and (i.tag is not etree.Comment): 
+                                i.text = newvalue
+
+
+                        if xmlschema.validate(root): 
+                            entry1.config(bg = c1)
+                        else:
+                            entry1.config(bg = 'salmon1')
+
+
                     
                     rrow +=1 
                     if rrow > 30:  ## if there are more than 30 entries start a new column
@@ -353,6 +333,7 @@ def open_gui(input_filepath):
 
             Button(fr_top, text = 'save', bg = c2,  command = lambda: save_codeparam_to_file(dest_file, codeparam_dict)).grid(row = 0 ,column = 1, padx = 5, pady = 5)
             Button(fr_top, text = 'load default', bg = c2, command = lambda: make_frame(hsys, actor_name,  prev_frame, True)).grid(row = 0, column =2, padx = 5, pady = 5)
+            Button(fr_top, text = 'exit', bg = c2, command = lambda: cp_top.destroy()).grid(row = 0, column = 4, padx = (20, 5), pady = 5)
                     
 
 
@@ -372,6 +353,10 @@ def open_gui(input_filepath):
                 if int(workflow_param[cod_ref][cat]) is not 0:
                     actor_name = list(maindict[actors_ref][hsys][cat].keys())[int(workflow_param[cod_ref][cat])-1]
                     # get xml path from actor.py 
+                    if actor_name in list_of_uncompiled_actors:
+                         print('ERROR: ', actor_name, ' is selected as an active actor, but it has not been found. \n Please change your selection of actors or load', actor_name, 'and try again')
+                         sys.exit()
+
                     
                     dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')
                     if not os.path.exists(dest_file):
@@ -405,7 +390,7 @@ def open_gui(input_filepath):
     def save_and_run(filepath, save_yn):
         
         save_workflow_param_to_file(filepath)
-        
+
         #window.destroy()
         hcd_wrapper(run_config_folder_path)
 
@@ -432,6 +417,7 @@ def open_gui(input_filepath):
                     rmtree(run_config_folder_path)
                     copytree(source_folder, run_config_folder_path)
 
+                    
 
                 open_gui(run_config_folder_path+ '/input_workflow.xml')
 

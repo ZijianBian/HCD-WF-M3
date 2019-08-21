@@ -31,7 +31,7 @@ def create_maindict(default_workflow_parameters):
                     out_l.append(iids)
         except:
             if name not in not_compiled_list: 
-                print('WARNING:', name, 'not compiled')
+                print('WARNING:', name, 'not found')
             not_compiled_list.append(name)
 
         return(in_l, out_l)
@@ -56,4 +56,5 @@ def create_maindict(default_workflow_parameters):
         maindict[step.tag] = dict3
 
 
-    return(maindict, actor_path)
+
+    return(maindict, actor_path, not_compiled_list)

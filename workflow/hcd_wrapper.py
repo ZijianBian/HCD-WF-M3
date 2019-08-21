@@ -81,7 +81,7 @@ def hcd_wrapper(par_path):
         print(name, ' not found!')
 
 
-        
+
 
   ## CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
@@ -157,7 +157,6 @@ def hcd_wrapper(par_path):
            ids_bundle_work[elem].getSlice(param['tbegin'],1)
            oldtime[elem] = [ids_bundle_work[elem].time, True]
          
-    
   print('---- enter timeloop ----')
   
   #########################################################################
@@ -170,7 +169,7 @@ def hcd_wrapper(par_path):
   timenow = param['tbegin']
 
 
-  while timenow < param['tend']:
+  while timenow < param['tend']+param['dt_required']:
      
       print('Time =         ', timenow, 's')
       print('dt =           ', param['dt_required'], 's')
@@ -179,7 +178,7 @@ def hcd_wrapper(par_path):
     
       print('entering heating & current drive workflow')
       ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
-    #  ids_bundle_updated = copy.deepcopy(ids_bundle_work)
+   #   ids_bundle_updated = copy.deepcopy(ids_bundle_work)
       
       if param['run_simpletrans'] == 1:
         ## import simpletrans
@@ -190,55 +189,62 @@ def hcd_wrapper(par_path):
              print('WARNING - skipping simpletrans even though it has been choosen in the configuration!')
           
 
-      print('set output')
+  #    print('set output')
        
-
+     
 
       for elem in ids_bundle_updated:   
-           print(elem+': ')
-           print('-- setExpIdx')
+         #  print(elem+': ')
+         #  print('-- setExpIdx')
            ids_bundle_updated[elem].setExpIdx(idx_out)
            if timenow ==  (param['tbegin']):
                
                if ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or ids_bundle_updated[elem].ids_properties.homogeneous_time == 0:
-                 print('-- set static variables')
+              #   print('-- set static variables')
                  ids_bundle_updated[elem].putNonTimed()
                else:
-                 print('-- ids is empty, not putNonTimed quits with no action')
-
+               #  print('-- ids is empty, not putNonTimed quits with no action')
+                 pass
           ## if the ids has been modified - change the time to the workflow time - and definitely put to database
           #  elif the ids has not been modified AND the time has changed - put to database
           #  else (the ids has not been modified AND the time has not changed) - don't put
-        
+
            if elem in out_l: 
-                 print('-- setting time to the workflow time ('+str(timenow)+' s)')
-                 print(np.array([timenow]))
 
-                 ids_bundle_updated[elem].time = np.array([[timenow]])
+            #     print('-- setting time to the workflow time ('+str(timenow)+' s)')
+                     
+                 m = ids_bundle_updated['core_profiles'].time
+                 m[0] = float(timenow)
+                 ids_bundle_updated[elem].time = m
 
-                 print(type(ids_bundle_updated[elem].time))
 
-
-                 print('-- putSlice')
+                 if not ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or not ids_bundle_updated[elem].ids_properties.homogeneous_time == 0: #if the ids didnot exist before (homogeneous time not filled) and it is an output set homogeneous time to 1
+               #      print('-- setting homogeneous time to one')
+                     ids_bundle_updated[elem].ids_properties.homogeneous_time = 1
+                     
+             #    print('-- putSlice')
                  ids_bundle_work[elem].putSlice()
+
+
            elif oldtime[elem][1]:
-                 print(ids_bundle_updated[elem].ids_properties.homogeneous_time)
                  if ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or ids_bundle_updated[elem].ids_properties.homogeneous_time == 0:
-                     print('-- putSlice')
+                #     print('-- putSlice')
                      ids_bundle_updated[elem].putSlice()
                  else: 
-                  print('-- ids is empty -> no putSlice')
+                   pass
+              #    print('-- ids is empty -> no putSlice')
            else:
-                 print('-- not putting Slice to avoid duplicate')
+               pass
+              #   print('-- not putting Slice to avoid duplicate')
 
 
-
-      print('prepare ids bundle for next timestep')
+    #  print('prepare ids bundle for next timestep')
       timenow += param['dt_required']
+      
 
       ids_bundle_work = copy.deepcopy(ids_bundle_initial)
       for elem in ids_bundle_work: 
-          print('get slice ', elem)
+         # print('get slice ', elem)
           ids_bundle_work[elem].getSlice(timenow,1)
           
           ## does this new Slice have a different time than the old Slice? 
@@ -251,7 +257,7 @@ def hcd_wrapper(par_path):
 
           if elem in out_l: 
               ids_bundle_work[elem] =  copy.deepcopy(ids_bundle_updated[elem])
-              print('using the '+ elem+ 'output as input for the next timeslice')
+        #      print('using the '+ elem+ ' output as input for the next timeslice')
 
 
       
