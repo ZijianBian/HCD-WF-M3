@@ -12,7 +12,7 @@ for name in list_of_actors:
         globals()[name] = getattr(__import__(name), name)
     except:
         pass
-        #print(name, 'not compiled')
+        print(name, 'not found')
 #--------------------------------------------------------------------------------------------------------------------
 
 def hcd_workflow(IDS_BUNDLE_in, parameters):
@@ -24,7 +24,7 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
     IDS_BUNDLE_ic    = copy.deepcopy(IDS_BUNDLE_in)
     IDS_BUNDLE_ec    = copy.deepcopy(IDS_BUNDLE_in)
     IDS_BUNDLE_out   = copy.deepcopy(IDS_BUNDLE_in)
-    print('-- step 0: done')
+  
 
     ## STEP 1:  SOURCE CODES and WAVE SOLVER (and ICCOUP) :
     print('-- step 1: source codes and wave solvers')
@@ -33,10 +33,10 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
     IDS_BUNDLE_ic['waves']                      = copy.deepcopy(act.ic_coup(IDS_BUNDLE_ic, parameters))
     IDS_BUNDLE_ic['waves']                      = copy.deepcopy(act.ic_wave_solver(IDS_BUNDLE_ic, parameters))
     IDS_BUNDLE_ec['waves']                      = copy.deepcopy(act.ec_wave_solver(IDS_BUNDLE_ec, parameters))
-    print('-- step 1: done')
+  
 
     ## STEP 2: FOKKER PLANK SOLVERS and creating a common nbi_ic distributions IDS
-    print('-- step 3: fokker plank solvers')
+    print('-- step 2: fokker plank solvers')
     IDS_BUNDLE_nuclear['distributions']        = copy.deepcopy(act.nuclear_fp(IDS_BUNDLE_nuclear, parameters))
 
     if(parameters['nbi_fp'] == 9 and parameters['ic_fp'] == 9):
@@ -46,17 +46,17 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
         IDS_BUNDLE_ic['distributions']     =   copy.deepcopy(act.ic_wave_fp(IDS_BUNDLE_ic, parameters))
 
         distributions_nbi_ic =   merge_distributions(IDS_BUNDLE_nbi['distributions'], IDS_BUNDLE_ic['distributions'])
-    print('-- step 3: done')
+
 
     ## STEP 4: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION SOURCES and WAVES
-    print('-- step 4: mergers')
+    print('-- step 3: mergers')
     distributions_final        = merge_distributions(IDS_BUNDLE_nuclear['distributions'], distributions_nbi_ic)
     waves_final                = merge_waves(IDS_BUNDLE_ec['waves'], IDS_BUNDLE_ic['waves'])
     distribution_sources_final = merge_distribution_sources(IDS_BUNDLE_nbi['distribution_sources'], IDS_BUNDLE_nuclear['distribution_sources'])
-    print('-- step 4: done')
+   
 
     ## STEP 5: MAKE CORE IDS:
-    print('-- step 5: make core ids')
+    print('-- step 4: make core ids')
     if parameters['hcd2core_sources'] == 1:
         core_sources_final  = hcd2core_sources(distributions_final, distribution_sources_final, waves_final, IDS_BUNDLE_in['core_profiles'])
     else:
@@ -68,7 +68,7 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
     else:
         pass
         core_profiles_final = copy.deepcopy(IDS_BUNDLE_in['core_profiles'])
-    print('-- step 5: done')
+   
 
 
 
@@ -76,6 +76,8 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
     IDS_BUNDLE_out['waves']                = waves_final
     IDS_BUNDLE_out['distribution_sources'] = distribution_sources_final 
     IDS_BUNDLE_out['core_sources']         = core_sources_final
+
+    print('end of timeloop')
 
     return IDS_BUNDLE_out
 
