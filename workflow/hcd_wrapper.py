@@ -46,7 +46,7 @@ def hcd_wrapper(par_path):
           
   if len(list_of_actors) == 0:
      print('ERROR: no actors selected - heating & current drive workflow will not be executed')
-     sys.exit()
+     return
 
 
 
@@ -105,7 +105,7 @@ def hcd_wrapper(par_path):
        print('--> Create local database '+os.getenv('HOME')+'/public/imasdb/'+tokamakname)
        os.popen("imasdb "+tokamakname).read()
 
-  print('open input and output file')
+  print('-- open input and output file --')
   input = imas.ids(param['shot_nr'], param['run_in'], 0,0)
   input.open_env(user_in,tokamakname,version)
   output = imas.ids(param["shot_nr"], param["run_out"], 0,0)
@@ -130,32 +130,37 @@ def hcd_wrapper(par_path):
 
   for elem in ids_bundle_initial: 
       if  elem in in_l or elem in out_l:
+           print('get ', elem)
            ids_bundle_initial[elem].get()
 
 
   ## CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY:
-  if param['tbegin'] > 0 and param['tbegin'] < ids_bundle_initial['core_profiles'].time[0]:
-     print('ERROR: tbegin out of range (smaller than first time of core_profiles)')
-     sys.exit()
-  
-  if param['tend'] > 0 and param['tend'] > ids_bundle_initial['core_profiles'].time[-1]:
-     print('ERROR: tend out of range (bigger than last time of core_profiles)')
-     sys.exit()
-
   if param['tbegin'] < 0:
       param['tbegin'] = ids_bundle_initial['core_profiles'].time[0]
       print('tbegin set to time of first core_profiles timeslice. tbegin = ', param['tbegin'])
+
+  if param['tbegin'] > 0 and param['tbegin'] < ids_bundle_initial['core_profiles'].time[0]:
+     print('ERROR: tbegin out of range ('+str(param['tbegin'])+'s is less than first time in core_profiles')
+     return
 
   if param['tend'] < 0:
       param['tend'] = ids_bundle_initial['core_profiles'].time[-1]
       print('tend set to time of last core_profiles timeslice, tend = ', param['tend'])
 
+  if param['tend'] > 0 and param['tend'] > ids_bundle_initial['core_profiles'].time[-1]:
+     print('ERROR: tend out of range  ('+str(param['tend'])+ 's is greater than last time in core_profiles')
+     return
+
 
   oldtime = {}
+
   for elem in ids_bundle_work: 
 
-           ids_bundle_work[elem].getSlice(param['tbegin'],1)
-           oldtime[elem] = [ids_bundle_work[elem].time, True]
+       print(ids_bundle_work[elem].ids_properties)
+  
+       ids_bundle_work[elem].getSlice(param['tbegin'],1)
+
+       oldtime[elem] = [ids_bundle_work[elem].time, True]
          
   print('---- enter timeloop ----')
   
@@ -177,8 +182,8 @@ def hcd_wrapper(par_path):
            
     
       print('entering heating & current drive workflow')
-      ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
-   #   ids_bundle_updated = copy.deepcopy(ids_bundle_work)
+    #  ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
+      ids_bundle_updated = copy.deepcopy(ids_bundle_work)
       
       if param['run_simpletrans'] == 1:
         ## import simpletrans
@@ -194,7 +199,7 @@ def hcd_wrapper(par_path):
      
 
       for elem in ids_bundle_updated:   
-         #  print(elem+': ')
+           print( elem+': ')
          #  print('-- setExpIdx')
            ids_bundle_updated[elem].setExpIdx(idx_out)
            if timenow ==  (param['tbegin']):
