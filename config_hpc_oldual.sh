@@ -5,18 +5,25 @@ module load IMAS/3.21.0-3.8.11
 module load Kepler/2.5p4-2.1.5
 module load FC2K/4.4.0
 
-# To read Machine Description data
-module use --append m-machine-description/src/main/Environment/HPC/modules
-module load m-machine-description
+# To read Machine Description data from the MD datbase
+export MD_ACCESS=no
+if [ $MD_ACCESS = "yes" ]; then
+    echo "Load m-machine-description module"
+    module use --append m-machine-description/src/main/Environment/HPC/modules
+    module load m-machine-description
+fi
 
 # Switch from Python 2.7 to Python 3
-source m-machine-description/src/main/Environment/HPC/switch_python_ITER_HPC.sh
+source switch_python_ITER_HPC.sh
+
+# For Python actors
+module load PyUAL/1.0.0-foss-2018a-Python-3.6.4
 
 # For actor release procedure
 module load sh/1.12.14-foss-2018a-Python-3.6.4
 
 # Compile actors without diagnostic information
-# (not compatible with Python for this old version of FC2K)
+# (the diag info is not compatible with Python for this old version of FC2K)
 export DIAG_INFO=-DNO_DIAG_INFO
 
 # Library to process xml with Python
