@@ -140,7 +140,7 @@ def hcd_wrapper(par_path):
       print('tbegin set to time of first core_profiles timeslice. tbegin = ', param['tbegin'])
 
   if param['tbegin'] > 0 and param['tbegin'] < ids_bundle_initial['core_profiles'].time[0]:
-     print('ERROR: tbegin out of range ('+str(param['tbegin'])+'s is less than first time in core_profiles')
+     print('ERROR: tbegin out of range ('+str(param['tbegin'])+'s is less than first time in core_profiles)')
      return
 
   if param['tend'] < 0:
@@ -148,7 +148,7 @@ def hcd_wrapper(par_path):
       print('tend set to time of last core_profiles timeslice, tend = ', param['tend'])
 
   if param['tend'] > 0 and param['tend'] > ids_bundle_initial['core_profiles'].time[-1]:
-     print('ERROR: tend out of range  ('+str(param['tend'])+ 's is greater than last time in core_profiles')
+     print('ERROR: tend out of range  ('+str(param['tend'])+ 's is greater than last time in core_profiles)')
      return
 
 
@@ -156,8 +156,6 @@ def hcd_wrapper(par_path):
 
   for elem in ids_bundle_work: 
 
-       print(ids_bundle_work[elem].ids_properties)
-  
        ids_bundle_work[elem].getSlice(param['tbegin'],1)
 
        oldtime[elem] = [ids_bundle_work[elem].time, True]
@@ -182,8 +180,8 @@ def hcd_wrapper(par_path):
            
     
       print('entering heating & current drive workflow')
-    #  ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
-      ids_bundle_updated = copy.deepcopy(ids_bundle_work)
+      ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
+    
       
       if param['run_simpletrans'] == 1:
         ## import simpletrans
@@ -199,7 +197,7 @@ def hcd_wrapper(par_path):
      
 
       for elem in ids_bundle_updated:   
-           print( elem+': ')
+#           print( elem+': ')
          #  print('-- setExpIdx')
            ids_bundle_updated[elem].setExpIdx(idx_out)
            if timenow ==  (param['tbegin']):
