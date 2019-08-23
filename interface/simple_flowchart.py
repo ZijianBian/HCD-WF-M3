@@ -433,9 +433,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
             dx = line_end_x - line_start_x
             dy = line_end_y - line_start_y
 
-            print(label_n.winfo_x())
-            print(label_n.winfo_y())
-             
 
             mergefr.create_line(line_start_x, line_start_y,
                                 line_start_x, line_start_y + dy/2,
