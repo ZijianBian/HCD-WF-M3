@@ -10,7 +10,6 @@ def hcd_wrapper(par_path):
   from developer_file import load_code_dependencies
   from check_for_dependencies import check_for_dependencies
   import numpy as np 
-  import pdb
 
 
   # IMPORT PARAMETERS FROM XML --------------------------------------
@@ -151,8 +150,6 @@ def hcd_wrapper(par_path):
   if param['tend'] > 0 and param['tend'] > ids_bundle_initial['core_profiles'].time[-1]:
      print('ERROR: tend out of range  ('+str(param['tend'])+ 's is greater than last time in core_profiles)')
      return
-
-  pdb.set_trace()
 
   oldtime = {}
 
