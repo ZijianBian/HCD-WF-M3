@@ -348,7 +348,7 @@ def open_gui(input_filepath):
     def save_workflow_param_to_file(filepath):
 
         if filepath == '':
-            filepath = run_config_folder_path+'/input_workflow.xml'
+            filepath = run_config_folder_path
          
        ## COPY 
         ## for all the active actors
@@ -377,7 +377,10 @@ def open_gui(input_filepath):
               
                                     break
 
-        print(filepath)
+        if  'xml'  not in filepath:
+             filepath = filepath+'/input_workflow.xml'
+
+      
         tree = etree.parse(filepath)
         root = tree.getroot()
         
@@ -395,7 +398,7 @@ def open_gui(input_filepath):
     def save_as():
         
         filepath = filedialog.askdirectory()
-        print(filepath)
+       
         global run_config_folder_path
         old_run_config_folder_path = copy.copy(run_config_folder_path)
       
@@ -410,12 +413,11 @@ def open_gui(input_filepath):
         else:
             copytree(run_config_folder_path, filepath)
             run_config_folder_path = copy.copy(filepath)
-            print('r  ', run_config_folder_path)
             save_workflow_param_to_file(run_config_folder_path+'/input_workflow.xml')
 
             if old_run_config_folder_path is not run_config_folder_path:
                 rmtree(old_run_config_folder_path) 
-        print(run_config_folder_path)
+       
         return run_config_folder_path
      
 
@@ -476,6 +478,5 @@ def open_gui(input_filepath):
 
     window.mainloop()
 
-print(run_config_folder_path)
 
 open_gui(default_workflow_param_path)
