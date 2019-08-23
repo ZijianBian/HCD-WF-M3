@@ -25,6 +25,7 @@ if (os.getenv('KEPLER') is None)  or ('/work/imas/extra' in os.getenv('KEPLER'))
 # ---------------------------------------------------------------------------------------------
 # set the path to the folders where the configuration and codeparameters are stored
     
+global run_config_folder_path 
 run_config_folder_path  = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
 
 run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
@@ -346,7 +347,7 @@ def open_gui(input_filepath):
       
         
     def save_workflow_param_to_file(filepath):
-
+        global run_config_folder_path
         if filepath == '':
             filepath = run_config_folder_path
          
@@ -377,7 +378,7 @@ def open_gui(input_filepath):
               
                                     break
 
-        if  'xml'  not in filepath:
+        if  'xml'  not in filepath[-4:]:
              filepath = filepath+'/input_workflow.xml'
 
       
@@ -406,14 +407,14 @@ def open_gui(input_filepath):
         if os.path.exists(filepath):
             
             run_config_folder_path = copy.copy(filepath)
-            save_workflow_param_to_file(run_config_folder_path+'/input_workflow.xml')
+            save_workflow_param_to_file(run_config_folder_path)
             if old_run_config_folder_path is not run_config_folder_path:
                 rmtree(old_run_config_folder_path) 
 
         else:
             copytree(run_config_folder_path, filepath)
             run_config_folder_path = copy.copy(filepath)
-            save_workflow_param_to_file(run_config_folder_path+'/input_workflow.xml')
+            save_workflow_param_to_file(run_config_folder_path)
 
             if old_run_config_folder_path is not run_config_folder_path:
                 rmtree(old_run_config_folder_path) 
