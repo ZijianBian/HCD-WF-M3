@@ -148,7 +148,7 @@ def open_gui(input_filepath):
     # left: 
     button_saveconfig = Button(fr_wfp, text = 'Save Configuration', bg = c2)
     button_saveconfig.grid(row = 52, column = 0, padx = 5, pady = 5, sticky = 'ew')
-    button_saveconfig.configure(command = lambda: save_workflow_param_to_file(''))
+    button_saveconfig.configure(command = lambda: save_workflow_param_to_file(run_config_folder_path))
     # save xml to the run folder
     button_loadconfig = Button(fr_wfp, text = 'Load Configuration', bg = c2)
     button_loadconfig.grid(row = 52, column = 1, padx = 5, pady = 5, sticky = 'ew')
@@ -363,7 +363,7 @@ def open_gui(input_filepath):
                          return False
 
                     
-                    dest_file = os.path.join(filepath+'/'+hsys+'/input_'+actor_name+'.xml')
+                    dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')
                     if not os.path.exists(dest_file):
                         actor_python_script = actor_path+'/'+actor_name+'/'+actor_name+'.py'
                         found_xml = False
@@ -419,7 +419,7 @@ def open_gui(input_filepath):
             if old_run_config_folder_path is not run_config_folder_path:
                 rmtree(old_run_config_folder_path) 
        
-        return run_config_folder_path
+   
      
 
     def save_and_run(filepath, save_yn):
