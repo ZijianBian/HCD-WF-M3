@@ -10,7 +10,7 @@ c_arr=['red', 'blue','yellow','green']
 mergec = ['red4', 'blue4', 'yellow4']
 
 
-def make_flowchart(old_frame, window,  maindict, workflow_param,  c1, c2, c3, c4, c5):
+def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  c1, c2, c3, c4, c5):
 #--------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------
@@ -123,8 +123,8 @@ def make_flowchart(old_frame, window,  maindict, workflow_param,  c1, c2, c3, c4
 #--------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------
+ 
 
-    old_frame.grid_forget()
     base = Canvas(window, width = 100, height = 100, bg = c1)
     base.grid(row = 0, column = 2, sticky = 'news')
     base.rowconfigure(0, minsize = 30)
@@ -134,7 +134,14 @@ def make_flowchart(old_frame, window,  maindict, workflow_param,  c1, c2, c3, c4
     base.columnconfigure(3, minsize = 40)
     
     conn_list = []
-
+    
+    exitbutton = Button(base, text = 'close')
+    exitbutton.grid(row = 0, column = 3, padx = 2, pady = 2)
+    exitbutton.configure(command = lambda: hide_display())
+    def hide_display():
+        for b in removed_by_close_button:
+            b.grid_remove()
+            b.grid_forget()
 
     ## CREATE BASIC LAYOUT FOR THE FLOWCHART)
     initla = Label(base, bg = c2, text = 'INITIALIZING', font = '14', relief = 'solid', pady = 5, width = 25)
@@ -596,3 +603,4 @@ def make_flowchart(old_frame, window,  maindict, workflow_param,  c1, c2, c3, c4
     for elem in conn_list:
         connect_labels(base, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5],elem[6])
     
+    return base
