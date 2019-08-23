@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, copy
 sys.path.append('interface')
 sys.path.append('workflow')
 sys.path.append(os.getcwd())
@@ -25,7 +25,7 @@ if (os.getenv('KEPLER') is None)  or ('/work/imas/extra' in os.getenv('KEPLER'))
 # ---------------------------------------------------------------------------------------------
 # set the path to the folders where the configuration and codeparameters are stored
     
-run_config_folder_path = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
+run_config_folder_path  = os.path.join(os.getcwd(), 'run_configurations/run_'+datetime.now().strftime('%m%d_%H%M%S'))
 
 run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
 
@@ -147,7 +147,7 @@ def open_gui(input_filepath):
     # left: 
     button_saveconfig = Button(fr_wfp, text = 'Save Configuration', bg = c2)
     button_saveconfig.grid(row = 52, column = 0, padx = 5, pady = 5, sticky = 'ew')
-    button_saveconfig.configure(command = lambda: save_workflow_param_to_file(run_workflow_param_path))
+    button_saveconfig.configure(command = lambda: save_workflow_param_to_file(''))
     # save xml to the run folder
     button_loadconfig = Button(fr_wfp, text = 'Load Configuration', bg = c2)
     button_loadconfig.grid(row = 52, column = 1, padx = 5, pady = 5, sticky = 'ew')
@@ -170,11 +170,15 @@ def open_gui(input_filepath):
     button_restore_def.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
     button_restore_def.configure(command = lambda: open_gui('input_workflow_default.xml'))
 
+    button_saveas      = Button(fr_wfp, text = 'Save as', bg = c2)
+    button_saveas.grid(row = 54, column = 0, padx = 5, pady = 5, sticky = 'ew')
+    button_saveas.configure(command = lambda: save_as())
+
     button_exit = Button(fr_wfp, text = 'Exit', bg = 'light grey')
-    button_exit.grid(row = 54, column = 0, padx = 5, pady = 5, sticky = 'w')
+    button_exit.grid(row = 55, column = 0, padx = 5, pady = 5, sticky = 'w')
     button_exit.configure(command = lambda: sys.exit())
 
-    
+   
     # middle: 
     button_create_flowchart = Button(fr_as, text = 'Show Flowchart', bg = c2)
     button_create_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
@@ -343,6 +347,9 @@ def open_gui(input_filepath):
         
     def save_workflow_param_to_file(filepath):
 
+        if filepath == '':
+            filepath = run_config_folder_path+'/input_workflow.xml'
+         
        ## COPY 
         ## for all the active actors
         for hsys in maindict[actors_ref]:
@@ -355,7 +362,7 @@ def open_gui(input_filepath):
                          return False
 
                     
-                    dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')
+                    dest_file = os.path.join(filepath+'/'+hsys+'/input_'+actor_name+'.xml')
                     if not os.path.exists(dest_file):
                         actor_python_script = actor_path+'/'+actor_name+'/'+actor_name+'.py'
                         found_xml = False
@@ -370,7 +377,7 @@ def open_gui(input_filepath):
               
                                     break
 
-
+        print(filepath)
         tree = etree.parse(filepath)
         root = tree.getroot()
         
@@ -384,6 +391,33 @@ def open_gui(input_filepath):
                    
         tree.write(filepath)
         return True
+
+    def save_as():
+        
+        filepath = filedialog.askdirectory()
+        print(filepath)
+        global run_config_folder_path
+        old_run_config_folder_path = copy.copy(run_config_folder_path)
+      
+
+        if os.path.exists(filepath):
+            
+            run_config_folder_path = copy.copy(filepath)
+            save_workflow_param_to_file(run_config_folder_path+'/input_workflow.xml')
+            if old_run_config_folder_path is not run_config_folder_path:
+                rmtree(old_run_config_folder_path) 
+
+        else:
+            copytree(run_config_folder_path, filepath)
+            run_config_folder_path = copy.copy(filepath)
+            print('r  ', run_config_folder_path)
+            save_workflow_param_to_file(run_config_folder_path+'/input_workflow.xml')
+
+            if old_run_config_folder_path is not run_config_folder_path:
+                rmtree(old_run_config_folder_path) 
+        print(run_config_folder_path)
+        return run_config_folder_path
+     
 
     def save_and_run(filepath, save_yn):
         noerror = save_workflow_param_to_file(filepath)
@@ -442,5 +476,6 @@ def open_gui(input_filepath):
 
     window.mainloop()
 
+print(run_config_folder_path)
 
 open_gui(default_workflow_param_path)
