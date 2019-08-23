@@ -84,11 +84,11 @@ def open_gui(input_filepath):
     fr_as = Frame(window, width = 500, height = 500, background = c1)
     fr_as.grid(row = 0, column = 1, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
 
-    fr_fc = Frame(window, width = 100, height = 100, background = c1)
-    fr_fc.grid(row = 0, column = 2, sticky = 'news', padx = 3, pady = 3)
+    fr_fc = Frame(window, width = 500, height = 500, background = c1)
+    fr_fc.grid(row = 0, column = 2, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
+
+    removed_by_close_button = [fr_fc]
     fr_fc.grid_remove()
-    
-    old_Fr = fr_fc
 
     ## abbreviations for the keys - makes it easier to change them in the xml file
     wfp_ref = list(workflow_param.keys())[0]
@@ -174,28 +174,25 @@ def open_gui(input_filepath):
     button_exit.grid(row = 54, column = 0, padx = 5, pady = 5, sticky = 'w')
     button_exit.configure(command = lambda: sys.exit())
 
+    
     # middle: 
     button_create_flowchart = Button(fr_as, text = 'Show Flowchart', bg = c2)
     button_create_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
-    old_fr = fr_fc
-    button_create_flowchart.configure(command = lambda: flowchart_and_hide_button(old_fr, window, maindict, workflow_param, c1, c2, c3, c4,c5))
+    button_create_flowchart.configure(command = lambda: destr_and_make(removed_by_close_button, window, maindict, workflow_param, c1, c2, c3, c4,c5))
+   
+
+    def destr_and_make(removed_by_close_button,  window, maindict, workflow_param, c1, c2, c3, c4,c5):
+        
+        base = make_flowchart(removed_by_close_button, window, maindict, workflow_param, c1, c2, c3, c4,c5)
+        removed_by_close_button.append(base)
+
+      
 
     button_edit_codeparameters = Button(fr_as, text = 'Edit Codeparameters', bg = c2)
     button_edit_codeparameters.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
     button_edit_codeparameters.configure(command = lambda: edit_codeparam())
 
     
-    def flowchart_and_hide_button(old_fr, window, maindict, workflow_param, c1, c2, c3, c4,c5):
-        button_hide_flowchart = Button(fr_as, text = 'Hide Flowchart', bg = c2)
-        button_hide_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
-        button_hide_flowchart.configure(command = lambda: destroy_window_and_button())
-        new_old_fr = make_flowchart(old_fr, window, maindict, workflow_param, c1, c2, c3, c4,c5)
-
-        def destroy_window_and_button():
-            new_old_fr.grid_remove()
-            new_old_fr.grid_forget()
-            button_hide_flowchart.grid_remove()
-            button_hide_flowchart.grid_forget()
 
     ## MANAGE XML FILES
     def edit_codeparam():
@@ -355,7 +352,7 @@ def open_gui(input_filepath):
                     # get xml path from actor.py 
                     if actor_name in list_of_uncompiled_actors:
                          print('ERROR: ', actor_name, ' is selected as an active actor, but it has not been found. \n Please change your selection of actors or load', actor_name, 'and try again')
-                         sys.exit()
+                         return False
 
                     
                     dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')
@@ -386,16 +383,17 @@ def open_gui(input_filepath):
                    elem.text = workflow_param[rl[iroot]][elem.tag]
                    
         tree.write(filepath)
+        return True
 
     def save_and_run(filepath, save_yn):
-        
-        save_workflow_param_to_file(filepath)
-
+        noerror = save_workflow_param_to_file(filepath)
+        if noerror:
         #window.destroy()
-        hcd_wrapper(run_config_folder_path)
+            hcd_wrapper(run_config_folder_path)
 
-        if save_yn == 0:
-            rmtree(run_config_folder_path)
+            if save_yn == 0:
+                rmtree(run_config_folder_path)        
+   
 
     def load_configuration_from_file(filepath):
         if 'input_workflow_default.xml' in filepath:
