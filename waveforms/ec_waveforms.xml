@@ -24,10 +24,9 @@
     <launching_angle_pol>         0.2618  </launching_angle_pol>
     <launching_angle_tor_time>    0.      </launching_angle_tor_time>
     <launching_angle_tor>        -0.3491  </launching_angle_tor>
-    <beam_spot_size_time>         0.      </beam_spot_size_time>
-    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
-    <beam_spot_size1>             0.03    </beam_spot_size1>
-    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_size_time>         0.     10.   200   201 </beam_spot_size_time>
+    <beam_spot_size>              0.03   0.4   0.4   0.8
+                                  0.03   0.4   0.4   0.9   </beam_spot_size>
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
@@ -55,10 +54,9 @@
     <launching_angle_pol>         0.      </launching_angle_pol>
     <launching_angle_tor_time>    0.      </launching_angle_tor_time>
     <launching_angle_tor>         0.4363  </launching_angle_tor>
-    <beam_spot_size_time>         0.      </beam_spot_size_time>
-    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
-    <beam_spot_size1>             0.03    </beam_spot_size1>
-    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_size_time>         0.     10.   200   201 </beam_spot_size_time>
+    <beam_spot_size>              0.03   0.4   0.4   0.8
+                                  0.03   0.4   0.4   0.9   </beam_spot_size>
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
@@ -86,10 +84,9 @@
     <launching_angle_pol>         -0.1745 </launching_angle_pol>
     <launching_angle_tor_time>    0.      </launching_angle_tor_time>
     <launching_angle_tor>         0.4363  </launching_angle_tor>
-    <beam_spot_size_time>         0.      </beam_spot_size_time>
-    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
-    <beam_spot_size1>             0.03    </beam_spot_size1>
-    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_size_time>         0.     10.   200   201 </beam_spot_size_time>
+    <beam_spot_size>              0.03   0.4   0.4   0.8
+                                  0.03   0.4   0.4   0.9   </beam_spot_size>
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
@@ -117,10 +114,9 @@
     <launching_angle_pol>         1.1345  </launching_angle_pol>
     <launching_angle_tor_time>    0.      </launching_angle_tor_time>
     <launching_angle_tor>         0.3491  </launching_angle_tor>
-    <beam_spot_size_time>         0.      </beam_spot_size_time>
-    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
-    <beam_spot_size1>             0.03    </beam_spot_size1>
-    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_size_time>         0.     10.   200   201 </beam_spot_size_time>
+    <beam_spot_size>              0.03   0.4   0.4   0.8
+                                  0.03   0.4   0.4   0.9   </beam_spot_size>
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
@@ -148,10 +144,9 @@
     <launching_angle_pol>         0.9599  </launching_angle_pol>
     <launching_angle_tor_time>    0.      </launching_angle_tor_time>
     <launching_angle_tor>         0.3491  </launching_angle_tor>
-    <beam_spot_size_time>         0.      </beam_spot_size_time>
-    <beam_spot_nsize>             2       </beam_spot_nsize> <!-- beam.spot.size.data(:,:) is 2D -->
-    <beam_spot_size1>             0.03    </beam_spot_size1>
-    <beam_spot_size2>             0.03    </beam_spot_size2>
+    <beam_spot_size_time>         0.     10.   200   201 </beam_spot_size_time>
+    <beam_spot_size>              0.03   0.4   0.4   0.8
+                                  0.03   0.4   0.4   0.9   </beam_spot_size>
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->

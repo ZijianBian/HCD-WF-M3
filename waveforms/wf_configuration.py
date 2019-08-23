@@ -8,31 +8,9 @@ from datetime import datetime
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
-
+import numpy as np
 from write_to_ids_xml import ec_write_to_ids_and_xml
 
-param = {'user': 'mitterv', 'machine': 'iter', 'shot_nr': 7897, 'run_in': 1, 'run_out': 456}
-
-#### OPEN IDS: 
-# remote and local database environment
-user_in     = param['user']
-local_user  = os.getenv('USER')
-tokamakname = param['machine'] # assumed to be the same for remote/local DB
-version     = os.getenv('IMAS_VERSION')[0]
-
-# If the local database for the required tokamak does not exist yet: create it
-if not os.path.exists(os.getenv('HOME')+'/public/imasdb/'+tokamakname):
-    print('--> Create local database '+os.getenv('HOME')+'/public/imasdb/'+tokamakname)
-    os.popen("imasdb "+tokamakname).read()
-
-
-print('open input and output file')
-input = imas.ids(param['shot_nr'], param['run_in'], 0,0)
-input.open_env(user_in,tokamakname,version)
-output  = imas.ids(param["shot_nr"], param["run_out"], 0,0)
-output.create_env(user_in,tokamakname,version)
-
-input.ec_antennas.get()
     
 
 ### MAKE WINDOW FOR INTERFACE    
@@ -49,15 +27,53 @@ window.configure(bg = c1)
 
 #window.resizable(0,1)
 
+runconfigfr = Frame(window, width = 600, height = 100, bg = c3)
+runconfigfr.grid(row = 0, column = 0, sticky = 'nwes')
+
+def update_ids_param_dict(newval, field):
+    ids_param_dict[field] = newval
+
+
+ids_param_dict = {}
+userstr = StringVar()
+userstr.trace('w', lambda name, index, mode, ids_param_dict_field = 'user': update_ids_param_dict(userstr.get(), ids_param_dict_field))
+Label(runconfigfr, text = 'user', bg = c3).grid(row = 1, column = 1, sticky = 'wns', padx = 3, pady = 3)
+Entry(runconfigfr, textvariable = userstr, bg = c1).grid(row = 1, column = 2, sticky = 'news', padx = 3, pady = 3)
+userstr.set('mitterv')
+
+machinestr = StringVar()
+machinestr.trace('w', lambda name, index, mode, ids_param_dict_field = 'machine': update_ids_param_dict(machinestr.get(), ids_param_dict_field))
+Label(runconfigfr, text = 'machine', bg = c3).grid(row = 2, column = 1, sticky = 'wns', padx = 3, pady = 3)
+Entry(runconfigfr, textvariable = machinestr, bg = c1).grid(row = 2, column = 2, sticky = 'news', padx = 3, pady = 3)
+machinestr.set('iter')
+
+shotnrstr = StringVar()
+shotnrstr.trace('w', lambda name, index, mode, ids_param_dict_field = 'shot_nr': update_ids_param_dict(int(shotnrstr.get()), ids_param_dict_field))
+Label(runconfigfr, text = 'shotnr', bg = c3).grid(row = 1, column = 3, sticky = 'wns', padx = 3, pady = 3)
+Entry(runconfigfr, textvariable = shotnrstr, bg = c1).grid(row = 1, column = 4, sticky = 'news', padx = 3, pady = 3)
+shotnrstr.set('7897')
+
+runinstr = StringVar()
+runinstr.trace('w', lambda name, index, mode, ids_param_dict_field = 'run_in': update_ids_param_dict(int(runinstr.get()), ids_param_dict_field))
+Label(runconfigfr, text = 'runin', bg = c3).grid(row = 2, column = 3, sticky = 'wns', padx = 3, pady = 3)
+Entry(runconfigfr, textvariable = runinstr, bg = c1).grid(row = 2, column = 4, sticky = 'news', padx = 3, pady = 3)
+runinstr.set('1')
+
+runoutstr = StringVar()
+runoutstr.trace('w', lambda name, index, mode , ids_param_dict_field = 'run_out': update_ids_param_dict(int(runoutstr.get()), ids_param_dict_field))
+Label(runconfigfr, text = 'runout', bg = c3).grid(row = 3, column = 3, sticky = 'wns', padx = 3, pady = 3)
+Entry(runconfigfr, textvariable = runoutstr, bg = c1).grid(row = 3, column =4, sticky = 'news', padx = 3, pady = 3)
+runoutstr.set('345')
+
 
 ## EC
 
 ecfr = Frame(window, width = 600, height = 200, background = c3)
-ecfr.grid(row = 0, column = 0, sticky = 'nwes')
+ecfr.grid(row = 1, column = 0, sticky = 'nwes')
 
 ## IC
 icfr = Frame(window, width = 600, height = 200, background = c3)
-icfr.grid(row = 1, column = 0, sticky = 'news')
+icfr.grid(row = 2, column = 0, sticky = 'news')
 
 Label(icfr, text = 'IC', bg = c2,  font = '15').grid(row = 0, column = 0, sticky = 'news', columnspan = 2)
 
@@ -69,7 +85,7 @@ icb_fr.grid(row = 1, column = 1, rowspan = 2, sticky = 'news', padx = 3, pady = 
 
 ## NBI
 nbifr = Frame(window, width = 600, height = 200, background = c3)
-nbifr.grid(row = 2, column = 0, sticky = 'news')
+nbifr.grid(row = 3, column = 0, sticky = 'news')
 
 Label(nbifr, text = 'NBI', bg = c2,  font = '15').grid(row = 0, column = 0, sticky = 'news', columnspan = 2)
 nbic_fr = Frame(nbifr, width = 300, height = 200, background = c3)
@@ -88,17 +104,15 @@ def ec(ec_waveform_path):
 
     c_fr = Frame(ecfr, width = 300, height = 200, background = c3)
     c_fr.grid(row = 1, column = 0, sticky = 'nwes') #, padx = 3, pady = 3)
-
     b_fr = Frame(ecfr, width = 300, height = 200, background = c1)
     b_fr.grid(row = 1, column = 1, rowspan = 2,   sticky = 'nwes') #, padx = 3, pady = 3)
-    
     s_fr = Frame(ecfr, width = 300, height = 100, bg = c1)
     s_fr.grid(row = 2, column = 0)
     
 
     ## put a button in the place for the buttons
 
-    save_button = Button(s_fr, text = 'save', bg = c2, command = lambda: ec_write_to_ids_and_xml(ec_dict, input.ec_antennas))
+    save_button = Button(s_fr, text = 'save', bg = c2, command = lambda: ec_write_to_ids_and_xml(ec_dict, ids_param_dict))
     save_button.grid()
 
     ### WRITE THE DATA FROM THE XML INTO A DICTIONARY
@@ -117,8 +131,19 @@ def ec(ec_waveform_path):
 
         for param in i:
             if param.tag is not etree.Comment:
+                
+                if '\n'in param.text: 
+                    
+                    temp_val = param.text.strip()
+                    temp_val = param.text.split('\n')
+                    temp_val = [i.strip() for i in temp_val]
+                    ec_dict[i.tag][param.tag] = temp_val
+                
+                    
 
-                ec_dict[i.tag][param.tag] = param.text.strip()
+                else:
+                    ec_dict[i.tag][param.tag] = param.text.strip()
+
 
 
     ## PUT THE CONFIGURATION ON THE LEFT SIDE: 
@@ -134,7 +159,7 @@ def ec(ec_waveform_path):
                     Label(c_fr, text = elem, bg = c3, anchor = W, justify = LEFT).grid(row = rrow_l, column = 0, sticky = W)
                     entrystring = StringVar()
                     entrystring.set(ec_dict[iant][elem])
-                    entrystring.trace('w', lambda name, index, mode, elem = elem, entrystring = entrystring, iant = iant: print(hi))
+                    entrystring.trace('w', lambda name, index, mode, elem = elem, entrystring = entrystring, iant = iant: print('hi'))
                     Entry(c_fr, textvariable = entrystring,  bg = c1).grid(row = rrow_l, column =1, sticky = 'ew')
                     rrow_l +=1
         else:
@@ -165,8 +190,10 @@ def ec(ec_waveform_path):
             entrystring.trace('w', lambda name, index, mode, param = param, entrystring = entrystring, iant = iant: update_ec_dict(iant, entrystring.get(), param))
             Entry(rfr, textvariable = entrystring,  bg = c1).grid(row = rrow_r, column =1, sticky = 'ew', padx = 5, pady = 2)
             
+            if param+'_time' in ec_dict[iant]: 
+                Button(rfr, text = 'edit', bg = c2, command = lambda param = param: nice_editwindow(param), padx = 1, pady = 1).grid(row = rrow_r -1, column = 2, rowspan = 2, sticky = 'wns', padx = 2, pady = 2)
             
-            l.bind('<Button-1>', lambda event, param = param: nice_editwindow(param))
+
 
             rrow_r +=1
 
@@ -189,41 +216,66 @@ def ec(ec_waveform_path):
                 mfr = Frame(ewf_top, width = 500, height = 500, bg = c1)
                 mfr.grid(row = 0, column = 2, sticky = 'ns')
 
-            
+
+
                 ## power launched time: 
-                powl = ec_dict[iant][param].split()
+                
+
                 powl_time = ec_dict[iant][param+'_time'].split()
-
-
-                Label(lfr, text = param, bg = c3,).grid(row  = 1, column = 2)
                 Label(lfr, text = 'time', bg = c3).grid(row = 1, column = 1)
-
                 textwidget_powl_time= Text(lfr, height = len(powl_time), width = 10, bg = c1, padx = 3, pady =2)
                 textwidget_powl_time.grid(row = 2, column = 1, sticky = 'nse', padx = (5, 1))
-                textwidget_powl_time.bind('<Leave>', lambda event, entryelem = param+'_time', iant = iant: update_ec_dict(iant, textwidget_powl_time.get('1.0', END).replace('\n', ' '), entryelem))
-
-
-                textwidget_powl = Text(lfr, width = 10, padx = 3, bg = c1)
-                textwidget_powl.grid(row = 2, column = 2, sticky = 'nsw', padx = (1,5))
-                textwidget_powl.bind('<Leave>', lambda event, entryelem = param, iant = iant: update_ec_dict(iant, textwidget_powl.get('1.0', END).replace('\n', ' '), entryelem))
-
+                textwidget_powl_time.bind('<Leave>', lambda event, entryelem = param+'_time', iant = iant: update_ec_dict(iant, textwidget_powl_time.get('1.0', END).replace('\n', ' '), entryelem, -999))
 
                 for powl_time_datapoint in powl_time:
                     textwidget_powl_time.insert(END, powl_time_datapoint+'\n')
 
-                for powl_datapoint in powl:
-                    textwidget_powl.insert(END, powl_datapoint+'\n')
+                if  isinstance(ec_dict[iant][param], str):
+                    powl = ec_dict[iant][param].split()
+                    Label(lfr, text = param, bg = c3).grid(row  = 1, column = 2)
+                
+                    textwidget_powl = Text(lfr, width = 10, padx = 3, bg = c1)
+                    textwidget_powl.grid(row = 2, column = 2, sticky = 'nsw', padx = (1,5))
+                    textwidget_powl.bind('<Leave>', lambda event, entryelem = param, iant = iant: update_ec_dict(iant, textwidget_powl.get('1.0', END).replace('\n', ' '), entryelem, -999))
+
+                    for powl_datapoint in powl:
+                        textwidget_powl.insert(END, powl_datapoint+'\n')
+                else: 
+                    
+                    for id in range(len(ec_dict[iant][param])):
+                        powl = ec_dict[iant][param][id].split()
+                        Label(lfr, text = param, bg = c3).grid(row = 1, column = 2 + id)
+                        
+                        textwidget_powl = Text(lfr, width = 10, padx = 3, bg = c1)
+                        textwidget_powl.grid(row = 2, column = 2 + id, sticky = 'nsw', padx = (1,1))
+                        textwidget_powl.bind('<Leave>', lambda event, entryelem = param, iant = iant, id = id, textwidget_powl = textwidget_powl: update_ec_dict(iant, textwidget_powl.get('1.0', END).replace('\n', ' '), entryelem, id))
+                        for powl_datapoint in powl:
+                            textwidget_powl.insert(END, powl_datapoint+'\n')
+
+
 
                 update_button = Button(lfr, text = 'update',bg = c2, command = lambda: plot_waveform())
                 update_button.grid(row = 50, column = 1, columnspan = 2, pady = 10, sticky = 'ew')
 
-                def plot_waveform(): 
-                    powl_time_int = [float(i.strip()) for i in ec_dict[iant][param+'_time'].split()]
-                    powl_int = [float(i.strip()) for i in ec_dict[iant][param].split()]
-
-
+                def plot_waveform():
                     fig = Figure(dpi = 100)
-                    fig.add_subplot(111).plot(powl_time_int, powl_int)
+
+              
+                    powl_time_int = [float(i.strip()) for i in ec_dict[iant][param+'_time'].split()]
+                    try:
+                        powl_int = [float(i.strip()) for i in ec_dict[iant][param].split()]
+                        fig.add_subplot(111).plot(powl_time_int, powl_int)
+                    except:
+                    
+                        for id in range(len(ec_dict[iant][param])):
+                            powl_int = [float(i.strip()) for i in ec_dict[iant][param][id].split()]
+                       # powl_int = np.array(ec_dict[iant][param][0].split(), ec_dict[iant][param][1].split())
+                            fig.add_subplot(len(ec_dict[iant][param]), 1, id+1).plot(powl_time_int, powl_int)
+                    
+
+                    
+                    
+                    
                     fig.suptitle(param, fontsize=16)
                     canvas = FigureCanvasTkAgg(fig, master = mfr)
                     canvas.draw()
@@ -231,9 +283,14 @@ def ec(ec_waveform_path):
 
                 plot_waveform()
 
-        def update_ec_dict(iant, newvalue, entryelem):
+        def update_ec_dict(iant, newvalue, entryelem, id):
+            if id < 0:
+                ec_dict[iant][entryelem] = newvalue
+            else: 
+                ec_dict[iant][entryelem][id] = newvalue
 
-            ec_dict[iant][entryelem] = newvalue
+            print(ec_dict[iant][entryelem])
+
 
                    
 
