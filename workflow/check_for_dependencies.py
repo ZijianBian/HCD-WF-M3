@@ -1,7 +1,6 @@
 def check_for_dependencies(root, dependencies):
     from lxml import etree
     
-    
     codedict_names = {}
 
     for elem in root.iter():
@@ -35,7 +34,7 @@ def check_for_dependencies(root, dependencies):
                                 pass
                             else:
                                 print('ERROR: this is not a valid configuration for '+ code.upper() + ' please change the selection of your actors and try again')
-                                sys.exit()
+                                return
                                 
 
     for entry in codedict_names:

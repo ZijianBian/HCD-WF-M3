@@ -26,13 +26,13 @@
     <launching_angle_tor>        -0.3491  </launching_angle_tor>
     <beam_spot_size_time>         0.     10.   200   201 </beam_spot_size_time>
     <beam_spot_size>              0.03   0.4   0.4   0.8
-                                  0.03   0.4   0.4   0.9   </beam_spot_size>
+                                  0.03   0.4   0.4   0.9 </beam_spot_size>
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
-    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
-    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
-    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_curvature>        0.
+                                  0. </beam_phase_curvature>
+    
     <beam_phase_angle_time>       0.      </beam_phase_angle_time>
     <beam_phase_angle>            0.      </beam_phase_angle>
   </antenna1>
@@ -56,13 +56,15 @@
     <launching_angle_tor>         0.4363  </launching_angle_tor>
     <beam_spot_size_time>         0.     10.   200   201 </beam_spot_size_time>
     <beam_spot_size>              0.03   0.4   0.4   0.8
-                                  0.03   0.4   0.4   0.9   </beam_spot_size>
+                                  0.03   0.4   0.4   0.9   
+				  
+    </beam_spot_size>
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
-    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
-    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
-    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_curvature>        0.     
+                                  0.
+    </beam_phase_curvature>
     <beam_phase_angle_time>       0.      </beam_phase_angle_time>
     <beam_phase_angle>            0.      </beam_phase_angle>
   </antenna2>
@@ -90,9 +92,9 @@
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
-    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
-    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
-    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_curvature>        0.     
+                                  0.
+    </beam_phase_curvature>
     <beam_phase_angle_time>       0.      </beam_phase_angle_time>
     <beam_phase_angle>            0.      </beam_phase_angle>
   </antenna3>
@@ -120,9 +122,8 @@
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
-    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
-    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
-    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_curvature>        0.     
+    0.</beam_phase_curvature>
     <beam_phase_angle_time>       0.      </beam_phase_angle_time>
     <beam_phase_angle>            0.      </beam_phase_angle>
   </antenna4>
@@ -150,9 +151,9 @@
     <beam_spot_angle_time>        0.      </beam_spot_angle_time>
     <beam_spot_angle>             0.      </beam_spot_angle>
     <beam_phase_curvature_time>   0.      </beam_phase_curvature_time> <!-- beam.phase.curvature.data(:,:) is 2D -->
-    <beam_phase_ncurvature>       2       </beam_phase_ncurvature>
-    <beam_phase_curvature1>       0.      </beam_phase_curvature1>
-    <beam_phase_curvature2>       0.      </beam_phase_curvature2>
+    <beam_phase_curvature>        0.     
+                                  0.
+    </beam_phase_curvature>
     <beam_phase_angle_time>       0.      </beam_phase_angle_time>
     <beam_phase_angle>            0.      </beam_phase_angle>
   </antenna5>
