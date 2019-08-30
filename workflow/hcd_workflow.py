@@ -33,23 +33,24 @@ def hcd_workflow(IDS_BUNDLE_in, parameters):
     IDS_BUNDLE_ic['waves']                      = copy.deepcopy(act.ic_coup(IDS_BUNDLE_ic, parameters))
     IDS_BUNDLE_ic['waves']                      = copy.deepcopy(act.ic_wave_solver(IDS_BUNDLE_ic, parameters))
     IDS_BUNDLE_ec['waves']                      = copy.deepcopy(act.ec_wave_solver(IDS_BUNDLE_ec, parameters))
-  
 
+    
+    
     ## STEP 2: FOKKER PLANK SOLVERS and creating a common nbi_ic distributions IDS
     print('-- step 2: fokker plank solvers')
+    # copy the distribution sources of nbi to the the ic bundle - in case you want to model synergy
+    # if you don want to model synergy effects, this does not make a difference at all, this is why we always do it just in case 
+    IDS_BUNDLE_ic['distribution_sources'] = copy.deepcopy(IDS_BUNDLE_nbi['distribution_sources'])
+    # then execute all the fokker plank solvers
+    IDS_BUNDLE_ic['distributions']     =   copy.deepcopy(act.ic_wave_fp(IDS_BUNDLE_ic, parameters))
     IDS_BUNDLE_nuclear['distributions']        = copy.deepcopy(act.nuclear_fp(IDS_BUNDLE_nuclear, parameters))
-
-    if(parameters['nbi_fp'] == 9 and parameters['ic_fp'] == 9):
-        distributions_nbi_ic    =   copy.deepcopy(act.synergy_fp(IDS_BUNDLE_nbi, IDS_BUNDLE_ic, parameters))
-    else:
-        IDS_BUNDLE_nbi['distributions']    =   copy.deepcopy(act.nbi_fp(IDS_BUNDLE_nbi, parameters))
-        IDS_BUNDLE_ic['distributions']     =   copy.deepcopy(act.ic_wave_fp(IDS_BUNDLE_ic, parameters))
-
-        distributions_nbi_ic =   merge_distributions(IDS_BUNDLE_nbi['distributions'], IDS_BUNDLE_ic['distributions'])
+    IDS_BUNDLE_nbi['distributions']    =   copy.deepcopy(act.nbi_fp(IDS_BUNDLE_nbi, parameters))
+   
 
 
     ## STEP 4: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION SOURCES and WAVES
     print('-- step 3: mergers')
+    distributions_nbi_ic   =   merge_distributions(IDS_BUNDLE_nbi['distributions'], IDS_BUNDLE_ic['distributions'])
     distributions_final        = merge_distributions(IDS_BUNDLE_nuclear['distributions'], distributions_nbi_ic)
     waves_final                = merge_waves(IDS_BUNDLE_ec['waves'], IDS_BUNDLE_ic['waves'])
     distribution_sources_final = merge_distribution_sources(IDS_BUNDLE_nbi['distribution_sources'], IDS_BUNDLE_nuclear['distribution_sources'])
