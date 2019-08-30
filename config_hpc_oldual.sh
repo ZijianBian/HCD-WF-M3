@@ -13,6 +13,9 @@ if [ $MD_ACCESS = "yes" ]; then
     module load m-machine-description
 fi
 
+# Need to remove the stack limit to avoid segmentation fault inside codes
+ulimit -Ss unlimited
+
 # Switch from Python 2.7 to Python 3
 source switch_python_ITER_HPC.sh
 
