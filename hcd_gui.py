@@ -156,12 +156,12 @@ def open_gui(input_filepath):
 
     button_saveandrun = Button(fr_wfp, text = 'Save and Run', bg = c2)
     button_saveandrun.grid(row = 51, column = 0, padx = 5, pady = 5, sticky = 'ew')
-    button_saveandrun.configure(command = lambda: save_and_run(run_workflow_param_path, True))
+    button_saveandrun.configure(command = lambda: save_and_run(run_config_folder_path, True))
 
 
     button_run_nosave = Button(fr_wfp, text = 'Run (without Saving)', bg = c2)
     button_run_nosave.grid(row = 51, column = 1, padx = 5, pady = 5, sticky = 'ew')
-    button_run_nosave.configure(command = lambda: save_and_run(run_workflow_param_path, False))
+    button_run_nosave.configure(command = lambda: save_and_run(run_config_folder_path, False))
 
     button_save_asdef = Button(fr_wfp, text = 'Save Configuration as Default', bg = c2)
     button_save_asdef.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
