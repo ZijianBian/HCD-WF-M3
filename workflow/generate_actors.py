@@ -42,9 +42,8 @@ def read_inputoutput(name):
                 elif elem.find('codeparam') is not -1:
                     in_l.append('codeparam')
                     break
-                elif elem.find(':param result: '+iids) is not -1:
+                elif elem.find(':param result: ') is not -1 and elem.find(iids) is not -1:
                     out_l.append(iids)
-                    break
 
         list_of_actors.append(name)
 
@@ -104,8 +103,8 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                         file.write('   elif parameters["'+cat +'"] == '+str(i)+':\n')
                     file.write('       print("--'+code.upper()+'--")\n')
                     if len(maindict[proc][sys][cat][code][1]) > 0:
-                        output_ids_list = maindict[proc][sys][cat][code][1][0]
-                        file.write('       '+output_ids_list+'_temp = '+code+'(')
+                        output_ids_list = maindict[proc][sys][cat][code][1]
+                        file.write('       '+",".join(str(x)+'_temp' for x in output_ids_list)+' = '+code+'(')
                         
                         first_in = True
                         for ids_in in maindict[proc][sys][cat][code][0]:
@@ -134,13 +133,12 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                     else:
                         file.write('       print("code not installed")\n\n')
                 
-                #pdb.set_trace()
                 file.write('\n')
                 file.write('   else: \n')
-                file.write('       '+output_ids_list+'_temp = empty_'+output_ids_list+ '(bundle["core_profiles"])')
+                file.write('       '+output_ids_list[0]+'_temp = empty_'+output_ids_list[0]+ '(bundle["core_profiles"])')
                 file.write('\n\n')
 
-                file.write('   return('+ output_ids_list+'_temp)')
+                file.write('   return('+ output_ids_list[0]+'_temp)')
                 file.write('\n\n')    
 
 
