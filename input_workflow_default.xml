@@ -1,13 +1,13 @@
 <root>
   <workflow_parameters display="WORKFLOW PARAMETERS (STANDALONE)">
     <machine>iter</machine>
-    <shot_nr>7897</shot_nr>
+    <shot_nr>130011</shot_nr>
     <run_in>1</run_in>
-    <run_out>301</run_out>
+    <run_out>13</run_out>
     <user>public</user>
-    <tbegin>200</tbegin>
-    <tend>203</tend>
-    <dt_required>2</dt_required>
+    <tbegin>5</tbegin>
+    <tend>350.</tend>
+    <dt_required>20</dt_required>
     <run_simpletrans>False</run_simpletrans>
   </workflow_parameters>
 
@@ -22,13 +22,13 @@
   <actor_selection display="ACTOR SELECTION">
     <systems>
       <ECRH>
-	<ec_wave_solver list="genray gray">0</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
+	<ec_wave_solver list="genray gray">2</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
 
       </ECRH>
 
       <ICRH>
 	<ic_coup list="iccoup">0</ic_coup> 
-	<ic_wave_solver list="Cyrano tomcat lion">0</ic_wave_solver>         <!-- 0: none 1: CYRANO  2: TOMCAT, 3: LION  -->
+	<ic_wave_solver list="Cyrano tomcat lion pion">0</ic_wave_solver>         <!-- 0: none 1: CYRANO  2: TOMCAT, 3: LION, 4: PION -->
 	<ic_wave_fp list="StixReDist">0</ic_wave_fp>             <!-- 0: none 1: StixReDist 9: FP WITH NBI/IC SYNERGY -->
       </ICRH>
     
@@ -47,7 +47,7 @@
 
     <post_process>
       <source>
-	<hcd2core_sources list="hcd2core_sources">0</hcd2core_sources> 
+	<hcd2core_sources list="hcd2core_sources">1</hcd2core_sources> 
       </source>
       <profiles>
 	<hcd2core_profiles list="hcd2core_profiles">0</hcd2core_profiles>
