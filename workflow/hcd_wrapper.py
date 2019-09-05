@@ -10,7 +10,7 @@ def hcd_wrapper(par_path):
   from developer_file import load_code_dependencies
   from check_for_dependencies import check_for_dependencies
   import numpy as np 
-
+  import pdb
 
   # IMPORT PARAMETERS FROM XML --------------------------------------
   
@@ -133,8 +133,13 @@ def hcd_wrapper(par_path):
            print('get ', elem)
            ids_bundle_initial[elem].get()
 
+  ## ALWAYS GET CORE_PROFILES IDS, SINCE IT IS USED AS A REFERNCE, EVEN WHEN IT IS NOT USED 
+  ## IN A SPECIFIC H&CD CODES (LIKE E.G. WITH ICCOUP)
+  if len(ids_bundle_initial['core_profiles'].time)==0:
+      print('get core_profiles')
+      ids_bundle_initial['core_profiles'].get()
 
-  ## CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY:
+  ## CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY
   if param['tbegin'] < 0:
       param['tbegin'] = ids_bundle_initial['core_profiles'].time[0]
       print('tbegin set to time of first core_profiles timeslice. tbegin = ', param['tbegin'])
