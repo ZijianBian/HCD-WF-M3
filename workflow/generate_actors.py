@@ -2,6 +2,7 @@ import os, imas,sys,copy
 import lxml
 from lxml import etree
 import check_for_mpi as cfmpi
+import pdb
 from developer_file import load_add_arg 
 
 tree = etree.parse('input_workflow_default.xml')
@@ -92,7 +93,9 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                 file.write('def '+ cat + '(bundle, parameters): \n')
                 i = 0
                 
-                for code in maindict[proc][sys][cat]: 
+#                    if code not in list_of_uncompiled_actors: 
+
+                for code in maindict[proc][sys][cat]:
                     add_arg_nr = 0
                     i +=1 
                     if i == 1:
@@ -101,7 +104,8 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                         file.write('   elif parameters["'+cat +'"] == '+str(i)+':\n')
                     file.write('       print("--'+code.upper()+'--")\n')
                     if len(maindict[proc][sys][cat][code][1]) > 0:
-                        file.write('       '+maindict[proc][sys][cat][code][1][0]+'_temp = '+code+'(')
+                        output_ids_list = maindict[proc][sys][cat][code][1][0]
+                        file.write('       '+output_ids_list+'_temp = '+code+'(')
                         
                         first_in = True
                         for ids_in in maindict[proc][sys][cat][code][0]:
@@ -129,14 +133,14 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                         file.write(')\n\n')
                     else:
                         file.write('       print("code not installed")\n\n')
-
-                        
+                
+                #pdb.set_trace()
                 file.write('\n')
                 file.write('   else: \n')
-                file.write('       '+maindict[proc][sys][cat][code][1][0]+'_temp = empty_'+maindict[proc][sys][cat][code][1][0]+ '(bundle["core_profiles"])')
+                file.write('       '+output_ids_list+'_temp = empty_'+output_ids_list+ '(bundle["core_profiles"])')
                 file.write('\n\n')
 
-                file.write('   return('+ maindict[proc][sys][cat][code][1][0]+'_temp)')
+                file.write('   return('+ output_ids_list+'_temp)')
                 file.write('\n\n')    
 
 
