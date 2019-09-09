@@ -3,14 +3,14 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/fpsim.git
-    VERSION: feature/build_actor_release
+    VERSION: feature/compilation_ITER_HPC
     DIR: iccoup
 
 MODULES: [XMLlib/3.1.0-intel-2018a]
 
 BUILDS: 
-  - DIR: iccoup
-    CMD: ./tools/build_imas.sh
+  - DIR: iccoup/tools
+    CMD: ./build_imas.sh
 
 ACTORS: 
   - DIR: iccoup/tools
