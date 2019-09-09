@@ -205,13 +205,17 @@ def open_gui(input_filepath):
         cp_top.title('Edit Code Parameters')
         cp_top.geometry('500x700')
 
-        fr_ab = Frame(cp_top, width = 200, height = 500, bg = c4)
+
+        fr_ab = Frame(cp_top, width = 200, height = 650, bg = c4)
         fr_ab.grid(row = 0, column = 0, rowspan = 2, sticky = 'ns')
-        fr_main = Frame(cp_top, width = 500, height = 1500, bg = c1)
-        fr_main.grid(row = 1, column = 1, sticky = 'nwes')
-        prev_frame = fr_main
+        
+        fr_main = Frame(cp_top, width = 500, height = 650, bg = c1)
+        fr_main.grid(row = 1, column = 2, sticky = 'nwes')
+        fr_main.grid_propagate(0)
+        prev_frame = Canvas(fr_main, width = 500, height = 1500)
+        
         fr_top = Frame(cp_top, width = 500, height = 50, bg = c2) 
-        fr_top.grid(row = 0, column =1, sticky = 'ew')
+        fr_top.grid(row = 0, column =1, sticky = 'ew', columnspan = 2)
         
         for hsys in maindict[actors_ref]:
             la_sys = Label(fr_ab, text = hsys, bg = c4)
@@ -224,14 +228,12 @@ def open_gui(input_filepath):
                     Button(fr_ab, text = curval, bg = c2, command = lambda actor_name = curval, hsys = hsys: make_frame(hsys, actor_name, prev_frame, False) ).grid(padx = 5, pady = 5, sticky = 'ew')                                                             
                                                                     
         def make_frame(hsys, actor_name,  prev_frame, is_load_default_from_kepler):
-            prev_frame.grid_remove()
-            prev_frame.grid_forget()
+          prev_frame.grid_remove()
+          prev_frame.grid_forget()
 
-            fr = Frame(cp_top, width = 500, height = 1500, bg = c1)
-            prev_frame = fr
-            fr.grid(row = 1, column =1, sticky = 'nswe')
-            fr.grid_propagate(0)
+ 
 
+          def populate(frame):
             codeparam_xml_path = StringVar()
             codeparam_xsd_path = StringVar()
         
@@ -241,7 +243,6 @@ def open_gui(input_filepath):
             actor_python_script = actor_path+'/'+actor_name+'/'+actor_name+'.py'
             found_xml = False
             found_xsd = False
-
 
 
             with open(actor_python_script) as pfile:
@@ -284,20 +285,17 @@ def open_gui(input_filepath):
             ### load the list of code parameters, create the labels and entries
             tree = etree.parse(codeparam_xml_path.get())        
             root = tree.getroot()
-       #     fr.grid_remove()
-       #     fr.grid_forget()
-       #     fr = Frame(cp_top, width = 500, height = 1500, bg = c1)
-       #     fr.grid(row = 1, column = 1, sticky = 'nswe')
-       #     fr.grid_propagate(0)
 
             rrow = 1
             ccolumn = 0
             codeparam_dict = {}
+            
+
 
             for elem in root.iter():
                 if ((elem.tag is not etree.Comment) and (len(elem) == 0)):
-                    l = Label(fr, text = elem.tag.strip(), bg = c1)
-                    l.grid(row = rrow, column = ccolumn)
+                    l = Label(fr, text = elem.tag.strip(), bg = c1, wraplength = '200', anchor = 'w', justify = LEFT )
+                    l.grid(row = rrow, column = ccolumn, sticky = 'w')
 
                     entrystring = StringVar()
                     entrystring.set(elem.text.strip())
@@ -328,14 +326,45 @@ def open_gui(input_filepath):
 
                     
                     rrow +=1 
-                    if rrow > 30:  ## if there are more than 30 entries start a new column
-                        ccolumn += 2
-                        rrow = 1
-                        fr.grid_propagate(1)
 
-            Button(fr_top, text = 'save', bg = c2,  command = lambda: save_codeparam_to_file(dest_file, codeparam_dict)).grid(row = 0 ,column = 1, padx = 5, pady = 5)
-            Button(fr_top, text = 'load default', bg = c2, command = lambda: make_frame(hsys, actor_name,  prev_frame, True)).grid(row = 0, column =2, padx = 5, pady = 5)
-            Button(fr_top, text = 'exit', bg = c2, command = lambda: cp_top.destroy()).grid(row = 0, column = 4, padx = (20, 5), pady = 5)
+                    
+
+                    if rrow > 20:
+                        v_scroll.grid(row = 1, column = 1, sticky = 'ns')
+                    else:
+                        v_scroll.grid_remove()
+
+          # end of populate frame       
+          
+          def onFrameConfigure(canvas):
+              canvas.configure(scrollregion = canvas.bbox('all'))
+
+          canvas = Canvas(cp_top, borderwidth = 0, highlightthickness = 0, background = c1)
+          fr = Frame(canvas, width = 500, height = 1500, bg = c1)
+          prev_frame = fr
+          v_scroll = Scrollbar(cp_top, orient = 'vertical', command = canvas.yview)
+          canvas.configure(yscrollcommand = v_scroll.set)
+        #  v_scroll.grid()
+
+         
+          canvas.grid(row = 1, column = 2, sticky = ' news')
+          canvas.create_window((4,4), window = fr, anchor = 'nw')
+
+          #    fr.grid_propagate(0)
+          fr.bind('<Configure>', lambda event, canvas = canvas: onFrameConfigure(canvas))
+          
+          populate(fr)
+          
+        
+
+
+          Button(fr_top, text = 'save', bg = c2,  command = lambda: save_codeparam_to_file(dest_file, codeparam_dict)).grid(row = 0 ,column = 1, padx = 5, pady = 5)
+          Button(fr_top, text = 'load default', bg = c2, command = lambda: make_frame(hsys, actor_name,  prev_frame, True)).grid(row = 0, column =2, padx = 5, pady = 5)
+          Button(fr_top, text = 'exit', bg = c2, command = lambda: cp_top.destroy()).grid(row = 0, column = 4, padx = (20, 5), pady = 5)        
+
+
+
+          populate(fr)    
                     
 
 
