@@ -51,10 +51,25 @@ cb = 'LavenderBlush3'
 default_workflow_param_path = 'input_workflow_default.xml'
 window = Tk()
 ## create mainwindow
+
+fontsize = int(window.winfo_screenheight()/100)-2
+
+if fontsize > 14:
+    fontsize = 14
+if fontsize < 5:
+    fontsize = 5
+
+print(fontsize)
+
+window.option_add('*font', 'courier '+str(fontsize))
+#window.option_add('*font', 'courier 50')
       
+
 window.title('HCD WORKFLOW')
 window.configure(bg = c1)
 
+
+print(window.winfo_screenheight())
 
 def open_gui(input_filepath):
 
@@ -109,12 +124,12 @@ def open_gui(input_filepath):
 
         for elem in workflow_param[ref]:        
             
-            Label(fr_wfp, text = elem, bg = c3).grid(row = irow,  column = 0, padx = 3, pady = 2, sticky = 'w')
+            Label(fr_wfp, text = elem, bg = c3).grid(row = irow,  column = 0, padx = 1, pady = 2, sticky = 'w')
 
             entrystring = StringVar()
             entrystring.set(workflow_param[ref][elem])
             entrystring.trace('w', lambda name, index, mode, elem = elem, entrystring = entrystring, ref = ref: update_workflow_param(ref, elem, entrystring.get()))                      # if an entry is changed, the new values should immediately be changed in the workflow_param dictionary
-            Entry(fr_wfp, textvariable = entrystring, bg = c1).grid(row = irow, column = 1, padx = 3, pady = 2, sticky = 'e')
+            Entry(fr_wfp, textvariable = entrystring, bg = c1).grid(row = irow, column = 1, padx = 1, pady = 2, sticky = 'e')
             irow += 1
 
 
@@ -506,7 +521,8 @@ def open_gui(input_filepath):
         
         tree.write(filepath)
 
+    
     window.mainloop()
 
-
 open_gui(default_workflow_param_path)
+
