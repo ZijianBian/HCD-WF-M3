@@ -59,17 +59,11 @@ if fontsize > 14:
 if fontsize < 5:
     fontsize = 5
 
-print(fontsize)
-
 window.option_add('*font', 'courier '+str(fontsize))
-#window.option_add('*font', 'courier 50')
-      
+
 
 window.title('HCD WORKFLOW')
 window.configure(bg = c1)
-
-
-print(window.winfo_screenheight())
 
 def open_gui(input_filepath):
 
