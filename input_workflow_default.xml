@@ -1,10 +1,10 @@
 <root>
   <workflow_parameters display="WORKFLOW PARAMETERS (STANDALONE)">
+    <user>public</user>
     <machine>iter</machine>
     <shot_nr>130011</shot_nr>
     <run_in>1</run_in>
     <run_out>13</run_out>
-    <user>public</user>
     <tbegin>5</tbegin>
     <tend>350.</tend>
     <dt_required>20</dt_required>
