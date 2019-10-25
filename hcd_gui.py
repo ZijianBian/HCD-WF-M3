@@ -52,7 +52,7 @@ default_workflow_param_path = 'input_workflow_default.xml'
 window = Tk()
 ## create mainwindow
 
-fontsize = int(window.winfo_screenheight()/100)-2
+fontsize = int(window.winfo_screenheight()/100)+3
 
 if fontsize > 14:
     fontsize = 14
