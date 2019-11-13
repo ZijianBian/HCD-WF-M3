@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/hcd2core-sources.git
-    VERSION: feature/disable_diag_info
+    VERSION: develop
     DIR:     hcd2core-sources
 
 MODULES: []
