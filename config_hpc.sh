@@ -1,19 +1,24 @@
 module purge
 
+# WE SHOULD NOT DESPAIR
+imasdb iter
+
 # IMAS, Kepler, FC2K
 module load IMAS
 module load Kepler
-module load FC2K
+module load FC2K/4.6.5-PyAL
 
 # Need to remove the stack limit to avoid segmentation fault inside codes
 ulimit -Ss unlimited
 
-# For Python actors
-module load PyUAL
+# Compile actors without diagnostic information
+# (the diag info is not compatible with Python for this old version of FC2K)
+export DIAG_INFO=-DNO_DIAG_INFO
 
 # For actor release procedure
 module load sh/1.12.14-intel-2018a-Python-3.6.4
 
+# Library to process xml with Python
 # Library to process xml with Python
 module load lxml/4.2.0-intel-2018a-Python-3.6.4
 
@@ -23,7 +28,7 @@ module load FRUIT_processor/3.4.3-intel-2018a-Ruby-2.5.1
 module load interpos/8.2.1-ifort
 module load XMLlib/3.2.0-intel-2018a
 module load PSPLINE/20181008-intel-2018a
-module load PyUAL/1.0.2-intel-2018a-Python-3.6.4
+module load PyAL/1.1.0-intel-2018a-Python-3.6.4
 
 # To read Machine Description data from the MD datbase
 export MD_ACCESS=no
