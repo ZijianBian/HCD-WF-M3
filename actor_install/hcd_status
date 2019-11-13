@@ -10,7 +10,7 @@ root_directory = '/home/ITER/schneim/public/git'
 #root_directory = '/home/ITER/mitterv/codes'
 #root_directory = '/home/ITER/weia/codes'
 
-list_of_projects = ['hcd-wf','nemo','spot','risk','ids-tools','genray','gray','fpsim/tools','hcd2core-sources','hcd2core-profiles','ascot','core_sources-combiner','stixredist','tomcat','cyrano','lion','pion']
+list_of_projects = ['hcd','hcd-wf','nemo','spot','risk','ids-tools','genray','gray','fpsim/tools','hcd2core-sources','hcd2core-profiles','ascot','core_sources-combiner','stixredist','tomcat','cyrano','lion','pion']
 
 print('--------------------------------------------------------------------------------------------')
 print('ACTORS                    ACTIVE BRANCH                LOCAL COMMITS          LOCAL CHANGES')
