@@ -34,5 +34,6 @@ python actor_install.py --skipModules ascot.yml
 python actor_install.py --skipModules tomcat.yml
 python actor_install.py --skipModules nemo.yml
 python actor_install.py --skipModules genray.yml
+python actor_install.py --skipModules pion.yml
 
 cd ${PWD}
