@@ -134,4 +134,10 @@ def edit_waveforms(iant, sys_dict):
         else: 
             sys_dict[iant][entryelem][i_d] = newvalue
 
-        print(sys_dict[iant][entryelem])
+        #print(sys_dict[iant][entryelem])
+
+    def close_window(): 
+        ewf_top.destroy()
+
+    button_close = Button(rfr, text = 'Close', bg = 'light grey', command = close_window)
+    button_close.grid(column=0, sticky='W', padx = 5, pady = 5)

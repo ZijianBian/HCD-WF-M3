@@ -7,7 +7,8 @@ from datetime import datetime
 
 from write_to_ids import write_to_ids
 from edit_waveforms import edit_waveforms
-    
+
+import pdb    
 
 ### MAKE WINDOW FOR INTERFACE    
 c1 = 'white'
@@ -39,7 +40,7 @@ userstr = StringVar()
 userstr.trace('w', lambda name, index, mode, ids_param_dict_field = 'user': update_ids_param_dict(userstr.get(), ids_param_dict_field))
 Label(runconfigfr, text = 'user', bg = c5).grid(row = 1, column = 1, sticky = 'wns', padx = 3, pady = 3)
 Entry(runconfigfr, textvariable = userstr, bg = c1).grid(row = 1, column = 2, sticky = 'news', padx = 3, pady = 3)
-userstr.set('mitterv')
+userstr.set('public')
 
 machinestr = StringVar()
 machinestr.trace('w', lambda name, index, mode, ids_param_dict_field = 'machine': update_ids_param_dict(machinestr.get(), ids_param_dict_field))
@@ -47,29 +48,30 @@ Label(runconfigfr, text = 'machine', bg = c5).grid(row = 2, column = 1, sticky =
 Entry(runconfigfr, textvariable = machinestr, bg = c1).grid(row = 2, column = 2, sticky = 'news', padx = 3, pady = 3)
 machinestr.set('iter')
 
-shotnrstr = StringVar()
-shotnrstr.trace('w', lambda name, index, mode, ids_param_dict_field = 'shot_nr': update_ids_param_dict(int(shotnrstr.get()), ids_param_dict_field))
+shotnrstr = IntVar()
+shotnrstr.trace('w', lambda name, index, mode, ids_param_dict_field = 'shot_nr': update_ids_param_dict(shotnrstr.get(), ids_param_dict_field))
 Label(runconfigfr, text = 'shotnr', bg = c5).grid(row = 1, column = 3, sticky = 'wns', padx = 3, pady = 3)
 Entry(runconfigfr, textvariable = shotnrstr, bg = c1).grid(row = 1, column = 4, sticky = 'news', padx = 3, pady = 3)
-shotnrstr.set('7897')
+shotnrstr.set(130011)
 
-runinstr = StringVar()
-runinstr.trace('w', lambda name, index, mode, ids_param_dict_field = 'run_in': update_ids_param_dict(int(runinstr.get()), ids_param_dict_field))
+runinstr = IntVar()
+#pdb.set_trace()
+runinstr.trace('w', lambda name, index, mode, ids_param_dict_field = 'run_in': update_ids_param_dict(runinstr.get(), ids_param_dict_field))
 Label(runconfigfr, text = 'runin', bg = c5).grid(row = 2, column = 3, sticky = 'wns', padx = 3, pady = 3)
 Entry(runconfigfr, textvariable = runinstr, bg = c1).grid(row = 2, column = 4, sticky = 'news', padx = 3, pady = 3)
-runinstr.set('1')
+runinstr.set(1)
 
-runoutstr = StringVar()
-runoutstr.trace('w', lambda name, index, mode , ids_param_dict_field = 'run_out': update_ids_param_dict(int(runoutstr.get()), ids_param_dict_field))
+runoutstr = IntVar()
+runoutstr.trace('w', lambda name, index, mode , ids_param_dict_field = 'run_out': update_ids_param_dict(runoutstr.get(), ids_param_dict_field))
 Label(runconfigfr, text = 'runout', bg = c5).grid(row = 3, column = 3, sticky = 'wns', padx = 3, pady = 3)
 Entry(runconfigfr, textvariable = runoutstr, bg = c1).grid(row = 3, column =4, sticky = 'news', padx = 3, pady = 3)
-runoutstr.set('345')
+runoutstr.set(345)
 
 def update_sys_dict(iant, newvalue, entryelem, sys_dict):
 
         sys_dict[iant][entryelem] = newvalue
 
-        print(sys_dict[iant][entryelem])
+        #print(sys_dict[iant][entryelem])
 
 
 
@@ -80,9 +82,7 @@ def ec(ec_waveform_path):
     ecfr = Frame(window, width = 600, height = 200, background = c3)
     ecfr.grid(row = 1, column = 0, sticky = 'nwes')
 
-
-
-    Label(ecfr, text = 'EC',  font = '15').grid(row = 0, column = 0, sticky = 'ew', columnspan = 50)
+    Label(ecfr, text = 'EC', bg = c2,  font = '15').grid(row = 0, column = 0, sticky = 'ew', columnspan = 50)
 
     ecfr.columnconfigure(0, minsize = 303)
     ecfr.columnconfigure(1, minsize = 303)
@@ -98,8 +98,10 @@ def ec(ec_waveform_path):
 
     ## put a button in the place for the buttons
 
-    save_button = Button(s_fr, text = 'save', bg = c2, command = lambda: write_to_ids(ec_dict, ids_param_dict, 'ec'))
+    save_button = Button(s_fr, text = 'save', bg = c2)
+    save_button.configure(command = lambda: write_to_ids(ec_dict, ids_param_dict, 'ec'))
     save_button.grid()
+
 
     ### WRITE THE DATA FROM THE XML INTO A DICTIONARY
 
@@ -323,11 +325,13 @@ def nbi(nbi_waveform_path):
             Button(b_fr, text = 'edit waveform', bg = c2, command = lambda iant = iant: edit_waveforms(iant, nbi_dict)).grid(row = rrow_r, column = 2, sticky = 'ew', padx = (50, 5), pady = 3)
             rrow_r += 1
 
-
-
 ec('ec_waveforms.xml')
 ic('ic_waveforms.xml')
 nbi('nb_waveforms.xml')
+
+button_exit = Button(window, text = 'Exit', bg = 'light grey')
+button_exit.grid(column=0, sticky='W', padx = 5, pady = 5)
+button_exit.configure(command = lambda: sys.exit())
 
 
 window.mainloop()
