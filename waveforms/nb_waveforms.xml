@@ -1,12 +1,12 @@
 <nbi>
   <configure>
     <comment>nbi IDS filled from CPO version (CPO = Rui Coelho ; conversion = Mireille Schneider)</comment>
-    <n_time_slices> 175     </n_time_slices> <!-- Number of time slices for which the ec_antennas IDS should be defined -->
+    <n_time_slices> 175     </n_time_slices> <!-- Number of time slices for which the nbi IDS should be defined -->
     <t_begin>       1.5     </t_begin>       <!-- Starting value of the time array -->
-    <t_end>         647.428 </t_end>         <!-- Final value of the time array -->
-    
-    <n_units> 2 </n_units>
+    <t_end>         647.428 </t_end>         <!-- Final value of the time array -->    
+    <n_units>       2       </n_units>
   </configure>
+
   <unit1>
     <name>NBI</name>
     <identifier>injector1</identifier>
@@ -22,10 +22,9 @@
                                  0.     
     </beam_current_fraction>
     <beam_power_fraction_time>   0.     </beam_power_fraction_time>
-    <beam_power_nfraction>       3      </beam_power_nfraction>   <!-- beam_power_fraction.data(:,:) is 2D -->
     <beam_power_fraction>        1.     
                                  0.     
-                                 0.     </beam_power_fraction> 
+                                 0.     </beam_power_fraction>    <!-- beam_power_fraction.data(:,:) is 2D -->
   </unit1>
 
   <unit2>
@@ -38,12 +37,10 @@
     <energy_time>                0.     </energy_time>
     <energy>                     870.e3 </energy>
     <beam_current_fraction_time> 0.     </beam_current_fraction_time>
-    <!--beam_current_nfraction>     3      </beam_current_nfraction--> <!-- beam_current_fraction.data(:,:) is 2D -->
     <beam_current_fraction>      1.     
                                  0.    
                                  0.     </beam_current_fraction>
     <beam_power_fraction_time>   0.     </beam_power_fraction_time>
-    <!--beam_power_nfraction>       3      </beam_power_nfraction-->   <!-- beam_power_fraction.data(:,:) is 2D -->
     <beam_power_fraction>        1.     
                                  0.     
                                  0.     </beam_power_fraction> 

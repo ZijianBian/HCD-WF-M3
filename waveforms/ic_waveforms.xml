@@ -5,7 +5,7 @@
 <ic_antennas>
   <configure> 
     <comment>Origin: probably converted from some CPO version, from ICRH benchmark let by R. Bilato</comment>
-    <n_time_slices> 175     </n_time_slices> <!-- Number of time slices for which the ec_antennas IDS should be defined -->
+    <n_time_slices> 175     </n_time_slices> <!-- Number of time slices for which the ic_antennas IDS should be defined -->
     <t_begin>       1.5     </t_begin>       <!-- Starting value of the time array -->
     <t_end>         647.428 </t_end>         <!-- Final value of the time array -->
   
