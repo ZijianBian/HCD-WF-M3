@@ -2516,7 +2516,7 @@
                         <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                         </property>
                     </port>
-                    <port name="ec_antennas" class="ptolemy.actor.TypedIOPort">
+                    <port name="ec_launchers" class="ptolemy.actor.TypedIOPort">
                         <property name="output"/>
                         <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                         </property>
@@ -2960,7 +2960,7 @@
                         <property name="_location" class="ptolemy.kernel.util.Location" value="[20.0, 845.0]">
                         </property>
                     </port>
-                    <port name="ec_antennas" class="ptolemy.actor.TypedIOPort">
+                    <port name="ec_launchers" class="ptolemy.actor.TypedIOPort">
                         <property name="input"/>
                         <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                         </property>
@@ -3464,7 +3464,7 @@
                         </port>
                     </entity>
                     <entity name="MACHINE" class="ptolemy.actor.lib.Expression">
-                        <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="{wall=wall,&#10;nbi=nbi,&#10;ec_antennas=ec_antennas,&#10;ic_antennas=ic_antennas,&#10;iron_core=iron_core,&#10;pf_active=pf_active,&#10;pf_passive=pf_passive,&#10;tf=tf,&#10;pellets=pellets,&#10;em_coupling=em_coupling}">
+                        <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="{wall=wall,&#10;nbi=nbi,&#10;ec_launchers=ec_launchers,&#10;ic_antennas=ic_antennas,&#10;iron_core=iron_core,&#10;pf_active=pf_active,&#10;pf_passive=pf_passive,&#10;tf=tf,&#10;pellets=pellets,&#10;em_coupling=em_coupling}">
                             <property name="_hide" class="ptolemy.data.expr.Parameter" value="true">
                             </property>
                             <property name="style" class="ptolemy.actor.gui.style.TextStyle">
@@ -3516,7 +3516,7 @@
                             <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                             </property>
                         </port>
-                        <port name="ec_antennas" class="ptolemy.actor.TypedIOPort">
+                        <port name="ec_launchers" class="ptolemy.actor.TypedIOPort">
                             <property name="input"/>
                             <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                             </property>
@@ -3989,7 +3989,7 @@
                     <link port="waves" relation="relation18"/>
                     <link port="wall" relation="relation3"/>
                     <link port="nbi" relation="relation19"/>
-                    <link port="ec_antennas" relation="relation20"/>
+                    <link port="ec_launchers" relation="relation20"/>
                     <link port="iron_core" relation="relation22"/>
                     <link port="pf_active" relation="relation23"/>
                     <link port="pf_passive" relation="relation24"/>
@@ -4044,7 +4044,7 @@
                     <link port="MACHINE.output" relation="relation38"/>
                     <link port="MACHINE.wall" relation="relation3"/>
                     <link port="MACHINE.nbi" relation="relation19"/>
-                    <link port="MACHINE.ec_antennas" relation="relation20"/>
+                    <link port="MACHINE.ec_launchers" relation="relation20"/>
                     <link port="MACHINE.ic_antennas" relation="relation21"/>
                     <link port="MACHINE.iron_core" relation="relation22"/>
                     <link port="MACHINE.pf_active" relation="relation23"/>
@@ -4206,7 +4206,7 @@
                 <link port="UALInit.waves" relation="relation23"/>
                 <link port="UALInit.wall" relation="relation24"/>
                 <link port="UALInit.nbi" relation="relation25"/>
-                <link port="UALInit.ec_antennas" relation="relation26"/>
+                <link port="UALInit.ec_launchers" relation="relation26"/>
                 <link port="UALInit.iron_core" relation="relation27"/>
                 <link port="UALInit.pf_active" relation="relation28"/>
                 <link port="UALInit.pf_passive" relation="relation29"/>
@@ -4253,7 +4253,7 @@
                 <link port="Bundle IDSs.waves" relation="relation23"/>
                 <link port="Bundle IDSs.wall" relation="relation24"/>
                 <link port="Bundle IDSs.nbi" relation="relation25"/>
-                <link port="Bundle IDSs.ec_antennas" relation="relation26"/>
+                <link port="Bundle IDSs.ec_launchers" relation="relation26"/>
                 <link port="Bundle IDSs.iron_core" relation="relation27"/>
                 <link port="Bundle IDSs.pf_active" relation="relation28"/>
                 <link port="Bundle IDSs.pf_passive" relation="relation29"/>
@@ -4908,7 +4908,7 @@
                     </property>
                 </port>
                 <entity name="UALPython" class="org.iter.imas.actors.UALPython">
-                    <property name="script" class="ptolemy.kernel.util.StringAttribute" value="import os,imas,sys, copy&#10;&#10;print('Welcome to the Python HCD workflow')&#10;&#10;hcd_location = parameters['hcd_location']&#10;&#10;sys.path.append(hcd_location+'/workflow')&#10;os.chdir(hcd_location)&#10;par_path = hcd_location+'/kepler/'&#10;&#10;from hcd_workflow  import hcd_workflow&#10;import xml.etree.ElementTree as ET&#10;&#10;tree = ET.parse(par_path+ '/input_workflow.xml')&#10;&#10;root = tree.getroot()&#10;&#10;param = {}&#10; &#10;for elem in root.iter():&#10;    if len(elem) == 0:&#10;      try:&#10;        param[elem.tag] = int(elem.text)&#10;      except:&#10;        try:&#10;          param[elem.tag] = float(elem.text)&#10;        except:&#10;          param[elem.tag] = elem.text&#10;&#10;      param['input_path'] = par_path&#10;      print(elem.tag, ' = ', param[elem.tag])&#10;&#10;&#10;ids_bundle_initial = {'core_profiles': core_profiles0, &#10;                      'core_sources': core_sources0,&#10;                      'equilibrium': equilibrium0, &#10;                      'pulse_schedule': pulse_schedule0, &#10;                      'nbi': nbi0, &#10;                      'ic_antennas': ic_antennas0, &#10;                      'ec_antennas': ec_antennas0, &#10;                      'wall': wall0, &#10;                      'distribution_sources': distribution_sources0, &#10;                      'distributions': distributions0,&#10;                      'waves': waves0&#10;}&#10;&#10;&#10;ids_bundle_updated = hcd_workflow(ids_bundle_initial, param)&#10;&#10;&#10;core_profiles1 =  ids_bundle_updated['core_profiles']&#10;core_sources1 =  ids_bundle_updated['core_sources']&#10;&#10;print('End of the Python HCD workflow')&#10;&#10;equilibrium1 =  ids_bundle_updated['equilibrium']&#10;pulse_schedule1 =  ids_bundle_updated['pulse_schedule']&#10;nbi1 =  ids_bundle_updated['nbi']&#10;ic_antennas1 =  ids_bundle_updated['ic_antennas']&#10;ec_antennas1 =  ids_bundle_updated['ec_antennas']&#10;wall1 =  ids_bundle_updated['wall']&#10;distribution_sources1 =  ids_bundle_updated['distribution_sources']&#10;distributions1 =  ids_bundle_updated['distributions']&#10;waves1 =  ids_bundle_updated['waves']">
+                    <property name="script" class="ptolemy.kernel.util.StringAttribute" value="import os,imas,sys, copy&#10;&#10;print('Welcome to the Python HCD workflow')&#10;&#10;hcd_location = parameters['hcd_location']&#10;&#10;sys.path.append(hcd_location+'/workflow')&#10;os.chdir(hcd_location)&#10;par_path = hcd_location+'/kepler/'&#10;&#10;from hcd_workflow  import hcd_workflow&#10;import xml.etree.ElementTree as ET&#10;&#10;tree = ET.parse(par_path+ '/input_workflow.xml')&#10;&#10;root = tree.getroot()&#10;&#10;param = {}&#10; &#10;for elem in root.iter():&#10;    if len(elem) == 0:&#10;      try:&#10;        param[elem.tag] = int(elem.text)&#10;      except:&#10;        try:&#10;          param[elem.tag] = float(elem.text)&#10;        except:&#10;          param[elem.tag] = elem.text&#10;&#10;      param['input_path'] = par_path&#10;      print(elem.tag, ' = ', param[elem.tag])&#10;&#10;&#10;ids_bundle_initial = {'core_profiles': core_profiles0, &#10;                      'core_sources': core_sources0,&#10;                      'equilibrium': equilibrium0, &#10;                      'pulse_schedule': pulse_schedule0, &#10;                      'nbi': nbi0, &#10;                      'ic_antennas': ic_antennas0, &#10;                      'ec_launchers': ec_launchers0, &#10;                      'wall': wall0, &#10;                      'distribution_sources': distribution_sources0, &#10;                      'distributions': distributions0,&#10;                      'waves': waves0&#10;}&#10;&#10;&#10;ids_bundle_updated = hcd_workflow(ids_bundle_initial, param)&#10;&#10;&#10;core_profiles1 =  ids_bundle_updated['core_profiles']&#10;core_sources1 =  ids_bundle_updated['core_sources']&#10;&#10;print('End of the Python HCD workflow')&#10;&#10;equilibrium1 =  ids_bundle_updated['equilibrium']&#10;pulse_schedule1 =  ids_bundle_updated['pulse_schedule']&#10;nbi1 =  ids_bundle_updated['nbi']&#10;ic_antennas1 =  ids_bundle_updated['ic_antennas']&#10;ec_launchers1 =  ids_bundle_updated['ec_launchers']&#10;wall1 =  ids_bundle_updated['wall']&#10;distribution_sources1 =  ids_bundle_updated['distribution_sources']&#10;distributions1 =  ids_bundle_updated['distributions']&#10;waves1 =  ids_bundle_updated['waves']">
                         <display name="Python commands or script"/>
                         <property name="python lines" class="ptolemy.actor.gui.style.TextStyle">
                             <property name="height" class="ptolemy.data.expr.Parameter" value="10">
@@ -5035,7 +5035,7 @@
                         <property name="_hide" class="ptolemy.data.expr.SingletonParameter" value="false">
                         </property>
                     </port>
-                    <port name="ec_antennas0" class="ptolemy.actor.TypedIOPort">
+                    <port name="ec_launchers0" class="ptolemy.actor.TypedIOPort">
                         <property name="input"/>
                         <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                         </property>
@@ -5324,7 +5324,7 @@
                 </entity>
                 <entity name="Expression6" class="ptolemy.actor.lib.Expression">
                     <display name="Extract input IDS"/>
-                    <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="in.DM.MACHINE.ec_antennas">
+                    <property name="expression" class="ptolemy.kernel.util.StringAttribute" value="in.DM.MACHINE.ec_launchers">
                         <property name="_hide" class="ptolemy.data.expr.Parameter" value="true">
                         </property>
                     </property>
@@ -5691,7 +5691,7 @@
                 <link port="UALPython.core_profiles0" relation="relation5"/>
                 <link port="UALPython.waves0" relation="relation"/>
                 <link port="UALPython.ic_antennas0" relation="relation4"/>
-                <link port="UALPython.ec_antennas0" relation="relation6"/>
+                <link port="UALPython.ec_launchers0" relation="relation6"/>
                 <link port="UALPython.wall0" relation="relation2"/>
                 <link port="UALPython.distribution_sources1" relation="relation16"/>
                 <link port="UALPython.distributions1" relation="relation17"/>
@@ -8578,7 +8578,7 @@
                     <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                     </property>
                 </port>
-                <port name="ec_antennas" class="ptolemy.actor.TypedIOPort">
+                <port name="ec_launchers" class="ptolemy.actor.TypedIOPort">
                     <property name="input"/>
                     <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                     </property>
@@ -8953,7 +8953,7 @@
                     <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                     </property>
                 </port>
-                <port name="DM/MACHINE/ec_antennas" class="ptolemy.actor.TypedIOPort">
+                <port name="DM/MACHINE/ec_launchers" class="ptolemy.actor.TypedIOPort">
                     <property name="output"/>
                     <property name="_showName" class="ptolemy.data.expr.SingletonParameter" value="true">
                     </property>
@@ -9060,7 +9060,7 @@
             <link port="UALSliceCollector.distribution_sources" relation="relation22"/>
             <link port="UALSliceCollector.distributions" relation="relation23"/>
             <link port="UALSliceCollector.ic_antennas" relation="relation24"/>
-            <link port="UALSliceCollector.ec_antennas" relation="relation25"/>
+            <link port="UALSliceCollector.ec_launchers" relation="relation25"/>
             <link port="UALSliceCollector.nbi" relation="relation26"/>
             <link port="UALSliceCollector.wall" relation="relation27"/>
             <link port="Machine.output" relation="relation"/>
@@ -9096,7 +9096,7 @@
             <link port="RecordGet.DM/HCD/distribution_sources" relation="relation22"/>
             <link port="RecordGet.DM/HCD/distributions" relation="relation23"/>
             <link port="RecordGet.DM/MACHINE/ic_antennas" relation="relation24"/>
-            <link port="RecordGet.DM/MACHINE/ec_antennas" relation="relation25"/>
+            <link port="RecordGet.DM/MACHINE/ec_launchers" relation="relation25"/>
             <link port="RecordGet.DM/MACHINE/nbi" relation="relation26"/>
             <link port="RecordGet.DM/MACHINE/wall" relation="relation27"/>
             <link relation1="relation28" relation2="relation4"/>
