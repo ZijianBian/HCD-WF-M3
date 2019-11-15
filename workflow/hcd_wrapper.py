@@ -56,7 +56,7 @@ def hcd_wrapper(par_path):
 
   actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
 
-  ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
+  ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_launchers','wall', 'distribution_sources', 'distributions', 'waves']
 
 
   in_l = []
@@ -110,7 +110,7 @@ def hcd_wrapper(par_path):
   input.open_env(user_in,tokamakname,version)
   output = imas.ids(param["shot_nr"], param["run_out"], 0,0)
   output.create_env(local_user,tokamakname, version)
-  idx_out = output.core_profiles.idx
+  idx_out = output.core_profiles.getPulseCtx()
 
   ids_bundle_initial = {'core_profiles': input.core_profiles, 
                         'core_sources': input.core_sources,
@@ -118,7 +118,7 @@ def hcd_wrapper(par_path):
                         'pulse_schedule': input.pulse_schedule, 
                         'nbi': input.nbi, 
                         'ic_antennas': input.ic_antennas, 
-                        'ec_antennas': input.ec_antennas, 
+                        'ec_launchers': input.ec_launchers, 
                         'wall': input.wall, 
                         'distribution_sources': input.distribution_sources, 
                         'distributions': input.distributions,
@@ -201,12 +201,12 @@ def hcd_wrapper(par_path):
 
       for elem in ids_bundle_updated:   
 
-           ids_bundle_updated[elem].setExpIdx(idx_out)
+           ids_bundle_updated[elem].setPulseCtx(idx_out)
            if timenow ==  (param['tbegin']):
                
                if ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or ids_bundle_updated[elem].ids_properties.homogeneous_time == 0:
 
-                 ids_bundle_updated[elem].putNonTimed()
+                 ids_bundle_updated[elem].put()
                else:
              
                  pass

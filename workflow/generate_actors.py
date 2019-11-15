@@ -11,7 +11,7 @@ maindict = {}
 
 actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
 
-ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_antennas','wall', 'distribution_sources', 'distributions', 'waves']
+ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_launchers','wall', 'distribution_sources', 'distributions', 'waves']
 
 add_arg = load_add_arg()
 
