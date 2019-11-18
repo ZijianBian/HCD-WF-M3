@@ -1,9 +1,10 @@
-
 def hcd_wrapper(par_path):
   import os,imas,sys, copy
   sys.path.append('interface')
   sys.path.append('workflow')
   sys.path.append(os.getcwd())
+  from pyal import ALEnv
+  from random import randint
   from hcd_workflow  import hcd_workflow
   from lxml import etree
   import xml.etree.ElementTree as ET
@@ -111,6 +112,18 @@ def hcd_wrapper(par_path):
   output = imas.ids(param["shot_nr"], param["run_out"], 0,0)
   output.create_env(local_user,tokamakname, version)
   idx_out = output.core_profiles.getPulseCtx()
+
+  # DEFINE THE SHOT/RUN NUMBERS AND LOCATION OF THE TEMPORARY FILE
+  exist = 'yes'
+  shot_tmp = 9988
+  while exist == 'yes':
+    run_tmp  = randint(0,9999)
+    tmp = imas.ids(shot_tmp,run_tmp,0,0)
+    try:
+      tmp.open_env(user,tokamakname,version)
+    except Exception:
+      exist = 'no'
+  tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tokamakname).ids_tmp
 
   ids_bundle_initial = {'core_profiles': input.core_profiles, 
                         'core_sources': input.core_sources,

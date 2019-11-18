@@ -3,6 +3,8 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
     import numpy as np
     import matplotlib.pyplot as plt
     import pdb
+    from pyal import ALEnv
+    from random import randint
     from get_MDdb2ids import get_MDdb2ids # Machine Description data from SQL DB
     from idsdisp import idsprint,idsrprint
 
@@ -38,6 +40,18 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
         print('--> Create output datafile %s/%s for user = %s, machine = %s'%(str(shot),str(run_out),str(local_user),str(machine)))
         output.create_env(local_user,machine,version)
     idx_out = output.core_profiles.idx
+
+    # DEFINE THE SHOT/RUN NUMBERS AND LOCATION OF THE TEMPORARY FILE
+    exist = 'yes'
+    shot_tmp = 9988
+    while exist == 'yes':
+        run_tmp  = randint(0,9999)
+        tmp = imas.ids(shot_tmp,run_tmp,0,0)
+        try:
+            tmp.open_env(user,tokamakname,version)
+        except Exception:
+            exist = 'no'
+    tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tokamakname).ids_tmp
 
     ## PREPARE PUTTING TO IDS STRUCTURE -> adjust the number of timesteps
     sys_dict_temp =  {}
