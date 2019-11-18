@@ -145,10 +145,10 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
             output.ec_launchers.launcher[i].beam.spot.size.time.resize(len(ec_dict_temp[iant]['beam_spot_size_time']))
             output.ec_launchers.launcher[i].beam.spot.angle.data.resize(len(ec_dict_temp[iant]['beam_spot_angle']))
             output.ec_launchers.launcher[i].beam.spot.angle.time.resize(len(ec_dict_temp[iant]['beam_spot_angle_time']))
-            #output.ec_launchers.launcher[i].beam.phase.curvature.data.resize(len(ec_dict_temp[iant]['beam_phase_curvature']))
-            #output.ec_launchers.launcher[i].beam.phase.curvature.time.resize(len(ec_dict_temp[iant]['beam_phase_curvature_time']))
-            #output.ec_launchers.launcher[i].beam.phase.angle.data.resize(len(ec_dict_temp[iant]['beam_phase_angle']))
-            #output.ec_launchers.launcher[i].beam.phase.angle.time.resize(len(ec_dict_temp[iant]['beam_phase_angle_time']))
+            output.ec_launchers.launcher[i].beam.phase.curvature.data.resize(len(ec_dict_temp[iant]['beam_phase_curvature']))
+            output.ec_launchers.launcher[i].beam.phase.curvature.time.resize(len(ec_dict_temp[iant]['beam_phase_curvature_time']))
+            output.ec_launchers.launcher[i].beam.phase.angle.data.resize(len(ec_dict_temp[iant]['beam_phase_angle']))
+            output.ec_launchers.launcher[i].beam.phase.angle.time.resize(len(ec_dict_temp[iant]['beam_phase_angle_time']))
             i += 1
 
         # Fill all variables with information from the xml file / interface edition
