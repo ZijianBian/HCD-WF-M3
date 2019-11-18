@@ -20,7 +20,7 @@ os.popen('mkdir -p '+actor_pool_folder).read()
 minimal_list = ['empty_distribution_sources','empty_distributions','empty_waves','empty_core_sources','merge_distribution_sources','merge_distributions','merge_waves']
 
 # LIST OF H&CD ACTORS FOR PYTHON WORKFLOW
-hcd_list = ['genray','iccoup','gray','tomcat','StixReDist','lion','Cyrano','nemo','bbnbi','spot','risk','ascot4serial','ascot4parallel','hcd2core_sources','hcd2core_profiles','afsi']
+hcd_list = ['genray','iccoup','gray','tomcat','StixReDist','lion','Cyrano','pion','nemo','bbnbi','spot','risk','ascot4serial','ascot4parallel','hcd2core_sources','hcd2core_profiles','afsi']
 
 # EXTRA LIST FOR KEPLER WORKFLOW: ALL ACTORS HAVE TO BE COMPILED
 extra_list_for_kepler = ['core_sources_combiner','empty_core_profiles','merge_core_sources']
