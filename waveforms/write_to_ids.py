@@ -4,7 +4,6 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
     import matplotlib.pyplot as plt
     import pdb
     from pyal import ALEnv
-    from random import randint
     from get_MDdb2ids import get_MDdb2ids # Machine Description data from SQL DB
     from idsdisp import idsprint,idsrprint
 
@@ -42,15 +41,8 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
     idx_out = output.core_profiles.getPulseCtx()
 
     # DEFINE THE SHOT/RUN NUMBERS AND LOCATION OF THE TEMPORARY FILE
-    exist = 'yes'
     shot_tmp = 9988
-    while exist == 'yes':
-        run_tmp  = randint(0,9999)
-        tmp = imas.ids(shot_tmp,run_tmp,0,0)
-        try:
-            tmp.open_env(user,machine,version)
-        except Exception:
-            exist = 'no'
+    run_tmp = 9988
     tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=machine).ids_tmp
 
     ## PREPARE PUTTING TO IDS STRUCTURE -> adjust the number of timesteps
@@ -184,6 +176,7 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
         output.ec_launchers.time.resize(len(output.ec_launchers.launcher[0].power_launched.time))
         output.ec_launchers.time = output.ec_launchers.launcher[0].power_launched.time
         output.ec_launchers.put()
+        output.close()
         print('--> Saved ec_launchers IDS.')
        
     def set_ic(ic_dict_temp):
@@ -220,6 +213,7 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
         output.ic_antennas.time.resize(len(output.ic_antennas.antenna[0].power_launched.time))
         output.ic_antennas.time = output.ic_antennas.antenna[0].power_launched.time
         output.ic_antennas.put()
+        output.close()
         print('--> Saved ic_antennas IDS.')
 
     def set_nbi(nbi_dict_temp):
@@ -256,19 +250,20 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
             output.nbi.unit[i].power_launched.time = nbi_dict_temp[iunit]['power_launched_time']
             output.nbi.unit[i].energy.data = nbi_dict_temp[iunit]['energy']
             output.nbi.unit[i].energy.time = nbi_dict_temp[iunit]['energy_time']
-            output.nbi.unit[i].beam_current_fraction.data = nbi_dict_temp[iunit]['beam_current_fraction']
-            output.nbi.unit[i].beam_current_fraction.time = nbi_dict_temp[iunit]['beam_current_fraction_time']
-            output.nbi.unit[i].beam_power_fraction.data = nbi_dict_temp[iunit]['beam_power_fraction']
-            output.nbi.unit[i].beam_power_fraction.time = nbi_dict_temp[iunit]['beam_power_fraction_time']
+            #output.nbi.unit[i].beam_current_fraction.data = nbi_dict_temp[iunit]['beam_current_fraction']
+            #output.nbi.unit[i].beam_current_fraction.time = nbi_dict_temp[iunit]['beam_current_fraction_time']
+            #output.nbi.unit[i].beam_power_fraction.data = nbi_dict_temp[iunit]['beam_power_fraction']
+            #output.nbi.unit[i].beam_power_fraction.time = nbi_dict_temp[iunit]['beam_power_fraction_time']
             i += 1
 
         # Save IDS to local database
         output.nbi.ids_properties.homogeneous_time = 0.
         output.nbi.time.resize(len(output.nbi.unit[0].power_launched.time))
         output.nbi.time = output.nbi.unit[0].power_launched.time
-        idsprint('output.nbi')
-        pdb.set_trace()
+        #idsprint('output.nbi')
+        #pdb.set_trace()
         output.nbi.put()
+        output.close()
         print('--> Saved nbi IDS.')
         
     if source == 'ec':
