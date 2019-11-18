@@ -13,6 +13,7 @@ from hover_class import *
 from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
+import pdb
 
 
 #---------------------------------------------------------------------------------------------
@@ -297,6 +298,8 @@ def open_gui(input_filepath):
 
             rrow = 1
             ccolumn = 0
+
+            global codeparam_dict
             codeparam_dict = {}
             
 
@@ -364,9 +367,8 @@ def open_gui(input_filepath):
           
           populate(fr)
           
-        
-
-
+          ## name of the codeparam file in the run_config_folder
+          dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')            
           Button(fr_top, text = 'save', bg = c2,  command = lambda: save_codeparam_to_file(dest_file, codeparam_dict)).grid(row = 0 ,column = 1, padx = 5, pady = 5)
           Button(fr_top, text = 'load default', bg = c2, command = lambda: make_frame(hsys, actor_name,  prev_frame, True)).grid(row = 0, column =2, padx = 5, pady = 5)
           Button(fr_top, text = 'exit', bg = c2, command = lambda: cp_top.destroy()).grid(row = 0, column = 4, padx = (20, 5), pady = 5)        
