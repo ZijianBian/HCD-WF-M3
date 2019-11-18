@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/cyrano.git
-    VERSION: feature/IMAS_3.25.0-4.3.1
+    VERSION: develop
     DIR: cyrano
 
 MODULES: []
