@@ -240,7 +240,7 @@ def open_gui(input_filepath):
           prev_frame.grid_remove()
           prev_frame.grid_forget()
 
- 
+    
 
           def populate(frame):
             codeparam_xml_path = StringVar()
@@ -343,6 +343,8 @@ def open_gui(input_filepath):
                     else:
                         v_scroll.grid_remove()
 
+            return dest_file, codeparam_dict
+
           # end of populate frame       
           
           def onFrameConfigure(canvas):
@@ -362,7 +364,7 @@ def open_gui(input_filepath):
           #    fr.grid_propagate(0)
           fr.bind('<Configure>', lambda event, canvas = canvas: onFrameConfigure(canvas))
           
-          populate(fr)
+          dest_file, codeparam_dict = populate(fr)
           
         
 
@@ -373,7 +375,7 @@ def open_gui(input_filepath):
 
 
 
-          populate(fr)    
+          dest_file, codeparam_dict = populate(fr)    
                     
 
 
