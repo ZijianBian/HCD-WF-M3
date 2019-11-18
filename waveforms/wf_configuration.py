@@ -18,9 +18,11 @@ c4 = 'ghost white'
 c5 = 'powder blue'
 cb = 'LavenderBlush3'
 
+fontsize = 10
 window = Tk()
 window.title('CONFIGURE WAVEFORMS')
 window.configure(bg = c1)
+window.option_add('*font', 'courier '+str(fontsize))
 
 #window.resizable(0,1)
 
