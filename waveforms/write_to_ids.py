@@ -95,7 +95,6 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
                         
                         timearray = np.linspace(float(sys_dict['configure']['t_begin']), float(sys_dict['configure']['t_end']), int(sys_dict['configure']['n_time_slices']))
                         interpolated_values = np.interp(timearray, t_list, val_list)
-                     
                         sys_dict_temp[iant][elem][id] = interpolated_values
 
                     sys_dict_temp[iant][elem+'_time'] = timearray
@@ -146,10 +145,10 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
             output.ec_launchers.launcher[i].beam.spot.size.time.resize(len(ec_dict_temp[iant]['beam_spot_size_time']))
             output.ec_launchers.launcher[i].beam.spot.angle.data.resize(len(ec_dict_temp[iant]['beam_spot_angle']))
             output.ec_launchers.launcher[i].beam.spot.angle.time.resize(len(ec_dict_temp[iant]['beam_spot_angle_time']))
-            output.ec_launchers.launcher[i].beam.phase.curvature.data.resize(len(ec_dict_temp[iant]['beam_phase_curvature']))
-            output.ec_launchers.launcher[i].beam.phase.curvature.time.resize(len(ec_dict_temp[iant]['beam_phase_curvature_time']))
-            output.ec_launchers.launcher[i].beam.phase.angle.data.resize(len(ec_dict_temp[iant]['beam_phase_angle']))
-            output.ec_launchers.launcher[i].beam.phase.angle.time.resize(len(ec_dict_temp[iant]['beam_phase_angle_time']))
+            #output.ec_launchers.launcher[i].beam.phase.curvature.data.resize(len(ec_dict_temp[iant]['beam_phase_curvature']))
+            #output.ec_launchers.launcher[i].beam.phase.curvature.time.resize(len(ec_dict_temp[iant]['beam_phase_curvature_time']))
+            #output.ec_launchers.launcher[i].beam.phase.angle.data.resize(len(ec_dict_temp[iant]['beam_phase_angle']))
+            #output.ec_launchers.launcher[i].beam.phase.angle.time.resize(len(ec_dict_temp[iant]['beam_phase_angle_time']))
             i += 1
 
         # Fill all variables with information from the xml file / interface edition
@@ -158,8 +157,8 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
             output.ec_launchers.launcher[i].name = ec_dict_temp[iant]['name']
             output.ec_launchers.launcher[i].power_launched.data = ec_dict_temp[iant]['power_launched']
             output.ec_launchers.launcher[i].power_launched.time = ec_dict_temp[iant]['power_launched_time']
-            output.ec_launchers.launcher[i].frequency.data = ec_dict_temp[iant]['frequency'][0]
-            output.ec_launchers.launcher[i].frequency.time = ec_dict_temp[iant]['frequency_time'][0]
+            output.ec_launchers.launcher[i].frequency.data = ec_dict_temp[iant]['frequency']
+            output.ec_launchers.launcher[i].frequency.time = ec_dict_temp[iant]['frequency_time']
             output.ec_launchers.launcher[i].mode.data = ec_dict_temp[iant]['mode']
             output.ec_launchers.launcher[i].mode.time = ec_dict_temp[iant]['mode_time']
             output.ec_launchers.launcher[i].launching_position.time  = ec_dict_temp[iant]['launching_position_time']
@@ -167,15 +166,15 @@ def write_to_ids(sys_dict, param,source ): #, ntime_slices, t_begin, t_end):
             output.ec_launchers.launcher[i].launching_position.z = ec_dict_temp[iant]['launching_position_z']
             output.ec_launchers.launcher[i].launching_position.phi = ec_dict_temp[iant]['launching_position_phi']
             output.ec_launchers.launcher[i].steering_angle_pol.data = ec_dict_temp[iant]['steering_angle_pol']
-            output.ec_launchers.launcher[i].steering_angle_pol.time= ec_dict_temp[iant]['steering_angle_pol_time']
+            output.ec_launchers.launcher[i].steering_angle_pol.time = ec_dict_temp[iant]['steering_angle_pol_time']
             output.ec_launchers.launcher[i].steering_angle_tor.data = ec_dict_temp[iant]['steering_angle_tor']
             output.ec_launchers.launcher[i].steering_angle_tor.time = ec_dict_temp[iant]['steering_angle_tor_time']
-            output.ec_launchers.launcher[i].beam.spot.size.data = ec_dict_temp[iant]['beam_spot_size']
-            output.ec_launchers.launcher[i].beam.spot.size.time = ec_dict_temp[iant]['beam_spot_size_time']
+            output.ec_launchers.launcher[i].beam.spot.size.data = np.array(ec_dict_temp[iant]['beam_spot_size']).transpose()
+            output.ec_launchers.launcher[i].beam.spot.size.time = np.array(ec_dict_temp[iant]['beam_spot_size_time'])
             output.ec_launchers.launcher[i].beam.spot.angle.data = ec_dict_temp[iant]['beam_spot_angle']
             output.ec_launchers.launcher[i].beam.spot.angle.time = ec_dict_temp[iant]['beam_spot_angle_time']
-            output.ec_launchers.launcher[i].beam.phase.curvature.data = ec_dict_temp[iant]['beam_phase_curvature']
-            output.ec_launchers.launcher[i].beam.phase.curvature.time = ec_dict_temp[iant]['beam_phase_curvature_time']
+            output.ec_launchers.launcher[i].beam.phase.curvature.data = np.array(ec_dict_temp[iant]['beam_phase_curvature']).transpose()
+            output.ec_launchers.launcher[i].beam.phase.curvature.time = np.array(ec_dict_temp[iant]['beam_phase_curvature_time']).transpose()
             output.ec_launchers.launcher[i].beam.phase.angle.data = ec_dict_temp[iant]['beam_phase_angle']
             output.ec_launchers.launcher[i].beam.phase.angle.time = ec_dict_temp[iant]['beam_phase_angle_time']
             i += 1
