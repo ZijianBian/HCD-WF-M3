@@ -369,17 +369,11 @@ def open_gui(input_filepath):
           
           dest_file, codeparam_dict = populate(fr)
           
-          ## name of the codeparam file in the run_config_folder
-          dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')            
           Button(fr_top, text = 'save', bg = c2,  command = lambda: save_codeparam_to_file(dest_file, codeparam_dict)).grid(row = 0 ,column = 1, padx = 5, pady = 5)
           Button(fr_top, text = 'load default', bg = c2, command = lambda: make_frame(hsys, actor_name,  prev_frame, True)).grid(row = 0, column =2, padx = 5, pady = 5)
           Button(fr_top, text = 'exit', bg = c2, command = lambda: cp_top.destroy()).grid(row = 0, column = 4, padx = (20, 5), pady = 5)        
 
-
-
           dest_file, codeparam_dict = populate(fr)    
-                    
-
 
     ## FUNCTIONS - SAVING & UPDATING
 
