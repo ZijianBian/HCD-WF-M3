@@ -26,16 +26,3 @@ module load XMLlib/3.2.0-intel-2018a
 module load PSPLINE/20181008-intel-2018a
 module load PyAL/1.1.1-intel-2018a-Python-3.6.4
 module load NAG/26-intel-2018a
-
-# To read Machine Description data from the MD database
-export MD_ACCESS=yes
-if [ $MD_ACCESS = "yes" ]; then
-    #echo "m-machine-description module loaded"
-    module use --append m-machine-description/src/main/Environment/HPC/modules
-    module load m-machine-description
-fi
-
-#else
-    #echo "Warning: m-machine-description module not loaded"
-#fi
-
