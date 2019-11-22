@@ -33,6 +33,7 @@ if [ $MD_ACCESS = "yes" ]; then
     #echo "m-machine-description module loaded"
     module use --append m-machine-description/src/main/Environment/HPC/modules
     module load m-machine-description
+    module load PostgreSQL/10.3-intel-2018a-Python-3.6.4
 fi
 
 #else
