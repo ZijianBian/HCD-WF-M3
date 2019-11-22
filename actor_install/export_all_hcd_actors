@@ -15,7 +15,8 @@ args = vars(parser.parse_args())
 # Actor pool folder
 actor_pool_folder = args["actor_pool_folder"]
 os.popen('mkdir -p '+actor_pool_folder).read()
-os.popen('rm -f  '+actor_pool_folder+'/*.tar.gz').read()
+os.popen('mkdir -p '+actor_pool_folder+'/zipped_actors').read()
+os.popen('rm -f  '+actor_pool_folder+'/zipped_actors'+'/*.tar.gz').read()
 
 # MINIMAL LIST FOR PYTHON WORKFLOW
 minimal_list = ['empty_distribution_sources','empty_distributions','empty_waves','empty_core_sources','merge_distribution_sources','merge_distributions','merge_waves']
@@ -23,14 +24,19 @@ minimal_list = ['empty_distribution_sources','empty_distributions','empty_waves'
 # LIST OF H&CD ACTORS FOR PYTHON WORKFLOW
 hcd_list = ['genray','iccoup','gray','tomcat','StixReDist','lion','pion','Cyrano','nemo','bbnbi','spot','risk','ascot4serial','ascot4parallel','hcd2core_sources','hcd2core_profiles','afsi']
 
-# EXTRA LIST FOR KEPLER WORKFLOW: ALL ACTORS HAVE TO BE COMPILED
-extra_list_for_kepler = ['core_sources_combiner','empty_core_profiles','merge_core_sources']
+# EXTRA LIST OF ACTORS
+extra_list = ['core_sources_combiner','empty_core_profiles','merge_core_sources']
+
+# test provisoire to speed up the tests
+#minimal_list = ['empty_distribution_sources','empty_distributions']
+#hcd_list = ['genray','iccoup','gray']
+#extra_list = []
 
 sep = '-'*(26+len(actor_pool_folder))
 print(sep)
 print('Export actors to folder '+actor_pool_folder)
 print(sep)
-os.chdir(actor_pool_folder)
+os.chdir(actor_pool_folder+'/zipped_actors')
 print('--- Export minimal list of actors ---')
 print('---')
 for actor in minimal_list:
@@ -49,13 +55,21 @@ print('---')
 print('------> List of H&CD actors complete.')
 print(sep)
 
-print('--- Export extra actors needed for Kepler ---')
+print('--- Export extra list of actors ---')
 print('---')
-for actor in extra_list_for_kepler:
+for actor in extra_list:
     print('--> Export '+actor)
     os.popen('kepler_actor_export '+actor).read()
 print('---')
-print('------> List of extra actors needed for Kepler complete.')
+print('------> List of extra actors complete.')
 print(sep)
+
+os.chdir(actor_pool_folder)
+for file in os.listdir(actor_pool_folder+'/zipped_actors'):
+    os.popen('tar -xzvf '+'zipped_actors/'+file).read()
+    os.popen('rm -f '+file).read()
+
+os.popen('mkdir -p '+actor_pool_folder+'/imas').read()
+os.popen('mv lib64 resources src imas/').read()
 
 print('ACTOR EXPORT COMPLETE.')

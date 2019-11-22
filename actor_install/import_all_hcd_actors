@@ -22,8 +22,8 @@ minimal_list = ['empty_distribution_sources','empty_distributions','empty_waves'
 # LIST OF H&CD ACTORS FOR PYTHON WORKFLOW
 hcd_list = ['genray','iccoup','gray','tomcat','StixReDist','lion','Cyrano','pion','nemo','bbnbi','spot','risk','ascot4serial','ascot4parallel','hcd2core_sources','hcd2core_profiles','afsi']
 
-# EXTRA LIST FOR KEPLER WORKFLOW: ALL ACTORS HAVE TO BE COMPILED
-extra_list_for_kepler = ['core_sources_combiner','empty_core_profiles','merge_core_sources']
+# EXTRA LIST OF ACTORS
+extra_list = ['core_sources_combiner','empty_core_profiles','merge_core_sources']
 
 # 1) Minimal list
 sep = '-'*(28+len(actor_pool_folder))
@@ -52,15 +52,15 @@ print('---')
 print('------> List of H&CD actors complete.')
 print(sep)
 
-# 3 Kepler extra list
-print('--- Import extra actors needed for Kepler ---')
+# 3) Extra list
+print('--- Import extra actors ---')
 print('---')
-for actor in extra_list_for_kepler:
+for actor in extra_list:
     print('--> Import '+actor)
     os.popen('kepler_actor_rm '+actor).read()
     os.popen('kepler_actor_import '+actor+'.tar.gz').read()
 print('---')
-print('------> List of extra actors needed for Kepler complete.')
+print('------> List of extra actors complete.')
 print(sep)
 
 print('Actor import complete.')
