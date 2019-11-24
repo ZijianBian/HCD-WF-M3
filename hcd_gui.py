@@ -19,8 +19,8 @@ import pdb
 #---------------------------------------------------------------------------------------------
 
 
-if (os.getenv('KEPLER') is None)  or ('/work/imas/extra' in os.getenv('KEPLER')):
-    print('ERROR: the local version of Kepler is not loaded')
+if (os.getenv('ACTOR_POOL') is None):
+    print('ERROR: the environment variable ACTOR_POOL has not been set up')
     sys.exit()
 
 # ---------------------------------------------------------------------------------------------
