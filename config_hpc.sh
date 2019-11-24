@@ -27,6 +27,6 @@ module load PSPLINE/20181008-intel-2018a
 module load PyAL/1.1.1-intel-2018a-Python-3.6.4
 module load NAG/26-intel-2018a
 
-# Force a new location for IMAS actors (the users do not need kepler)
-export KEPLER=$PWD/actor_install/actors
+# Location for IMAS actors (pre-compiled)
+export ACTOR_POOL=$PWD/actor_install/actors
 
