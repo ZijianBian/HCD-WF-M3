@@ -8,7 +8,7 @@ def create_maindict(default_workflow_parameters):
     #---------------------------------------------------------------------------------------------
     ##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
 
-    actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
+    actor_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/src/org/iter/imas/python')
 
     ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_launchers','wall', 'distribution_sources', 'distributions', 'waves']
 
