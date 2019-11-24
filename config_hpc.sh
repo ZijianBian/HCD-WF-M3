@@ -29,4 +29,5 @@ module load NAG/26-intel-2018a
 
 # Location for IMAS actors (pre-compiled)
 export ACTOR_POOL=$PWD/actor_install/actors
+export KEPLER=$ACTOR_POOL # (still needed by IMAS actors themselves)
 
