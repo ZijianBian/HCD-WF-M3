@@ -3,7 +3,7 @@ from set_md_from_pulse_schedule import set_md_from_pulse_schedule
 import generate_actors
 import auto_hcd_actors as act
 
-actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
+actor_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/src/org/iter/imas/python')
 list_of_actors = ['merge_waves', 'merge_distributions', 'merge_distribution_sources', 'hcd2core_sources', 'empty_core_sources']
 
 for name in list_of_actors:

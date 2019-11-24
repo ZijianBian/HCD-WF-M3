@@ -55,7 +55,7 @@ def hcd_wrapper(par_path):
   ##----------------------------------------------------------------------------------
   # make a list of input and output idss 
 
-  actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
+  actor_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/src/org/iter/imas/python')
 
   ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_launchers','wall', 'distribution_sources', 'distributions', 'waves']
 

@@ -9,7 +9,7 @@ tree = etree.parse('input_workflow_default.xml')
 root = tree.getroot()
 maindict = {}
 
-actor_path = os.path.join(os.getenv('KEPLER'), 'imas/src/org/iter/imas/python')
+actor_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/src/org/iter/imas/python')
 
 ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_launchers','wall', 'distribution_sources', 'distributions', 'waves']
 
@@ -77,7 +77,7 @@ for step in root[2]:
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
     file.write('import os, imas, sys, copy\n\n')
-    file.write('actor_path = os.path.join(os.getenv("KEPLER"), "imas/src/org/iter/imas/python")\n')
+    file.write('actor_path = os.path.join(os.getenv("ACTOR_POOL"), "imas/src/org/iter/imas/python")\n')
     file.write('list_of_actors = ["'+'","'.join(list_of_actors)+'", "empty_distribution_sources", "empty_waves", "empty_distributions"]\n\n\n')
     file.write('for name in list_of_actors:\n')
     file.write('   sys.path[:0] = [os.path.join(actor_path,name)]\n')
@@ -122,7 +122,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
 
                         
 
-                        libmpi_path = os.path.join(os.getenv('KEPLER'), 'imas/lib64/lib'+code+'.so')
+                        libmpi_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/lib64/lib'+code+'.so')
                             
                         if cfmpi.is_compiled_for_mpi(libmpi_path, 'libmpi'):
                             file.write(',  "mpi_local"')
