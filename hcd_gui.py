@@ -19,7 +19,7 @@ import argparse
 
 #---------------------------------------------------------------------------------------------
 
-if (os.getenv('ACTOR_POOL') is None):
+if os.getenv('ACTOR_POOL') is None:
     print('ERROR: the environment variable ACTOR_POOL has not been set up')
     sys.exit()
 
@@ -27,8 +27,8 @@ if (os.getenv('ACTOR_POOL') is None):
 # set the path to the folders where the configuration and codeparameters are stored
 
 global run_config_folder_path
-run_config_folder_path  = os.path.join(os.getcwd(), 'run_configurations/run_'
-                                       +datetime.now().strftime('%m%d_%H%M%S'))
+run_config_folder_path = os.path.join(os.getcwd(), 'run_configurations/run_'
+                                      +datetime.now().strftime('%m%d_%H%M%S'))
 
 global run_workflow_param_path
 run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
@@ -66,7 +66,7 @@ window.option_add('*font', 'courier '+str(fontsize))
 
 
 window.title('HCD WORKFLOW')
-window.configure(bg = c1)
+window.configure(bg=c1)
 
 def open_gui(input_filepath, norun, input_dir, output_dir):
 
@@ -134,14 +134,14 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
             os.makedirs(run_config_folder_path+'/'+systemname)
             copy2(input_filepath, run_workflow_param_path, follow_symlinks=True)
 
-    fr_wfp = Frame(window, width = 300, height = 500, background = c3)
-    fr_wfp.grid(row = 0, column = 0, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
+    fr_wfp = Frame(window, width=300, height=500, background=c3)
+    fr_wfp.grid(row=0, column=0, rowspan=2, sticky='nwes', padx=3, pady=3)
 
-    fr_as = Frame(window, width = 500, height = 500, background = c1)
-    fr_as.grid(row = 0, column = 1, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
+    fr_as = Frame(window, width=500, height=500, background=c1)
+    fr_as.grid(row=0, column=1, rowspan=2, sticky='nwes', padx=3, pady=3)
 
-    fr_fc = Frame(window, width = 500, height = 500, background = c1)
-    fr_fc.grid(row = 0, column = 2, rowspan = 2,  sticky = 'nwes', padx = 3, pady = 3)
+    fr_fc = Frame(window, width=500, height=500, background=c1)
+    fr_fc.grid(row=0, column=2, rowspan=2, sticky='nwes', padx=3, pady=3)
 
     removed_by_close_button = [fr_fc]
     fr_fc.grid_remove()
@@ -159,34 +159,36 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     irow = 0
     for ref in [wfp_ref, fur_ref]:
 
-        Label(fr_wfp, text = ref, bg = c3, font = '15').grid(row = irow,
-                                                             column = 0,
-                                                             columnspan = 3,
-                                                             pady = 10,
-                                                             padx = 5,
-                                                             sticky = 'we')
+        Label(fr_wfp, text=ref, bg=c3, font='15').grid(row=irow,
+                                                       column=0,
+                                                       columnspan=3,
+                                                       pady=10,
+                                                       padx=5,
+                                                       sticky='we')
         irow += 1
 
         for elem in workflow_param[ref]:
 
-            Label(fr_wfp, text = elem, bg = c3).grid(row = irow,
-                                                     column = 0,
-                                                     padx = 1,
-                                                     pady = 2,
-                                                     sticky = 'w')
+            Label(fr_wfp, text=elem, bg=c3).grid(row=irow,
+                                                 column=0,
+                                                 padx=1,
+                                                 pady=2,
+                                                 sticky='w')
 
             entrystring = StringVar()
             entrystring.set(workflow_param[ref][elem])
             entrystring.trace('w', lambda name, index, mode,
-                              elem = elem, entrystring = entrystring,
-                              ref = ref: update_workflow_param(ref, elem, entrystring.get()))
+                                          elem=elem, entrystring=entrystring,
+                                          ref=ref: update_workflow_param(ref,
+                                                                         elem,
+                                                                         entrystring.get()))
             # if an entry is changed, the new values should immediately be changed
             # in the workflow_param dictionary
-            Entry(fr_wfp, textvariable = entrystring, bg = c1).grid(row = irow,
-                                                                    column = 1,
-                                                                    padx = 1,
-                                                                    pady = 2,
-                                                                    sticky = 'e')
+            Entry(fr_wfp, textvariable=entrystring, bg=c1).grid(row=irow,
+                                                                column=1,
+                                                                padx=1,
+                                                                pady=2,
+                                                                sticky='e')
             irow += 1
 
 
@@ -196,21 +198,23 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     for ref in [actors_ref, make_core_ref]:
 
         for hsys in maindict[ref]:
-            Label(fr_as, text = hsys, bg = c1, font = '15').grid(row = rrow,
-                                                                 column = 0,
-                                                                 columnspan = 2,
-                                                                 sticky = 'ew')
+            Label(fr_as, text=hsys, bg=c1, font='15').grid(row=rrow,
+                                                           column=0,
+                                                           columnspan=2,
+                                                           sticky='ew')
             rrow += 1
 
             for cat in maindict[ref][hsys]:
-                Label(fr_as, text = cat, bg = c1,anchor=W, justify=LEFT).grid(row = rrow,
-                                                                              column = 0,
-                                                                              sticky = W)
-                cb = ttk.Combobox(fr_as, value = ['']+list(maindict[ref][hsys][cat]))
-                cb.grid(row = rrow, column = 1, padx = 20, pady = 5, sticky = 'ew')
+                Label(fr_as, text=cat, bg=c1, anchor=W, justify=LEFT).grid(row=rrow,
+                                                                           column=0,
+                                                                           sticky=W)
+                cb = ttk.Combobox(fr_as, value=['']+list(maindict[ref][hsys][cat]))
+                cb.grid(row=rrow, column=1, padx=20, pady=5, sticky='ew')
                 cb.current(workflow_param[cod_ref][cat])
-                cb.bind('<<ComboboxSelected>>', lambda event, cat = cat,
-                        cb = cb: update_workflow_param(cod_ref, cat, str(cb.current())))
+                cb.bind('<<ComboboxSelected>>',
+                        lambda event, cat=cat, cb=cb: update_workflow_param(cod_ref,
+                                                                            cat,
+                                                                            str(cb.current())))
                 rrow += 1
 
 
@@ -225,62 +229,62 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
         run_state = 'disabled'
 
     # left:
-    button_saveconfig = Button(fr_wfp, text = 'Save Configuration', bg = c2)
-    button_saveconfig.grid(row = 52, column = 0, padx = 5, pady = 5, sticky = 'ew')
-    button_saveconfig.configure(command = lambda:
+    button_saveconfig = Button(fr_wfp, text='Save Configuration', bg=c2)
+    button_saveconfig.grid(row=52, column=0, padx=5, pady=5, sticky='ew')
+    button_saveconfig.configure(command=lambda:
                                 save_workflow_param_to_file(run_config_folder_path))
     # save xml to the run folder
-    button_loadconfig = Button(fr_wfp, text = 'Load Configuration', bg = c2)
-    button_loadconfig.grid(row = 52, column = 1, padx = 5, pady = 5, sticky = 'ew')
-    button_loadconfig.configure(command = lambda:
+    button_loadconfig = Button(fr_wfp, text='Load Configuration', bg=c2)
+    button_loadconfig.grid(row=52, column=1, padx=5, pady=5, sticky='ew')
+    button_loadconfig.configure(command=lambda:
                                 load_configuration_from_file(filedialog.askopenfilename(
-                                    initialdir =  os.path.join(os.getcwd(), 'run_configurations'))))
+                                    initialdir=os.path.join(os.getcwd(), 'run_configurations'))))
 
-    button_saveandrun = Button(fr_wfp, text = 'Save and Run', bg = c2, state=run_state)
-    button_saveandrun.grid(row = 51, column = 0, padx = 5, pady = 5, sticky = 'ew')
-    button_saveandrun.configure(command = lambda: save_and_run(run_config_folder_path, True))
+    button_saveandrun = Button(fr_wfp, text='Save and Run', bg=c2, state=run_state)
+    button_saveandrun.grid(row=51, column=0, padx=5, pady=5, sticky='ew')
+    button_saveandrun.configure(command=lambda: save_and_run(run_config_folder_path, True))
 
-    button_run_nosave = Button(fr_wfp, text = 'Run (without Saving)', bg = c2, state=run_state)
-    button_run_nosave.grid(row = 51, column = 1, padx = 5, pady = 5, sticky = 'ew')
-    button_run_nosave.configure(command = lambda: save_and_run(run_config_folder_path, False))
+    button_run_nosave = Button(fr_wfp, text='Run (without Saving)', bg=c2, state=run_state)
+    button_run_nosave.grid(row=51, column=1, padx=5, pady=5, sticky='ew')
+    button_run_nosave.configure(command=lambda: save_and_run(run_config_folder_path, False))
 
-    button_save_asdef = Button(fr_wfp, text = 'Save Configuration as Default', bg = c2)
-    button_save_asdef.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
-    button_save_asdef.configure(command = lambda:
+    button_save_asdef = Button(fr_wfp, text='Save Configuration as Default', bg=c2)
+    button_save_asdef.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
+    button_save_asdef.configure(command=lambda:
                                 save_workflow_param_to_file('input_workflow_default.xml'))
 
-    button_restore_def = Button(fr_wfp, text = 'Restore Default', bg =c2)
-    button_restore_def.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
-    button_restore_def.configure(command = lambda:
+    button_restore_def = Button(fr_wfp, text='Restore Default', bg=c2)
+    button_restore_def.grid(row=53, column=1, padx=5, pady=5, sticky='ew')
+    button_restore_def.configure(command=lambda:
                                  open_gui('input_workflow_default.xml', norun, None, None))
 
-    button_saveas = Button(fr_wfp, text = 'Save as', bg = c2)
-    button_saveas.grid(row = 54, column = 0, padx = 5, pady = 5, sticky = 'ew')
-    button_saveas.configure(command = lambda: save_as())
+    button_saveas = Button(fr_wfp, text='Save as', bg=c2)
+    button_saveas.grid(row=54, column=0, padx=5, pady=5, sticky='ew')
+    button_saveas.configure(command=lambda: save_as())
 
-    button_exit = Button(fr_wfp, text = 'Exit', bg = 'light grey')
-    button_exit.grid(row = 55, column = 0, padx = 5, pady = 5, sticky = 'w')
-    button_exit.configure(command = lambda: sys.exit())
+    button_exit = Button(fr_wfp, text='Exit', bg='light grey')
+    button_exit.grid(row=55, column=0, padx=5, pady=5, sticky='w')
+    button_exit.configure(command=lambda: sys.exit())
 
 
     # middle:
-    button_create_flowchart = Button(fr_as, text = 'Show Flowchart', bg = c2)
-    button_create_flowchart.grid(row = 53, column = 1, padx = 5, pady = 5, sticky = 'ew')
-    button_create_flowchart.configure(command = lambda:
+    button_create_flowchart = Button(fr_as, text='Show Flowchart', bg=c2)
+    button_create_flowchart.grid(row=53, column=1, padx=5, pady=5, sticky='ew')
+    button_create_flowchart.configure(command=lambda:
                                       destr_and_make(
                                           removed_by_close_button, window, maindict,
-                                          workflow_param, c1, c2, c3, c4,c5))
+                                          workflow_param, c1, c2, c3, c4, c5))
 
     def destr_and_make(removed_by_close_button, window, maindict,
-                       workflow_param, c1, c2, c3, c4,c5):
+                       workflow_param, c1, c2, c3, c4, c5):
 
         base = make_flowchart(removed_by_close_button, window, maindict,
-                              workflow_param, c1, c2, c3, c4,c5)
+                              workflow_param, c1, c2, c3, c4, c5)
         removed_by_close_button.append(base)
 
-    button_edit_codeparameters = Button(fr_as, text = 'Edit Codeparameters', bg = c2)
-    button_edit_codeparameters.grid(row = 53, column = 0, padx = 5, pady = 5, sticky = 'ew')
-    button_edit_codeparameters.configure(command = lambda: edit_codeparam())
+    button_edit_codeparameters = Button(fr_as, text='Edit Codeparameters', bg=c2)
+    button_edit_codeparameters.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
+    button_edit_codeparameters.configure(command=lambda: edit_codeparam())
 
 
     ## MANAGE XML FILES
@@ -289,31 +293,35 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
         cp_top.title('Edit Code Parameters')
         cp_top.geometry('500x700')
 
-        fr_ab = Frame(cp_top, width = 200, height = 650, bg = c4)
-        fr_ab.grid(row = 0, column = 0, rowspan = 2, sticky = 'ns')
+        fr_ab = Frame(cp_top, width=200, height=650, bg=c4)
+        fr_ab.grid(row=0, column=0, rowspan=2, sticky='ns')
 
-        fr_main = Frame(cp_top, width = 500, height = 650, bg = c1)
-        fr_main.grid(row = 1, column = 2, sticky = 'nwes')
+        fr_main = Frame(cp_top, width=500, height=650, bg=c1)
+        fr_main.grid(row=1, column=2, sticky='nwes')
         fr_main.grid_propagate(0)
-        prev_frame = Canvas(fr_main, width = 500, height = 1500)
+        prev_frame = Canvas(fr_main, width=500, height=1500)
 
-        fr_top = Frame(cp_top, width = 500, height = 50, bg = c2)
-        fr_top.grid(row = 0, column =1, sticky = 'ew', columnspan = 2)
+        fr_top = Frame(cp_top, width=500, height=50, bg=c2)
+        fr_top.grid(row=0, column=1, sticky='ew', columnspan=2)
 
         for hsys in maindict[actors_ref]:
-            la_sys = Label(fr_ab, text = hsys, bg = c4)
+            la_sys = Label(fr_ab, text=hsys, bg=c4)
             for cat in maindict[actors_ref][hsys]:
                 if int(workflow_param[cod_ref][cat]) is not 0:
-                    la_sys.grid(padx = 5, pady = 5, sticky = 'ew')
+                    la_sys.grid(padx=5, pady=5, sticky='ew')
 
                     curval = list(maindict[actors_ref][hsys][cat].keys())[int(
                         workflow_param[cod_ref][cat])-1]
-                    Button(fr_ab, text = curval, bg = c2,
-                           command = lambda actor_name = curval,
-                           hsys = hsys: make_frame(hsys, actor_name, prev_frame, False) ).grid(
-                               padx = 5, pady = 5, sticky = 'ew')
+                    Button(fr_ab, text=curval, bg=c2,
+                           command=lambda actor_name=curval,
+                                          hsys=hsys: make_frame(hsys,
+                                                                actor_name,
+                                                                prev_frame,
+                                                                False)).grid(padx=5,
+                                                                             pady=5,
+                                                                             sticky='ew')
 
-        def make_frame(hsys, actor_name,  prev_frame, is_load_default_from_kepler):
+        def make_frame(hsys, actor_name, prev_frame, is_load_default_from_kepler):
             prev_frame.grid_remove()
             prev_frame.grid_forget()
 
@@ -332,7 +340,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                 with open(actor_python_script) as pfile:
 
                     for iline in pfile:
-                        if ('xml_location = ' in iline) and ('_default_xml_location' not in iline):
+                        if 'xml_location = ' in iline and '_default_xml_location' not in iline:
                             ## check if there already is a version of the xml file for this actor
                             ## - this could be put outside of the loop for reading the file,
                             ## but the code is shorter this way, it shouldnt be too confusing i hope
@@ -352,7 +360,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                             codeparam_xsd_path.set(iline[17:-2])
                             found_xsd = True
 
-                        if found_xml == True and found_xsd == True:
+                        if found_xml is True and found_xsd is True:
                             break
 
                 #### read the additional information from the xsd file
@@ -362,9 +370,9 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                     xmlschema = etree.XMLSchema(xmlschema_doc)
                     docum_dict = {}
                     for elem in root_xsd.iter():
-                        if elem.tag ==  '{http://www.w3.org/2001/XMLSchema}element':
+                        if elem.tag == '{http://www.w3.org/2001/XMLSchema}element':
                             for i in elem.iter():
-                                if i.tag ==  '{http://www.w3.org/2001/XMLSchema}documentation':
+                                if i.tag == '{http://www.w3.org/2001/XMLSchema}documentation':
                                     docum_dict[elem.attrib.values()[0]] = i.text
                 except:
                     docum_dict = {}
@@ -380,20 +388,22 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                 codeparam_dict = {}
 
                 for elem in root.iter():
-                    if ((elem.tag is not etree.Comment) and (len(elem) == 0)):
-                        l = Label(fr, text = elem.tag.strip(), bg = c1,
-                                  wraplength = '200', anchor = 'w', justify = LEFT )
-                        l.grid(row = rrow, column = ccolumn, sticky = 'w')
+                    if elem.tag is not etree.Comment and len(elem) == 0:
+                        l = Label(fr, text=elem.tag.strip(), bg=c1,
+                                  wraplength='200', anchor='w', justify=LEFT)
+                        l.grid(row=rrow, column=ccolumn, sticky='w')
 
                         entrystring = StringVar()
                         entrystring.set(elem.text.strip())
-                        e = Entry(fr, textvar = entrystring, bg = c1)
-                        e.grid(row = rrow, column = ccolumn+1, padx = 3, pady = 3)
+                        e = Entry(fr, textvar=entrystring, bg=c1)
+                        e.grid(row=rrow, column=ccolumn+1, padx=3, pady=3)
                         codeparam_dict[elem.tag] = entrystring.get()
 
                         entrystring.trace('w', lambda name, index, mode,
-                                          elem = elem.tag, entrystring = entrystring,
-                                          e = e: update_codeparam_dict(elem, entrystring.get(), e))
+                                                      elem=elem.tag, entrystring=entrystring,
+                                                      e=e: update_codeparam_dict(elem,
+                                                                                 entrystring.get(),
+                                                                                 e))
 
                         try:
                             CreateToolTip(l, docum_dict[l.cget('text')])
@@ -403,18 +413,18 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                         def update_codeparam_dict(elem, newvalue, entry1):
                             codeparam_dict[elem] = newvalue
                             for i in root.iter():
-                                if (elem in [str(i.tag)]) and (i.tag is not etree.Comment):
+                                if elem in [str(i.tag)] and i.tag is not etree.Comment:
                                     i.text = newvalue
 
                             if xmlschema.validate(root):
-                                entry1.config(bg = c1)
+                                entry1.config(bg=c1)
                             else:
-                                entry1.config(bg = 'salmon1')
+                                entry1.config(bg='salmon1')
 
-                        rrow +=1
+                        rrow += 1
 
                         if rrow > 20:
-                            v_scroll.grid(row = 1, column = 1, sticky = 'ns')
+                            v_scroll.grid(row=1, column=1, sticky='ns')
                         else:
                             v_scroll.grid_remove()
 
@@ -423,32 +433,32 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
             # end of populate frame
 
             def onFrameConfigure(canvas):
-                canvas.configure(scrollregion = canvas.bbox('all'))
+                canvas.configure(scrollregion=canvas.bbox('all'))
 
-            canvas = Canvas(cp_top, borderwidth = 0, highlightthickness = 0, background = c1)
-            fr = Frame(canvas, width = 500, height = 1500, bg = c1)
+            canvas = Canvas(cp_top, borderwidth=0, highlightthickness=0, background=c1)
+            fr = Frame(canvas, width=500, height=1500, bg=c1)
             prev_frame = fr
-            v_scroll = Scrollbar(cp_top, orient = 'vertical', command = canvas.yview)
-            canvas.configure(yscrollcommand = v_scroll.set)
+            v_scroll = Scrollbar(cp_top, orient='vertical', command=canvas.yview)
+            canvas.configure(yscrollcommand=v_scroll.set)
             #  v_scroll.grid()
 
 
-            canvas.grid(row = 1, column = 2, sticky = ' news')
-            canvas.create_window((4,4), window = fr, anchor = 'nw')
+            canvas.grid(row=1, column=2, sticky=' news')
+            canvas.create_window((4, 4), window=fr, anchor='nw')
 
             #  fr.grid_propagate(0)
-            fr.bind('<Configure>', lambda event, canvas = canvas: onFrameConfigure(canvas))
+            fr.bind('<Configure>', lambda event, canvas=canvas: onFrameConfigure(canvas))
 
             dest_file, codeparam_dict = populate(fr)
 
-            Button(fr_top, text = 'save', bg = c2,  command = lambda:
+            Button(fr_top, text='save', bg=c2, command=lambda:
                    save_codeparam_to_file(dest_file, codeparam_dict)).grid(
-                       row = 0 ,column = 1, padx = 5, pady = 5)
-            Button(fr_top, text = 'load default', bg = c2, command = lambda:
-                   make_frame(hsys, actor_name,  prev_frame, True)).grid(
-                       row = 0, column =2, padx = 5, pady = 5)
-            Button(fr_top, text = 'exit', bg = c2, command = lambda:
-                   cp_top.destroy()).grid(row = 0, column = 4, padx = (20, 5), pady = 5)
+                       row=0, column=1, padx=5, pady=5)
+            Button(fr_top, text='load default', bg=c2, command=lambda:
+                   make_frame(hsys, actor_name, prev_frame, True)).grid(
+                       row=0, column=2, padx=5, pady=5)
+            Button(fr_top, text='exit', bg=c2, command=lambda:
+                   cp_top.destroy()).grid(row=0, column=4, padx=(20, 5), pady=5)
 
             dest_file, codeparam_dict = populate(fr)
 
@@ -471,13 +481,14 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                         int(workflow_param[cod_ref][cat])-1]
                     # get xml path from actor.py
                     if actor_name in list_of_uncompiled_actors:
-                         print('ERROR: ', actor_name, ' is selected as an active actor, '
-                               'but it has not been found. \n'
-                               'Please change your selection of actors or load',
-                               actor_name, 'and try again')
-                         return False
+                        print('ERROR: ', actor_name, ' is selected as an active actor, '
+                              'but it has not been found. \n'
+                              'Please change your selection of actors or load',
+                              actor_name, 'and try again')
+                        return False
 
-                    dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'+actor_name+'.xml')
+                    dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'
+                                             +actor_name+'.xml')
                     if not os.path.exists(dest_file):
                         actor_python_script = actor_path+'/'+actor_name+'/'+actor_name+'.py'
                         found_xml = False
@@ -485,13 +496,15 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
 
                         with open(actor_python_script) as pfile:
                             for iline in pfile:
-                                if ('xml_location = ' in iline) and ('_default_xml_location' not in iline):
+                                if 'xml_location = ' in iline and \
+                                   '_default_xml_location' not in iline:
                                     path_to_kepler_xml_location = iline[17:-2]
-                                    copy2(path_to_kepler_xml_location, dest_file, follow_symlinks=True)
+                                    copy2(path_to_kepler_xml_location, dest_file,
+                                          follow_symlinks=True)
                                     break
 
-        if  'xml'  not in filepath[-4:]:
-             filepath = filepath+'/input_workflow.xml'
+        if 'xml' not in filepath[-4:]:
+            filepath = filepath+'/input_workflow.xml'
 
         tree = etree.parse(filepath)
         root = tree.getroot()
@@ -500,9 +513,8 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
 
         for iroot in range(3):
             for elem in root[iroot].iter():
-                if((elem.tag is not etree.Comment) and (len(elem) == 0)):
-
-                   elem.text = workflow_param[rl[iroot]][elem.tag]
+                if elem.tag is not etree.Comment and len(elem) == 0:
+                    elem.text = workflow_param[rl[iroot]][elem.tag]
 
         tree.write(filepath)
         return True
@@ -543,8 +555,8 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
         root = tree.getroot()
 
         for elem in root.iter():
-            if((elem.tag is not etree.Comment) and (len(elem) == 0)):
-               elem.text = codeparam_dict[elem.tag]
+            if elem.tag is not etree.Comment and len(elem) == 0:
+                elem.text = codeparam_dict[elem.tag]
         pass
 
         tree.write(filepath)
