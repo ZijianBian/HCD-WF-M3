@@ -214,6 +214,7 @@ def hcd_wrapper(par_path):
 
       for elem in ids_bundle_updated:   
 
+           ids_bundle_work[elem].setPulseCtx(idx_out)
            ids_bundle_updated[elem].setPulseCtx(idx_out)
            if timenow ==  (param['tbegin']):
                
