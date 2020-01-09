@@ -19,21 +19,14 @@ set PWD=`pwd`
 cp actor_install.py *.yml ${ACTOR_RELEASE_DIRECTORY}
 cd ${ACTOR_RELEASE_DIRECTORY}
 
-python actor_install.py --skipModules core_sources_combiner.yml
-python actor_install.py --skipModules cyrano.yml
-python actor_install.py --skipModules gray.yml
-python actor_install.py --skipModules hcd2core-profiles.yml
-python actor_install.py --skipModules hcd2core-sources.yml
-python actor_install.py --skipModules iccoup.yml
-python actor_install.py --skipModules ids-tools.yml
-python actor_install.py --skipModules lion.yml
-python actor_install.py --skipModules risk.yml
-python actor_install.py --skipModules spot.yml
-python actor_install.py --skipModules stixredist.yml
-python actor_install.py --skipModules ascot.yml
-python actor_install.py --skipModules tomcat.yml
-python actor_install.py --skipModules nemo.yml
-python actor_install.py --skipModules genray.yml
-python actor_install.py --skipModules pion.yml
+set actor_list=(core_sources_combiner cyrano gray hcd2_core_profiles \
+  hcd2core_sources iccoup ids-tools lion risk spot stixredist ascot \
+  tomcat nemo genray pion)
+
+foreach actor ($actor_list)
+  python actor_install.py --skipModules $actor.yml
+end
+
+break
 
 cd ${PWD}
