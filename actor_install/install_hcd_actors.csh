@@ -27,6 +27,4 @@ foreach actor ($actor_list)
   python actor_install.py --skipModules $actor.yml
 end
 
-break
-
 cd ${PWD}
