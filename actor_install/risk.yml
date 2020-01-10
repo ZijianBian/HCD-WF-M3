@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/risk.git
-    VERSION: hcd_python
+    VERSION: develop
     DIR:     risk
 
 MODULES: [FRUIT/3.4.3-intel-2018a-Ruby-2.5.1,FRUIT_processor/3.4.3-intel-2018a-Ruby-2.5.1, interpos/8.2.1-ifort, XMLlib/3.1.0-intel-2018a]
