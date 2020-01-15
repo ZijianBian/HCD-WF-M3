@@ -23,8 +23,6 @@ set actor_list=(core_sources_combiner cyrano gray hcd2_core-profiles \
   hcd2core-sources iccoup ids-tools lion risk spot stixredist ascot \
   tomcat nemo genray pion)
 
-set actor_list=(hcd2core-sources hcd2core-profiles)
-
 foreach actor ($actor_list)
   python actor_install.py --skipModules $actor.yml
 end
