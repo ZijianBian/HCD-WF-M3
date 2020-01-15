@@ -13,10 +13,7 @@
 
   <further_settings display="FURTHER SETTINGS">
     <fokker_flag>0</fokker_flag>
-    <nmarker>10000</nmarker>
-    <nbi_markers_in>32</nbi_markers_in>
     <ic_wave_nr_toroidal_modes>1</ic_wave_nr_toroidal_modes> 
-
   </further_settings>
 
   <actor_selection display="ACTOR SELECTION">

@@ -3,7 +3,7 @@ module purge
 # IMAS, Kepler, FC2K
 module load IMAS
 module load Kepler
-module load FC2K/4.6.5-PyAL
+module load FC2K
 
 # Need to remove the stack limit to avoid segmentation fault inside codes
 ulimit -Ss unlimited

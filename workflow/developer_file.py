@@ -24,6 +24,5 @@ def load_add_arg():
                'spot': ['dt_required'],  
                'pion': ['tbegin','tend','dt_required'],  
                'iccoup': ['ic_wave_nr_toroidal_modes'],
-               'nemo': ['fokker_flag','nmarker'], 
                'bbnbi':['fokker_flag']}
     return add_arg
