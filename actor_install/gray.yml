@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: gray
-    XML: fc2k/gray_nodiag.xml
+    XML: fc2k/gray-ids.xml
 
 #COMMENTS:  
 ...
