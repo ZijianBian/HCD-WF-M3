@@ -8,9 +8,8 @@ module load FC2K
 # Need to remove the stack limit to avoid segmentation fault inside codes
 ulimit -Ss unlimited
 
-# Compile actors without diagnostic information
-# (the diag info is not compatible with Python yet, see IMAS-2186)
-export DIAG_INFO=-DNO_DIAG_INFO
+# Intel as default compiler
+export FCOMPILER=ifort
 
 # For actor release procedure
 module load sh/1.12.14-intel-2018a-Python-3.6.4
