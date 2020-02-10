@@ -125,7 +125,10 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                         libmpi_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/lib64/lib'+code+'.so')
                             
                         if cfmpi.is_compiled_for_mpi(libmpi_path, 'libmpi'):
-                            file.write(',  "mpi_local"')
+                            if cat == 'nbi_fp':
+                                file.write(',  "mpi_local", mpi_processes=parameters["nproc_ion_fp"]')
+                            else:
+                                file.write(',  "mpi_local"') # FOR OTHER MPI CODES, KEEP THE DEFAULT FOR NOW (NPROC=4)
                             
 
 
