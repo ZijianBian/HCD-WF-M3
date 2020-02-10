@@ -12,6 +12,7 @@
   </workflow_parameters>
 
   <further_settings display="FURTHER SETTINGS">
+    <nproc_ion_fp>8</nproc_ion_fp>
     <fokker_flag>0</fokker_flag>
     <ic_wave_nr_toroidal_modes>1</ic_wave_nr_toroidal_modes> 
   </further_settings>
