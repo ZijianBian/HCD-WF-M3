@@ -120,7 +120,7 @@ def hcd_wrapper(par_path):
     run_tmp  = randint(0,9999)
     tmp = imas.ids(shot_tmp,run_tmp,0,0)
     try:
-      tmp.open_env(user,tokamakname,version)
+      tmp.open_env(user,tokamakname,version,silent=True)
     except Exception:
       exist = 'no'
   if ALEnv.itm_tmp==None: # Ensure that it is done only once
