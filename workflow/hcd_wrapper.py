@@ -196,8 +196,7 @@ def hcd_wrapper(par_path):
 
   timenow = param['tbegin']
 
-
-  while timenow < param['tend']+param['dt_required']:
+  while timenow < param['tend']:
      
       print('Time =         ', timenow, 's')
       print('dt =           ', param['dt_required'], 's')
@@ -248,8 +247,6 @@ def hcd_wrapper(par_path):
                  if not ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or not ids_bundle_updated[elem].ids_properties.homogeneous_time == 0: #if the ids didnot exist before (homogeneous time not filled) and it is an output set homogeneous time to 1
            
                      ids_bundle_updated[elem].ids_properties.homogeneous_time = 1
-                 ids_bundle_work[elem].putSlice()
-
 
            elif oldtime[elem][1]:
                  if ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or ids_bundle_updated[elem].ids_properties.homogeneous_time == 0:
@@ -259,7 +256,6 @@ def hcd_wrapper(par_path):
            else:
                pass
              
-
 
     #  print('prepare ids bundle for next timestep')
       timenow += param['dt_required']
