@@ -97,9 +97,17 @@ def hcd_wrapper(par_path):
 
   # remote and local database environment
   user_in     = param['user']
-  local_user  = os.getenv('USER')
   tokamakname = param['machine'] # assumed to be the same for remote/local DB
   version     = os.getenv('IMAS_VERSION')[0]
+
+  if param['local_db']=='default':
+    local_user = os.getenv('USER')
+  else:
+    local_user = param['local_db']
+    local_folder = local_user+'/'+tokamakname+'/3/0'
+    if os.path.isdir(local_folder) == False:
+      print(local_folder+' does not exist --> Create it')
+      os.makedirs(local_folder)
 
   # If the local database for the required tokamak does not exist yet: create it
   if not os.path.exists(os.getenv('HOME')+'/public/imasdb/'+tokamakname):

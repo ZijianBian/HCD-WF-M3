@@ -1,5 +1,6 @@
 <root>
   <workflow_parameters display="WORKFLOW PARAMETERS (STANDALONE)">
+    <local_db>default</local_db>
     <user>public</user>
     <machine>iter</machine>
     <shot_nr>130011</shot_nr>
