@@ -20,7 +20,7 @@ def hcd_wrapper(par_path):
 
   param = {}
   
-  print('----- WORKFLOW PARAMETERS ----')
+  #print('----- WORKFLOW PARAMETERS ----')
 
   for elem in root.iter():
     if len(elem) == 0:
@@ -33,7 +33,7 @@ def hcd_wrapper(par_path):
           param[elem.tag] = elem.text
 
       param['input_path'] = par_path
-      print(elem.tag, ' = ', param[elem.tag])
+      #print(elem.tag, ' = ', param[elem.tag])
 
   if param['run_simpletrans'] == 1:
       list_of_actors = ['simpletrans'] ## 
@@ -113,7 +113,7 @@ def hcd_wrapper(par_path):
       print(local_folder+' does not exist --> Create it')
       os.makedirs(local_folder)
 
-  print('-- open input and output file --')
+  print('-- Open input and output file --')
   input = imas.ids(param['shot_nr'], param['run_in'], 0,0)
   input.open_env(user_in,tokamakname,version)
   output = imas.ids(param["shot_nr"], param["run_out"], 0,0)
@@ -151,13 +151,13 @@ def hcd_wrapper(par_path):
 
   for elem in ids_bundle_initial: 
       if  elem in in_l or elem in out_l:
-           print('get ', elem)
+           print('Get', elem)
            ids_bundle_initial[elem].get()
 
   ## ALWAYS GET CORE_PROFILES IDS, SINCE IT IS USED AS A REFERNCE, EVEN WHEN IT IS NOT USED 
   ## IN A SPECIFIC H&CD CODES (LIKE E.G. WITH ICCOUP)
   if len(ids_bundle_initial['core_profiles'].time)==0:
-      print('get core_profiles')
+      print('Get core_profiles')
       ids_bundle_initial['core_profiles'].get()
 
   ## CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY
@@ -185,7 +185,7 @@ def hcd_wrapper(par_path):
 
        oldtime[elem] = [ids_bundle_work[elem].time, True]
          
-  print('---- enter timeloop ----')
+  print('---- Enter timeloop ----')
   
   #########################################################################
   #-----------------------------------------------------------------------
@@ -203,7 +203,7 @@ def hcd_wrapper(par_path):
 
            
     
-      print('entering heating & current drive workflow')
+      print('Entering heating & current drive workflow')
       ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
     
       
@@ -279,6 +279,6 @@ def hcd_wrapper(par_path):
               ids_bundle_work[elem] =  copy.deepcopy(ids_bundle_updated[elem])
         #      print('using the '+ elem+ ' output as input for the next timeslice')
 
-
+  print('End of H&CD workflow.')      
       
         

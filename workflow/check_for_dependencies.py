@@ -42,4 +42,4 @@ def check_for_dependencies(root, dependencies):
             check_if_code_fulfills_configuration(entry, codedict_names[entry])
 
 
-    print('selection fulfills all actor selection rules')
+    print('Selection fulfills all actor selection rules')
