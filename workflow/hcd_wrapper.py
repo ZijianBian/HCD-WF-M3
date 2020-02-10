@@ -123,7 +123,8 @@ def hcd_wrapper(par_path):
       tmp.open_env(user,tokamakname,version)
     except Exception:
       exist = 'no'
-  tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tokamakname).ids_tmp
+  if ALEnv.itm_tmp==None: # Ensure that it is done only once
+    tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tokamakname).ids_tmp
 
   ids_bundle_initial = {'core_profiles': input.core_profiles, 
                         'core_sources': input.core_sources,
