@@ -102,17 +102,16 @@ def hcd_wrapper(par_path):
 
   if param['local_db']=='default':
     local_user = os.getenv('USER')
+    # If the local database for the required tokamak does not exist yet: create it
+    if not os.path.exists(os.getenv('HOME')+'/public/imasdb/'+tokamakname):
+      print('--> Create local database '+os.getenv('HOME')+'/public/imasdb/'+tokamakname)
+      os.popen("imasdb "+tokamakname).read()
   else:
     local_user = param['local_db']
     local_folder = local_user+'/'+tokamakname+'/3/0'
     if os.path.isdir(local_folder) == False:
       print(local_folder+' does not exist --> Create it')
       os.makedirs(local_folder)
-
-  # If the local database for the required tokamak does not exist yet: create it
-  if not os.path.exists(os.getenv('HOME')+'/public/imasdb/'+tokamakname):
-       print('--> Create local database '+os.getenv('HOME')+'/public/imasdb/'+tokamakname)
-       os.popen("imasdb "+tokamakname).read()
 
   print('-- open input and output file --')
   input = imas.ids(param['shot_nr'], param['run_in'], 0,0)
@@ -128,7 +127,7 @@ def hcd_wrapper(par_path):
     run_tmp  = randint(0,9999)
     tmp = imas.ids(shot_tmp,run_tmp,0,0)
     try:
-      tmp.open_env(user,tokamakname,version,silent=True)
+      tmp.open_env(user_in,tokamakname,version,silent=True)
     except Exception:
       exist = 'no'
   if ALEnv.itm_tmp==None: # Ensure that it is done only once
