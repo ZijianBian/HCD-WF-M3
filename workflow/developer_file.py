@@ -13,8 +13,8 @@ def load_code_dependencies():
                  #   'nbi_fp':            {'risk': [{'nbi_source': 'nemo bbnbi'}]},
                     'nuclear_source':    None,
                     'nuclear_fp':        None,
-                    'hcd2core_sources':  None,
-                    'hcd2core_profiles': None}
+                    'fill_core_sources':  None,
+                    'fill_core_profiles': None}
     return dependencies
 
 
