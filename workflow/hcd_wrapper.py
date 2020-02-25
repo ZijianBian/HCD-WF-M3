@@ -10,18 +10,14 @@ def hcd_wrapper(par_path):
   import xml.etree.ElementTree as ET
   from developer_file import load_code_dependencies
   from check_for_dependencies import check_for_dependencies
-  import numpy as np 
-  import pdb
+  from bundle_copy import bundle_copy
+  import numpy as np
 
-  # IMPORT PARAMETERS FROM XML --------------------------------------
-  
+  # IMPORT PARAMETERS FROM THE XML PARAMETER FILE OF THE WORKFLOW  
   tree = ET.parse(par_path+'/input_workflow.xml')
   root = tree.getroot()
 
-  param = {}
-  
-  #print('----- WORKFLOW PARAMETERS ----')
-
+  param = {}  
   for elem in root.iter():
     if len(elem) == 0:
       try:
@@ -33,10 +29,9 @@ def hcd_wrapper(par_path):
           param[elem.tag] = elem.text
 
       param['input_path'] = par_path
-      #print(elem.tag, ' = ', param[elem.tag])
 
   if param['run_simpletrans'] == 1:
-      list_of_actors = ['simpletrans'] ## 
+      list_of_actors = ['simpletrans']
   else:
       list_of_actors = []
 
@@ -46,78 +41,101 @@ def hcd_wrapper(par_path):
                list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
           
   if len(list_of_actors) == 0:
-     print('ERROR: no actors selected - heating & current drive workflow will not be executed')
+     print('ERROR: no actors selected --> Heating & Current Drive workflow will not be executed')
      return
 
-
-
-
-  ##----------------------------------------------------------------------------------
-  # make a list of input and output idss 
-
-  actor_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/src/org/iter/imas/python')
-
-  ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_launchers','wall', 'distribution_sources', 'distributions', 'waves']
-
-
-  in_l = []
+  # MAKE A LIST OF INPUT AND OUTPUT IDSS OF THE WHOLE WORKFLOW FROM THE LIST OF SELECTED ACTORS
+  ids_list = ['core_profiles',\
+              'core_sources',\
+              'equilibrium',\
+              'nbi',\
+              'ic_antennas',\
+              'ec_launchers',\
+              'wall',\
+              'distribution_sources',\
+              'distributions',\
+              'waves']
+  in_l  = []
   out_l = []
 
-  
-
+  # LOOP OVER ALL SELECTED ACTORS
+  actor_path = os.path.join(os.getenv('ACTOR_POOL'),'imas/src/org/iter/imas/python')
   for name in list_of_actors:
     try:
       sys.path[:0] = [os.path.join(actor_path,name)]
       globals()[name] = getattr(__import__(name), name)
-  
       parstr = globals()[name].__doc__
-        
       for iids in ids_list:
-        # append to list only if the name of ids is in the paramters string AND if it's not already on the input (output) list - because we are looking to find the input and output ids of the whole workflow
+        # APPEND ONLY IF THE IDS IS IN THE PARAMETERS STRING AND NOT ALREADY IN THE INPUT (OUTPUT) LIST
         if parstr.find(':param '+iids) is not -1  and iids not in in_l:
                 in_l.append(iids)
         if parstr.find(':param result: '+iids) is not -1 and iids not in out_l:
                 out_l.append(iids)
     except:
-        print(name, ' not found!')
+        print(name,' not found!')
 
+  # ALWAYS INCLUDE CORE_PROFILES IDS, SINCE IT IS USED AS A REFERENCE, EVEN WHEN IT IS NOT USED
+  # IN A SPECIFIC H&CD CODES (LIKE E.G. WITH ICCOUP)
+  if not 'core_profiles' in in_l:
+      in_l.append('core_profiles')
 
-
-
-  ## CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
+  # CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
   check_for_dependencies(root, dependencies)
 
+  # ------------------------------------------------------------------------
+  # IDS BUNDLES
+  # BUNDLING THE IDSS MAKES IT EASIER TO PASS THEM AROUND BETWEEN THE ACTORS
+  # IDS_BUNDLE_INPUT:  IDSS FROM THE INPUT DATABASE
+  # IDS_BUNDLE_WORK:   IDSS OF THE CURRENT TIMESTEP IN THE WORKFLOW
+  # IDS_BUNDLE_OUTPUT: IDSS FOR THE OUTPUT DATABASE
+  # ------------------------------------------------------------------------
 
-  # MAKE IDS BUNDLE --------------------------------------------------
-  # bundling the idss makes it easier to pass them around between the actors
-  # ids_bundle_initial:   idss of the input database file (all timeslices)
-  # ids_bundle_work:      input idss of the current timestep, only one timeslice
-  # ids_bundle_updated:   output idss of the curren timestep, only one timeslice
+  # IMAS DB VERSION
+  version = os.getenv('IMAS_VERSION')[0]
 
-  # remote and local database environment
-  user_in     = param['user']
-  tokamakname = param['machine'] # assumed to be the same for remote/local DB
-  version     = os.getenv('IMAS_VERSION')[0]
+  # INPUT DB ENVIRONMENT
+  input_db_root = param['input_db_root']
+  input_db_sub  = param['input_db_sub']
 
-  if param['local_db']=='default':
-    local_user = os.getenv('USER')
-    # If the local database for the required tokamak does not exist yet: create it
-    if not os.path.exists(os.getenv('HOME')+'/public/imasdb/'+tokamakname):
-      print('--> Create local database '+os.getenv('HOME')+'/public/imasdb/'+tokamakname)
-      os.popen("imasdb "+tokamakname).read()
+  # LOCAL DB ENVIRONMENT
+  local_db_root = param['local_db_root']
+  local_db_sub  = param['local_db_sub']
+
+  # DEFAULT LOCAL DATABASE ROOT NAME IS ENVIRONMENT VARIABLE $USER
+  if local_db_root=='default':
+    local_db_root = os.getenv('USER')
+
+  # DEFAULT LOCAL DATABASE SUB-NAME IS THE SAME AS THE INPUT ONE
+  if local_db_sub=='default':
+    local_db_sub = input_db_sub
+
+  # IF THE LOCAL DATABASE DOES NOT EXIST: CREATE IT
+  if local_db_root== os.getenv('USER'):
+    local_folder = os.getenv('HOME')+'/public/imasdb/'+local_db_sub+'/3/0'
   else:
-    local_user = param['local_db']
-    local_folder = local_user+'/'+tokamakname+'/3/0'
-    if os.path.isdir(local_folder) == False:
-      print(local_folder+' does not exist --> Create it')
-      os.makedirs(local_folder)
+    local_folder = local_db_root+'/'+local_db_sub+'/3/0'
+  if os.path.isdir(local_folder) == False:
+    print('-- Create local database for output file '+local_folder)
+    os.makedirs(local_folder)
 
+  # FOR THE TEMPORARY FILE, ONLY THE DEFAULT LOCAL_DB_ROOT BASED ON USERNAME IS USED
+  # CLEVERLY CHOOSE 'TMP' FOR LOCAL DB SUBNAME TO NEVER MIX TEMPORARY FILES WITH OTHERS
+  local_db_tmp = 'tmp'
+  local_folder_tmp = os.getenv('HOME')+'/public/imasdb/'+local_db_tmp+'/3/0'
+  if os.path.isdir(local_folder_tmp) == False:
+    print('-- Create local database for tmp file '+local_folder_tmp)
+    os.makedirs(local_folder_tmp)
+
+  # OPEN INPUT DATAFILE
   print('-- Open input and output file --')
-  input = imas.ids(param['shot_nr'], param['run_in'], 0,0)
-  input.open_env(user_in,tokamakname,version)
-  output = imas.ids(param["shot_nr"], param["run_out"], 0,0)
-  output.create_env(local_user,tokamakname, version)
+  input = imas.ids(param['shot_nr'], param['run_in'])
+  input.open_env(input_db_root,input_db_sub,version)
+  idx_in = input.core_profiles.getPulseCtx()
+
+  # CREATE OUTPUT DATAFILE
+  output = imas.ids(param["shot_nr"], param["run_out"])
+  output.create_env(local_db_root,local_db_sub,version)
   idx_out = output.core_profiles.getPulseCtx()
 
   # DEFINE THE SHOT/RUN NUMBERS AND LOCATION OF THE TEMPORARY FILE
@@ -127,158 +145,154 @@ def hcd_wrapper(par_path):
     run_tmp  = randint(0,9999)
     tmp = imas.ids(shot_tmp,run_tmp,0,0)
     try:
-      tmp.open_env(user_in,tokamakname,version,silent=True)
+      tmp.open_env(local_db_root,local_db_tmp,version,silent=True)
     except Exception:
       exist = 'no'
   if ALEnv.itm_tmp==None: # Ensure that it is done only once
-    tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tokamakname).ids_tmp
+      tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=local_db_tmp).ids_tmp
+  #tmp.create_env(local_db_root,local_db_tmp,version)
+  #idx_tmp = tmp.core_profiles.getPulseCtx()
 
-  ids_bundle_initial = {'core_profiles': input.core_profiles, 
-                        'core_sources': input.core_sources,
-                        'equilibrium': input.equilibrium, 
-                        'pulse_schedule': input.pulse_schedule, 
-                        'nbi': input.nbi, 
-                        'ic_antennas': input.ic_antennas, 
-                        'ec_launchers': input.ec_launchers, 
-                        'wall': input.wall, 
-                        'distribution_sources': input.distribution_sources, 
-                        'distributions': input.distributions,
-                        'waves': input.waves
-                        }
+  # TOTAL LIST OF IDSS TO BE READ FROM THE INPUT SCENARIO FOR H&CD CALCULATIONS
+  ids_bundle_input = {'core_profiles':        input.core_profiles, 
+                      'core_sources':         input.core_sources,
+                      'equilibrium':          input.equilibrium, 
+                      'nbi':                  input.nbi, 
+                      'ic_antennas':          input.ic_antennas, 
+                      'ec_launchers':         input.ec_launchers, 
+                      'wall':                 input.wall, 
+                      'distribution_sources': input.distribution_sources, 
+                      'distributions':        input.distributions,
+                      'waves':                input.waves}
 
+  # TOTAL LIST OF IDSS TO BE WRITTEN AS AN OUTPUT
+  ids_bundle_output = {'core_profiles':       output.core_profiles, 
+                      'core_sources':         output.core_sources,
+                      'equilibrium':          output.equilibrium, 
+                      'nbi':                  output.nbi, 
+                      'ic_antennas':          output.ic_antennas, 
+                      'ec_launchers':         output.ec_launchers, 
+                      'wall':                 output.wall, 
+                      'distribution_sources': output.distribution_sources, 
+                      'distributions':        output.distributions,
+                      'waves':                output.waves}
 
-  ids_bundle_work = copy.deepcopy(ids_bundle_initial)  
+  # IDS BUNDLE WORK USES THE TEMPORARY FILE TO SAVE WORKING STATE OF IDSS
+  ids_bundle_work   = {'core_profiles':       tmp.core_profiles, 
+                      'core_sources':         tmp.core_sources,
+                      'equilibrium':          tmp.equilibrium, 
+                      'nbi':                  tmp.nbi, 
+                      'ic_antennas':          tmp.ic_antennas, 
+                      'ec_launchers':         tmp.ec_launchers, 
+                      'wall':                 tmp.wall, 
+                      'distribution_sources': tmp.distribution_sources, 
+                      'distributions':        tmp.distributions,
+                      'waves':                tmp.waves}
 
-  for elem in ids_bundle_initial: 
-      if  elem in in_l or elem in out_l:
-           print('Get', elem)
-           ids_bundle_initial[elem].get()
+  # FOR TIME REFERENCE
+  time_array = ids_bundle_input['core_profiles'].partialGet('time')
 
-  ## ALWAYS GET CORE_PROFILES IDS, SINCE IT IS USED AS A REFERNCE, EVEN WHEN IT IS NOT USED 
-  ## IN A SPECIFIC H&CD CODES (LIKE E.G. WITH ICCOUP)
-  if len(ids_bundle_initial['core_profiles'].time)==0:
-      print('Get core_profiles')
-      ids_bundle_initial['core_profiles'].get()
-
-  ## CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY
+  # CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY
   if param['tbegin'] < 0:
-      param['tbegin'] = ids_bundle_initial['core_profiles'].time[0]
-      print('tbegin set to time of first core_profiles timeslice. tbegin = ', param['tbegin'])
+      param['tbegin'] = time_array[0]
+      print('Initial time tbegin set to core_profiles first time slice. tbegin = ', param['tbegin'])
 
-  if param['tbegin'] > 0 and param['tbegin'] < ids_bundle_initial['core_profiles'].time[0]:
+  if param['tbegin'] > 0 and param['tbegin'] < time_array[0]:
      print('ERROR: tbegin out of range ('+str(param['tbegin'])+'s is less than first time in core_profiles)')
      return
 
   if param['tend'] < 0:
-      param['tend'] = ids_bundle_initial['core_profiles'].time[-1]
-      print('tend set to time of last core_profiles timeslice, tend = ', param['tend'])
+      param['tend'] = time_array[-1]
+      print('Final time tend set to core_profiles final time slice, tend = ', param['tend'])
 
-  if param['tend'] > 0 and param['tend'] > ids_bundle_initial['core_profiles'].time[-1]:
+  if param['tend'] > 0 and param['tend'] > time_array[-1]:
      print('ERROR: tend out of range  ('+str(param['tend'])+ 's is greater than last time in core_profiles)')
      return
 
-  oldtime = {}
-
-  for elem in ids_bundle_work: 
-
-       ids_bundle_work[elem].getSlice(param['tbegin'],1)
-
-       oldtime[elem] = [ids_bundle_work[elem].time, True]
-         
-  print('---- Enter timeloop ----')
+  print('---------------------------------------------')
+  print('---- Enter time loop of the H&CD wrapper ----')
   
-  #########################################################################
+  ########################################################################
   #-----------------------------------------------------------------------
   #                  BEGIN TIME LOOP 
   #-----------------------------------------------------------------------
   ########################################################################
 
-
   timenow = param['tbegin']
+  nsteps  = int((param['tend']-param['tbegin'])/param['dt_required'])+1
+  step = 0
 
   while timenow < param['tend']:
      
-      print('Time =         ', timenow, 's')
-      print('dt =           ', param['dt_required'], 's')
+      step+=1
 
-           
-    
-      print('Entering heating & current drive workflow')
-      ids_bundle_updated = hcd_workflow(ids_bundle_work, param)
-    
-      
+      print('---------------------------------------------')
+      print('Step = '+str(step)+'/'+str(nsteps))
+      print('Time =', timenow, 's')
+      print('dt   =', param['dt_required'], 's')
+
+      # READ ALL INPUT IDSS FOR THE CURRENT TIME SLICE
+      for elem in in_l:
+        print('  Get', elem)
+        ids_bundle_input[elem].getSlice(timenow,1)
+
+      # COPY THE INITIAL BUNDLE TO THE WORK BUNDLE
+      # WHEN IT IS NOT THE FIRST TIME SLICE: COPY ONLY IDSS WHICH ARE NO OUTPUT OF H&CD ACTORS
+      # EXCEPTION: CORE_PROFILES TO ALWAYS BE READ EVEN IF IT IS AN OUTPUT OF HCD2CORE_PROFILES
+      if timenow == param['tbegin']:
+        ids_bundle_work = bundle_copy(ids_bundle_input,in_l)
+      else:
+        list_to_get = [value for value in in_l if (value not in out_l or value =='core_profiles')] 
+        ids_bundle_work.update(bundle_copy(ids_bundle_input,list_to_get))
+
+      # ARTIFICIALLY REMOVE WARNINGS
+      warning_list = ['distribution_sources','distributions','ec_launchers','ic_antennas','nbi','wall']
+      for ids in warning_list:
+        if ids in ids_bundle_work:
+          ids_bundle_work[ids].ids_properties.homogeneous_time = 1
+          ids_bundle_work[ids].time = ids_bundle_input['core_profiles'].time
+
+      print('Execute H&CD workflow for current time slice')
+      ids_bundle_work = hcd_workflow(ids_bundle_work, param)
+
+      # OPTIONALLY CALL THE SIMPLE TRANSPORT SOLVER
       if param['run_simpletrans'] == 1:
-        ## import simpletrans
         try:
-             ids_bundle_updated['core_profiles'] = simpletrans(ids_bundle_updated['equilibirum'], ids_bundle_updated['core_profiles'], ids_bundle_updated['waves'], ids_bundle_updated['distributions'])
+             ids_bundle_work['core_profiles'] = simpletrans(ids_bundle_work['equilibirum'], \
+                                                            ids_bundle_work['core_profiles'], \
+                                                            ids_bundle_work['waves'], \
+                                                            ids_bundle_work['distributions'])
         except: 
-             print('FAILED TO LOAD OR RUN SIMPLETRANS')
-             print('WARNING - skipping simpletrans even though it has been choosen in the configuration!')
-          
+             print('Failed to load or run SimpleTrans')
+             print('WARNING - Skipping SimpleTrans even though it has been choosen in the configuration!')
 
-       
-     
+      # COPY WORK BUNDLE TO OUTPUT BUNDLE TO SAVE THE RESULTS TO DISK
+      ids_bundle_output = bundle_copy(ids_bundle_work)
 
-      for elem in ids_bundle_updated:   
+      for elem in ids_bundle_output:
 
-           ids_bundle_work[elem].setPulseCtx(idx_out)
-           ids_bundle_updated[elem].setPulseCtx(idx_out)
-           if timenow ==  (param['tbegin']):
-               
-               if ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or ids_bundle_updated[elem].ids_properties.homogeneous_time == 0:
+        # THE OUTPUT PULSECTX IS NOT PRESERVED IN THE WORKFLOW ITSELF
+        ids_bundle_output[elem].setPulseCtx(idx_out)
 
-                 ids_bundle_updated[elem].put()
-               else:
-             
-                 pass
-          ## if the ids has been modified - change the time to the workflow time - and definitely put to database
-          #  elif the ids has not been modified AND the time has changed - put to database
-          #  else (the ids has not been modified AND the time has not changed) - don't put
+        # IF THE IDS IS NOT EMPTY (INPUT OR OUTPUT) IT IS GOING TO BE SAVED USING THE TIME OF THE WORKFLOW
+        # (TO AVOID SAVING IDENTICAL TIME VALUES IN CASE THE WORKFLOW TIME RESOLUTION IS SCARCER THAN THE INPUT ONE)
+        if ids_bundle_output[elem].ids_properties.homogeneous_time>=0:
+          ids_bundle_output[elem].time = np.array([timenow])
 
-           if elem in out_l: 
+          # FIRST TIME SLICE: PUT() INSTEAD OF PUTSLICE() TO SAVE ALSO STATIC DATA
+          if timenow == param['tbegin']:
+            ids_bundle_output[elem].put()
 
-
-                     
-                 m = ids_bundle_updated['core_profiles'].time
-                 m[0] = float(timenow)
-                 ids_bundle_updated[elem].time = m
-
-
-                 if not ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or not ids_bundle_updated[elem].ids_properties.homogeneous_time == 0: #if the ids didnot exist before (homogeneous time not filled) and it is an output set homogeneous time to 1
-           
-                     ids_bundle_updated[elem].ids_properties.homogeneous_time = 1
-                 if ids_bundle_work[elem].ids_properties.homogeneous_time>=0:
-                   ids_bundle_work[elem].putSlice()
-
-
-           elif oldtime[elem][1]:
-                 if ids_bundle_updated[elem].ids_properties.homogeneous_time == 1 or ids_bundle_updated[elem].ids_properties.homogeneous_time == 0:
-                     ids_bundle_updated[elem].putSlice()
-                 else: 
-                   pass
-           else:
-               pass
-             
-    #  print('prepare ids bundle for next timestep')
-      timenow += param['dt_required']
-      
-
-      ids_bundle_work = copy.deepcopy(ids_bundle_initial)
-      for elem in ids_bundle_work: 
-          ids_bundle_work[elem].getSlice(timenow,1)
-          
-          ## does this new Slice have a different time than the old Slice? 
-          if oldtime[elem][0] == ids_bundle_work[elem].time:
-                oldtime[elem][1] = False
+          # OTHER TIME SLICES: SAVE ONLY THE TIME SLICE
           else:
-                oldtime[elem][1] = True
-          oldtime[elem][0] =  ids_bundle_work[elem].time
-      
+            ids_bundle_output[elem].putSlice()
 
-          if elem in out_l: 
-              ids_bundle_work[elem] =  copy.deepcopy(ids_bundle_updated[elem])
-        #      print('using the '+ elem+ ' output as input for the next timeslice')
+      # PREPARE FOR THE NEXT TIME STEP
+      timenow += param['dt_required']
+      for elem in ids_bundle_work:
+        ids_bundle_work[elem].time = np.array([timenow])
 
+  print('---------------------------------------------')
   print('End of H&CD workflow.')      
-      
-        
+  print('---------------------')
+
