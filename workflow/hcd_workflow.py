@@ -1,85 +1,75 @@
 import os, imas, sys, copy
-from set_md_from_pulse_schedule import set_md_from_pulse_schedule
 import generate_actors
-import auto_hcd_actors as act
+import auto_hcd_actors as actors
+from bundle_copy import bundle_copy
 
+# PATH TO FOLDER WHERE PYTHON ACTORS ARE AVAILABLE
 actor_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/src/org/iter/imas/python')
-list_of_actors = ['merge_waves', 'merge_distributions', 'merge_distribution_sources', 'hcd2core_sources', 'empty_core_sources']
 
+# MERGERS EXECUTED LOCALLY IN HCD_WORKFLOW (ALL OTHER ACTORS ARE DEFINED IN AUTO_HCD_ACTORS)
+list_of_actors = ['merge_waves','merge_distributions','merge_distribution_sources','merge_core_sources']
+
+# IMPORT ALL ACTORS FROM THE MINIMUM LIST
 for name in list_of_actors:
     try:
-        sys.path[:0] = [os.path.join(actor_path,name)]
+        sys.path[:0] = [os.path.join(actor_path, name)]
         globals()[name] = getattr(__import__(name), name)
     except:
-        pass
         print(name, 'not found')
-#--------------------------------------------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------------------------------------------
 
 def hcd_workflow(IDS_BUNDLE_in, parameters):
 
-    ## STEP 0: preparation - modified IDSs will be stored in their respective bundles, IDS_BUNDLE_out will hold the final information:
-    print('-- Step 0')
-    IDS_BUNDLE_nbi   = copy.deepcopy(IDS_BUNDLE_in)
-    IDS_BUNDLE_nuclear = copy.deepcopy(IDS_BUNDLE_in)
-    IDS_BUNDLE_ic    = copy.deepcopy(IDS_BUNDLE_in)
-    IDS_BUNDLE_ec    = copy.deepcopy(IDS_BUNDLE_in)
-    IDS_BUNDLE_out   = copy.deepcopy(IDS_BUNDLE_in)
-  
+    # STEP 0: PREPARATION OF SUB-BUNDLES FOR EACH TYPE OF H&CD CALCULATION - IDS_BUNDLE_OUT WILL HOLD THE FINAL RESULT
+    IDS_BUNDLE_nbi     = bundle_copy(IDS_BUNDLE_in)
+    IDS_BUNDLE_nuclear = bundle_copy(IDS_BUNDLE_in)
+    IDS_BUNDLE_ic      = bundle_copy(IDS_BUNDLE_in)
+    IDS_BUNDLE_ec      = bundle_copy(IDS_BUNDLE_in)
+    IDS_BUNDLE_core    = bundle_copy(IDS_BUNDLE_in)
+    IDS_BUNDLE_out     = bundle_copy(IDS_BUNDLE_in)
 
-    ## STEP 1:  SOURCE CODES and WAVE SOLVER (and ICCOUP) :
-    print('-- Step 1: source codes and wave solvers')
-    IDS_BUNDLE_nbi['distribution_sources']      = copy.deepcopy(act.nbi_source(IDS_BUNDLE_nbi, parameters))
-    IDS_BUNDLE_nuclear['distribution_sources']  = copy.deepcopy(act.nuclear_source(IDS_BUNDLE_nuclear, parameters))
-    IDS_BUNDLE_ic['waves']                      = copy.deepcopy(act.ic_coup(IDS_BUNDLE_ic, parameters))
-    IDS_BUNDLE_ic['waves']                      = copy.deepcopy(act.ic_wave_solver(IDS_BUNDLE_ic, parameters))
-    IDS_BUNDLE_ec['waves']                      = copy.deepcopy(act.ec_wave_solver(IDS_BUNDLE_ec, parameters))
+    # STEP 1: SOURCE CODES, ICCOUP (FOR IC COUPLING) AND WAVE SOLVERS
+    print('-- Step 1: Source codes and Wave solvers')
+    IDS_BUNDLE_nbi     ['distribution_sources'] = actors.nbi_source     ( IDS_BUNDLE_nbi,     parameters )
+    IDS_BUNDLE_nuclear ['distribution_sources'] = actors.nuclear_source ( IDS_BUNDLE_nuclear, parameters )
+    IDS_BUNDLE_ic      ['waves']                = actors.ic_coup        ( IDS_BUNDLE_ic,      parameters )
+    IDS_BUNDLE_ic      ['waves']                = actors.ic_wave_solver ( IDS_BUNDLE_ic,      parameters )
+    IDS_BUNDLE_ec      ['waves']                = actors.ec_wave_solver ( IDS_BUNDLE_ec,      parameters )
 
-    
-    
-    ## STEP 2: FOKKER PLANK SOLVERS and creating a common nbi_ic distributions IDS
-    print('-- Step 2: fokker plank solvers')
-    # copy the distribution sources of nbi to the the ic bundle - in case you want to model synergy
-    # if you don want to model synergy effects, this does not make a difference at all, this is why we always do it just in case 
-    IDS_BUNDLE_ic['distribution_sources'] = copy.deepcopy(IDS_BUNDLE_nbi['distribution_sources'])
-    # then execute all the fokker plank solvers
-    IDS_BUNDLE_ic['distributions']     =   copy.deepcopy(act.ic_wave_fp(IDS_BUNDLE_ic, parameters))
-    IDS_BUNDLE_nuclear['distributions']        = copy.deepcopy(act.nuclear_fp(IDS_BUNDLE_nuclear, parameters))
-    IDS_BUNDLE_nbi['distributions']    =   copy.deepcopy(act.nbi_fp(IDS_BUNDLE_nbi, parameters))
-   
+    # INTERMEDIATE STEP: SYSTEMATICALLY COPY THE NBI DISTRIBUTION_SOURCES TO THE IC BUNDLE IN CASE SYNERGY IS MODELLED
+    IDS_BUNDLE_ic ['distribution_sources'] = IDS_BUNDLE_nbi['distribution_sources']
 
+    # STEP 2: FOKKER PLANK SOLVERS
+    print('-- Step 2: Fokker Planck solvers')
+    IDS_BUNDLE_ic      ['distributions'] = actors.ic_wave_fp ( IDS_BUNDLE_ic,      parameters)
+    IDS_BUNDLE_nuclear ['distributions'] = actors.nuclear_fp ( IDS_BUNDLE_nuclear, parameters)
+    IDS_BUNDLE_nbi     ['distributions'] = actors.nbi_fp     ( IDS_BUNDLE_nbi,     parameters)
 
-    ## STEP 4: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION SOURCES and WAVES
-    print('-- Step 3: mergers')
-    distributions_nbi_ic   =   merge_distributions(IDS_BUNDLE_nbi['distributions'], IDS_BUNDLE_ic['distributions'])
-    distributions_final        = merge_distributions(IDS_BUNDLE_nuclear['distributions'], distributions_nbi_ic)
-    waves_final                = merge_waves(IDS_BUNDLE_ec['waves'], IDS_BUNDLE_ic['waves'])
-    distribution_sources_final = merge_distribution_sources(IDS_BUNDLE_nbi['distribution_sources'], IDS_BUNDLE_nuclear['distribution_sources'])
-   
+    # STEP 3: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION_SOURCES and WAVES
+    print('-- Step 3: Mergers')
+    distributions_nbi_ic         = merge_distributions        ( IDS_BUNDLE_nbi['distributions'],            IDS_BUNDLE_ic['distributions'])
+    distributions_fus_nbi_ic     = merge_distributions        ( IDS_BUNDLE_nuclear['distributions'],        distributions_nbi_ic)
+    waves_ec_ic                  = merge_waves                ( IDS_BUNDLE_ec['waves'],                     IDS_BUNDLE_ic['waves'])
+    distribution_sources_fus_nbi = merge_distribution_sources ( IDS_BUNDLE_nuclear['distribution_sources'], IDS_BUNDLE_nbi['distribution_sources'])
 
-    ## STEP 5: MAKE CORE IDS:
-    print('-- Step 4: make core ids')
-    if parameters['hcd2core_sources'] == 1:
-        core_sources_final  = hcd2core_sources(distributions_final, distribution_sources_final, waves_final, IDS_BUNDLE_in['core_profiles'])
-    else:
-        pass
-        core_sources_final = empty_core_sources(IDS_BUNDLE_in['core_profiles'])
+    # INTERMEDIATE STEP: COPY H&CD RESULTS INTO THE BUNDLES FOR CORE_SOURCES AND CORE_PROFILES
+    IDS_BUNDLE_core ['distribution_sources'] = distribution_sources_fus_nbi
+    IDS_BUNDLE_core ['distributions']        = distributions_fus_nbi_ic
+    IDS_BUNDLE_core ['waves']                = waves_ec_ic 
 
-    if parameters['hcd2core_profiles'] == 1:
-        core_profiles_final = hcd2core_profiles(distributions_final, distribution_sources_final, waves_final, IDS_BUNDLE_in['core_profiles'])
-    else:
-        pass
-        core_profiles_final = copy.deepcopy(IDS_BUNDLE_in['core_profiles'])
-   
+    # STEP 4: MAKE CORE_SOURCES AND CORE_PROFILES IDS:
+    print('-- Step 4: Make core_sources and/or core_profiles')
+    IDS_BUNDLE_core ['core_sources']  = actors.fill_core_sources  ( IDS_BUNDLE_core, parameters )
+    IDS_BUNDLE_core ['core_profiles'] = actors.fill_core_profiles ( IDS_BUNDLE_core, parameters )
 
-
-
-    IDS_BUNDLE_out['distributions']        = distributions_final
-    IDS_BUNDLE_out['waves']                = waves_final
-    IDS_BUNDLE_out['distribution_sources'] = distribution_sources_final 
-    IDS_BUNDLE_out['core_sources']         = core_sources_final
+    # FILL THE OUTPUT BUNDLE WITH THE RESULTS OF H&CD CALCUATIONS
+    IDS_BUNDLE_out['distribution_sources'] = IDS_BUNDLE_core ['distribution_sources']
+    IDS_BUNDLE_out['distributions']        = IDS_BUNDLE_core ['distributions']
+    IDS_BUNDLE_out['waves']                = IDS_BUNDLE_core ['waves']
+    IDS_BUNDLE_out['core_sources']         = IDS_BUNDLE_core ['core_sources']
+    IDS_BUNDLE_out['core_profiles']        = IDS_BUNDLE_core ['core_profiles']
 
     print('End of time slice')
 
     return IDS_BUNDLE_out
-
-    
