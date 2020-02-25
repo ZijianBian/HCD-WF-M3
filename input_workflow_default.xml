@@ -1,10 +1,11 @@
 <root>
   <workflow_parameters display="WORKFLOW PARAMETERS (STANDALONE)">
-    <local_db>default</local_db>
-    <user>public</user>
-    <machine>iter</machine>
+    <input_db_root>public</input_db_root>
+    <input_db_sub>iter</input_db_sub>
     <shot_nr>130011</shot_nr>
     <run_in>1</run_in>
+    <local_db_root>default</local_db_root>
+    <local_db_sub>default</local_db_sub>
     <run_out>13</run_out>
     <tbegin>5</tbegin>
     <tend>350.</tend>
@@ -46,10 +47,10 @@
 
     <post_process>
       <source>
-	<hcd2core_sources list="hcd2core_sources">1</hcd2core_sources> 
+	<fill_core_sources list="hcd2core_sources">1</fill_core_sources> 
       </source>
       <profiles>
-	<hcd2core_profiles list="hcd2core_profiles">0</hcd2core_profiles>
+	<fill_core_profiles list="hcd2core_profiles">0</fill_core_profiles>
       </profiles>
     </post_process>
 
