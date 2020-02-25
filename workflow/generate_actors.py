@@ -1,8 +1,11 @@
+# -------------------------------------------------------
+# PURPOSE: GENERATE THE AUTO_HCD_ACTORS PYTHON FILE
+#          ACCORDING TO THE ACTOR SELECTION FROM THE GUI
+# -------------------------------------------------------
 import os, imas,sys,copy
 import lxml
 from lxml import etree
 import check_for_mpi as cfmpi
-import pdb
 from developer_file import load_add_arg 
 
 tree = etree.parse('input_workflow_default.xml')
@@ -18,6 +21,7 @@ add_arg = load_add_arg()
 list_of_actors = []
 list_of_uncompiled_actors = []
 
+# ----------------------------------------------------------------------
 def read_inputoutput(name):
     in_l = []
     out_l = []
@@ -25,7 +29,6 @@ def read_inputoutput(name):
         sys.path[:0] = [os.path.join(actor_path,name)]
         globals()[name] = getattr(__import__(name), name)
         parstr = globals()[name].__doc__
-
         
         for elem in parstr.split('\n'):
             
@@ -42,11 +45,11 @@ def read_inputoutput(name):
                 elif elem.find('codeparam') is not -1:
                     in_l.append('codeparam')
                     break
-                elif elem.find(':param result: ') is not -1 and elem.find(iids) is not -1:
+                elif elem.find(':param result: ') is not -1 \
+                and elem.find(iids) is not -1:
                     out_l.append(iids)
 
         list_of_actors.append(name)
-
         
     except:
         if name not in list_of_uncompiled_actors:
@@ -54,7 +57,7 @@ def read_inputoutput(name):
         list_of_uncompiled_actors.append(name)
 
     return(in_l, out_l)
-
+# ----------------------------------------------------------------------
 
 for step in root[2]:
     dict3 = {}
@@ -70,21 +73,17 @@ for step in root[2]:
         dict3[isys.tag] = dict2
     maindict[step.tag] = dict3
 
-#print(maindict)
-
-
-
+# GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
     file.write('import os, imas, sys, copy\n\n')
     file.write('actor_path = os.path.join(os.getenv("ACTOR_POOL"), "imas/src/org/iter/imas/python")\n')
-    file.write('list_of_actors = ["'+'","'.join(list_of_actors)+'", "empty_distribution_sources", "empty_waves", "empty_distributions"]\n\n\n')
+    file.write('list_of_actors = ["'+'","'.join(list_of_actors)+\
+               '", "empty_distribution_sources","empty_waves","empty_distributions","empty_core_sources","empty_core_profiles"]\n\n\n')
     file.write('for name in list_of_actors:\n')
     file.write('   sys.path[:0] = [os.path.join(actor_path,name)]\n')
     file.write('   globals()[name] = getattr(__import__(name), name)\n\n\n\n\n')
         
-
-
     for proc in maindict:
         for sys in maindict[proc]:
             for cat in maindict[proc][sys]:
@@ -92,8 +91,6 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                 file.write('def '+ cat + '(bundle, parameters): \n')
                 i = 0
                 
-#                    if code not in list_of_uncompiled_actors: 
-
                 for code in maindict[proc][sys][cat]:
                     add_arg_nr = 0
                     i +=1 
@@ -120,8 +117,6 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                                 file.write('bundle["'+ids_in+'"]')
                             first_in = False
 
-                        
-
                         libmpi_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/lib64/lib'+code+'.so')
                             
                         if cfmpi.is_compiled_for_mpi(libmpi_path, 'libmpi'):
@@ -129,8 +124,6 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                                 file.write(',  "mpi_local", mpi_processes=parameters["nproc_ion_fp"]')
                             else:
                                 file.write(',  "mpi_local"') # FOR OTHER MPI CODES, KEEP THE DEFAULT FOR NOW (NPROC=4)
-                            
-
 
                         file.write(')\n\n')
                     else:
@@ -143,8 +136,3 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
 
                 file.write('   return('+ output_ids_list[0]+'_temp)')
                 file.write('\n\n')    
-
-
-#import auto_hcd_actors
-
-
