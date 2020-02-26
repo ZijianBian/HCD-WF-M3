@@ -204,7 +204,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     ## INITIALISE FRAME-----------------------------------------------------------------------------
 
     il = Label(initfr, text = 
-               'reading input from database\n- shot:   '+ workflow_param[wfp_ref]['shot_nr']+  '\n- run:   '+ workflow_param[wfp_ref]['run_in']+'\n- machine:   '+ workflow_param[wfp_ref]['machine']+' \n- start time:   '+ workflow_param[wfp_ref]['tbegin']+'s \n- timestep:   '+ workflow_param[wfp_ref]['dt_required']+'s \n- end time:   '+ workflow_param[wfp_ref]['tend']+'s', 
+               'reading input from database\n- shot:   '+ workflow_param[wfp_ref]['shot_nr']+  '\n- run:   '+ workflow_param[wfp_ref]['run_in']+'\n- machine:   '+ workflow_param[wfp_ref]['input_database']+' \n- start time:   '+ workflow_param[wfp_ref]['tbegin']+'s \n- timestep:   '+ workflow_param[wfp_ref]['dt_required']+'s \n- end time:   '+ workflow_param[wfp_ref]['tend']+'s', 
                bg = infolabelcolor, anchor = W,  justify = LEFT, padx = 4 , pady = 4)
 
     il.pack(side = TOP)
