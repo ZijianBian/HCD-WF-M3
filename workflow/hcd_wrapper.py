@@ -1,5 +1,5 @@
 def hcd_wrapper(par_path):
-  import os,imas,sys, copy
+  import os,imas,sys
   sys.path.append('interface')
   sys.path.append('workflow')
   sys.path.append(os.getcwd())
@@ -150,8 +150,6 @@ def hcd_wrapper(par_path):
       exist = 'no'
   if ALEnv.itm_tmp==None: # Ensure that it is done only once
       tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=local_db_tmp).ids_tmp
-  #tmp.create_env(local_db_root,local_db_tmp,version)
-  #idx_tmp = tmp.core_profiles.getPulseCtx()
 
   # TOTAL LIST OF IDSS TO BE READ FROM THE INPUT SCENARIO FOR H&CD CALCULATIONS
   ids_bundle_input = {'core_profiles':        input.core_profiles, 
@@ -176,18 +174,6 @@ def hcd_wrapper(par_path):
                       'distribution_sources': output.distribution_sources, 
                       'distributions':        output.distributions,
                       'waves':                output.waves}
-
-  # IDS BUNDLE WORK USES THE TEMPORARY FILE TO SAVE WORKING STATE OF IDSS
-  ids_bundle_work   = {'core_profiles':       tmp.core_profiles, 
-                      'core_sources':         tmp.core_sources,
-                      'equilibrium':          tmp.equilibrium, 
-                      'nbi':                  tmp.nbi, 
-                      'ic_antennas':          tmp.ic_antennas, 
-                      'ec_launchers':         tmp.ec_launchers, 
-                      'wall':                 tmp.wall, 
-                      'distribution_sources': tmp.distribution_sources, 
-                      'distributions':        tmp.distributions,
-                      'waves':                tmp.waves}
 
   # FOR TIME REFERENCE
   time_array = ids_bundle_input['core_profiles'].partialGet('time')
@@ -291,6 +277,9 @@ def hcd_wrapper(par_path):
       timenow += param['dt_required']
       for elem in ids_bundle_work:
         ids_bundle_work[elem].time = np.array([timenow])
+
+      # CLEAN TO SAVE A BIT OF MEMORY
+      del ids_bundle_output
 
   print('---------------------------------------------')
   print('End of H&CD workflow.')      
