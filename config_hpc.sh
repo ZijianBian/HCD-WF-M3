@@ -3,8 +3,6 @@
 if [ -z "$KEPLER_DOT" ]
 then
     export ACTOR_POOL=$PWD/actor_install/actors
-    export KEPLER_OLD=$KEPLER
-    export KEPLER=$ACTOR_POOL # (still needed by IMAS actors themselves)
     unset local_kepler
     echo "H&CD actors taken from ~/actor_install/actors"
 else
@@ -21,7 +19,8 @@ module load Kepler
 module load FC2K
 
 # Re-load Kepler if it was loaded already
-if [ "$local_kepler" ]
+if [ -z "$local_kepler" ]
+    export KEPLER=$ACTOR_POOL # (still needed by IMAS actors themselves)
 then
     kepler_load $local_kepler >& /dev/null
 fi
