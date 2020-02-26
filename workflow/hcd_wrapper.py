@@ -95,47 +95,48 @@ def hcd_wrapper(par_path):
   version = os.getenv('IMAS_VERSION')[0]
 
   # INPUT DB ENVIRONMENT
-  input_db_root = param['input_db_root']
-  input_db_sub  = param['input_db_sub']
+  input_user_or_path = param['input_user_or_path']
+  input_database     = param['input_database']
 
-  # LOCAL DB ENVIRONMENT
-  local_db_root = param['local_db_root']
-  local_db_sub  = param['local_db_sub']
+  # OUTPUT DB ENVIRONMENT
+  output_user_or_path = param['output_user_or_path']
+  output_database     = param['output_database']
 
-  # DEFAULT LOCAL DATABASE ROOT NAME IS ENVIRONMENT VARIABLE $USER
-  if local_db_root=='default':
-    local_db_root = os.getenv('USER')
+  # DEFAULT OUTPUT USER_OR_PATH NAME IS ENVIRONMENT VARIABLE $USER
+  if output_user_or_path=='default':
+    output_user_or_path = os.getenv('USER')
 
-  # DEFAULT LOCAL DATABASE SUB-NAME IS THE SAME AS THE INPUT ONE
-  if local_db_sub=='default':
-    local_db_sub = input_db_sub
+  # DEFAULT LOCAL DATABASE NAME IS THE SAME AS THE INPUT ONE
+  if output_database=='default':
+    output_database = input_database
 
-  # IF THE LOCAL DATABASE DOES NOT EXIST: CREATE IT
-  if local_db_root== os.getenv('USER'):
-    local_folder = os.getenv('HOME')+'/public/imasdb/'+local_db_sub+'/3/0'
+  # IF THE OUTPUT DATABASE DOES NOT EXIST: CREATE IT
+  if output_user_or_path== os.getenv('USER'):
+    output_folder = os.getenv('HOME')+'/public/imasdb/'+output_database+'/3/0'
   else:
-    local_folder = local_db_root+'/'+local_db_sub+'/3/0'
-  if os.path.isdir(local_folder) == False:
-    print('-- Create local database for output file '+local_folder)
-    os.makedirs(local_folder)
+    output_folder = output_user_or_path+'/'+output_database+'/3/0'
+  if os.path.isdir(output_folder) == False:
+    print('-- Create local database for output file '+output_folder)
+    os.makedirs(output_folder)
 
-  # FOR THE TEMPORARY FILE, ONLY THE DEFAULT LOCAL_DB_ROOT BASED ON USERNAME IS USED
-  # CLEVERLY CHOOSE 'TMP' FOR LOCAL DB SUBNAME TO NEVER MIX TEMPORARY FILES WITH OTHERS
-  local_db_tmp = 'tmp'
-  local_folder_tmp = os.getenv('HOME')+'/public/imasdb/'+local_db_tmp+'/3/0'
-  if os.path.isdir(local_folder_tmp) == False:
-    print('-- Create local database for tmp file '+local_folder_tmp)
-    os.makedirs(local_folder_tmp)
+  # FOR THE TEMPORARY FILE, ONLY THE DEFAULT USER_OR_PATH BASED ON USERNAME IS USED
+  # CLEVERLY CHOOSE 'TMP' FOR DATABASE NAME TO NEVER MIX TEMPORARY FILES WITH OTHERS
+  tmp_user_or_path = os.getenv('USER') # (PUTTING IT TO SOMETHING ELSE DOES NOT MAKE A DIFFERENCE)
+  tmp_database = 'tmp'
+  tmp_folder = os.getenv('HOME')+'/public/imasdb/'+tmp_database+'/3/0'
+  if os.path.isdir(tmp_folder) == False:
+    print('-- Create local database for tmp file '+tmp_folder)
+    os.makedirs(tmp_folder)
 
   # OPEN INPUT DATAFILE
   print('-- Open input and output file --')
   input = imas.ids(param['shot_nr'], param['run_in'])
-  input.open_env(input_db_root,input_db_sub,version)
+  input.open_env(input_user_or_path,input_database,version)
   idx_in = input.core_profiles.getPulseCtx()
 
   # CREATE OUTPUT DATAFILE
   output = imas.ids(param["shot_nr"], param["run_out"])
-  output.create_env(local_db_root,local_db_sub,version)
+  output.create_env(output_user_or_path,output_database,version)
   idx_out = output.core_profiles.getPulseCtx()
 
   # DEFINE THE SHOT/RUN NUMBERS AND LOCATION OF THE TEMPORARY FILE
@@ -145,11 +146,11 @@ def hcd_wrapper(par_path):
     run_tmp  = randint(0,9999)
     tmp = imas.ids(shot_tmp,run_tmp,0,0)
     try:
-      tmp.open_env(local_db_root,local_db_tmp,version,silent=True)
+      tmp.open_env(tmp_user_or_path,tmp_database,version,silent=True)
     except Exception:
       exist = 'no'
   if ALEnv.itm_tmp==None: # Ensure that it is done only once
-      tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=local_db_tmp).ids_tmp
+      tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tmp_database).ids_tmp
 
   # TOTAL LIST OF IDSS TO BE READ FROM THE INPUT SCENARIO FOR H&CD CALCULATIONS
   ids_bundle_input = {'core_profiles':        input.core_profiles, 

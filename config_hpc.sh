@@ -4,11 +4,11 @@ if [ -z "$KEPLER_DOT" ]
 then
     export ACTOR_POOL=$PWD/actor_install/actors
     unset local_kepler
-    echo "H&CD actors taken from ~/actor_install/actors"
+    echo "H&CD actors taken from" $ACTOR_POOL
 else
     export local_kepler=`echo $KEPLER_DOT | awk -F "/" '{print $NF}'`
     export ACTOR_POOL=$KEPLER_DOT/kepler/
-    echo "Local Kepler" $local_kepler "loaded --> H&CD actors taken from there"
+    echo "Local Kepler \""$local_kepler"\" loaded --> H&CD actors taken from there"
 fi
 
 module purge

@@ -1,11 +1,11 @@
 <root>
   <workflow_parameters display="WORKFLOW PARAMETERS (STANDALONE)">
-    <input_db_root>public</input_db_root>
-    <input_db_sub>iter</input_db_sub>
+    <input_user_or_path>public</input_user_or_path>
+    <input_database>iter</input_database>
     <shot_nr>130011</shot_nr>
     <run_in>1</run_in>
-    <local_db_root>default</local_db_root>
-    <local_db_sub>default</local_db_sub>
+    <output_user_or_path>default</output_user_or_path>
+    <output_database>default</output_database>
     <run_out>13</run_out>
     <tbegin>5</tbegin>
     <tend>350.</tend>
