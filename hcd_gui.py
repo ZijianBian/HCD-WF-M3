@@ -499,8 +499,11 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                                 if 'xml_location = ' in iline and \
                                    '_default_xml_location' not in iline:
                                     path_to_kepler_xml_location = iline[17:-2]
-                                    copy2(path_to_kepler_xml_location, dest_file,
-                                          follow_symlinks=True)
+                                    # IF PATH_TO_KEPLER_XML_LOCATION IS TOO SMALL:
+                                    # IT MEANS THERE IS NO INPUT XML FILE (NOTHING TO COPY)
+                                    if len(path_to_kepler_xml_location) > 5:
+                                        copy2(path_to_kepler_xml_location, dest_file,
+                                              follow_symlinks=True)
                                     break
 
         if 'xml' not in filepath[-4:]:
