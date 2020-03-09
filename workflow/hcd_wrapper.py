@@ -145,12 +145,10 @@ def hcd_wrapper(par_path):
   while exist == 'yes':
     run_tmp  = randint(0,9999)
     tmp = imas.ids(shot_tmp,run_tmp,0,0)
-    try:
-      tmp.open_env(tmp_user_or_path,tmp_database,version,silent=True)
-    except Exception:
+    [err,n]=tmp.open_env(tmp_user_or_path,tmp_database,version,silent=True)
+    if err != 0:
       exist = 'no'
-  if ALEnv.itm_tmp==None: # Ensure that it is done only once
-      tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tmp_database).ids_tmp
+  tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tmp_database).ids_tmp
 
   # TOTAL LIST OF IDSS TO BE READ FROM THE INPUT SCENARIO FOR H&CD CALCULATIONS
   ids_bundle_input = {'core_profiles':        input.core_profiles, 
