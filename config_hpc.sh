@@ -1,7 +1,6 @@
 
 # Location of IMAS actors (pre-compiled)
-if [ -z "$KEPLER_DOT" ]
-then
+if [ -z "$KEPLER_DOT" ];then
     export ACTOR_POOL=$PWD/actor_install/actors
     unset local_kepler
     echo "H&CD actors taken from" $ACTOR_POOL
@@ -19,9 +18,9 @@ module load Kepler
 module load FC2K
 
 # Re-load Kepler if it was loaded already
-if [ -z "$local_kepler" ]
+if [ -z "$local_kepler" ];then
     export KEPLER=$ACTOR_POOL # (still needed by IMAS actors themselves)
-then
+else
     kepler_load $local_kepler >& /dev/null
 fi
 
