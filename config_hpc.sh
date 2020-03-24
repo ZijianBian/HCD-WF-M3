@@ -1,28 +1,14 @@
-
-# Location of IMAS actors (pre-compiled)
-if [ -z "$KEPLER_DOT" ];then
-    export ACTOR_POOL=$PWD/actor_install/actors
-    unset local_kepler
-    echo "H&CD actors taken from" $ACTOR_POOL
-else
-    export local_kepler=`echo $KEPLER_DOT | awk -F "/" '{print $NF}'`
-    export ACTOR_POOL=$KEPLER_DOT/kepler/
-    echo "Local Kepler \""$local_kepler"\" loaded --> H&CD actors taken from there"
-fi
-
+# Start from clean environment
 module purge
 
-# IMAS, Kepler, FC2K
+# IMAS and FC2K
 module load IMAS
-module load Kepler
 module load FC2K
 
-# Re-load Kepler if it was loaded already
-if [ -z "$local_kepler" ];then
-    export KEPLER=$ACTOR_POOL # (still needed by IMAS actors themselves)
-else
-    kepler_load $local_kepler >& /dev/null
-fi
+# Actor folder
+export ACTOR_FOLDER=~/public/imas_actors
+mkdir -p $ACTOR_FOLDER
+echo "H&CD actors taken from" $ACTOR_FOLDER
 
 # Need to remove the stack limit to avoid segmentation fault inside codes
 ulimit -Ss unlimited
@@ -45,3 +31,6 @@ module load PSPLINE/20181008-intel-2018a
 module load PyAL/1.1.2-intel-2018a-Python-3.6.4
 module load NAG/26-intel-2018a
 
+# Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
+HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export PYTHONPATH=$HCD_FOLDER/tools:$PYTHONPATH

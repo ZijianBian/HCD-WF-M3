@@ -1,11 +1,5 @@
 #!/usr/bin/env python
-import yaml
-import os
-import sys
-import shutil
-import sh
-import argparse
-import subprocess
+import yaml,os,sys,shutil,sh,argparse,subprocess
 from getpass import getuser
 from datetime import datetime
 from io import open
@@ -152,11 +146,12 @@ def install_actors(desc, args):
 
         xml = b.get('XML')
         #print xml
+
         if isinstance(xml,list):
             for x in xml:
-                subprocess.call(['fc2k',x])
+                subprocess.call(['fc2k '+x+' -nokepler -pyworkspace '+os.getenv('ACTOR_FOLDER')],shell=True)
         else:
-            subprocess.call(['fc2k',xml])
+            subprocess.call(['fc2k '+xml+' -nokepler -pyworkspace '+os.getenv('ACTOR_FOLDER')],shell=True)
             
         os.chdir(prevdir)
     

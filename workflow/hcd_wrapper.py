@@ -213,8 +213,8 @@ def hcd_wrapper(par_path):
 
       print('---------------------------------------------')
       print('Step = '+str(step)+'/'+str(nsteps))
-      print('Time =', timenow, 's')
-      print('dt   =', param['dt_required'], 's')
+      print('Time = %5.2f' % timenow, 's')
+      print('dt   = %5.2f' % param['dt_required'], 's')
 
       # READ ALL INPUT IDSS FOR THE CURRENT TIME SLICE
       for elem in in_l:

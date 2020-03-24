@@ -3,12 +3,11 @@ sys.path.append('interface')
 sys.path.append('workflow')
 sys.path.append(os.getcwd())
 from lxml import etree
+from import_actor import import_actor
 
 def create_maindict(default_workflow_parameters):
     #---------------------------------------------------------------------------------------------
     ##  create a python directory (maindict) that contains the name of all codes (nemo, bbnbi, ...) , their in & output IDSs, their category (ec_wavesolver, nbi_source, ..) the heating system they belong to (EC, IC, NBI, alpha)
-
-    actor_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/src/org/iter/imas/python')
 
     ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_launchers','wall', 'distribution_sources', 'distributions', 'waves']
 
@@ -19,9 +18,8 @@ def create_maindict(default_workflow_parameters):
         in_l = []
         out_l = []
         try:
-            sys.path[:0] = [os.path.join(actor_path,name)]
-            globals()[name] = getattr(__import__(name), name)
 
+            import_actor(name)
             parstr = globals()[name].__doc__
 
             for iids in ids_list:
@@ -57,4 +55,4 @@ def create_maindict(default_workflow_parameters):
 
 
 
-    return(maindict, actor_path, not_compiled_list)
+    return(maindict,not_compiled_list)

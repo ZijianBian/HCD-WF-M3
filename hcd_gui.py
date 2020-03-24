@@ -13,15 +13,17 @@ from hover_class import *
 from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
+from import_actor import import_actor
 import pdb
 import argparse
 
-
 #---------------------------------------------------------------------------------------------
 
-if os.getenv('ACTOR_POOL') is None:
-    print('ERROR: the environment variable ACTOR_POOL has not been set up')
+if os.getenv('ACTOR_FOLDER') is None:
+    print('ERROR: the environment variable ACTOR_FOLDER has not been set up')
     sys.exit()
+else:
+    ACTOR_FOLDER = os.getenv('ACTOR_FOLDER')
 
 # ---------------------------------------------------------------------------------------------
 # set the path to the folders where the configuration and codeparameters are stored
@@ -125,7 +127,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     ##  the name of all codes (nemo, bbnbi, ...),
     ##  their in & output IDSs, their category (ec_wavesolver, nbi_source, ..)
     ##  and the heating system they belong to (EC, IC, NBI, alpha)
-    (maindict, actor_path, list_of_uncompiled_actors) = create_maindict(input_filepath)
+    (maindict, list_of_uncompiled_actors) = create_maindict(input_filepath)
     workflow_param = create_workflow_param_from_file(input_filepath)
 
     ### setup
@@ -333,31 +335,31 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                 dest_file = os.path.join(run_config_folder_path+'/'+hsys
                                          +'/input_'+actor_name+'.xml')
 
-                actor_python_script = actor_path+'/'+actor_name+'/'+actor_name+'.py'
+                import_actor(actor_name)
+                actor_python_folder = eval(actor_name+'.location')
                 found_xml = False
                 found_xsd = False
 
-                with open(actor_python_script) as pfile:
+                with open(actor_python_folder+'/wrapper.py') as pfile:
 
                     for iline in pfile:
                         if 'xml_location = ' in iline and '_default_xml_location' not in iline:
-                            ## check if there already is a version of the xml file for this actor
+                            ## check if there is already is a version of the xml file for this actor
                             ## - this could be put outside of the loop for reading the file,
                             ## but the code is shorter this way, it shouldnt be too confusing i hope
                             if os.path.exists(dest_file) and is_load_default_from_kepler is False:
                                 ## if yes, use that one as xml
                                 codeparam_xml_path.set(dest_file)
                             else:
-                                ## if not, OR it is supposed to load the default,
-                                ## use the one we just found
-                                codeparam_xml_path.set(iline[17:-2])
+                                ## if not, OR it is supposed to load the default, use the one we just found
+                                xml_name = iline.split('+')[-1].replace("'","").replace(" ","").replace("\n","")
+                                codeparam_xml_path.set(actor_python_folder+xml_name)
                                 copy2(codeparam_xml_path.get(), dest_file, follow_symlinks=True)
-                                # copy the one stored in the kepler folder to the
-                                # current runfolder necessary for saving the changes later
                             found_xml = True
 
                         if 'xsd_location = ' in iline:
-                            codeparam_xsd_path.set(iline[17:-2])
+                            xsd_name = iline.split('+')[-1].replace("'","").replace(" ","").replace("\n","")
+                            codeparam_xsd_path.set(actor_python_folder+xsd_name)
                             found_xsd = True
 
                         if found_xml is True and found_xsd is True:
@@ -415,7 +417,6 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                             for i in root.iter():
                                 if elem in [str(i.tag)] and i.tag is not etree.Comment:
                                     i.text = newvalue
-
                             if xmlschema.validate(root):
                                 entry1.config(bg=c1)
                             else:
@@ -490,19 +491,20 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                     dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'
                                              +actor_name+'.xml')
                     if not os.path.exists(dest_file):
-                        actor_python_script = actor_path+'/'+actor_name+'/'+actor_name+'.py'
+                        import_actor(actor_name)
+                        actor_python_folder = eval(actor_name+'.location')
+                        #actor_python_folder = ACTOR_FOLDER+'/'+actor_name+'/'+actor_name
                         found_xml = False
                         found_xsd = False
 
-                        with open(actor_python_script) as pfile:
+                        with open(actor_python_folder+'/wrapper.py') as pfile:
                             for iline in pfile:
                                 if 'xml_location = ' in iline and \
                                    '_default_xml_location' not in iline:
-                                    path_to_kepler_xml_location = iline[17:-2]
-                                    # IF PATH_TO_KEPLER_XML_LOCATION IS TOO SMALL:
-                                    # IT MEANS THERE IS NO INPUT XML FILE (NOTHING TO COPY)
-                                    if len(path_to_kepler_xml_location) > 5:
-                                        copy2(path_to_kepler_xml_location, dest_file,
+                                    xml_name = iline.split('+')[-1].replace("'","").replace(" ","").replace("\n","")
+                                    # IF XML_NAME IS TOO SMALL: IT MEANS THERE IS NO INPUT XML FILE (NOTHING TO COPY)
+                                    if len(xml_name) > 5:
+                                        copy2(actor_python_folder+xml_name, dest_file,
                                               follow_symlinks=True)
                                     break
 
