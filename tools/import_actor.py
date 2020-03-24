@@ -6,8 +6,15 @@ from inspect import getmodule,stack
 # Sub-function to add the actor folder to the path and to import it
 def syspath_import_actor(actor_folder,actor_name):
 
+    actor_function=[]
+    error = 0
+
     # Folder where the actor is located
     actor_folder_name = actor_folder+"/"+actor_name
+    if not os.path.isdir(actor_folder_name):
+        print('Actor '+actor_name+' not found.')
+        error = 1
+        return actor_function,error
     version = [f for f in os.listdir(actor_folder_name) if os.path.isdir(os.path.join(actor_folder_name,f))][0]
 
     # Determine the actor location
@@ -22,10 +29,12 @@ def syspath_import_actor(actor_folder,actor_name):
     actor_function = getattr(import_module(actor_name+'.wrapper'),actor_name+'_actor')
     actor_function.location = actor_location
 
-    return actor_function
+    return actor_function,error
 
 # Function to import an actor
 def import_actor(actor_input):
+
+    error=0
 
     # Check if ACTOR_FOLDER is defined
     ACTOR_FOLDER = os.environ.get('ACTOR_FOLDER')
@@ -39,10 +48,12 @@ def import_actor(actor_input):
     # Import the actor(s) and put into a dictionary
     dictactor = {}
     if type(actor_input) is str:
-        dictactor[actor_input] = syspath_import_actor(ACTOR_FOLDER,actor_input)
+        dictactor[actor_input],error = syspath_import_actor(ACTOR_FOLDER,actor_input)
     else:
         for actor_name in actor_input:
-            dictactor[actor_name] = syspath_import_actor(ACTOR_FOLDER,actor_name)
+            dictactor[actor_name],err = syspath_import_actor(ACTOR_FOLDER,actor_name)
+            if err==1:
+                error=1
 
     # Add this dictionary into the local variables of the calling routine:
     # 1) from interactive sessions, f_locals from current frame is modified
@@ -55,6 +66,6 @@ def import_actor(actor_input):
     else:
         getmodule(stack()[1].frame).__dict__.update(dictactor)
 
-
+    return error
 
 

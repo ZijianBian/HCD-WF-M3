@@ -11,6 +11,7 @@ def hcd_wrapper(par_path):
   from developer_file import load_code_dependencies
   from check_for_dependencies import check_for_dependencies
   from bundle_copy import bundle_copy
+  from import_actor import import_actor
   import numpy as np
 
   # IMPORT PARAMETERS FROM THE XML PARAMETER FILE OF THE WORKFLOW  
@@ -59,20 +60,16 @@ def hcd_wrapper(par_path):
   out_l = []
 
   # LOOP OVER ALL SELECTED ACTORS
-  actor_path = os.path.join(os.getenv('ACTOR_POOL'),'imas/src/org/iter/imas/python')
   for name in list_of_actors:
-    try:
-      sys.path[:0] = [os.path.join(actor_path,name)]
-      globals()[name] = getattr(__import__(name), name)
-      parstr = globals()[name].__doc__
-      for iids in ids_list:
-        # APPEND ONLY IF THE IDS IS IN THE PARAMETERS STRING AND NOT ALREADY IN THE INPUT (OUTPUT) LIST
-        if parstr.find(':param '+iids) is not -1  and iids not in in_l:
-                in_l.append(iids)
-        if parstr.find(':param result: '+iids) is not -1 and iids not in out_l:
-                out_l.append(iids)
-    except:
-        print(name,' not found!')
+
+    import_actor(name)
+    parstr = globals()[name].__doc__
+    for iids in ids_list:
+      # APPEND ONLY IF THE IDS IS IN THE PARAMETERS STRING AND NOT ALREADY IN THE INPUT (OUTPUT) LIST
+      if parstr.find(':param '+iids) is not -1  and iids not in in_l:
+        in_l.append(iids)
+      if parstr.find(':param result: '+iids) is not -1 and iids not in out_l:
+        out_l.append(iids)
 
   # ALWAYS INCLUDE CORE_PROFILES IDS, SINCE IT IS USED AS A REFERENCE, EVEN WHEN IT IS NOT USED
   # IN A SPECIFIC H&CD CODES (LIKE E.G. WITH ICCOUP)
@@ -148,7 +145,8 @@ def hcd_wrapper(par_path):
     [err,n]=tmp.open_env(tmp_user_or_path,tmp_database,version,silent=True)
     if err != 0:
       exist = 'no'
-  tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tmp_database).ids_tmp
+  if ALEnv.itm_tmp==None: # Ensure that it is done only once
+    tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tmp_database).ids_tmp
 
   # TOTAL LIST OF IDSS TO BE READ FROM THE INPUT SCENARIO FOR H&CD CALCULATIONS
   ids_bundle_input = {'core_profiles':        input.core_profiles, 

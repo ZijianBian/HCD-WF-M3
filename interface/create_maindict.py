@@ -17,9 +17,10 @@ def create_maindict(default_workflow_parameters):
 
         in_l = []
         out_l = []
-        try:
 
-            import_actor(name)
+        err = import_actor(name)
+
+        if err == 0:
             parstr = globals()[name].__doc__
 
             for iids in ids_list:
@@ -27,9 +28,7 @@ def create_maindict(default_workflow_parameters):
                     in_l.append(iids)
                 if parstr.find(':param result: '+iids) is not -1:
                     out_l.append(iids)
-        except:
-            if name not in not_compiled_list: 
-                print('WARNING:', name, 'not found')
+        else:
             not_compiled_list.append(name)
 
         return(in_l, out_l)

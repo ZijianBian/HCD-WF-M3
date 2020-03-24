@@ -2,20 +2,15 @@ import os, imas, sys
 import generate_actors
 import auto_hcd_actors as actors
 from bundle_copy import bundle_copy
-
-# PATH TO FOLDER WHERE PYTHON ACTORS ARE AVAILABLE
-actor_path = os.path.join(os.getenv('ACTOR_POOL'), 'imas/src/org/iter/imas/python')
+from import_actor import import_actor
 
 # MERGERS EXECUTED LOCALLY IN HCD_WORKFLOW (ALL OTHER ACTORS ARE DEFINED IN AUTO_HCD_ACTORS)
 list_of_actors = ['merge_waves','merge_distributions','merge_distribution_sources','merge_core_sources']
 
 # IMPORT ALL ACTORS FROM THE MINIMUM LIST
 for name in list_of_actors:
-    try:
-        sys.path[:0] = [os.path.join(actor_path, name)]
-        globals()[name] = getattr(__import__(name), name)
-    except:
-        print(name, 'not found')
+
+    import_actor(name)
 
 # --------------------------------------------------------------------------------------------------------------------
 
