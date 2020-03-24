@@ -3,8 +3,6 @@ def hcd_wrapper(par_path):
   sys.path.append('interface')
   sys.path.append('workflow')
   sys.path.append(os.getcwd())
-  from pyal import ALEnv
-  from random import randint
   from hcd_workflow  import hcd_workflow
   from lxml import etree
   import xml.etree.ElementTree as ET
@@ -12,6 +10,7 @@ def hcd_wrapper(par_path):
   from check_for_dependencies import check_for_dependencies
   from bundle_copy import bundle_copy
   from import_actor import import_actor
+  from tmp_ids_storage import tmp_ids_storage
   import numpy as np
 
   # IMPORT PARAMETERS FROM THE XML PARAMETER FILE OF THE WORKFLOW  
@@ -136,17 +135,8 @@ def hcd_wrapper(par_path):
   output.create_env(output_user_or_path,output_database,version)
   idx_out = output.core_profiles.getPulseCtx()
 
-  # DEFINE THE SHOT/RUN NUMBERS AND LOCATION OF THE TEMPORARY FILE
-  exist = 'yes'
-  shot_tmp = 9988
-  while exist == 'yes':
-    run_tmp  = randint(0,9999)
-    tmp = imas.ids(shot_tmp,run_tmp,0,0)
-    [err,n]=tmp.open_env(tmp_user_or_path,tmp_database,version,silent=True)
-    if err != 0:
-      exist = 'no'
-  if ALEnv.itm_tmp==None: # Ensure that it is done only once
-    tmp_db = ALEnv(shot=shot_tmp, run_temp=run_tmp, machine_temp=tmp_database).ids_tmp
+  # SETUP ENVIRONMENT FOR TEMPORARY FILE
+  tmp_ids_storage()
 
   # TOTAL LIST OF IDSS TO BE READ FROM THE INPUT SCENARIO FOR H&CD CALCULATIONS
   ids_bundle_input = {'core_profiles':        input.core_profiles, 
