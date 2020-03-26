@@ -10,7 +10,6 @@ def hcd_wrapper(par_path):
   from check_for_dependencies import check_for_dependencies
   from bundle_copy import bundle_copy
   from import_actor import import_actor
-  from tmp_ids_storage import tmp_ids_storage
   import numpy as np
 
   # IMPORT PARAMETERS FROM THE XML PARAMETER FILE OF THE WORKFLOW  
@@ -134,9 +133,6 @@ def hcd_wrapper(par_path):
   output = imas.ids(param["shot_nr"], param["run_out"])
   output.create_env(output_user_or_path,output_database,version)
   idx_out = output.core_profiles.getPulseCtx()
-
-  # SETUP ENVIRONMENT FOR TEMPORARY FILE
-  tmp_ids_storage()
 
   # TOTAL LIST OF IDSS TO BE READ FROM THE INPUT SCENARIO FOR H&CD CALCULATIONS
   ids_bundle_input = {'core_profiles':        input.core_profiles, 
