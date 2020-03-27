@@ -24,7 +24,7 @@ module load lxml/4.2.0-intel-2018a-Python-3.6.4
 # Libraries needed for the compilation of the H&CD codes themselves
 module load FRUIT/3.4.3-intel-2018a-Ruby-2.5.1
 module load FRUIT_processor/3.4.3-intel-2018a-Ruby-2.5.1
-module load interpos/8.2.1-ifort
+module load INTERPOS/9.0.2-intel-2018a
 module load XMLlib/3.2.0-intel-2018a
 module load PSPLINE/20181008-intel-2018a
 module load PyAL/1.2.0-intel-2018a-Python-3.6.4
