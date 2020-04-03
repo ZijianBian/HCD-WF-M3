@@ -22,7 +22,7 @@
   <actor_selection display="ACTOR SELECTION">
     <systems>
       <ECRH>
-	<ec_wave_solver list="genray gray">2</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY-->
+	<ec_wave_solver list="genray gray grayscale">3</ec_wave_solver>         <!-- 0: none 1: GENRAY  2: GRAY 3: GRAY scaling based -->
 
       </ECRH>
 
