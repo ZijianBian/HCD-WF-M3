@@ -79,7 +79,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
     file.write('list_of_actors = ["'+'","'.join(list_of_actors)+\
                '", "empty_distribution_sources","empty_waves","empty_distributions","empty_core_sources","empty_core_profiles"]\n\n\n')
     file.write('for name in list_of_actors:\n')
-    file.write('   import_actor(name)\n')
+    file.write('   err = import_actor(name)\n')
         
     for proc in maindict:
         for sys in maindict[proc]:

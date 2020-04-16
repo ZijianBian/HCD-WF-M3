@@ -1,4 +1,4 @@
-import os, imas, sys
+=import os, imas, sys
 import generate_actors
 import auto_hcd_actors as actors
 from bundle_copy import bundle_copy
@@ -10,7 +10,7 @@ list_of_actors = ['merge_waves','merge_distributions','merge_distribution_source
 # IMPORT ALL ACTORS FROM THE MINIMUM LIST
 for name in list_of_actors:
 
-    import_actor(name)
+    err = import_actor(name)
 
 # --------------------------------------------------------------------------------------------------------------------
 

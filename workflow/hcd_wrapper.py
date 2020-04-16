@@ -60,7 +60,7 @@ def hcd_wrapper(par_path):
   # LOOP OVER ALL SELECTED ACTORS
   for name in list_of_actors:
 
-    import_actor(name)
+    err = import_actor(name)
     parstr = globals()[name].__doc__
     for iids in ids_list:
       # APPEND ONLY IF THE IDS IS IN THE PARAMETERS STRING AND NOT ALREADY IN THE INPUT (OUTPUT) LIST

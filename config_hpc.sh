@@ -5,7 +5,7 @@ module purge
 module load IMAS FC2K
 
 # Actor folder
-export ACTOR_FOLDER=~/public/imas_actors
+export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
 echo "H&CD actors taken from" $ACTOR_FOLDER
 
@@ -26,10 +26,11 @@ module load FRUIT/3.4.3-intel-2018a-Ruby-2.5.1
 module load FRUIT_processor/3.4.3-intel-2018a-Ruby-2.5.1
 module load INTERPOS/9.0.2-intel-2018a
 module load XMLlib/3.2.0-intel-2018a
-module load PSPLINE/20181008-intel-2018a
-module load PyAL/1.2.0-intel-2018a-Python-3.6.4
+module load PSPLINE/2.0.0-intel-2018a
+module load PyAL/1.3.1-intel-2018a-Python-3.6.4
 module load NAG/26-intel-2018a
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export PYTHONPATH=$HCD_FOLDER/tools:$PYTHONPATH
+export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
