@@ -114,15 +114,6 @@ def hcd_wrapper(par_path):
     print('-- Create local database for output file '+output_folder)
     os.makedirs(output_folder)
 
-  # FOR THE TEMPORARY FILE, ONLY THE DEFAULT USER_OR_PATH BASED ON USERNAME IS USED
-  # CLEVERLY CHOOSE 'TMP' FOR DATABASE NAME TO NEVER MIX TEMPORARY FILES WITH OTHERS
-  tmp_user_or_path = os.getenv('USER') # (PUTTING IT TO SOMETHING ELSE DOES NOT MAKE A DIFFERENCE)
-  tmp_database = 'tmp'
-  tmp_folder = os.getenv('HOME')+'/public/imasdb/'+tmp_database+'/3/0'
-  if os.path.isdir(tmp_folder) == False:
-    print('-- Create local database for tmp file '+tmp_folder)
-    os.makedirs(tmp_folder)
-
   # OPEN INPUT DATAFILE
   print('-- Open input and output file --')
   input = imas.ids(param['shot_nr'], param['run_in'])

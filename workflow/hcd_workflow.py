@@ -1,4 +1,4 @@
-=import os, imas, sys
+import os, imas, sys
 import generate_actors
 import auto_hcd_actors as actors
 from bundle_copy import bundle_copy
