@@ -3,16 +3,22 @@ def hcd_wrapper(par_path):
   sys.path.append('interface')
   sys.path.append('workflow')
   sys.path.append(os.getcwd())
-  from hcd_workflow  import hcd_workflow
   from lxml import etree
   import xml.etree.ElementTree as ET
-  from developer_file import load_code_dependencies
-  from check_for_dependencies import check_for_dependencies
-  from bundle_copy import bundle_copy
-  from import_actor import import_actor
+  from hcd_workflow             import hcd_workflow
+  from developer_file           import load_code_dependencies
+  from check_for_dependencies   import check_for_dependencies
+  from bundle_copy              import bundle_copy
+  from import_actor             import import_actor
+  from loadlist                 import loadlist
+  from create_dict_from_idslist import create_dict_from_idslist
   import numpy as np
 
-  # IMPORT PARAMETERS FROM THE XML PARAMETER FILE OF THE WORKFLOW  
+  ##################################################################
+
+  # --------------------------------------------------------------
+  # READ PARAMETERS FROM INPUT PARAMETER XML FILE OF THE WORKFLOW
+  # --------------------------------------------------------------
   tree = ET.parse(par_path+'/input_workflow.xml')
   root = tree.getroot()
 
@@ -29,6 +35,13 @@ def hcd_wrapper(par_path):
 
       param['input_path'] = par_path
 
+  ##################################################################
+
+  # -------------------------------------------------
+  # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
+  # -------------------------------------------------
+
+  # LIST OF SELECTED ACTORS
   if param['run_simpletrans'] == 1:
       list_of_actors = ['simpletrans']
   else:
@@ -40,68 +53,51 @@ def hcd_wrapper(par_path):
                list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
           
   if len(list_of_actors) == 0:
-     print('ERROR: no actors selected --> Heating & Current Drive workflow will not be executed')
+     print('ERROR: no actor selected --> The H&CD workflow will not be executed')
      return
 
-  # MAKE A LIST OF INPUT AND OUTPUT IDSS OF THE WHOLE WORKFLOW FROM THE LIST OF SELECTED ACTORS
-  ids_list = ['core_profiles',\
-              'core_sources',\
-              'equilibrium',\
-              'nbi',\
-              'ic_antennas',\
-              'ec_launchers',\
-              'wall',\
-              'distribution_sources',\
-              'distributions',\
-              'waves']
-  in_l  = []
-  out_l = []
-
-  # LOOP OVER ALL SELECTED ACTORS
+  # LOOP OVER ACTORS TO DEFINE LIST OF INPUT AND OUTPUT IDSS
+  ids_list = loadlist('ids_list')
+  in_l     = []
+  out_l    = []
   for name in list_of_actors:
-
     err = import_actor(name)
     parstr = globals()[name].__doc__
     for iids in ids_list:
       # APPEND ONLY IF THE IDS IS IN THE PARAMETERS STRING AND NOT ALREADY IN THE INPUT (OUTPUT) LIST
-      if parstr.find(':param '+iids) is not -1  and iids not in in_l:
+      if parstr.find(':param '+iids) is not -1 and iids not in in_l:
         in_l.append(iids)
       if parstr.find(':param result: '+iids) is not -1 and iids not in out_l:
         out_l.append(iids)
 
-  # ALWAYS INCLUDE CORE_PROFILES IDS, SINCE IT IS USED AS A REFERENCE, EVEN WHEN IT IS NOT USED
-  # IN A SPECIFIC H&CD CODES (LIKE E.G. WITH ICCOUP)
+  # ALWAYS INCLUDE CORE_PROFILES IDS, SINCE IT IS USED AS A REFERENCE
   if not 'core_profiles' in in_l:
       in_l.append('core_profiles')
 
   # CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
   check_for_dependencies(root, dependencies)
+  
+  ##################################################################
 
-  # ------------------------------------------------------------------------
-  # IDS BUNDLES
-  # BUNDLING THE IDSS MAKES IT EASIER TO PASS THEM AROUND BETWEEN THE ACTORS
-  # IDS_BUNDLE_INPUT:  IDSS FROM THE INPUT DATABASE
-  # IDS_BUNDLE_WORK:   IDSS OF THE CURRENT TIMESTEP IN THE WORKFLOW
-  # IDS_BUNDLE_OUTPUT: IDSS FOR THE OUTPUT DATABASE
-  # ------------------------------------------------------------------------
+  # -------------------------------------
+  # INPUT AND OUTPUT DATABASE MANAGEMENT
+  # -------------------------------------
 
-  # IMAS DB VERSION
+   # IMAS DB VERSION
   version = os.getenv('IMAS_VERSION')[0]
 
-  # INPUT DB ENVIRONMENT
-  input_user_or_path = param['input_user_or_path']
-  input_database     = param['input_database']
-
-  # OUTPUT DB ENVIRONMENT
+  # INPUT AND OUTPUT DB ENVIRONMENT
+  input_user_or_path  = param['input_user_or_path']
+  input_database      = param['input_database']
   output_user_or_path = param['output_user_or_path']
   output_database     = param['output_database']
 
-  # DEFAULT OUTPUT USER_OR_PATH NAME IS ENVIRONMENT VARIABLE $USER
+  # DEFAULT OUTPUT USER_OR_PATH IS $USER
   if output_user_or_path=='default':
     output_user_or_path = os.getenv('USER')
 
-  # DEFAULT LOCAL DATABASE NAME IS THE SAME AS THE INPUT ONE
+  # DEFAULT OUTPUT LOCAL DB NAME IS EQUAL TO THE INPUT ONE
   if output_database=='default':
     output_database = input_database
 
@@ -125,34 +121,31 @@ def hcd_wrapper(par_path):
   output.create_env(output_user_or_path,output_database,version)
   idx_out = output.core_profiles.getPulseCtx()
 
-  # TOTAL LIST OF IDSS TO BE READ FROM THE INPUT SCENARIO FOR H&CD CALCULATIONS
-  ids_bundle_input = {'core_profiles':        input.core_profiles, 
-                      'core_sources':         input.core_sources,
-                      'equilibrium':          input.equilibrium, 
-                      'nbi':                  input.nbi, 
-                      'ic_antennas':          input.ic_antennas, 
-                      'ec_launchers':         input.ec_launchers, 
-                      'wall':                 input.wall, 
-                      'distribution_sources': input.distribution_sources, 
-                      'distributions':        input.distributions,
-                      'waves':                input.waves}
+  ##################################################################
 
-  # TOTAL LIST OF IDSS TO BE WRITTEN AS AN OUTPUT
-  ids_bundle_output = {'core_profiles':       output.core_profiles, 
-                      'core_sources':         output.core_sources,
-                      'equilibrium':          output.equilibrium, 
-                      'nbi':                  output.nbi, 
-                      'ic_antennas':          output.ic_antennas, 
-                      'ec_launchers':         output.ec_launchers, 
-                      'wall':                 output.wall, 
-                      'distribution_sources': output.distribution_sources, 
-                      'distributions':        output.distributions,
-                      'waves':                output.waves}
+  # ------------------
+  # BUNDLE MANAGEMENT
+  # ------------------
+  # BUNDLING THE IDSS MAKES IT EASIER TO PASS THEM BETWEEN ACTORS
+  # IDS_BUNDLE_INPUT:  IDSS FROM THE INPUT DATABASE
+  # IDS_BUNDLE_WORK:   IDSS OF THE CURRENT TIMESTEP IN THE WORKFLOW
+  # IDS_BUNDLE_OUTPUT: IDSS FOR THE OUTPUT DATABASE
+  # ----------------------------------------------------------------
 
-  # FOR TIME REFERENCE
+  # TOTAL LIST OF INPUT AND OUTPUT IDSS FOR H&CD CALCULATIONS
+  ids_bundle_input  = create_dict_from_idslist(ids_list,input)
+  ids_bundle_output = create_dict_from_idslist(ids_list,output)
+
+  ##################################################################
+
+  # -----------------------------------------
+  # PREPARE THE TIME RANGE FOR THE TIME LOOP
+  # -----------------------------------------
+
+  # INPUT TIME ARRAY
   time_array = ids_bundle_input['core_profiles'].partialGet('time')
 
-  # CHECK & ADJUST TIME TO CORE_PROFILES IF NECESSARY
+  # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
   if param['tbegin'] < 0:
       param['tbegin'] = time_array[0]
       print('Initial time tbegin set to core_profiles first time slice. tbegin = ', param['tbegin'])
@@ -169,15 +162,15 @@ def hcd_wrapper(par_path):
      print('ERROR: tend out of range  ('+str(param['tend'])+ 's is greater than last time in core_profiles)')
      return
 
+  ##################################################################
+
+  #-----------------
+  # BEGIN TIME LOOP 
+  #-----------------
+
   print('---------------------------------------------')
   print('---- Enter time loop of the H&CD wrapper ----')
   
-  ########################################################################
-  #-----------------------------------------------------------------------
-  #                  BEGIN TIME LOOP 
-  #-----------------------------------------------------------------------
-  ########################################################################
-
   timenow = param['tbegin']
   nsteps  = int((param['tend']-param['tbegin'])/param['dt_required'])+1
   step = 0
