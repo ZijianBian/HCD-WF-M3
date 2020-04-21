@@ -2,27 +2,27 @@
 # PURPOSE: GENERATE THE AUTO_HCD_ACTORS PYTHON FILE
 #          ACCORDING TO THE ACTOR SELECTION FROM THE GUI
 # -------------------------------------------------------
-import os, imas,sys,copy
+import os,imas,sys,copy
 import lxml
 from lxml import etree
-import check_for_mpi as cfmpi
+import check_for_mpi
 from developer_file import load_add_arg
-from import_actor import import_actor
+from import_actor   import import_actor
+from loadlist       import loadlist
 
-tree = etree.parse('input_workflow_default.xml')
-root = tree.getroot()
-maindict = {}
-
-ids_list = ['core_profiles','core_sources','equilibrium', 'pulse_schedule', 'nbi', 'ic_antennas', 'ec_launchers','wall', 'distribution_sources', 'distributions', 'waves']
-
-add_arg = load_add_arg()
-
-list_of_actors = []
+tree                      = etree.parse('input_workflow_default.xml')
+root                      = tree.getroot()
+maindict                  = {}
+ids_list                  = loadlist('ids_list')
+merge_actor_list          = loadlist('merge_actor_list')
+empty_actor_list          = loadlist('empty_actor_list')
+add_arg                   = load_add_arg()
+list_of_actors            = []
 list_of_uncompiled_actors = []
 
 # ----------------------------------------------------------------------
 def read_inputoutput(name):
-    in_l = []
+    in_l  = []
     out_l = []
 
     err = import_actor(name)
@@ -76,8 +76,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
 
     file.write('import os, imas, sys, copy\n')
     file.write('from import_actor import import_actor\n\n')
-    file.write('list_of_actors = ["'+'","'.join(list_of_actors)+\
-               '", "empty_distribution_sources","empty_waves","empty_distributions","empty_core_sources","empty_core_profiles"]\n\n\n')
+    file.write('list_of_actors = ["'+'","'.join(list_of_actors+empty_actor_list)+'"]\n\n\n')
     file.write('for name in list_of_actors:\n')
     file.write('   err = import_actor(name)\n')
         
@@ -115,7 +114,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                             first_in = False
 
                         libmpi_path = eval(code+'.location')+'/native_wrapper/lib/lib'+code+'.so'
-                        if cfmpi.is_compiled_for_mpi(libmpi_path, 'libmpi'):
+                        if check_for_mpi.is_compiled_for_mpi(libmpi_path, 'libmpi'):
                             if cat == 'nbi_fp':
                                 file.write(',  "mpi_local", mpi_processes=parameters["nproc_ion_fp"]')
                             else:
