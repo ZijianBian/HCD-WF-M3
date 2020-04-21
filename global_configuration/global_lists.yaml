@@ -17,21 +17,12 @@ actor_list:
     ascot4serial 
     bbnbi 
     Cyrano 
-    empty_distribution_sources 
-    empty_waves 
-    empty_distributions 
-    empty_core_sources 
-    empty_core_profiles
     genray 
     gray 
     hcd2core_sources 
     hcd2core_profiles  
     iccoup 
     lion 
-    merge_waves
-    merge_distributions
-    merge_distribution_sources
-    merge_core_sources
     nemo 
     pion 
     risk 

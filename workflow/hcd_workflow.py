@@ -1,14 +1,15 @@
 import os, imas, sys
 import generate_actors
 import auto_hcd_actors as actors
-from bundle_copy import bundle_copy
+from bundle_copy  import bundle_copy
 from import_actor import import_actor
+from loadlist     import loadlist
 
 # MERGERS EXECUTED LOCALLY IN HCD_WORKFLOW (ALL OTHER ACTORS ARE DEFINED IN AUTO_HCD_ACTORS)
-list_of_actors = ['merge_waves','merge_distributions','merge_distribution_sources','merge_core_sources']
+merge_actor_list = loadlist('merge_actor_list')
 
 # IMPORT ALL ACTORS FROM THE MINIMUM LIST
-for name in list_of_actors:
+for name in merge_actor_list:
 
     err = import_actor(name)
 
