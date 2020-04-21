@@ -13,18 +13,35 @@ def create_maindict(default_workflow_parameters):
         from hcd_tools import loadlist
         ids_list = loadlist('ids_list')
         input_ids_list  = []
+        input_arg_list  = []
         output_ids_list = []
         err = import_actor(name)
         if err == 0:
             parstr = globals()[name].__doc__
-            for iids in ids_list:
-                if parstr.find(':param '+iids) is not -1:
-                    input_ids_list.append(iids)
-                if parstr.find(':param result: '+iids) is not -1:
-                    output_ids_list.append(iids)
+
+            for elem in parstr.split('\n'):
+            
+                for iids in ids_list:
+                    if elem.find(':param '+iids) is not -1:
+                        input_ids_list.append(iids)
+                        input_arg_list.append(iids)
+                        break
+                    elif elem.find('integ') is not -1:
+                        input_arg_list.append('add_arg')
+                        break
+                    elif elem.find('doub') is not -1:
+                        input_arg_list.append('add_arg')
+                        break
+                    elif elem.find('codeparam') is not -1:
+                        input_arg_list.append('codeparam')
+                        break
+                    elif elem.find(':param result: ') is not -1 \
+                         and elem.find(iids) is not -1:
+                        output_ids_list.append(iids)
+
         return(input_ids_list,output_ids_list,err)
 
-    # READ THE ACTOR_SELECTION STRUCTURE OF PARAMETERS FROM THE WORKFLOW INPUT XML FILE
+    # READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
     tree = etree.parse(default_workflow_parameters)
     root = tree.getroot()
     actor_selection = root[2]

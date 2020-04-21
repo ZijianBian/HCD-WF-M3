@@ -9,18 +9,10 @@ import check_for_mpi
 from developer_file import load_add_arg
 from hcd_tools import import_actor, loadlist
 
-tree                      = etree.parse('input_workflow_default.xml')
-root                      = tree.getroot()
-maindict                  = {}
-ids_list                  = loadlist('ids_list')
-merge_actor_list          = loadlist('merge_actor_list')
-empty_actor_list          = loadlist('empty_actor_list')
-add_arg                   = load_add_arg()
-list_of_actors            = []
-list_of_uncompiled_actors = []
-
 # ----------------------------------------------------------------------
 def read_inputoutput(name):
+
+    ids_list = loadlist('ids_list')
     in_l  = []
     out_l = []
 
@@ -48,14 +40,16 @@ def read_inputoutput(name):
                 and elem.find(iids) is not -1:
                     out_l.append(iids)
 
-        list_of_actors.append(name)
-        
-    else:
-        list_of_uncompiled_actors.append(name)
-
-    return(in_l, out_l)
+    return(in_l, out_l, err)
 # ----------------------------------------------------------------------
 
+# READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
+tree = etree.parse('input_workflow_default.xml')
+root = tree.getroot()
+actor_selection = root[2]
+
+list_of_actors = []
+maindict = {}
 for step in root[2]:
     dict3 = {}
     for isys in step:
@@ -64,13 +58,22 @@ for step in root[2]:
             dict1 = {}
             if icat.tag is not etree.Comment:
                 for icode in icat.attrib['list'].split():
-                    (in_l, out_l) = read_inputoutput(icode)
+                    (in_l, out_l, err) = read_inputoutput(icode)
+                    if err == 0:
+                        list_of_actors.append(icode)
                     dict1[icode] = [in_l, out_l]
                 dict2[icat.tag] = dict1
         dict3[isys.tag] = dict2
     maindict[step.tag] = dict3
 
+
 # GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
+
+ids_list         = loadlist('ids_list')
+merge_actor_list = loadlist('merge_actor_list')
+empty_actor_list = loadlist('empty_actor_list')
+add_arg          = load_add_arg()
+
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
     file.write('import os, imas, sys, copy\n')
