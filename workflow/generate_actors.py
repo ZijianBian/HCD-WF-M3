@@ -7,8 +7,7 @@ import lxml
 from lxml import etree
 import check_for_mpi
 from developer_file import load_add_arg
-from import_actor   import import_actor
-from loadlist       import loadlist
+from hcd_tools import import_actor, loadlist
 
 tree                      = etree.parse('input_workflow_default.xml')
 root                      = tree.getroot()
@@ -75,7 +74,7 @@ for step in root[2]:
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
     file.write('import os, imas, sys, copy\n')
-    file.write('from import_actor import import_actor\n\n')
+    file.write('from hcd_tools import import_actor\n\n')
     file.write('list_of_actors = ["'+'","'.join(list_of_actors+empty_actor_list)+'"]\n\n\n')
     file.write('for name in list_of_actors:\n')
     file.write('   err = import_actor(name)\n')

@@ -1,9 +1,7 @@
 import os, imas, sys
 import generate_actors
 import auto_hcd_actors as actors
-from bundle_copy  import bundle_copy
-from import_actor import import_actor
-from loadlist     import loadlist
+from hcd_tools import bundle_copy, import_actor, loadlist
 
 # MERGERS EXECUTED LOCALLY IN HCD_WORKFLOW (ALL OTHER ACTORS ARE DEFINED IN AUTO_HCD_ACTORS)
 merge_actor_list = loadlist('merge_actor_list')

@@ -13,8 +13,7 @@ from hover_class import *
 from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
-from import_actor import import_actor
-import pdb
+from hcd_tools import import_actor
 import argparse
 
 #---------------------------------------------------------------------------------------------

@@ -3,8 +3,7 @@ sys.path.append('interface')
 sys.path.append('workflow')
 sys.path.append(os.getcwd())
 from lxml import etree
-from import_actor import import_actor
-from loadlist import loadlist
+from hcd_tools import import_actor, loadlist
 
 def create_maindict(default_workflow_parameters):
     #---------------------------------------------------------------------------------------------

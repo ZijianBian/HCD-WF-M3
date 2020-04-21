@@ -5,13 +5,11 @@ def hcd_wrapper(par_path):
   sys.path.append(os.getcwd())
   from lxml import etree
   import xml.etree.ElementTree as ET
+  from hcd_tools import import_actor, loadlist, \
+    bundle_copy, create_dict_from_idslist
   from hcd_workflow             import hcd_workflow
   from developer_file           import load_code_dependencies
   from check_for_dependencies   import check_for_dependencies
-  from bundle_copy              import bundle_copy
-  from import_actor             import import_actor
-  from loadlist                 import loadlist
-  from create_dict_from_idslist import create_dict_from_idslist
   import numpy as np
 
   ##################################################################
