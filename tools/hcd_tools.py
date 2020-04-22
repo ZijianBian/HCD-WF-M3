@@ -2,12 +2,17 @@
 import imas, os, sys, yaml, inspect
 from importlib import import_module
 from inspect import getmodule,stack
+from lxml import etree
+
+# Private function to inspect the full path of the function
+def __foo():
+  pass
 
 #####################################################################################
 
-# -----------------------------------------------------------------------------------------
-# Private function used in import_actor, to add the actor folder to the path and import it
-# -----------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------
+# Function used in import_actor, to add the actor folder to the path and import it
+# ---------------------------------------------------------------------------------
 def __syspath_import_actor(actor_folder,actor_name):
 
     actor_function=[]
@@ -23,10 +28,12 @@ def __syspath_import_actor(actor_folder,actor_name):
         if os.path.isdir(os.path.join(actor_folder_name,f))][0]
 
     # Determine the actor location
-    if os.path.isfile(actor_folder_name+'/'+version+'/'+actor_name+'/'+'wrapper.py'): # Actors with version number
+    # 1) Actors with version number
+    if os.path.isfile(actor_folder_name+'/'+version+'/'+actor_name+'/'+'wrapper.py'): 
         actor_location = actor_folder_name+'/'+version+'/'+actor_name
         sys.path.insert(0,actor_folder_name+'/'+version)
-    else: # Actors without version number
+    # 2) Actors without version number
+    else:
         actor_location = actor_folder_name+'/'+actor_name
         sys.path.insert(0,actor_folder_name)
 
@@ -144,13 +151,6 @@ def bundle_copy(input_bundle,idslist=None):
 # lists used in many places of the H&CD workflow
 # -----------------------------------------------------
 
-# Load necessary modules
-import yaml, inspect, os
-
-# Private function to inspect the full path of the function
-def __foo():
-  pass
-
 # Create lists from the global configuration yaml file
 def loadlist(listname):
 
@@ -173,3 +173,98 @@ def loadlist(listname):
         output_list=[]
 
     return output_list
+
+#####################################################################################
+
+# ---------------------------------------------------------------------
+# Returns the input IDSs, input arguments, and output IDSs of an actor
+# ---------------------------------------------------------------------
+
+def read_actor_ids(name):
+    ids_list = loadlist('ids_list')
+    input_ids_list  = []
+    input_arg_list  = []
+    output_ids_list = []
+    err = import_actor(name)
+    if err == 0:
+        parstr = globals()[name].__doc__
+
+        for elem in parstr.split('\n'):
+
+            for iids in ids_list:
+                if elem.find(':param '+iids) is not -1:
+                    input_ids_list.append(iids)
+                    input_arg_list.append(iids)
+                    break
+                elif elem.find('integ') is not -1:
+                    input_arg_list.append('add_arg')
+                    break
+                elif elem.find('doub') is not -1:
+                    input_arg_list.append('add_arg')
+                    break
+                elif elem.find('codeparam') is not -1:
+                    input_arg_list.append('codeparam')
+                    break
+                elif elem.find(':param result: ') is not -1 \
+                     and elem.find(iids) is not -1:
+                    output_ids_list.append(iids)
+
+    return(input_ids_list,input_arg_list,output_ids_list,err)
+
+#####################################################################################
+
+#---------------------------------------------------------------------------------
+# Create a python dictionary (maindict) that contains the name of all H&CD codes,
+# their input & output IDSs, their category (ec_wavesolver, nbi_source, ..), 
+# and the H&CD system they belong to (EC, IC, NBI, nuclear)
+#---------------------------------------------------------------------------------
+def create_maindict(default_workflow_parameters,input_option):
+
+    path_file = os.path.abspath(inspect.getfile(__foo))
+    path = '/'.join(path_file.split('/')[:-1])
+
+    #import pdb
+    #pdb.set_trace()
+
+    # READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
+    tree = etree.parse(path+'/../'+default_workflow_parameters)
+    root = tree.getroot()
+    actor_selection = root[2]
+
+    # --------------------------------------------------------------------------------------------
+    # MAINDICT CONTAINS 2 MAIN KEYS:
+    # - SYSTEMS      --> 4 SYSTEMS: ECRH, ICRH, NBI, NUCLEAR              --> CATEGORIES: 
+    #                                                                         EC_WAVE_SOLVER, ETC.
+    # - POST_PROCESS --> 2 SYSTEMS: FILL_CORE_SOURCES, FILL_CORE_PROFILES --> CATEGORIES: 
+    #                                                                         SOURCE, PROFILES
+    # --------------------------------------------------------------------------------------------
+    # INSIDE EACH CATEGORY (EC_WAVE_SOLVER, IC_WAVE_SOLVER, IC_WAVE_FP, ...):
+    # - KEYS ARE ACTOR NAMES
+    # - VALUES ARE INPUT/OUTPUT IDSS
+    # --------------------------------------------------------------------------------------------
+    compiled_list = []
+    not_compiled_list = []
+    maindict = {}
+    for sub_structure in actor_selection:
+        dict_system = {}
+        for system in sub_structure:
+            dict_category = {}
+            for category in system:
+                dict_actor = {}
+                if category.tag is not etree.Comment:
+                    for actor_name in category.attrib['list'].split():
+                        (input_ids_list, input_arg_list, output_ids_list, err) = \
+                            read_actor_ids(actor_name)
+                        if err == 0:
+                            compiled_list.append(actor_name)
+                        else:
+                            not_compiled_list.append(actor_name)
+                        if input_option==1:
+                            dict_actor[actor_name] = [input_ids_list, output_ids_list]
+                        else:
+                            dict_actor[actor_name] = [input_arg_list, output_ids_list]
+                    dict_category[category.tag] = dict_actor
+            dict_system[system.tag] = dict_category
+        maindict[sub_structure.tag] = dict_system
+
+    return(maindict,compiled_list,not_compiled_list)

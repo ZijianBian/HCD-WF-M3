@@ -7,13 +7,13 @@ from tkinter import *
 from tkinter import filedialog, ttk
 from lxml import etree
 from datetime import datetime
-from create_maindict import create_maindict
+#from create_maindict import create_maindict
 from create_workflow_param import create_workflow_param_from_file
 from hover_class import *
 from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
-from hcd_tools import import_actor
+from hcd_tools import import_actor, create_maindict
 import argparse
 
 #---------------------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     ##  the name of all codes (nemo, bbnbi, ...),
     ##  their in & output IDSs, their category (ec_wavesolver, nbi_source, ..)
     ##  and the heating system they belong to (EC, IC, NBI, alpha)
-    (maindict, list_of_uncompiled_actors) = create_maindict(input_filepath)
+    (maindict, compiled_actors, uncompiled_actors) = create_maindict(input_filepath,1)
     workflow_param = create_workflow_param_from_file(input_filepath)
 
     ### setup
@@ -480,10 +480,10 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                     actor_name = list(maindict[actors_ref][hsys][cat].keys())[
                         int(workflow_param[cod_ref][cat])-1]
                     # get xml path from actor.py
-                    if actor_name in list_of_uncompiled_actors:
-                        print('ERROR: ', actor_name, ' is selected as an active actor, '
+                    if actor_name in uncompiled_actors:
+                        print('ERROR:', actor_name, 'is selected as an active actor, '
                               'but it has not been found. \n'
-                              'Please change your selection of actors or load',
+                              'Please change your actor selection or load',
                               actor_name, 'and try again')
                         return False
 

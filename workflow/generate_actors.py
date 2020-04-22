@@ -7,78 +7,23 @@ import lxml
 from lxml import etree
 import check_for_mpi
 from developer_file import load_add_arg
-from hcd_tools import import_actor, loadlist
+from hcd_tools import import_actor, loadlist, read_actor_ids, create_maindict
 
-# ----------------------------------------------------------------------
-def read_inputoutput(name):
-
-    ids_list = loadlist('ids_list')
-    in_l  = []
-    out_l = []
-
-    err = import_actor(name)
-
-    if err==0:
-        parstr = globals()[name].__doc__
-        
-        for elem in parstr.split('\n'):
-            
-            for iids in ids_list:
-                if elem.find(':param '+iids) is not -1:
-                    in_l.append(iids)
-                    break
-                elif elem.find('integ') is not -1:
-                    in_l.append('add_arg')
-                    break
-                elif elem.find('doub') is not -1:
-                    in_l.append('add_arg')
-                    break
-                elif elem.find('codeparam') is not -1:
-                    in_l.append('codeparam')
-                    break
-                elif elem.find(':param result: ') is not -1 \
-                and elem.find(iids) is not -1:
-                    out_l.append(iids)
-
-    return(in_l, out_l, err)
-# ----------------------------------------------------------------------
-
-# READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
-tree = etree.parse('input_workflow_default.xml')
-root = tree.getroot()
-actor_selection = root[2]
-
-list_of_actors = []
-maindict = {}
-for step in root[2]:
-    dict3 = {}
-    for isys in step:
-        dict2 = {}
-        for icat in isys:
-            dict1 = {}
-            if icat.tag is not etree.Comment:
-                for icode in icat.attrib['list'].split():
-                    (in_l, out_l, err) = read_inputoutput(icode)
-                    if err == 0:
-                        list_of_actors.append(icode)
-                    dict1[icode] = [in_l, out_l]
-                dict2[icat.tag] = dict1
-        dict3[isys.tag] = dict2
-    maindict[step.tag] = dict3
+# CREATE THE DICTIONARY CONTAINING THE WHOLE ACTOR INFORMATION
+# (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
+(maindict, compiled_actors, uncompiled_actors) = create_maindict('input_workflow_default.xml',2)
 
 
 # GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
-
 ids_list         = loadlist('ids_list')
 merge_actor_list = loadlist('merge_actor_list')
 empty_actor_list = loadlist('empty_actor_list')
 add_arg          = load_add_arg()
-
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
     file.write('import os, imas, sys, copy\n')
     file.write('from hcd_tools import import_actor\n\n')
-    file.write('list_of_actors = ["'+'","'.join(list_of_actors+empty_actor_list)+'"]\n\n\n')
+    file.write('list_of_actors = ["'+'","'.join(compiled_actors+empty_actor_list)+'"]\n\n\n')
     file.write('for name in list_of_actors:\n')
     file.write('   err = import_actor(name)\n')
         
@@ -90,6 +35,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                 i = 0
                 
                 for code in maindict[proc][sys][cat]:
+                    err = import_actor(code)
                     add_arg_nr = 0
                     i +=1 
                     if i == 1:
