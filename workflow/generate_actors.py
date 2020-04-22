@@ -2,17 +2,12 @@
 # PURPOSE: GENERATE THE AUTO_HCD_ACTORS PYTHON FILE
 #          ACCORDING TO THE ACTOR SELECTION FROM THE GUI
 # -------------------------------------------------------
-import os,imas,sys,copy
-import lxml
-from lxml import etree
-import check_for_mpi
 from developer_file import load_add_arg
-from hcd_tools import import_actor, loadlist, read_actor_ids, create_maindict
+from hcd_tools import import_actor, loadlist, read_actor_ids, create_maindict, is_compiled_for_mpi
 
-# CREATE THE DICTIONARY CONTAINING THE WHOLE ACTOR INFORMATION
+# CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
 # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
 (maindict, compiled_actors, uncompiled_actors) = create_maindict('input_workflow_default.xml',2)
-
 
 # GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
 ids_list         = loadlist('ids_list')
@@ -21,7 +16,6 @@ empty_actor_list = loadlist('empty_actor_list')
 add_arg          = load_add_arg()
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
-    file.write('import os, imas, sys, copy\n')
     file.write('from hcd_tools import import_actor\n\n')
     file.write('list_of_actors = ["'+'","'.join(compiled_actors+empty_actor_list)+'"]\n\n\n')
     file.write('for name in list_of_actors:\n')
@@ -42,7 +36,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                         file.write('   if parameters["'+cat +'"] == '+str(i)+':\n')
                     else: 
                         file.write('   elif parameters["'+cat +'"] == '+str(i)+':\n')
-                    file.write('       print("--'+code.upper()+'--")\n')
+                    file.write('       print("-- '+code.upper()+' --")\n')
                     if len(maindict[proc][sys][cat][code][1]) > 0:
                         output_ids_list = maindict[proc][sys][cat][code][1]
                         file.write('       '+",".join(str(x)+'_temp' for x in output_ids_list)+' = '+code+'(')
@@ -62,7 +56,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                             first_in = False
 
                         libmpi_path = eval(code+'.location')+'/native_wrapper/lib/lib'+code+'.so'
-                        if check_for_mpi.is_compiled_for_mpi(libmpi_path, 'libmpi'):
+                        if is_compiled_for_mpi(libmpi_path, 'libmpi'):
                             if cat == 'nbi_fp':
                                 file.write(',  "mpi_local", mpi_processes=parameters["nproc_ion_fp"]')
                             else:

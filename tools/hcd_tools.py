@@ -3,6 +3,7 @@ import imas, os, sys, yaml, inspect
 from importlib import import_module
 from inspect import getmodule,stack
 from lxml import etree
+from subprocess import Popen, PIPE
 
 # Private function to inspect the full path of the function
 def __foo():
@@ -268,3 +269,28 @@ def create_maindict(default_workflow_parameters,input_option):
         maindict[sub_structure.tag] = dict_system
 
     return(maindict,compiled_list,not_compiled_list)
+
+#####################################################################################
+
+# ------------------------------------------------------------------------
+# Set of functions to check if an actor has been compiled with MPI or not
+# ------------------------------------------------------------------------
+def __get_result(p):
+    stdout = p.communicate()
+    for s in stdout:
+        if len(s) is not 0:
+            res = True
+        elif len(s) is 0:
+            res = False
+        break
+    return(res)
+        
+def __run_cmd(cmd):
+    p = Popen(cmd, shell = True, stdout = PIPE)
+    p.wait()
+    return __get_result(p)
+
+def is_compiled_for_mpi(file_path, grep_str):
+    cmd = 'ldd '+file_path + '| grep '+grep_str
+    return(__run_cmd(cmd))
+
