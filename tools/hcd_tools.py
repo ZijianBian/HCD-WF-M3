@@ -219,16 +219,10 @@ def read_actor_ids(name):
 # their input & output IDSs, their category (ec_wavesolver, nbi_source, ..), 
 # and the H&CD system they belong to (EC, IC, NBI, nuclear)
 #---------------------------------------------------------------------------------
-def create_maindict(default_workflow_parameters,input_option):
-
-    path_file = os.path.abspath(inspect.getfile(__foo))
-    path = '/'.join(path_file.split('/')[:-1])
-
-    #import pdb
-    #pdb.set_trace()
+def create_maindict(workflow_parameters,input_option):
 
     # READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
-    tree = etree.parse(path+'/../'+default_workflow_parameters)
+    tree = etree.parse(workflow_parameters)
     root = tree.getroot()
     actor_selection = root[2]
 

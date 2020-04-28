@@ -7,13 +7,13 @@ from tkinter import *
 from tkinter import filedialog, ttk
 from lxml import etree
 from datetime import datetime
-#from create_maindict import create_maindict
 from create_workflow_param import create_workflow_param_from_file
 from hover_class import *
 from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
 from hcd_tools import import_actor, create_maindict
+from inspect import getfile
 import argparse
 
 #---------------------------------------------------------------------------------------------
@@ -42,7 +42,6 @@ for systemname in root1[2][0]:
 
 copy2('input_workflow_default.xml', run_workflow_param_path, follow_symlinks=True)
 
-
 ## ------------------------------------------------------------------------------------------
 ## set a few standard colors to call later
 c1 = 'white'
@@ -64,8 +63,6 @@ if fontsize < 5:
     fontsize = 5
 
 window.option_add('*font', 'courier '+str(fontsize))
-
-
 window.title('HCD WORKFLOW')
 window.configure(bg=c1)
 
@@ -126,7 +123,9 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     ##  the name of all codes (nemo, bbnbi, ...),
     ##  their in & output IDSs, their category (ec_wavesolver, nbi_source, ..)
     ##  and the heating system they belong to (EC, IC, NBI, alpha)
-    (maindict, compiled_actors, uncompiled_actors) = create_maindict(input_filepath,1)
+    path_file = os.path.abspath(getfile(open_gui))
+    path = '/'.join(os.path.abspath(getfile(open_gui)).split('/')[:-1])+'/'
+    (maindict, compiled_actors, uncompiled_actors) = create_maindict(path+input_filepath,1)
     workflow_param = create_workflow_param_from_file(input_filepath)
 
     ### setup

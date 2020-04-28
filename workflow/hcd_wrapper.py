@@ -49,6 +49,12 @@ def hcd_wrapper(par_path):
       if elem.tag is not etree.Comment and len(elem)== 0:
           if int(elem.text) is not 0:
                list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
+
+
+  #from hcd_tools import create_maindict
+  #(maindict, compiled_actors, uncompiled_actors) = create_maindict(par_path+'/input_workflow.xml',1)
+  #import pdb
+  #pdb.set_trace()
           
   if len(list_of_actors) == 0:
      print('ERROR: no actor selected --> The H&CD workflow will not be executed')
