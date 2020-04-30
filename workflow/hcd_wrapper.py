@@ -5,8 +5,8 @@ def hcd_wrapper(par_path):
   sys.path.append(os.getcwd())
   from lxml import etree
   import xml.etree.ElementTree as ET
-  from hcd_tools import import_actor, loadlist, \
-    bundle_copy, create_dict_from_idslist
+  from hcd_tools import import_actor, loadlist, read_actor_ids, \
+    bundle_copy, create_dict_from_idslist, create_maindict
   from hcd_workflow             import hcd_workflow
   from developer_file           import load_code_dependencies
   from check_for_dependencies   import check_for_dependencies
@@ -50,33 +50,30 @@ def hcd_wrapper(par_path):
           if int(elem.text) is not 0:
                list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
 
-
-  #from hcd_tools import create_maindict
-  #(maindict, compiled_actors, uncompiled_actors) = create_maindict(par_path+'/input_workflow.xml',1)
-  #import pdb
-  #pdb.set_trace()
+  # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
+  # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
+  (maindict, compiled_actors, uncompiled_actors) = create_maindict(par_path+'/input_workflow.xml',1)
           
   if len(list_of_actors) == 0:
      print('ERROR: no actor selected --> The H&CD workflow will not be executed')
      return
 
-  # LOOP OVER ACTORS TO DEFINE LIST OF INPUT AND OUTPUT IDSS
-  ids_list = loadlist('ids_list')
-  in_l     = []
-  out_l    = []
+  # DEFINE THE TOTAL LIST OF INVOLVED INPUT AND OUTPUT IDSS ACCORDING TO THE ACTOR SELECTION
+  input_ids_list  = []
+  output_ids_list = []
   for name in list_of_actors:
-    err = import_actor(name)
-    parstr = globals()[name].__doc__
-    for iids in ids_list:
-      # APPEND ONLY IF THE IDS IS IN THE PARAMETERS STRING AND NOT ALREADY IN THE INPUT (OUTPUT) LIST
-      if parstr.find(':param '+iids) is not -1 and iids not in in_l:
-        in_l.append(iids)
-      if parstr.find(':param result: '+iids) is not -1 and iids not in out_l:
-        out_l.append(iids)
+    [single_input_ids_list,single_input_arg_list,single_output_ids_list,err] = read_actor_ids(name)
+    input_ids_list  = input_ids_list  + single_input_ids_list
+    output_ids_list = output_ids_list + single_output_ids_list
+  input_ids_list  = list(set(input_ids_list))
+  output_ids_list = list(set(output_ids_list))
+
+  # TOTAL LIST OF INVOLVED IDSS ACCORDING TO THE ACTOR SELECTION
+  ids_list = list(set(input_ids_list+output_ids_list))
 
   # ALWAYS INCLUDE CORE_PROFILES IDS, SINCE IT IS USED AS A REFERENCE
-  if not 'core_profiles' in in_l:
-      in_l.append('core_profiles')
+  if not 'core_profiles' in input_ids_list:
+      input_ids_list.append('core_profiles')
 
   # CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
@@ -189,7 +186,7 @@ def hcd_wrapper(par_path):
       print('dt   = %5.2f' % param['dt_required'], 's')
 
       # READ ALL INPUT IDSS FOR THE CURRENT TIME SLICE
-      for elem in in_l:
+      for elem in input_ids_list:
         print('  Get', elem)
         ids_bundle_input[elem].getSlice(timenow,1)
 
@@ -197,9 +194,9 @@ def hcd_wrapper(par_path):
       # WHEN IT IS NOT THE FIRST TIME SLICE: COPY ONLY IDSS WHICH ARE NO OUTPUT OF H&CD ACTORS
       # EXCEPTION: CORE_PROFILES TO ALWAYS BE READ EVEN IF IT IS AN OUTPUT OF HCD2CORE_PROFILES
       if timenow == param['tbegin']:
-        ids_bundle_work = bundle_copy(ids_bundle_input,in_l)
+        ids_bundle_work = bundle_copy(ids_bundle_input,input_ids_list)
       else:
-        list_to_get = [value for value in in_l if (value not in out_l or value =='core_profiles')] 
+        list_to_get = [value for value in input_ids_list if (value not in output_ids_list or value =='core_profiles')] 
         ids_bundle_work.update(bundle_copy(ids_bundle_input,list_to_get))
 
       # ARTIFICIALLY REMOVE WARNINGS

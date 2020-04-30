@@ -119,10 +119,8 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
 
         pass
 
-    ##  create a python directory (maindict) that contains
-    ##  the name of all codes (nemo, bbnbi, ...),
-    ##  their in & output IDSs, their category (ec_wavesolver, nbi_source, ..)
-    ##  and the heating system they belong to (EC, IC, NBI, alpha)
+    # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
+    # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
     path_file = os.path.abspath(getfile(open_gui))
     path = '/'.join(os.path.abspath(getfile(open_gui)).split('/')[:-1])+'/'
     (maindict, compiled_actors, uncompiled_actors) = create_maindict(path+input_filepath,1)
