@@ -19,7 +19,7 @@ set PWD=`pwd`
 cp actor_install.py *.yml ${ACTOR_RELEASE_DIRECTORY}
 cd ${ACTOR_RELEASE_DIRECTORY}
 
-set actor_list=(core_sources_combiner cyrano gray hcd2core-profiles \
+set actor_list=(cyrano gray hcd2core-profiles \
   hcd2core-sources iccoup ids-tools lion risk spot stixredist ascot \
   tomcat nemo genray pion)
 
