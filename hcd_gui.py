@@ -12,7 +12,7 @@ from hover_class import *
 from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
 from simple_flowchart import make_flowchart
-from hcd_tools import import_actor, create_maindict
+from hcd_tools import import_actor, create_maindict, loadlist
 from inspect import getfile
 import argparse
 
@@ -67,6 +67,23 @@ window.title('HCD WORKFLOW')
 window.configure(bg=c1)
 
 def open_gui(input_filepath, norun, input_dir, output_dir):
+
+    # CHECK THAT MANDATORY ACTORS ARE THERE
+    merge_actor_list = loadlist('merge_actor_list')
+    empty_actor_list = loadlist('empty_actor_list')
+    err_global = 0
+    for actor in merge_actor_list:
+        err = import_actor(actor,1)
+        err_global = err_global + err
+    for actor in empty_actor_list:
+        err = import_actor(actor,1)
+        err_global = err_global + err
+    if err_global!=0:
+        print('---------------------------------------------')
+        print('One or more mandatory actor(s) not accessible')
+        print('--> Program stopped.')
+        print('---------------------------------------------')
+        return
 
     global run_config_folder_path
     global run_workflow_param_path
@@ -123,7 +140,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
     path_file = os.path.abspath(getfile(open_gui))
     path = '/'.join(os.path.abspath(getfile(open_gui)).split('/')[:-1])+'/'
-    (maindict, compiled_actors, uncompiled_actors) = create_maindict(path+input_filepath,1)
+    (maindict, compiled_actors, uncompiled_actors) = create_maindict(path+input_filepath,1,1)
     workflow_param = create_workflow_param_from_file(input_filepath)
 
     ### setup
@@ -331,7 +348,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                 dest_file = os.path.join(run_config_folder_path+'/'+hsys
                                          +'/input_'+actor_name+'.xml')
 
-                import_actor(actor_name)
+                import_actor(actor_name,0)
                 actor_python_folder = eval(actor_name+'.location')
                 found_xml = False
                 found_xsd = False
@@ -487,7 +504,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                     dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'
                                              +actor_name+'.xml')
                     if not os.path.exists(dest_file):
-                        import_actor(actor_name)
+                        import_actor(actor_name,0)
                         actor_python_folder = eval(actor_name+'.location')
                         #actor_python_folder = ACTOR_FOLDER+'/'+actor_name+'/'+actor_name
                         found_xml = False

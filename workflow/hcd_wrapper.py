@@ -52,7 +52,7 @@ def hcd_wrapper(par_path):
 
   # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
   # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-  (maindict, compiled_actors, uncompiled_actors) = create_maindict(par_path+'/input_workflow.xml',1)
+  (maindict, compiled_actors, uncompiled_actors) = create_maindict(par_path+'/input_workflow.xml',1,0)
           
   if len(list_of_actors) == 0:
      print('ERROR: no actor selected --> The H&CD workflow will not be executed')
@@ -62,7 +62,7 @@ def hcd_wrapper(par_path):
   input_ids_list  = []
   output_ids_list = []
   for name in list_of_actors:
-    [single_input_ids_list,single_input_arg_list,single_output_ids_list,err] = read_actor_ids(name)
+    [single_input_ids_list,single_input_arg_list,single_output_ids_list,err] = read_actor_ids(name,0)
     input_ids_list  = input_ids_list  + single_input_ids_list
     output_ids_list = output_ids_list + single_output_ids_list
   input_ids_list  = list(set(input_ids_list))
@@ -248,6 +248,9 @@ def hcd_wrapper(par_path):
 
       # CLEAN TO SAVE A BIT OF MEMORY
       del ids_bundle_output
+
+  input.close()
+  output.close()
 
   print('---------------------------------------------')
   print('End of H&CD workflow.')      
