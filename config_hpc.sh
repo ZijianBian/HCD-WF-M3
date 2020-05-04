@@ -31,6 +31,6 @@ module load PyAL/1.3.1-intel-2018a-Python-3.6.4
 module load NAG/26-intel-2018a
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
-HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export PYTHONPATH=$HCD_FOLDER/tools:$PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"

@@ -51,7 +51,7 @@ c4 = 'ghost white'
 c5 = 'azure4'
 cb = 'LavenderBlush3'
 
-default_workflow_param_path = 'input_workflow_default.xml'
+default_workflow_param_path = os.getenv('HCD_FOLDER')+'/input_workflow_default.xml'
 window = Tk()
 ## create mainwindow
 
@@ -99,7 +99,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
 
         print(filepath)
         if filepath is not ():
-            source_folder = filepath[:-19]
+            source_folder = "/".join(filepath.split('/')[0:-1])
 
             #    rmtree(run_config_folder_path)
             if source_folder.find(run_config_folder_path) is -1:
@@ -138,9 +138,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-    path_file = os.path.abspath(getfile(open_gui))
-    path = '/'.join(os.path.abspath(getfile(open_gui)).split('/')[:-1])+'/'
-    (maindict, compiled_actors, uncompiled_actors) = create_maindict(path+input_filepath,1,1)
+    (maindict, compiled_actors, uncompiled_actors) = create_maindict(input_filepath,1,1)
     workflow_param = create_workflow_param_from_file(input_filepath)
 
     ### setup
