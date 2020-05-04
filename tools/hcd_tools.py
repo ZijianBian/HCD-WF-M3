@@ -160,7 +160,7 @@ def loadlist(listname):
     path = '/'.join(path_file.split('/')[:-1])
 
     file = open(path+'/../global_configuration/'+'global_lists.yaml', 'r')
-    data = yaml.load(file)
+    data = yaml.load(file, Loader=yaml.CLoader)
 
     if listname=='ids_list':
         output_list = data['ids_list'].split(' ')
