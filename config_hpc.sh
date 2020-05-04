@@ -2,7 +2,7 @@
 module purge
 
 # IMAS and FC2K
-module load IMAS FC2K
+module load IMAS/3.28.0-4.7.2 FC2K/4.9.0
 
 # Actor folder
 export ACTOR_FOLDER=~/public/PYTHON_ACTORS
