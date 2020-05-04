@@ -210,7 +210,7 @@ for yml in args.yml:
         continue
 
     try:
-        desc = yaml.load(yml)
+        desc = yaml.load(yml, Loader=yaml.CLoader)
 
         if args.verbose:
             print(desc)
