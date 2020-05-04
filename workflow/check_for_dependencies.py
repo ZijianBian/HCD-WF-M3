@@ -14,7 +14,10 @@ def check_for_dependencies(root, dependencies):
     #import pdb
     #pdb.set_trace()
 
+    error = 0
+
     def check_if_code_fulfills_configuration(cat, code):
+            err = 0
             if dependencies[cat] is not None and code in dependencies[cat]:                 
                     fulfills_all_dependencies = [1] * (len(dependencies[cat][code]))
                     for dep in dependencies[cat][code]:
@@ -26,10 +29,15 @@ def check_for_dependencies(root, dependencies):
                             else:
                                 print('ERROR: this is not a valid configuration for '+code.upper()\
                                       + ', please change the actor selection and try again')
-                                return
+                                err = 1
+            return err
                                 
     for entry in codedict_names:
         if codedict_names is not None:
-            check_if_code_fulfills_configuration(entry, codedict_names[entry])
+            err = check_if_code_fulfills_configuration(entry, codedict_names[entry])
+            error = error + err
 
-    print('Selection fulfills all actor selection rules')
+    if error == 0:
+        print('Selection fulfills all actor selection rules')
+
+    return error

@@ -77,8 +77,10 @@ def hcd_wrapper(par_path):
 
   # CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
-  check_for_dependencies(root, dependencies)
-  
+  err = check_for_dependencies(root, dependencies)
+  if err != 0:
+    return
+
   ##################################################################
 
   # -------------------------------------
