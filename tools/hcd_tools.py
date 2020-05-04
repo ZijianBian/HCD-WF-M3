@@ -1,5 +1,5 @@
 # Load necessary modules
-import imas, os, sys, yaml, inspect
+import os, sys, yaml, inspect, imas
 from importlib import import_module
 from inspect import getmodule,stack
 from lxml import etree
@@ -14,7 +14,7 @@ def __foo():
 # ---------------------------------------------------------------------------------
 # Function used in import_actor, to add the actor folder to the path and import it
 # ---------------------------------------------------------------------------------
-def __syspath_import_actor(actor_folder,actor_name):
+def __syspath_import_actor(actor_folder,actor_name,verbose):
 
     actor_function=[]
     error = 0
@@ -22,7 +22,8 @@ def __syspath_import_actor(actor_folder,actor_name):
     # Folder where the actor is located
     actor_folder_name = actor_folder+"/"+actor_name
     if not os.path.isdir(actor_folder_name):
-        print('Actor '+actor_name+' not found.')
+        if verbose == 1:
+            print('Actor '+actor_name+' not found.')
         error = 1
         return actor_function,error
     version = [f for f in os.listdir(actor_folder_name) \
@@ -49,7 +50,7 @@ def __syspath_import_actor(actor_folder,actor_name):
 # -----------------------------
 # Function to import an actor
 # -----------------------------
-def import_actor(actor_input):
+def import_actor(actor_input,verbose):
 
     error=0
 
@@ -65,10 +66,10 @@ def import_actor(actor_input):
     # Import the actor(s) and put into a dictionary
     dictactor = {}
     if type(actor_input) is str:
-        dictactor[actor_input],error = __syspath_import_actor(ACTOR_FOLDER,actor_input)
+        dictactor[actor_input],error = __syspath_import_actor(ACTOR_FOLDER,actor_input,verbose)
     else:
         for actor_name in actor_input:
-            dictactor[actor_name],err = __syspath_import_actor(ACTOR_FOLDER,actor_name)
+            dictactor[actor_name],err = __syspath_import_actor(ACTOR_FOLDER,actor_name,verbose)
             if err==1:
                 error=1
 
@@ -159,7 +160,7 @@ def loadlist(listname):
     path = '/'.join(path_file.split('/')[:-1])
 
     file = open(path+'/../global_configuration/'+'global_lists.yaml', 'r')
-    data = yaml.load(file, Loader=yaml.CLoader)
+    data = yaml.load(file)
 
     if listname=='ids_list':
         output_list = data['ids_list'].split(' ')
@@ -181,12 +182,12 @@ def loadlist(listname):
 # Returns the input IDSs, input arguments, and output IDSs of an actor
 # ---------------------------------------------------------------------
 
-def read_actor_ids(name):
+def read_actor_ids(name,verbose):
     ids_list = loadlist('ids_list')
     input_ids_list  = []
     input_arg_list  = []
     output_ids_list = []
-    err = import_actor(name)
+    err = import_actor(name,verbose)
     if err == 0:
         parstr = globals()[name].__doc__
 
@@ -219,7 +220,7 @@ def read_actor_ids(name):
 # their input & output IDSs, their category (ec_wavesolver, nbi_source, ..), 
 # and the H&CD system they belong to (EC, IC, NBI, nuclear)
 #---------------------------------------------------------------------------------
-def create_maindict(workflow_parameters,input_option):
+def create_maindict(workflow_parameters,input_option,verbose):
 
     # READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
     tree = etree.parse(workflow_parameters)
@@ -249,7 +250,7 @@ def create_maindict(workflow_parameters,input_option):
                 if category.tag is not etree.Comment:
                     for actor_name in category.attrib['list'].split():
                         (input_ids_list, input_arg_list, output_ids_list, err) = \
-                            read_actor_ids(actor_name)
+                            read_actor_ids(actor_name,verbose)
                         if err == 0:
                             compiled_list.append(actor_name)
                         else:

@@ -9,7 +9,7 @@ merge_actor_list = loadlist('merge_actor_list')
 # IMPORT ALL ACTORS FROM THE MINIMUM LIST
 for name in merge_actor_list:
 
-    err = import_actor(name)
+    err = import_actor(name,0)
 
 # --------------------------------------------------------------------------------------------------------------------
 
