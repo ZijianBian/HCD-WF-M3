@@ -148,7 +148,13 @@ def hcd_wrapper(par_path):
   # -----------------------------------------
 
   # INPUT TIME ARRAY
-  time_array = ids_bundle_input['core_profiles'].partialGet('time')
+  try:
+    time_array = ids_bundle_input['core_profiles'].partialGet('time')
+  except:
+    print('  !!! Error while reading the core_profiles IDS: is it really present in the input file?', \
+          file=sys.stderr)
+    print('  ----> Aborted.', file=sys.stderr)
+    return
 
   # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
   if param['tbegin'] < 0:
@@ -192,7 +198,14 @@ def hcd_wrapper(par_path):
       # READ ALL INPUT IDSS FOR THE CURRENT TIME SLICE
       for elem in input_ids_list:
         print('  Get', elem)
-        ids_bundle_input[elem].getSlice(timenow,1)
+        try:
+          ids_bundle_input[elem].getSlice(timenow,1)
+        except:
+          print('  !!! Error while reading the '+elem+' IDS:', file=sys.stderr)
+          print('  ----> Check the Data Dictionary version between the input file and your IMAS version.', \
+                file=sys.stderr)
+          print('  ----> Aborted.', file=sys.stderr)
+          return
 
       # COPY THE INITIAL BUNDLE TO THE WORK BUNDLE
       # WHEN IT IS NOT THE FIRST TIME SLICE: COPY ONLY IDSS WHICH ARE NO OUTPUT OF H&CD ACTORS
