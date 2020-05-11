@@ -222,6 +222,12 @@ def read_actor_ids(name,verbose):
 #---------------------------------------------------------------------------------
 def create_maindict(workflow_parameters,input_option,verbose):
 
+    # MEMO: STRUCTURE OF THE INPUT XML FILE
+    # ROOT.ITER() = LOOP OVER ALL ELEMENTS OF THE INPUT XML FILE
+    # ROOT[0] = workflow_parameters
+    # ROOT[1] = further_settings
+    # ROOT[2] = actor_selection
+
     # READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
     tree = etree.parse(workflow_parameters)
     root = tree.getroot()
@@ -238,12 +244,13 @@ def create_maindict(workflow_parameters,input_option,verbose):
     # - KEYS ARE ACTOR NAMES
     # - VALUES ARE INPUT/OUTPUT IDSS
     # --------------------------------------------------------------------------------------------
+    code_selection = {}
     compiled_list = []
     not_compiled_list = []
     maindict = {}
-    for sub_structure in actor_selection:
+    for main_key in actor_selection:
         dict_system = {}
-        for system in sub_structure:
+        for system in main_key:
             dict_category = {}
             for category in system:
                 dict_actor = {}
@@ -259,11 +266,15 @@ def create_maindict(workflow_parameters,input_option,verbose):
                             dict_actor[actor_name] = [input_ids_list, output_ids_list]
                         else:
                             dict_actor[actor_name] = [input_arg_list, output_ids_list]
+                    if category.text is not '0':
+                      code_selection[category.tag] = category.attrib['list'].split(' ')[int(category.text)-1]
+                    else:
+                      code_selection[category.tag] = None
                     dict_category[category.tag] = dict_actor
             dict_system[system.tag] = dict_category
-        maindict[sub_structure.tag] = dict_system
+        maindict[main_key.tag] = dict_system
 
-    return(maindict,compiled_list,not_compiled_list)
+    return(maindict,compiled_list,not_compiled_list,code_selection)
 
 #####################################################################################
 
@@ -289,3 +300,42 @@ def is_compiled_for_mpi(file_path, grep_str):
     cmd = 'ldd '+file_path + '| grep '+grep_str
     return(__run_cmd(cmd))
 
+#####################################################################################
+
+# -------------------------------------------------------------------------
+# Check whether the dependencies are fulfilled in the actual actor section
+# -------------------------------------------------------------------------
+
+def check_for_dependencies(workflow_xml,dependencies):
+
+    def check_if_code_fulfills_configuration(dependencies, entry, code_selection):
+        err = 0
+        code = code_selection[entry]
+        if dependencies[entry] is not None and code in dependencies[entry]:                 
+            fulfills_all_dependencies = [1] * (len(dependencies[entry][code]))
+            for dep in dependencies[entry][code]:
+                for i in dep.keys():
+                    if 'any'in str(dep[i]) and code_selection[i] is not None:
+                        pass
+                    elif str(dep[i]).find(str(code_selection[i]))is not -1:
+                        pass
+                    else:
+                        print('ERROR: this is not a valid configuration for '+code.upper()\
+                                      + ', please change the actor selection and try again')
+                        err = 1
+        return err
+
+    # FIND THE ACTUAL ACTOR SELECTION
+    (maindict, compiled_actors, uncompiled_actors, code_selection) = create_maindict(workflow_xml,1,0)
+
+    # FOR EACH OF THE SELECTED ACTORS, CHECK THAT DEPENDENCY RULES ARE FULFILLED
+    global_error = 0
+    for entry in code_selection:
+        if code_selection is not None:
+            err = check_if_code_fulfills_configuration(dependencies, entry, code_selection)
+            global_error = global_error + err
+
+    if global_error == 0:
+        print('Selection fulfills all actor selection rules')
+
+    return global_error

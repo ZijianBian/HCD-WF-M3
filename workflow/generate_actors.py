@@ -7,7 +7,8 @@ from hcd_tools import import_actor, loadlist, read_actor_ids, create_maindict, i
 
 # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
 # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-(maindict, compiled_actors, uncompiled_actors) = create_maindict('input_workflow_default.xml',2,0)
+(maindict, compiled_actors, uncompiled_actors, code_selection) = \
+    create_maindict('input_workflow_default.xml',2,0)
 
 # GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
 empty_actor_list = loadlist('empty_actor_list')

@@ -14,7 +14,7 @@ def hcd_jintrac_interface(ids_bundle_input,hcd_path,hcd_xml_path):
   from lxml import etree
   import xml.etree.ElementTree as ET
   from developer_file import load_code_dependencies
-  from check_for_dependencies import check_for_dependencies
+  from hcd_tools import check_for_dependencies
   from bundle_copy import bundle_copy
   import numpy as np
 
@@ -49,7 +49,7 @@ def hcd_jintrac_interface(ids_bundle_input,hcd_path,hcd_xml_path):
 
   # CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
-  check_for_dependencies(root, dependencies)
+  check_for_dependencies(par_path+'/input_workflow.xml',dependencies)
 
   print('---- Call H&C workflow ----')
   

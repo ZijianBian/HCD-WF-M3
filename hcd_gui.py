@@ -138,7 +138,8 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-    (maindict, compiled_actors, uncompiled_actors) = create_maindict(input_filepath,1,1)
+    (maindict, compiled_actors, uncompiled_actors, code_selection) = \
+        create_maindict(input_filepath,1,1)
     workflow_param = create_workflow_param_from_file(input_filepath)
 
     ### setup

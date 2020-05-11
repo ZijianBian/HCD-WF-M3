@@ -6,10 +6,10 @@ def hcd_wrapper(par_path):
   from lxml import etree
   import xml.etree.ElementTree as ET
   from hcd_tools import import_actor, loadlist, read_actor_ids, \
-    bundle_copy, create_dict_from_idslist, create_maindict
-  from hcd_workflow             import hcd_workflow
-  from developer_file           import load_code_dependencies
-  from check_for_dependencies   import check_for_dependencies
+    bundle_copy, create_dict_from_idslist, create_maindict, \
+    check_for_dependencies
+  from hcd_workflow   import hcd_workflow
+  from developer_file import load_code_dependencies
   import numpy as np
 
   ##################################################################
@@ -17,7 +17,8 @@ def hcd_wrapper(par_path):
   # --------------------------------------------------------------
   # READ PARAMETERS FROM INPUT PARAMETER XML FILE OF THE WORKFLOW
   # --------------------------------------------------------------
-  tree = ET.parse(par_path+'/input_workflow.xml')
+  workflow_xml = par_path+'/input_workflow.xml'
+  tree = ET.parse(workflow_xml)
   root = tree.getroot()
 
   param = {}  
@@ -52,7 +53,8 @@ def hcd_wrapper(par_path):
 
   # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
   # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-  (maindict, compiled_actors, uncompiled_actors) = create_maindict(par_path+'/input_workflow.xml',1,0)
+  (maindict, compiled_actors, uncompiled_actors, code_selection) = \
+          create_maindict(workflow_xml,1,0)
           
   if len(list_of_actors) == 0:
      print('ERROR: no actor selected --> The H&CD workflow will not be executed')
@@ -77,7 +79,7 @@ def hcd_wrapper(par_path):
 
   # CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
   dependencies = load_code_dependencies()
-  err = check_for_dependencies(root, dependencies)
+  err = check_for_dependencies(workflow_xml,dependencies)
   if err != 0:
     return
 
