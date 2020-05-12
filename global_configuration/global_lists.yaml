@@ -54,11 +54,18 @@ dependencies:
    nbi_source: None
    nbi_fp:
        risk:
-          ic_wave_solver: any
           nbi_source: [nemo, bbnbi]
        spot:
-          nbi_source: [nemo]
+          nbi_source: [nemo, bbnbi]
    nuclear_source: None
    nuclear_fp: None
    fill_core_sources: None
    fill_core_profiles: None
+
+extra_arguments:
+   risk:   [dt_required]
+   spot:   [dt_required]
+   pion:   [tbegin,tend,dt_required]
+   iccoup: [ic_wave_nr_toroidal_modes]
+   bbnbi:  [fokker_flag]
+

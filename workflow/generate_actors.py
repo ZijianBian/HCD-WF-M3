@@ -2,7 +2,6 @@
 # PURPOSE: GENERATE THE AUTO_HCD_ACTORS PYTHON FILE
 #          ACCORDING TO THE ACTOR SELECTION FROM THE GUI
 # -------------------------------------------------------
-from developer_file import load_add_arg
 from hcd_tools import import_actor, loadlist, read_actor_ids, create_maindict, is_compiled_for_mpi
 
 # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
@@ -10,9 +9,11 @@ from hcd_tools import import_actor, loadlist, read_actor_ids, create_maindict, i
 (maindict, compiled_actors, uncompiled_actors, code_selection) = \
     create_maindict('input_workflow_default.xml',2,0)
 
+# LIST OF EMPTY ACTORS AND OF EXTRA (NON-IDS) ARGUMENTS FOR EACH ACTOR
+empty_actor_list    = loadlist('empty_actor_list')
+extra_argument_list = loadlist('extra_arguments')
+
 # GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
-empty_actor_list = loadlist('empty_actor_list')
-add_arg          = load_add_arg()
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
     file.write('from hcd_tools import import_actor\n\n')
@@ -29,7 +30,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                 
                 for code in maindict[proc][sys][cat]:
                     err = import_actor(code,0)
-                    add_arg_nr = 0
+                    extra_arg_nr = 0
                     i +=1 
                     if i == 1:
                         file.write('   if parameters["'+cat +'"] == '+str(i)+':\n')
@@ -45,10 +46,10 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                             if first_in == False:
                                 file.write(', ')
                             
-                            if ids_in.find('add_arg') is not -1\
-                               and add_arg.get(code) is not None:
-                                file.write('parameters["'+add_arg[code][add_arg_nr]+'"]')
-                                add_arg_nr += 1
+                            if ids_in.find('extra_argument_list') is not -1\
+                               and extra_argument_list.get(code) is not None:
+                                file.write('parameters["'+extra_argument_list[code][extra_arg_nr]+'"]')
+                                extra_arg_nr += 1
                             elif ids_in.find('codeparam') is not -1:
                                 file.write('(parameters["input_path"]+"/'\
                                            +sys+'/input_'+code+'.xml")')

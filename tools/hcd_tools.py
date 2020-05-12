@@ -172,6 +172,8 @@ def loadlist(listname):
         output_list = data['empty_actor_list'].split(' ')
     elif listname=='dependencies':
         output_list = data['dependencies']
+    elif listname=='extra_arguments':
+        output_list = data['extra_arguments']
     else:
         print('Error: bad listname in loadlist()')
         output_list=[]
@@ -201,10 +203,10 @@ def read_actor_ids(name,verbose):
                     input_arg_list.append(iids)
                     break
                 elif elem.find('integ') is not -1:
-                    input_arg_list.append('add_arg')
+                    input_arg_list.append('extra_argument_list')
                     break
                 elif elem.find('doub') is not -1:
-                    input_arg_list.append('add_arg')
+                    input_arg_list.append('extra_argument_list')
                     break
                 elif elem.find('codeparam') is not -1:
                     input_arg_list.append('codeparam')
