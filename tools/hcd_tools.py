@@ -170,6 +170,8 @@ def loadlist(listname):
         output_list = data['merge_actor_list'].split(' ')
     elif listname=='empty_actor_list':
         output_list = data['empty_actor_list'].split(' ')
+    elif listname=='dependencies':
+        output_list = data['dependencies']
     else:
         print('Error: bad listname in loadlist()')
         output_list=[]
@@ -306,27 +308,40 @@ def is_compiled_for_mpi(file_path, grep_str):
 # Check whether the dependencies are fulfilled in the actual actor section
 # -------------------------------------------------------------------------
 
-def check_for_dependencies(workflow_xml,dependencies):
+def check_for_dependencies(workflow_xml):
 
     def check_if_code_fulfills_configuration(dependencies, entry, code_selection):
         err = 0
         code = code_selection[entry]
+        if dependencies[entry] == 'None':
+          dependencies[entry] = None
         if dependencies[entry] is not None and code in dependencies[entry]:                 
-            fulfills_all_dependencies = [1] * (len(dependencies[entry][code]))
-            for dep in dependencies[entry][code]:
-                for i in dep.keys():
-                    if 'any'in str(dep[i]) and code_selection[i] is not None:
-                        pass
-                    elif str(dep[i]).find(str(code_selection[i]))is not -1:
-                        pass
-                    else:
-                        print('ERROR: this is not a valid configuration for '+code.upper()\
-                                      + ', please change the actor selection and try again')
-                        err = 1
+          fulfills_all_dependencies = [1] * (len(dependencies[entry][code]))
+          for dep in [dependencies[entry][code]]:
+            for i in dep.keys():
+              if 'any'in str(dep[i]) and code_selection[i] is not None:
+                pass
+              elif str(dep[i]).find(str(code_selection[i]))is not -1:
+                pass
+              else:
+                if str(dep[i]) == 'any':
+                  print('ERROR: '+code.upper()+' needs any code as '+str(i), file=sys.stderr)
+                else:
+                  if len(dep[i]) < 2:
+                    print('ERROR: '+code.upper()+' needs the '+str(dep[i][0]).upper()+' code as '+str(i), \
+                          file=sys.stderr)
+                  else:
+                    print('ERROR: '+code.upper()+' needs the '+ \
+                          ' or '.join(dep[i]).upper().replace('OR','or') \
+                          +' codes as '+str(i),file=sys.stderr)
+                err = 1
         return err
 
     # FIND THE ACTUAL ACTOR SELECTION
     (maindict, compiled_actors, uncompiled_actors, code_selection) = create_maindict(workflow_xml,1,0)
+
+    # LOAD THE LIST OF DEPENDENCIES BETWEEN THE CODES
+    dependencies = loadlist('dependencies')
 
     # FOR EACH OF THE SELECTED ACTORS, CHECK THAT DEPENDENCY RULES ARE FULFILLED
     global_error = 0
@@ -336,6 +351,8 @@ def check_for_dependencies(workflow_xml,dependencies):
             global_error = global_error + err
 
     if global_error == 0:
-        print('Selection fulfills all actor selection rules')
+        print('Selection fulfills all actor selection rules', file=sys.stderr)
+    else:
+        print('Please change the actor selection and try again.', file=sys.stderr)
 
     return global_error

@@ -9,7 +9,6 @@ def hcd_wrapper(par_path):
     bundle_copy, create_dict_from_idslist, create_maindict, \
     check_for_dependencies
   from hcd_workflow   import hcd_workflow
-  from developer_file import load_code_dependencies
   import numpy as np
 
   ##################################################################
@@ -64,9 +63,10 @@ def hcd_wrapper(par_path):
   input_ids_list  = []
   output_ids_list = []
   for name in list_of_actors:
-    [single_input_ids_list,single_input_arg_list,single_output_ids_list,err] = read_actor_ids(name,0)
-    input_ids_list  = input_ids_list  + single_input_ids_list
-    output_ids_list = output_ids_list + single_output_ids_list
+     [single_input_ids_list,single_input_arg_list,single_output_ids_list,err] = \
+         read_actor_ids(name,0)
+     input_ids_list  = input_ids_list  + single_input_ids_list
+     output_ids_list = output_ids_list + single_output_ids_list
   input_ids_list  = list(set(input_ids_list))
   output_ids_list = list(set(output_ids_list))
 
@@ -78,8 +78,7 @@ def hcd_wrapper(par_path):
       input_ids_list.append('core_profiles')
 
   # CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
-  dependencies = load_code_dependencies()
-  err = check_for_dependencies(workflow_xml,dependencies)
+  err = check_for_dependencies(workflow_xml)
   if err != 0:
     return
 
@@ -151,7 +150,7 @@ def hcd_wrapper(par_path):
   try:
     time_array = ids_bundle_input['core_profiles'].partialGet('time')
   except:
-    print('  !!! Error while reading the core_profiles IDS: is it really present in the input file?', \
+    print('  ERROR while reading the core_profiles IDS: is it really present in the input file?',\
           file=sys.stderr)
     print('  ----> Aborted.', file=sys.stderr)
     return
@@ -162,7 +161,8 @@ def hcd_wrapper(par_path):
       print('Initial time tbegin set to core_profiles first time slice. tbegin = ', param['tbegin'])
 
   if param['tbegin'] > 0 and param['tbegin'] < time_array[0]:
-     print('ERROR: tbegin out of range ('+str(param['tbegin'])+'s is less than first time in core_profiles)')
+     print('ERROR: tbegin out of range ('+str(param['tbegin'])\
+           +'s is less than first time in core_profiles)')
      return
 
   if param['tend'] < 0:
@@ -170,7 +170,8 @@ def hcd_wrapper(par_path):
       print('Final time tend set to core_profiles final time slice, tend = ', param['tend'])
 
   if param['tend'] > 0 and param['tend'] > time_array[-1]:
-     print('ERROR: tend out of range  ('+str(param['tend'])+ 's is greater than last time in core_profiles)')
+     print('ERROR: tend out of range  ('+str(param['tend'])\
+           + 's is greater than last time in core_profiles)')
      return
 
   ##################################################################
@@ -201,9 +202,9 @@ def hcd_wrapper(par_path):
         try:
           ids_bundle_input[elem].getSlice(timenow,1)
         except:
-          print('  !!! Error while reading the '+elem+' IDS:', file=sys.stderr)
-          print('  ----> Check the Data Dictionary version between the input file and your IMAS version.', \
-                file=sys.stderr)
+          print('  ERROR while reading the '+elem+' IDS:', file=sys.stderr)
+          print('  ----> Check the version of the Data Dictionary between the'+ \
+                ' input and the loaded IMAS version.',file=sys.stderr)
           print('  ----> Aborted.', file=sys.stderr)
           return
 

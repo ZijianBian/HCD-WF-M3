@@ -133,7 +133,6 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
         window.geometry("+%d+%d" %(wx, wy))
 
     except:
-
         pass
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
