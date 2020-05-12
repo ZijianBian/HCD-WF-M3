@@ -1,8 +1,5 @@
 def hcd_jintrac_interface(ids_bundle_input,hcd_path,hcd_xml_path):
-  import os,imas,sys
-  sys.path.append(hcd_path+'/interface')
-  sys.path.append(hcd_path+'/workflow')
-  sys.path.append(hcd_path)
+  import os
   print('Plugin routine hcd_jintrac_interface called, HCD path set as:',hcd_path)
 
   # SET HCD DIRECTORY AS WORKING DIRECTORY

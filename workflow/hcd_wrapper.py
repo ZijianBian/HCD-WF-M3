@@ -1,14 +1,11 @@
 def hcd_wrapper(par_path):
   import os,imas,sys
-  sys.path.append('interface')
-  sys.path.append('workflow')
-  sys.path.append(os.getcwd())
   from lxml import etree
   import xml.etree.ElementTree as ET
-  from hcd_tools import import_actor, loadlist, read_actor_ids, \
+  from hcd_tools import import_actor, read_actor_ids, \
     bundle_copy, create_dict_from_idslist, create_maindict, \
     check_for_dependencies
-  from hcd_workflow   import hcd_workflow
+  from hcd_workflow import hcd_workflow
   import numpy as np
 
   ##################################################################

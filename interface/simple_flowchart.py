@@ -1,19 +1,13 @@
-
-import sys 
-sys.path.append('interface')
 from tkinter import *
 from hover_class import *
-import os
-from datetime import datetime
 cb = 'LavenderBlush3'
 c_arr=['red', 'blue','yellow','green']
 mergec = ['red4', 'blue4', 'yellow4']
 
-
 def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  c1, c2, c3, c4, c5):
-#--------------------------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
     infolabelcolor = c2
 
     actors_ref = list(maindict.keys())[0]
@@ -21,7 +15,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     wfp_ref = list(workflow_param.keys())[0]
     cod_ref = list(workflow_param.keys())[2]
     
-
     def click_actors(l0, l1, l2, conn_list_cur, fr):
         if l1.grid_info():
             l1.grid_remove()
@@ -37,8 +30,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
         base.delete('all')
         for elem in conn_list:
             connect_labels(base, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5], elem[6])
-
-
 
     def click_labels(f_or_l, cur_label, cur_frame, base, conn_list):
         if 'l' in f_or_l:
@@ -56,12 +47,10 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
             base.rowconfigure(cur_frame.grid_info()['row'] +1, minsize = 20)
             cur_frame.grid_remove()
             
-
         base.delete('all')
         for elem in conn_list:
             base.update()
             connect_labels(base, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5], elem[6])
-
 
     def connect_labels(canvas, w1, dir1, w2, dir2, arrow_yn, l, nrl):
         canvas.update()
@@ -69,7 +58,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
         uly1  = w1.winfo_y()
         ulx2  = w2.winfo_x()
         uly2  = w2.winfo_y()
-
 
         def find_coord(dir, widget, l, nrl):
             if dir == 'n':
@@ -85,8 +73,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
                 l_x = widget.winfo_x()
                 l_y = widget.winfo_y() +( widget.winfo_height()/nrl)*(l - 0.5)
             return(l_x, l_y)
-
-
 
         (line_start_x, line_start_y) = find_coord(dir1, w1, l, nrl)
         (line_end_x,   line_end_y)   = find_coord(dir2, w2, l, nrl)
@@ -119,12 +105,10 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
                                line_end_x, line_end_y,
                                width = 2, arrow = arrow_yn, fill =c5)
 
-
-#--------------------------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
  
-
     base = Canvas(window, width = 100, height = 100, bg = c1)
     base.grid(row = 0, column = 2, sticky = 'news')
     base.rowconfigure(0, minsize = 30)
@@ -199,9 +183,8 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     finalla.bind('<Button-1>', lambda event: click_labels('l',  finalla, finalfr,  base, conn_list))
     finalfr.bind('<Button-1>', lambda event: click_labels('f',  finalla, finalfr, base, conn_list)) 
     finalfr.grid_remove()
-    
 
-    ## INITIALISE FRAME-----------------------------------------------------------------------------
+    ## INITIALISE FRAME----------------------------------------------------------------------------
 
     il = Label(initfr, text = 
                'reading input from database\n- shot:   '+ workflow_param[wfp_ref]['shot_nr']+  '\n- run:   '+ workflow_param[wfp_ref]['run_in']+'\n- machine:   '+ workflow_param[wfp_ref]['input_database']+' \n- start time:   '+ workflow_param[wfp_ref]['tbegin']+'s \n- timestep:   '+ workflow_param[wfp_ref]['dt_required']+'s \n- end time:   '+ workflow_param[wfp_ref]['tend']+'s', 
@@ -209,8 +192,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
 
     il.pack(side = TOP)
 
-
-    ## HCD FRAME------------------------------------------------------------------------------------
+    ## HCD FRAME-----------------------------------------------------------------------------------
     ccol = 1
     ccol_max = 0
     rrow_max = 0
@@ -250,10 +232,8 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
                     l2.grid(column = ccol, row = rrow+3, sticky = 'new')
                     l2.grid_remove()
                     
-                    
                     l0.bind('<Button-1>', lambda event, l0 = l0, l1= l1, l2 = l2: click_actors(l0,l1,l2, conn_list_hcd, hcdfr))
 
-                    
                     hcdfr.columnconfigure(ccol  , minsize = 127)
                     if ccol > 1:
                         hcdfr.columnconfigure(ccol-1, minsize = 20)
@@ -262,7 +242,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
 
                     rrow += 3
         
-                   
                     if rrow == 4:
                         conn_list_hcd.append([inv, 's', l0, 'n', True,1, 1])
                     else:
@@ -277,12 +256,10 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
   #  for il in range(isys):
         #conn_list.append([hcdla, 's', mergela, 'n', True, il,  isys+1])
 
-    
-
     for elem in conn_list_hcd:
         connect_labels(hcdfr, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5], elem[6])
             
-    # MERGER FRAME:------------------------------------------------------------------------------------
+    # MERGER FRAME:--------------------------------------------------------------------------------
     merge_distributions = 0
     merge_waves = 0
     merge_distribution_sources = 0
@@ -299,7 +276,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     inv_bot = Frame(mergefr, height = 1, width = 2, bg = c5 )
     inv_bot.grid(row = 50, column = 0, columnspan = 50)
     
-
     for hsys in maindict[actors_ref]:
         if sum([int(workflow_param[cod_ref][i]) for i in maindict[actors_ref][hsys]]) is not 0:
             isys +=1 
@@ -310,9 +286,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
             inv[hsys].grid(row = 1, column = ccol+1, sticky  = 'ew')
             ccol += 2
           
-
-
-
     labelrow = Frame(mergefr, bg = c1)
     labelrow.grid(row = 3, column = 1)
 
@@ -332,7 +305,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
                 if ''.join(maindict[actors_ref][hsys][cat][curval][1]).find('waves') is not -1:
                     merge_waves += 1
             
-
     no_merge_dist = False
     no_merge_sources = False
     no_merge_waves = False
@@ -345,9 +317,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
         minsize_row += 20
         conn_list_merge_bottom.append([mwave, inv_bot])
        
-
       #  mwave.bind('<Button-1>', lambda event:click_on_merge_label(mwave, mwave_descr))
-        
 
     else: 
         no_merge_waves = True
@@ -381,8 +351,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     else:
         no_merge_sources = True
     
-       
-    
     if no_merge_waves == True  and no_merge_sources == True and no_merge_dist == True: 
         l = Label(mergefr, text = 'no merges necessary', bg = infolabelcolor, padx = 4, pady = 4)
         l.grid(row = 3, column = 0 , columnspan = 30, sticky = 'ns')
@@ -405,9 +373,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     elif no_merge_sources == False and no_merge_dist == False:
         labelrow.columnconfigure(3, minsize = 40)
     
-
-
-
     def mergefr_draw_lines(inv_n, label_n, color_line):
         mergefr.update()
         labelrow.update()
@@ -423,8 +388,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
             mergefr.update()
             labelrow.update()
 
-            
-       
             line_start_x = label_n.winfo_x()+ label_n.winfo_width()/2  + labelrow.winfo_x()
             line_start_y = label_n.winfo_y() + labelrow.winfo_y()
             line_end_x   = inv_i.winfo_x()
@@ -433,45 +396,35 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
             dx = line_end_x - line_start_x
             dy = line_end_y - line_start_y
 
-
             mergefr.create_line(line_start_x, line_start_y,
                                 line_start_x, line_start_y + dy/2,
                                 line_end_x, line_start_y + dy/2,
                                 line_end_x, line_end_y,
                                 width = 2, arrow = None, fill =c5)
 
-
     def click_on_merge_label(l0, l0descr):
         
-
         if l0descr.grid_info():
             l0descr.grid_remove()
         else:
             l0descr.grid()
         mergefr.delete('all')
 
-            
         for elem in conn_list_merge:
             mergefr_draw_lines(elem[0], elem[1], elem[2])
 
         # --- draw the remaining lines
         
-
         for elem in conn_list_merge_others:
             connect_labels(mergefr, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5], elem[6])
 
         for elem in conn_list_merge_bottom:
             merge_bottom_lines(elem[0], elem[1])
 
-        
-
-
-
     for elem in conn_list_merge:
         mergefr_draw_lines(elem[0], elem[1], elem[2])
 
        # --- draw the remaining lines
-        
 
     for elem in conn_list_merge_others:
          connect_labels(mergefr, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5], elem[6])
@@ -479,20 +432,18 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     for elem in conn_list_merge_bottom:
         merge_bottom_lines(elem[0], elem[1])
 
-    #MAKE CORE IDS: ------------------------------------------------------------------------------------
+    #MAKE CORE IDS: -------------------------------------------------------------------------------
     isys = 0
     ccol = 1
     ccol_max = 0
     rrow_max = 0
     conn_list_core = []
 
-
     inv = Frame(corefr, height = 2, width = 2, bg = c5)
     inv.grid(row = 0, column = 0, columnspan = 50)
 
     bl = Frame(corefr, height = 1, width = 1,bg = c1)
     bl.grid(row = 50, column = 0, columnspan = 50, padx = 10)
-
 
     for hsys in maindict[make_core_ids_ref]:
    
@@ -506,7 +457,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
                     curval = list(maindict[make_core_ids_ref][hsys][cat])[int(workflow_param[cod_ref][cat])-1]
                     input_text = "\n - ".join([strv for strv in maindict[make_core_ids_ref][hsys][cat][curval][0]])
                     output_text = "\n - ".join([strv for strv in maindict[make_core_ids_ref][hsys][cat][curval][1]])
-
 
                     corefr.rowconfigure(rrow, minsize = 25)
 
@@ -522,10 +472,8 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
                     
                     rrow += 2
                     
-                    
                     corefr.columnconfigure(ccol  , minsize = 120)
                     corefr.columnconfigure(ccol+1, minsize = 30)
-            
 
                     l0.bind('<Button-1>', lambda event, l0 = l0, l1= l1, l2 = l2: click_actors(l0,l1,l2, conn_list_core, corefr))            
                     conn_list_core.append([inv, 's', l0, 'n', True, 1, 1])
@@ -533,7 +481,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
 
                     ccol += 2 
         
-
         corefr.rowconfigure(rrow, minsize = 20)
 
     corefr.columnconfigure(ccol-1, minsize = 0)
@@ -549,12 +496,10 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     
     for elem in conn_list_core:
         connect_labels(corefr, elem[0], elem[1], elem[2], elem[3], elem[4], elem[5], elem[6])
-    
 
     #TIME CONTROL BLOCK WINDOW
 
     conn_list_timec = []
-
 
     tcontfr.columnconfigure(1, minsize = 100)
     tcontfr.columnconfigure(2, minsize = 400)
@@ -577,11 +522,9 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     inv5 = Frame(tcontfr, height = 3, width = 3, bg = c5)
     inv5.grid(row = 1, column = 3, sticky = 'e')
 
-
     tla = Label(tcontfr, text = 'increase timestep \n test if workflow time is smaller than tend', bg = infolabelcolor, padx = 4, pady = 4)
     
     tla.grid(row = 1, column = 2)
-
 
     line_start_x = tla.winfo_x() + tla.winfo_width() 
     line_start_y  = tla.winfo_y() + tla.winfo_height()/2
@@ -594,7 +537,6 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     il = Label(finalfr, text = 
                'saving output to database\n- output run nr:   '+ workflow_param[wfp_ref]['run_out'], bg = infolabelcolor, padx = 4, pady = 4)
     il.pack(side = TOP)
-    
        
     ### CONNECT LINE BASELEVEL
     for elem in conn_list:

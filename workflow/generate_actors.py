@@ -2,7 +2,7 @@
 # PURPOSE: GENERATE THE AUTO_HCD_ACTORS PYTHON FILE
 #          ACCORDING TO THE ACTOR SELECTION FROM THE GUI
 # -------------------------------------------------------
-from hcd_tools import import_actor, loadlist, read_actor_ids, create_maindict, is_compiled_for_mpi
+from hcd_tools import import_actor, loadlist, create_maindict, is_compiled_for_mpi
 
 # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
 # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)

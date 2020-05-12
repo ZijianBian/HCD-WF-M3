@@ -1,7 +1,4 @@
 import os, sys, copy
-sys.path.append('interface')
-sys.path.append('workflow')
-sys.path.append(os.getcwd())
 
 from tkinter import *
 from tkinter import filedialog, ttk
