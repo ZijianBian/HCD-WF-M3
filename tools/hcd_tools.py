@@ -23,7 +23,7 @@ def __syspath_import_actor(actor_folder,actor_name,verbose):
     actor_folder_name = actor_folder+"/"+actor_name
     if not os.path.isdir(actor_folder_name):
         if verbose == 1:
-            print('Actor '+actor_name+' not found.')
+            print('Actor '+actor_name.upper()+' not found.')
         error = 1
         return actor_function,error
     version = [f for f in os.listdir(actor_folder_name) \
@@ -260,8 +260,12 @@ def create_maindict(workflow_parameters,input_option,verbose):
                 dict_actor = {}
                 if category.tag is not etree.Comment:
                     for actor_name in category.attrib['list'].split():
+                        if actor_name in not_compiled_list:
+                          verbose_eff = 0
+                        else:
+                          verbose_eff = verbose
                         (input_ids_list, input_arg_list, output_ids_list, err) = \
-                            read_actor_ids(actor_name,verbose)
+                            read_actor_ids(actor_name,verbose_eff)
                         if err == 0:
                             compiled_list.append(actor_name)
                         else:
@@ -277,6 +281,10 @@ def create_maindict(workflow_parameters,input_option,verbose):
                     dict_category[category.tag] = dict_actor
             dict_system[system.tag] = dict_category
         maindict[main_key.tag] = dict_system
+
+        # Remove duplicates
+        compiled_list     = list( dict.fromkeys(compiled_list) )
+        not_compiled_list = list( dict.fromkeys(not_compiled_list) )
 
     return(maindict,compiled_list,not_compiled_list,code_selection)
 
