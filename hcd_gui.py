@@ -31,6 +31,7 @@ except:
     sys.exit()
 
 #---------------------------------------------------------------------------------------------
+# Folder from which to find the compiled HCD actors
 
 if os.getenv('ACTOR_FOLDER') is None:
     print('ERROR: the environment variable ACTOR_FOLDER has not been set up')
@@ -38,26 +39,15 @@ if os.getenv('ACTOR_FOLDER') is None:
 else:
     ACTOR_FOLDER = os.getenv('ACTOR_FOLDER')
 
-# ---------------------------------------------------------------------------------------------
-# set the path to the folders where the configuration and codeparameters are stored
+# --------------------------------------------------------------------------------------------
+# Path to the default parameter file
 
-global run_config_folder_path
-run_config_folder_path = os.path.join(os.getcwd(), 'run_configurations/run_'
-                                      +datetime.now().strftime('%m%d_%H%M%S'))
+default_wf_param_file = os.getenv('HCD_FOLDER')+'/input_workflow_default.xml'
+root1 = etree.parse(default_wf_param_file).getroot()
 
-global run_workflow_param_path
-run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
+# --------------------------------------------------------------------------------------------
+# Colors to be used later
 
-root1 = etree.parse('input_workflow_default.xml').getroot()
-
-os.makedirs(run_config_folder_path)
-for systemname in root1[2][0]:
-    os.makedirs(run_config_folder_path+'/'+systemname.tag)
-
-copy2('input_workflow_default.xml', run_workflow_param_path, follow_symlinks=True)
-
-## ------------------------------------------------------------------------------------------
-## set a few standard colors to call later
 c1 = 'white'
 c2 = 'white smoke'
 c3 = 'azure2'
@@ -65,22 +55,35 @@ c4 = 'ghost white'
 c5 = 'azure4'
 cb = 'LavenderBlush3'
 
-default_workflow_param_path = os.getenv('HCD_FOLDER')+'/input_workflow_default.xml'
+# --------------------------------------------------------------------------------------------
+# Create the main window (define font, title and background colour)
 window = Tk()
-## create mainwindow
-
-fontsize = int(window.winfo_screenheight()/100)+3
-
+fontsize = int(window.winfo_screenheight()/100)+3 # Adjusted with screen size
 if fontsize > 14:
     fontsize = 14
 if fontsize < 5:
     fontsize = 5
-
-window.option_add('*font', 'courier '+str(fontsize))
+window.option_add('*font','courier '+str(fontsize))
 window.title('HCD WORKFLOW')
 window.configure(bg=c1)
 
-def open_gui(input_filepath, norun, input_dir, output_dir):
+def open_gui(wf_param_file, norun, input_dir, output_dir):
+
+    # ----------------------
+
+    # Define the current folder and current workflow parameter file
+    current_config_folder = os.path.join(os.getenv('HCD_FOLDER'),'data/run_'+datetime.now().strftime('D%d_M%m_Y%y_H%H%M%S'))
+    current_wf_param_file = current_config_folder+ '/input_workflow.xml'
+
+    # Create the current configuration folder and its sub-folders for each HCD process
+    os.makedirs(current_config_folder)
+    for systemname in root1[2][0]:
+        os.makedirs(current_config_folder+'/'+systemname.tag)
+
+    # Copy the default workflow parameter file into the current one
+    copy2(default_wf_param_file, current_wf_param_file,follow_symlinks=True)
+
+    # ----------------------
 
     # CHECK THAT MANDATORY ACTORS ARE THERE
     merge_actor_list = loadlist('merge_actor_list')
@@ -99,9 +102,6 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
         print('---------------------------------------------')
         return
 
-    global run_config_folder_path
-    global run_workflow_param_path
-
     def load_configuration_from_file(filepath):
         if 'input_workflow_default.xml' in filepath:
             print('if you want to load the default configuration '
@@ -110,31 +110,25 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
         elif 'input_workflow.xml' not in filepath:
             print('please choose an input_workflow.xml file')
             filepath = ()
-
         print(filepath)
         if filepath is not ():
             source_folder = "/".join(filepath.split('/')[0:-1])
-
-            #    rmtree(run_config_folder_path)
-            if source_folder.find(run_config_folder_path) is -1:
+            if source_folder.find(current_config_folder) is -1:
                 try:
-                    copytree(source_folder, run_config_folder_path)
+                    copytree(source_folder, current_config_folder)
                 except:
-                    rmtree(run_config_folder_path)
-                    copytree(source_folder, run_config_folder_path)
-
-                open_gui(run_config_folder_path+ '/input_workflow.xml', norun, None, None)
-
+                    rmtree(current_config_folder)
+                    copytree(source_folder, current_config_folder)
+                open_gui(current_config_folder+ '/input_workflow.xml', norun, None, None)
             else:
                 print('this folder is the current folder. '
                       'it is not possible to load the current configuration')
-
         else:
             print('no file selected')
 
     if output_dir is not None:
-        run_config_folder_path = output_dir
-        run_config_param_path = run_config_folder_path+ '/input_workflow.xml'
+        current_config_folder = output_dir
+        run_config_param_path = current_config_folder+ '/input_workflow.xml'
 
     if input_dir is not None:
         load_configuration_from_file(input_dir+ '/input_workflow.xml')
@@ -152,14 +146,14 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
     (maindict, compiled_actors, uncompiled_actors, code_selection) = \
-        create_maindict(input_filepath,1,1)
-    workflow_param = create_workflow_param_from_file(input_filepath)
+        create_maindict(wf_param_file,1,1)
+    workflow_param = create_workflow_param_from_file(wf_param_file)
 
     ### setup
-    if not os.path.exists(run_config_folder_path):
+    if not os.path.exists(current_config_folder):
         for systemname in maindict[list(maindict.keys())[0]]:
-            os.makedirs(run_config_folder_path+'/'+systemname)
-            copy2(input_filepath, run_workflow_param_path, follow_symlinks=True)
+            os.makedirs(current_config_folder+'/'+systemname)
+            copy2(wf_param_file, current_wf_param_file, follow_symlinks=True)
 
     fr_wfp = Frame(window, width=300, height=500, background=c3)
     fr_wfp.grid(row=0, column=0, rowspan=2, sticky='nwes', padx=3, pady=3)
@@ -259,7 +253,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     button_saveconfig = Button(fr_wfp, text='Save Configuration', bg=c2)
     button_saveconfig.grid(row=52, column=0, padx=5, pady=5, sticky='ew')
     button_saveconfig.configure(command=lambda:
-                                save_workflow_param_to_file(run_config_folder_path))
+                                save_workflow_param_to_file(current_config_folder))
     # save xml to the run folder
     button_loadconfig = Button(fr_wfp, text='Load Configuration', bg=c2)
     button_loadconfig.grid(row=52, column=1, padx=5, pady=5, sticky='ew')
@@ -269,11 +263,11 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
 
     button_saveandrun = Button(fr_wfp, text='Save and Run', bg=c2, state=run_state)
     button_saveandrun.grid(row=51, column=0, padx=5, pady=5, sticky='ew')
-    button_saveandrun.configure(command=lambda: save_and_run(run_config_folder_path, True))
+    button_saveandrun.configure(command=lambda: save_and_run(current_config_folder, True))
 
     button_run_nosave = Button(fr_wfp, text='Run (without Saving)', bg=c2, state=run_state)
     button_run_nosave.grid(row=51, column=1, padx=5, pady=5, sticky='ew')
-    button_run_nosave.configure(command=lambda: save_and_run(run_config_folder_path, False))
+    button_run_nosave.configure(command=lambda: save_and_run(current_config_folder, False))
 
     button_save_asdef = Button(fr_wfp, text='Save Configuration as Default', bg=c2)
     button_save_asdef.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
@@ -357,7 +351,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                 codeparam_xsd_path = StringVar()
 
                 ## name of the codeparam file in the run_config_folder
-                dest_file = os.path.join(run_config_folder_path+'/'+hsys
+                dest_file = os.path.join(current_config_folder+'/'+hsys
                                          +'/input_'+actor_name+'.xml')
 
                 import_actor(actor_name,0)
@@ -411,7 +405,6 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                 rrow = 1
                 ccolumn = 0
 
-                global codeparam_dict
                 codeparam_dict = {}
 
                 for elem in root.iter():
@@ -494,9 +487,8 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
         workflow_param[ref][elem] = newvalue
 
     def save_workflow_param_to_file(filepath):
-        global run_config_folder_path
         if filepath == '':
-            filepath = run_config_folder_path
+            filepath = current_config_folder
 
         ## COPY
         ## for all the active actors
@@ -513,7 +505,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
                               actor_name, 'and try again')
                         return False
 
-                    dest_file = os.path.join(run_config_folder_path+'/'+hsys+'/input_'
+                    dest_file = os.path.join(current_config_folder+'/'+hsys+'/input_'
                                              +actor_name+'.xml')
                     if not os.path.exists(dest_file):
                         import_actor(actor_name,0)
@@ -552,32 +544,31 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
     def save_as():
         filepath = filedialog.askdirectory()
 
-        global run_config_folder_path
-        old_run_config_folder_path = copy.copy(run_config_folder_path)
+        old_current_config_folder = copy.copy(current_config_folder)
 
         if os.path.exists(filepath):
 
-            run_config_folder_path = copy.copy(filepath)
-            save_workflow_param_to_file(run_config_folder_path)
-            if old_run_config_folder_path is not run_config_folder_path:
-                rmtree(old_run_config_folder_path)
+            current_config_folder = copy.copy(filepath)
+            save_workflow_param_to_file(current_config_folder)
+            if old_current_config_folder is not current_config_folder:
+                rmtree(old_current_config_folder)
 
         else:
-            copytree(run_config_folder_path, filepath)
-            run_config_folder_path = copy.copy(filepath)
-            save_workflow_param_to_file(run_config_folder_path)
+            copytree(current_config_folder, filepath)
+            current_config_folder = copy.copy(filepath)
+            save_workflow_param_to_file(current_config_folder)
 
-            if old_run_config_folder_path is not run_config_folder_path:
-                rmtree(old_run_config_folder_path)
+            if old_current_config_folder is not current_config_folder:
+                rmtree(old_current_config_folder)
 
     def save_and_run(filepath, save_yn):
         noerror = save_workflow_param_to_file(filepath)
         if noerror:
         #window.destroy()
-            hcd_wrapper(run_config_folder_path)
+            hcd_wrapper(current_config_folder)
 
             if save_yn == 0:
-                rmtree(run_config_folder_path)
+                rmtree(current_config_folder)
 
     def save_codeparam_to_file(filepath, codeparam_dict):
 
@@ -615,5 +606,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    open_gui(default_workflow_param_path, args.norun, args.input_dir, args.output_dir)
+    open_gui(default_wf_param_file, args.norun, args.input_dir, args.output_dir)
 
