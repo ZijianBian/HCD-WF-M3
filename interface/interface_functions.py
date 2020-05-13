@@ -1,0 +1,131 @@
+import os
+from lxml import etree
+from hcd_tools import import_actor
+from shutil import copy2, rmtree
+from hcd_wrapper import hcd_wrapper
+from datetime import datetime
+
+# --------------------------------------------------------------------------------------------
+def save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat):
+
+    for hsys in maindict:
+        for cat in maindict[hsys]:
+            if int(workflow_param[cod_ref][cat]) is not 0:
+                actor_name = list(maindict[hsys][cat].keys())[
+                    int(workflow_param[cod_ref][cat])-1]
+                # get xml path from actor.py
+                if actor_name in uncompiled_actors:
+                    print('ERROR:', actor_name, 'is selected as an active actor, '
+                          'but it has not been found. \n'
+                          'Please change your actor selection or load',
+                          actor_name, 'and try again')
+                    return False
+                dest_file = os.path.join(current_config_folder+'/'+hsys+'/input_'
+                                         +actor_name+'.xml')
+                if not os.path.exists(dest_file):
+                    import_actor(actor_name,0)
+                    actor_python_folder = eval(actor_name+'.location')
+                    found_xml = False
+                    found_xsd = False
+                    with open(actor_python_folder+'/wrapper.py') as pfile:
+                        for iline in pfile:
+                            if 'xml_location = ' in iline and \
+                               '_default_xml_location' not in iline:
+                                xml_name = iline.split('+')[-1].replace("'","")\
+                                           .replace(" ","").replace("\n","")
+                                # IF XML_NAME TOO SMALL: MEANS NO INPUT XML FILE (NOTHING TO COPY)
+                                if len(xml_name) > 5:
+                                    copy2(actor_python_folder+xml_name,dest_file,follow_symlinks=True)
+                                break
+    tree = etree.parse(current_config_folder+'/input_workflow.xml')
+    root = tree.getroot()
+    rl = [wfp_ref, fur_ref, cod_ref]
+    for iroot in range(3):
+        for elem in root[iroot].iter():
+            if elem.tag is not etree.Comment and len(elem) == 0:
+                elem.text = workflow_param[rl[iroot]][elem.tag]
+    tree.write(current_config_folder+'/input_workflow.xml')
+    return True
+
+# --------------------------------------------------------------------------------------------
+def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat):
+
+    # Define the current folder (either chosen by the system with 'save' or by the user with 'save as')
+    if current_config_folder is None:
+        current_config_folder = os.path.join(os.getenv('HCD_FOLDER'),'data/run_'+datetime.now().strftime('D%d_M%m_Y%y_H%H%M%S'))
+
+    # Define the workflow parameter file within the current folder
+    current_wf_param_file = current_config_folder+ '/input_workflow.xml'
+
+    # Read the default workflow parameters
+    root = etree.parse(default_wf_param_file).getroot()
+
+    # Create the current configuration folder and its sub-folders for each HCD process
+    if not os.path.exists(current_config_folder):
+        os.makedirs(current_config_folder)
+        for systemname in root[2][0]:
+            os.makedirs(current_config_folder+'/'+systemname.tag)
+
+    # Copy the default workflow parameter file into the current one
+    copy2(default_wf_param_file,current_wf_param_file,follow_symlinks=True)
+
+    # Copy the code parameter files for the actors of the chosen configuration into their respective sub-folders
+    save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+
+    print('---> Configuration saved in '+current_config_folder)
+
+    return current_config_folder
+    
+# --------------------------------------------------------------------------------------------
+def run(current_config_folder):
+
+    hcd_wrapper(current_config_folder)
+
+# --------------------------------------------------------------------------------------------
+def save_codeparam_to_file(filepath, codeparam_dict):
+    tree = etree.parse(filepath)
+    root = tree.getroot()
+    for elem in root.iter():
+        if elem.tag is not etree.Comment and len(elem) == 0:
+            elem.text = codeparam_dict[elem.tag]
+    pass
+    tree.write(filepath)
+
+# --------------------------------------------------------------------------------------------
+def destr_and_make(removed_by_close_button, window, maindict,
+                   workflow_param, c1, c2, c3, c4, c5):
+
+    base = make_flowchart(removed_by_close_button, window, maindict,
+                          workflow_param, c1, c2, c3, c4, c5)
+    removed_by_close_button.append(base)
+
+# --------------------------------------------------------------------------------------------
+def load_configuration_from_file(filepath):
+    if 'input_workflow_default.xml' in filepath:
+        print('If you want to load the default configuration '
+              'please choose load default')
+        filepath = ()
+    elif 'input_workflow.xml' not in filepath:
+        print('Please choose an input_workflow.xml file')
+        filepath = ()
+    if filepath is not ():
+        source_folder = "/".join(filepath.split('/')[0:-1])
+        if source_folder.find(current_config_folder) is -1:
+            try:
+                copytree(source_folder, current_config_folder)
+            except:
+                rmtree(current_config_folder)
+                copytree(source_folder, current_config_folder)
+            open_gui(current_config_folder+ '/input_workflow.xml', norun, None, None)
+        else:
+            print('This folder is the current folder. '
+                  'it is not possible to load the current configuration')
+    else:
+        print('No file selected')
+
+# --------------------------------------------------------------------------------------------
+def update_workflow_param(workflow_param,ref,elem,newvalue):
+    workflow_param[ref][elem] = newvalue
+    return workflow_param
+
+# --------------------------------------------------------------------------------------------

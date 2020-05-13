@@ -30,6 +30,9 @@ def hcd_wrapper(par_path):
 
       param['input_path'] = par_path
 
+  # HARDCODED UNTIL THESE VARIABLES DISAPPEAR (TO REMOVE THEM FROM THE INTERFACE)
+  param['run_simpletrans'] = 0
+
   ##################################################################
 
   # -------------------------------------------------
