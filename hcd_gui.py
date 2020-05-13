@@ -120,7 +120,7 @@ def open_gui(input_filepath, norun, input_dir, output_dir):
 
     if output_dir is not None:
         run_config_folder_path = output_dir
-        run_config_param_path = run_config_folder_path+ '/input_workflow.xml'
+        run_workflow_param_path = run_config_folder_path+ '/input_workflow.xml'
 
     if input_dir is not None:
         load_configuration_from_file(input_dir+ '/input_workflow.xml')
