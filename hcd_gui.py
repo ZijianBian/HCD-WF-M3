@@ -1,17 +1,34 @@
 import os, sys, copy
-
-from tkinter import *
-from tkinter import filedialog, ttk
-from lxml import etree
 from datetime import datetime
-from create_workflow_param import create_workflow_param_from_file
-from hover_class import *
-from hcd_wrapper import hcd_wrapper
 from shutil import copy2, copytree, rmtree
-from simple_flowchart import make_flowchart
-from hcd_tools import import_actor, create_maindict, loadlist
 from inspect import getfile
 import argparse
+
+try:
+    from tkinter import *
+    from tkinter import filedialog, ttk
+except:
+    print('ERROR: tkinter not found')
+    print('---> TIP: source the HCD configuration file')
+    sys.exit()
+
+try:
+    from lxml import etree
+except:
+    print('ERROR: lxml module not found')
+    print('---> TIP: source the HCD configuration file')
+    sys.exit()
+
+try:
+    from create_workflow_param import create_workflow_param_from_file
+    from hover_class import *
+    from hcd_wrapper import hcd_wrapper
+    from simple_flowchart import make_flowchart
+    from hcd_tools import import_actor, create_maindict, loadlist
+except:
+    print('ERROR while loading internal HCD modules')
+    print('---> TIP: source the HCD configuration file')
+    sys.exit()
 
 #---------------------------------------------------------------------------------------------
 
