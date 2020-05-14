@@ -3,8 +3,8 @@ from shutil import copy2, copytree, rmtree
 from inspect import getfile
 from interface_functions import save_workflow_param_to_file, \
     save, run, save_codeparam_to_file, destr_and_make, \
-    load_configuration, update_workflow_param
-    #update_workflow_param
+    update_workflow_param
+    #load_configuration, update_workflow_param
 from edit_code_parameters import edit_codeparam
 
 try:
@@ -187,6 +187,20 @@ def open_gui(wf_param_file):
 
 
     ## RIGHT - FLOWCHART
+
+    def load_configuration(filepath):
+        # Check if the chosen folder is a valid configuration folder
+        if not os.path.exists(filepath+'/input_workflow.xml'):
+            print('The selected folder '+filepath+' does not appear to be a proper')
+            print('configuration folder since it contains no input_workflow.xml file --> Nothing loaded.')
+            return
+        for hcd_process in ['ECRH','ICRH','NBI','NUCLEAR']:
+            if not os.path.exists(filepath+'/'+hcd_process):
+                print('The selected folder '+filepath+' does not appear to be a proper')
+                print('configuration folder since it contains no '+hcd_process+' folder --> Nothing loaded.')
+                return
+        print('---> Configuration loaded from '+filepath)
+        open_gui(filepath+'/input_workflow.xml')
 
     # Left panel
     button_loadconfig = Button(fr_wfp, text='Load', bg=c2)
