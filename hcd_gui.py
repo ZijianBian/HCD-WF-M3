@@ -3,7 +3,8 @@ from shutil import copy2, copytree, rmtree
 from inspect import getfile
 from interface_functions import save_workflow_param_to_file, \
     save, run, save_codeparam_to_file, destr_and_make, \
-    load_configuration_from_file, update_workflow_param
+    load_configuration, update_workflow_param
+    #update_workflow_param
 from edit_code_parameters import edit_codeparam
 
 try:
@@ -190,8 +191,7 @@ def open_gui(wf_param_file):
     # Left panel
     button_loadconfig = Button(fr_wfp, text='Load', bg=c2)
     button_loadconfig.grid(row=51, column=0, padx=5, pady=5, sticky='ew')
-    button_loadconfig.configure(command=lambda: load_configuration_from_file(filedialog.askopenfilename(initialdir=os.path.join(os.getcwd(),'data'))))
-
+    button_loadconfig.configure(command=lambda: load_configuration(filedialog.askdirectory(initialdir=os.path.join(os.getcwd(),'data'))))
     class save_only_once(object):
         def __init__(self):
             self.value = None
@@ -200,8 +200,9 @@ def open_gui(wf_param_file):
                 self.value=save(self.value,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
             else:
                 self.value=save(chosen_folder,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+            return self.value
 
-    saving_state = save_only_once() 
+    saving_state = save_only_once()
 
     button_saveconfig = Button(fr_wfp, text='Save', bg=c2)
     button_saveconfig.grid(row=52, column=0, padx=5, pady=5, sticky='ew')
@@ -209,11 +210,11 @@ def open_gui(wf_param_file):
 
     button_saveas = Button(fr_wfp, text='Save as', bg=c2)
     button_saveas.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
-    button_saveas.configure(command=lambda: saving_state.Return(filedialog.askdirectory()))
+    button_saveas.configure(command=lambda: saving_state.Return(filedialog.askdirectory(initialdir=os.path.join(os.getcwd(),'data'))))
 
     button_saveandrun = Button(fr_wfp, text='Run', bg=c2, state='normal')
     button_saveandrun.grid(row=51, column=1, padx=5, pady=5, sticky='ew')
-    button_saveandrun.configure(command=lambda: run(save(current_config_folder,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)))
+    button_saveandrun.configure(command=lambda: run(saving_state.Return(None)))
 
     button_restore_def = Button(fr_wfp, text='Restore Default', bg=c2)
     button_restore_def.grid(row=52, column=1, padx=5, pady=5, sticky='ew')

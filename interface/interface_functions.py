@@ -54,16 +54,35 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     if current_config_folder is None:
         current_config_folder = os.path.join(os.getenv('HCD_FOLDER'),'data/run_'+datetime.now().strftime('D%d_M%m_Y%y_H%H%M%S'))
 
+    # When operation is cancelled from the interface
+    if current_config_folder is () or current_config_folder =='':
+        return current_config_folder
+
     # Define the workflow parameter file within the current folder
     current_wf_param_file = current_config_folder+ '/input_workflow.xml'
 
     # Read the default workflow parameters
     root = etree.parse(default_wf_param_file).getroot()
 
+    # Dont want to write configuration directly in $HCD_FOLDER or $HCD_FOLDER/data
+    if current_config_folder == os.getenv('HCD_FOLDER')+'/data' or \
+       current_config_folder == os.getenv('HCD_FOLDER'):
+         print('Refuse to write directly in folder '+current_config_folder)
+         return current_config_folder
+
+    # Dont want to write configuration in folders called ECRH, ICRH, NBI, NUCLEAR 
+    # because it would be too confusing
+    folder_name = current_config_folder.split('/')[-1]
+    if folder_name in ['ECRH','ICRH','NBI','NUCLEAR']:
+        print('Refuse to write directly in a folder named '+folder_name+ \
+              ' because it could be mixed with process sub-folders')
+        return current_config_folder
+
     # Create the current configuration folder and its sub-folders for each HCD process
     if not os.path.exists(current_config_folder):
         os.makedirs(current_config_folder)
-        for systemname in root[2][0]:
+    for systemname in root[2][0]:
+        if not os.path.exists(current_config_folder+'/'+systemname.tag):
             os.makedirs(current_config_folder+'/'+systemname.tag)
 
     # Copy the default workflow parameter file into the current one
@@ -100,28 +119,23 @@ def destr_and_make(removed_by_close_button, window, maindict,
     removed_by_close_button.append(base)
 
 # --------------------------------------------------------------------------------------------
-def load_configuration_from_file(filepath):
-    if 'input_workflow_default.xml' in filepath:
-        print('If you want to load the default configuration '
-              'please choose load default')
-        filepath = ()
-    elif 'input_workflow.xml' not in filepath:
-        print('Please choose an input_workflow.xml file')
-        filepath = ()
-    if filepath is not ():
-        source_folder = "/".join(filepath.split('/')[0:-1])
-        if source_folder.find(current_config_folder) is -1:
-            try:
-                copytree(source_folder, current_config_folder)
-            except:
-                rmtree(current_config_folder)
-                copytree(source_folder, current_config_folder)
-            open_gui(current_config_folder+ '/input_workflow.xml', norun, None, None)
-        else:
-            print('This folder is the current folder. '
-                  'it is not possible to load the current configuration')
-    else:
-        print('No file selected')
+def load_configuration(filepath):
+
+    from hcd_gui import open_gui
+
+    # Check if the chosen folder is a valid configuration folder
+    if not os.path.exists(filepath+'/input_workflow.xml'):
+        print('The selected folder '+filepath+' does not appear to be a proper')
+        print('configuration folder since it contains no input_workflow.xml file --> Nothing loaded.')
+        return
+    for hcd_process in ['ECRH','ICRH','NBI','NUCLEAR']:
+        if not os.path.exists(filepath+'/'+hcd_process):
+            print('The selected folder '+filepath+' does not appear to be a proper')
+            print('configuration folder since it contains no '+hcd_process+' folder --> Nothing loaded.')
+            return
+
+    print('---> Configuration loaded from '+filepath)
+    open_gui(filepath+'/input_workflow.xml')
 
 # --------------------------------------------------------------------------------------------
 def update_workflow_param(workflow_param,ref,elem,newvalue):
