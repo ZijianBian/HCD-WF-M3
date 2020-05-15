@@ -3,8 +3,7 @@ from shutil import copy2, copytree, rmtree
 from inspect import getfile
 from interface_functions import save_workflow_param_to_file, \
     save, run, save_codeparam_to_file, destr_and_make, \
-    update_workflow_param
-    #load_configuration, update_workflow_param
+    update_workflow_param,load
 from edit_code_parameters import edit_codeparam
 
 try:
@@ -185,50 +184,58 @@ def open_gui(wf_param_file):
                                                                             str(cb.current())))
                 rrow += 1
 
+    # -------------------------------------------------------------------------------------
+
+    # Class to not re-generate a new folder name between two 'save' statements
+    class saved_folder_name(object):
+        def __init__(self):
+            self.value = None
+        def Save(self,chosen_folder,init_folder):
+            if chosen_folder == init_folder: # 1st SAVE, or SAVE after a LOAD (but before a SAVE AS)
+                self.value=save(self.value,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+            else:
+                if chosen_folder is None:
+                    if self.value is None: # 1st SAVE after a LOAD
+                        self.value=save(init_folder,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+                    else: # SAVE after a SAVE AS which is after a LOAD
+                        self.value=save(self.value,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+                else: # SAVE AS
+                    if_cancelled = self.value
+                    self.value=save(chosen_folder,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+                    if self.value is None:
+                        self.value = if_cancelled
+            return self.value
+
+    saved_folder = saved_folder_name()
+
+    # -------------------------------------------------------------------------------------
+
+    # To use the folder loaded through the 'load' function for the next 'save' statements
+    if wf_param_file == default_wf_param_file:
+        init_folder = None
+    else:
+        init_folder = ('/').join(wf_param_file.split('/')[:-1])
+
+    # -------------------------------------------------------------------------------------
 
     ## RIGHT - FLOWCHART
-
-    def load_configuration(filepath):
-        # Check if the chosen folder is a valid configuration folder
-        if not os.path.exists(filepath+'/input_workflow.xml'):
-            print('The selected folder '+filepath+' does not appear to be a proper')
-            print('configuration folder since it contains no input_workflow.xml file --> Nothing loaded.')
-            return
-        for hcd_process in ['ECRH','ICRH','NBI','NUCLEAR']:
-            if not os.path.exists(filepath+'/'+hcd_process):
-                print('The selected folder '+filepath+' does not appear to be a proper')
-                print('configuration folder since it contains no '+hcd_process+' folder --> Nothing loaded.')
-                return
-        print('---> Configuration loaded from '+filepath)
-        open_gui(filepath+'/input_workflow.xml')
 
     # Left panel
     button_loadconfig = Button(fr_wfp, text='Load', bg=c2)
     button_loadconfig.grid(row=51, column=0, padx=5, pady=5, sticky='ew')
-    button_loadconfig.configure(command=lambda: load_configuration(filedialog.askdirectory(initialdir=os.path.join(os.getcwd(),'data'))))
-    class save_only_once(object):
-        def __init__(self):
-            self.value = None
-        def Return(self,chosen_folder):
-            if chosen_folder is None:
-                self.value=save(self.value,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
-            else:
-                self.value=save(chosen_folder,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
-            return self.value
-
-    saving_state = save_only_once()
+    button_loadconfig.configure(command=lambda: load(filedialog.askdirectory(initialdir=os.path.join(os.getcwd(),'data')),open_gui))
 
     button_saveconfig = Button(fr_wfp, text='Save', bg=c2)
     button_saveconfig.grid(row=52, column=0, padx=5, pady=5, sticky='ew')
-    button_saveconfig.configure(command=lambda: saving_state.Return(None))
+    button_saveconfig.configure(command=lambda: saved_folder.Save(None,init_folder))
 
     button_saveas = Button(fr_wfp, text='Save as', bg=c2)
     button_saveas.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
-    button_saveas.configure(command=lambda: saving_state.Return(filedialog.askdirectory(initialdir=os.path.join(os.getcwd(),'data'))))
+    button_saveas.configure(command=lambda: saved_folder.Save(filedialog.askdirectory(initialdir=os.path.join(os.getcwd(),'data')),init_folder))
 
     button_saveandrun = Button(fr_wfp, text='Run', bg=c2, state='normal')
     button_saveandrun.grid(row=51, column=1, padx=5, pady=5, sticky='ew')
-    button_saveandrun.configure(command=lambda: run(saving_state.Return(None)))
+    button_saveandrun.configure(command=lambda: run(saved_folder.Save(None,init_folder)))
 
     button_restore_def = Button(fr_wfp, text='Restore Default', bg=c2)
     button_restore_def.grid(row=52, column=1, padx=5, pady=5, sticky='ew')

@@ -119,12 +119,23 @@ def hcd_wrapper(par_path):
     # OPEN INPUT DATAFILE
     print('-- Open input and output file --')
     input = imas.ids(param['shot_nr'], param['run_in'])
-    input.open_env(input_user_or_path,input_database,version)
-    idx_in = input.core_profiles.getPulseCtx()
+    retstatus,idx_in = input.open_env(input_user_or_path,input_database,version)
+    if retstatus < 0:
+      print('   ERROR while reading the input shot='+str(param['shot_nr'])\
+            +' and run='+str(param['run_in'])+'\n   for user_or_path = '+input_user_or_path\
+            +' and database = '+input_database)
+      print('   Please check that the file exists.')
+      return
 
     # CREATE OUTPUT DATAFILE
     output = imas.ids(param["shot_nr"], param["run_out"])
-    output.create_env(output_user_or_path,output_database,version)
+    retstatus = output.create_env(output_user_or_path,output_database,version)
+    if retstatus < 0:
+      print('   ERROR while creating the output shot='+str(param['shot_nr'])\
+            +' and run='+str(param['run_out'])+'\n   for user_or_path = '+output_user_or_path\
+            +' and database = '+output_database)
+      print('   --> Aborted.')
+      return
     idx_out = output.core_profiles.getPulseCtx()
 
     ##################################################################
@@ -278,6 +289,8 @@ def hcd_wrapper(par_path):
 
   except (KeyboardInterrupt, SystemExit):
     print('  hcd_wrapper.py aborted via Ctrl-C')
+    input.close()
+    output.close()
 
   except:
     print('ERROR in hcd_wrapper.py')

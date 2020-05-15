@@ -52,11 +52,13 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
 
     # Define the current folder (either chosen by the system with 'save' or by the user with 'save as')
     if current_config_folder is None:
-        current_config_folder = os.path.join(os.getenv('HCD_FOLDER'),'data/run_'+datetime.now().strftime('D%d_M%m_Y%y_H%H%M%S'))
+        current_config_folder = os.path.join(os.getenv('HCD_FOLDER'),'data/run_'\
+                                +datetime.now().strftime('D%d_M%m_Y%y_H%H%M%S'))
 
     # When operation is cancelled from the interface
-    if current_config_folder is () or current_config_folder =='':
-        return current_config_folder
+    if current_config_folder is () or current_config_folder == '':
+        print('Save_as cancelled.')
+        return None
 
     # Define the workflow parameter file within the current folder
     current_wf_param_file = current_config_folder+ '/input_workflow.xml'
@@ -68,7 +70,7 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     if current_config_folder == os.getenv('HCD_FOLDER')+'/data' or \
        current_config_folder == os.getenv('HCD_FOLDER'):
          print('Refuse to write directly in folder '+current_config_folder)
-         return current_config_folder
+         return None
 
     # Dont want to write configuration in folders called ECRH, ICRH, NBI, NUCLEAR 
     # because it would be too confusing
@@ -76,7 +78,7 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     if folder_name in ['ECRH','ICRH','NBI','NUCLEAR']:
         print('Refuse to write directly in a folder named '+folder_name+ \
               ' because it could be mixed with process sub-folders')
-        return current_config_folder
+        return None
 
     # Create the current configuration folder and its sub-folders for each HCD process
     if not os.path.exists(current_config_folder):
@@ -119,23 +121,25 @@ def destr_and_make(removed_by_close_button, window, maindict,
     removed_by_close_button.append(base)
 
 # --------------------------------------------------------------------------------------------
-def load_configuration(filepath):
+def load(chosen_folder,open_gui):
 
-    from hcd_gui import open_gui
+    if chosen_folder is () or chosen_folder == '':
+        print('Load cancelled')
+        return
 
     # Check if the chosen folder is a valid configuration folder
-    if not os.path.exists(filepath+'/input_workflow.xml'):
-        print('The selected folder '+filepath+' does not appear to be a proper')
+    if not os.path.exists(chosen_folder+'/input_workflow.xml'):
+        print('The selected folder '+chosen_folder+' does not appear to be a proper')
         print('configuration folder since it contains no input_workflow.xml file --> Nothing loaded.')
         return
     for hcd_process in ['ECRH','ICRH','NBI','NUCLEAR']:
-        if not os.path.exists(filepath+'/'+hcd_process):
-            print('The selected folder '+filepath+' does not appear to be a proper')
+        if not os.path.exists(chosen_folder+'/'+hcd_process):
+            print('The selected folder '+chosen_folder+' does not appear to be a proper')
             print('configuration folder since it contains no '+hcd_process+' folder --> Nothing loaded.')
             return
 
-    print('---> Configuration loaded from '+filepath)
-    open_gui(filepath+'/input_workflow.xml')
+    print('---> Configuration loaded from '+chosen_folder)
+    open_gui(chosen_folder+'/input_workflow.xml')
 
 # --------------------------------------------------------------------------------------------
 def update_workflow_param(workflow_param,ref,elem,newvalue):
