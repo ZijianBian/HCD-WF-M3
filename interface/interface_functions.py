@@ -4,9 +4,11 @@ from hcd_tools import import_actor
 from shutil import copy2, rmtree
 from hcd_wrapper import hcd_wrapper
 from datetime import datetime
+from simple_flowchart import make_flowchart
 
 # --------------------------------------------------------------------------------------------
-def save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat):
+def save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors, \
+    workflow_param,wfp_ref,fur_ref,cod_ref,cat):
 
     for hsys in maindict:
         for cat in maindict[hsys]:
@@ -109,8 +111,8 @@ def save_codeparam_to_file(filepath, codeparam_dict):
     for elem in root.iter():
         if elem.tag is not etree.Comment and len(elem) == 0:
             elem.text = codeparam_dict[elem.tag]
-    pass
     tree.write(filepath)
+    print('--> Configuration saved in '+filepath)
 
 # --------------------------------------------------------------------------------------------
 def destr_and_make(removed_by_close_button, window, maindict,

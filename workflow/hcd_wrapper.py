@@ -34,6 +34,8 @@ def hcd_wrapper(par_path):
 
     # HARDCODED UNTIL THESE VARIABLES DISAPPEAR (TO REMOVE THEM FROM THE INTERFACE)
     param['run_simpletrans'] = 0
+    param['ic_wave_nr_toroidal_modes'] = 1
+    param['fokker_flag'] = 0
 
     ##################################################################
 
@@ -129,14 +131,13 @@ def hcd_wrapper(par_path):
 
     # CREATE OUTPUT DATAFILE
     output = imas.ids(param["shot_nr"], param["run_out"])
-    retstatus = output.create_env(output_user_or_path,output_database,version)
+    retstatus,idx_out = output.create_env(output_user_or_path,output_database,version)
     if retstatus < 0:
       print('   ERROR while creating the output shot='+str(param['shot_nr'])\
             +' and run='+str(param['run_out'])+'\n   for user_or_path = '+output_user_or_path\
             +' and database = '+output_database)
       print('   --> Aborted.')
       return
-    idx_out = output.core_profiles.getPulseCtx()
 
     ##################################################################
 
@@ -288,7 +289,7 @@ def hcd_wrapper(par_path):
     print('---------------------')
 
   except (KeyboardInterrupt, SystemExit):
-    print('  hcd_wrapper.py aborted via Ctrl-C')
+    print(' hcd_wrapper.py aborted by the user')
     input.close()
     output.close()
 

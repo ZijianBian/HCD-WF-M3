@@ -1,5 +1,14 @@
+from tkinter import *
+from shutil import copy2
+from hcd_tools import import_actor
+from interface_functions import save_codeparam_to_file
+from lxml import etree
+import os
+
 ## MANAGE XML FILES
-def edit_codeparam():
+def edit_codeparam(c1,c2,c3,c4,maindict,actors_ref,workflow_param, \
+    cod_ref,current_config_folder):
+
     cp_top = Toplevel()
     cp_top.title('Edit Code Parameters')
     cp_top.geometry('500x700')
@@ -53,7 +62,7 @@ def edit_codeparam():
 
                 for iline in pfile:
                     if 'xml_location = ' in iline and '_default_xml_location' not in iline:
-                        ## check if there is already is a version of the xml file for this actor
+                        ## check if there is already is a version of the xml for this actor
                         ## - this could be put outside of the loop for reading the file,
                         ## but the code is shorter this way, it shouldnt be too confusing i hope
                         if os.path.exists(dest_file) and is_load_default_from_kepler is False:
@@ -67,7 +76,8 @@ def edit_codeparam():
                         found_xml = True
 
                     if 'xsd_location = ' in iline:
-                        xsd_name = iline.split('+')[-1].replace("'","").replace(" ","").replace("\n","")
+                        xsd_name = iline.split('+')[-1].replace("'","")\
+                                   .replace(" ","").replace("\n","")
                         codeparam_xsd_path.set(actor_python_folder+xsd_name)
                         found_xsd = True
 
@@ -156,14 +166,15 @@ def edit_codeparam():
 
         dest_file, codeparam_dict = populate(fr)
 
-        Button(fr_top, text='save', bg=c2, command=lambda:
+        Button(fr_top, text='Save', bg=c2, command=lambda:
                save_codeparam_to_file(dest_file, codeparam_dict)).grid(
                    row=0, column=1, padx=5, pady=5)
-        Button(fr_top, text='load default', bg=c2, command=lambda:
+        Button(fr_top, text='Restore default', bg=c2, command=lambda:
                make_frame(hsys, actor_name, prev_frame, True)).grid(
                    row=0, column=2, padx=5, pady=5)
-        Button(fr_top, text='exit', bg=c2, command=lambda:
+        Button(fr_top, text='Exit', bg=c2, command=lambda:
                cp_top.destroy()).grid(row=0, column=4, padx=(20, 5), pady=5)
 
         dest_file, codeparam_dict = populate(fr)
+
 

@@ -24,8 +24,6 @@ except:
 try:
     from create_workflow_param import create_workflow_param_from_file
     from hover_class import *
-    from hcd_wrapper import hcd_wrapper
-    from simple_flowchart import make_flowchart
     from hcd_tools import import_actor, create_maindict, loadlist
 except:
     print('ERROR while loading internal HCD modules')
@@ -190,6 +188,8 @@ def open_gui(wf_param_file):
     class saved_folder_name(object):
         def __init__(self):
             self.value = None
+        def NoAction(self):
+            self.value = self.value
         def Save(self,chosen_folder,init_folder):
             if chosen_folder == init_folder: # 1st SAVE, or SAVE after a LOAD (but before a SAVE AS)
                 self.value=save(self.value,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
@@ -248,7 +248,8 @@ def open_gui(wf_param_file):
     # Middle panel
     button_edit_codeparameters = Button(fr_as, text='Edit Code Parameters', bg=c2)
     button_edit_codeparameters.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
-    button_edit_codeparameters.configure(command=lambda: edit_codeparam())
+    button_edit_codeparameters.configure(command=lambda: edit_codeparam(c1,c2,c3,c4,maindict,actors_ref,workflow_param,cod_ref,saved_folder.Save(None,init_folder)))
+    #saved_folder.NoAction()))
 
     button_create_flowchart = Button(fr_as, text='Show Flowchart', bg=c2)
     button_create_flowchart.grid(row=53, column=1, padx=5, pady=5, sticky='ew')
