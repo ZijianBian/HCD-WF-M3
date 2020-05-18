@@ -207,15 +207,6 @@ def hcd_wrapper(par_path):
                          or value =='core_profiles')] 
           ids_bundle_work.update(bundle_copy(ids_bundle_input,list_to_get))
 
-        # ARTIFICIALLY REMOVE WARNINGS
-        warning_list = ['distribution_sources','distributions','ec_launchers','ic_antennas',\
-                        'nbi','wall']
-        for ids in warning_list:
-          if ids in ids_bundle_work:
-            ids_bundle_work[ids].ids_properties.homogeneous_time = 1
-            ids_bundle_work[ids].time = ids_bundle_input['core_profiles'].time
-
-        print('Execute H&CD workflow for current time slice')
         ids_bundle_work = hcd_workflow(ids_bundle_work,workflow_xml)
 
         # OPTIONALLY CALL THE SIMPLE TRANSPORT SOLVER

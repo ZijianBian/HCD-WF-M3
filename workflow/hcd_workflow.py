@@ -7,6 +7,8 @@ from create_workflow_param import create_workflow_param_from_file
 
 def hcd_workflow(BNDL_in,workflow_xml):
 
+    print('Execute H&CD workflow for current time slice')
+
     # EXTRACT PARAMETERS FROM INPUT XML FILE
     parameters = create_workflow_param_from_file(workflow_xml,2)
 
