@@ -17,8 +17,6 @@ def hcd_wrapper(par_path):
     # READ PARAMETERS FROM INPUT PARAMETER XML FILE OF THE WORKFLOW
     # --------------------------------------------------------------
     workflow_xml = par_path+'/input_workflow.xml'
-    tree = ET.parse(workflow_xml)
-    root = tree.getroot()
     param = create_workflow_param_from_file(workflow_xml,2)
 
     ##################################################################
@@ -27,22 +25,16 @@ def hcd_wrapper(par_path):
     # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
     # -------------------------------------------------
 
-    # LIST OF SELECTED ACTORS
-    if param['run_simpletrans'] == 1:
-        list_of_actors = ['simpletrans']
-    else:
-        list_of_actors = []
-
-    for elem in root[2].iter():
-        if elem.tag is not etree.Comment and len(elem)== 0:
-            if int(elem.text) is not 0:
-                 list_of_actors.append(elem.attrib['list'].split()[int(elem.text)-1])
-
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
     (maindict, compiled_actors, uncompiled_actors, code_selection) = \
             create_maindict(workflow_xml,1,0)
 
+    # LIST OF SELECTED ACTORS
+    list_of_actors = []
+    for process,code in code_selection.items():
+      if code is not None:
+        list_of_actors.append(code)
     if len(list_of_actors) == 0:
        print('ERROR: no actor selected --> The H&CD workflow will not be executed')
        return
@@ -57,11 +49,9 @@ def hcd_wrapper(par_path):
        output_ids_list = output_ids_list + single_output_ids_list
     input_ids_list  = list(set(input_ids_list))
     output_ids_list = list(set(output_ids_list))
+    ids_list        = list(set(input_ids_list+output_ids_list))
 
-    # TOTAL LIST OF INVOLVED IDSS ACCORDING TO THE ACTOR SELECTION
-    ids_list = list(set(input_ids_list+output_ids_list))
-
-    # ALWAYS INCLUDE CORE_PROFILES IDS, SINCE IT IS USED AS A REFERENCE
+    # ALWAYS INCLUDE CORE_PROFILES IDS SINCE IT IS USED AS A REFERENCE
     if not 'core_profiles' in input_ids_list:
         input_ids_list.append('core_profiles')
 
@@ -148,15 +138,16 @@ def hcd_wrapper(par_path):
     try:
       time_array = ids_bundle_input['core_profiles'].partialGet('time')
     except:
-      print('  ERROR while reading the core_profiles IDS: is it really present in the input file?',\
-            file=sys.stderr)
+      print('  ERROR while reading the core_profiles IDS: is it really present in the input file?'\
+            ,file=sys.stderr)
       print('  ----> Aborted.', file=sys.stderr)
       return
 
     # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
     if param['tbegin'] < 0:
         param['tbegin'] = time_array[0]
-        print('Initial time tbegin set to core_profiles first time slice. tbegin = ', param['tbegin'])
+        print('Initial time tbegin set to core_profiles first time slice. tbegin = ',\
+              param['tbegin'])
 
     if param['tbegin'] > 0 and param['tbegin'] < time_array[0]:
        print('ERROR: tbegin out of range ('+str(param['tbegin'])\
@@ -212,18 +203,20 @@ def hcd_wrapper(par_path):
         if timenow == param['tbegin']:
           ids_bundle_work = bundle_copy(ids_bundle_input,input_ids_list)
         else:
-          list_to_get = [value for value in input_ids_list if (value not in output_ids_list or value =='core_profiles')] 
+          list_to_get = [value for value in input_ids_list if (value not in output_ids_list \
+                         or value =='core_profiles')] 
           ids_bundle_work.update(bundle_copy(ids_bundle_input,list_to_get))
 
         # ARTIFICIALLY REMOVE WARNINGS
-        warning_list = ['distribution_sources','distributions','ec_launchers','ic_antennas','nbi','wall']
+        warning_list = ['distribution_sources','distributions','ec_launchers','ic_antennas',\
+                        'nbi','wall']
         for ids in warning_list:
           if ids in ids_bundle_work:
             ids_bundle_work[ids].ids_properties.homogeneous_time = 1
             ids_bundle_work[ids].time = ids_bundle_input['core_profiles'].time
 
         print('Execute H&CD workflow for current time slice')
-        ids_bundle_work = hcd_workflow(ids_bundle_work, param)
+        ids_bundle_work = hcd_workflow(ids_bundle_work,workflow_xml)
 
         # OPTIONALLY CALL THE SIMPLE TRANSPORT SOLVER
         if param['run_simpletrans'] == 1:
@@ -234,7 +227,8 @@ def hcd_wrapper(par_path):
                                                               ids_bundle_work['distributions'])
           except: 
                print('Failed to load or run SimpleTrans')
-               print('WARNING - Skipping SimpleTrans even though it has been choosen in the configuration!')
+               print('WARNING - Skipping SimpleTrans even though it has been'+\
+                     ' choosen in the configuration!')
 
         # COPY WORK BUNDLE TO OUTPUT BUNDLE TO SAVE THE RESULTS TO DISK
         ids_bundle_output = bundle_copy(ids_bundle_work)
@@ -244,8 +238,9 @@ def hcd_wrapper(par_path):
           # THE OUTPUT PULSECTX IS NOT PRESERVED IN THE WORKFLOW ITSELF
           ids_bundle_output[elem].setPulseCtx(idx_out)
 
-          # IF THE IDS IS NOT EMPTY (INPUT OR OUTPUT) IT IS GOING TO BE SAVED USING THE TIME OF THE WORKFLOW
-          # (TO AVOID SAVING IDENTICAL TIME VALUES IN CASE THE WORKFLOW TIME RESOLUTION IS SCARCER THAN THE INPUT ONE)
+          # IF THE IDS IS NOT EMPTY (INPUT OR OUTPUT) IT IS GOING TO BE SAVED USING THE TIME OF 
+          # THE WORKFLOW (TO AVOID SAVING IDENTICAL TIME VALUES IN CASE THE WORKFLOW TIME 
+          # RESOLUTION IS SCARCER THAN THE INPUT ONE)
           if ids_bundle_output[elem].ids_properties.homogeneous_time>=0:
             ids_bundle_output[elem].time = np.array([timenow])
 

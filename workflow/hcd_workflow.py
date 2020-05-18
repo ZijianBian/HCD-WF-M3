@@ -1,6 +1,7 @@
 import generate_actors
 import auto_hcd_actors as actors
 from hcd_tools import bundle_copy, import_actor, loadlist
+from create_workflow_param import create_workflow_param_from_file
 
 # MERGERS EXECUTED LOCALLY IN HCD_WORKFLOW (ALL OTHER ACTORS ARE DEFINED IN AUTO_HCD_ACTORS)
 merge_actor_list = loadlist('merge_actor_list')
@@ -12,7 +13,10 @@ for name in merge_actor_list:
 
 # -------------------------------------------------------------------------------------------------
 
-def hcd_workflow(BNDL_in, parameters):
+def hcd_workflow(BNDL_in,workflow_xml):
+
+    # EXTRACT PARAMETERS FROM INPUT XML FILE
+    parameters = create_workflow_param_from_file(workflow_xml,2)
 
     # STEP 0: PREPARATION OF SUB-BUNDLES FOR EACH TYPE OF H&CD CALCULATION
     # BNDL_OUT WILL HOLD THE FINAL RESULT
