@@ -11,16 +11,18 @@ from hcd_tools import import_actor, loadlist, create_maindict, is_compiled_for_m
 
 # LIST OF EMPTY ACTORS AND OF EXTRA (NON-IDS) ARGUMENTS FOR EACH ACTOR
 empty_actor_list    = loadlist('empty_actor_list')
+merge_actor_list    = loadlist('merge_actor_list')
 extra_argument_list = loadlist('extra_arguments')
 
 # GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
-    file.write('from hcd_tools import import_actor\n\n')
-    file.write('list_of_actors = ["'+'","'.join(compiled_actors+empty_actor_list)+'"]\n\n')
+    file.write('from hcd_tools import import_actor, loadlist\n\n')
+    file.write('list_of_actors = ["'+'","'.join(compiled_actors+empty_actor_list+merge_actor_list)\
+               +'"]\n\n')
     file.write('for name in list_of_actors:\n')
     file.write('   err = import_actor(name,0)\n\n')
-        
+
     for proc in maindict:
         for sys in maindict[proc]:
             for cat in maindict[proc][sys]:
@@ -48,7 +50,8 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                             
                             if ids_in.find('extra_argument_list') is not -1\
                                and extra_argument_list.get(code) is not None:
-                                file.write('parameters["'+extra_argument_list[code][extra_arg_nr]+'"]')
+                                file.write('parameters["'+extra_argument_list[code][extra_arg_nr]\
+                                           +'"]')
                                 extra_arg_nr += 1
                             elif ids_in.find('codeparam') is not -1:
                                 file.write('(parameters["input_path"]+"/'\
@@ -66,8 +69,8 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
 
                         file.write(')\n')
                     else:
-                        file.write('       print("code not installed")\n\n')
-                        output_ids_list = ['core_profiles'] # DEFAULT WHEN NO CODE AVAILABLE FOR THIS SOURCE/PROCESS (TO REFINE LATER)
+                        file.write('       print("Code not installed")\n\n')
+                        output_ids_list = ['core_profiles'] # DEFAULT WHEN NO CODE FOR THIS SOURCE
                 
                 file.write('   else: \n')
                 file.write('       '+output_ids_list[0]+'_temp = empty_'\

@@ -1,15 +1,7 @@
 import generate_actors
 import auto_hcd_actors as actors
-from hcd_tools import bundle_copy, import_actor, loadlist
+from hcd_tools import bundle_copy
 from create_workflow_param import create_workflow_param_from_file
-
-# MERGERS EXECUTED LOCALLY IN HCD_WORKFLOW (ALL OTHER ACTORS ARE DEFINED IN AUTO_HCD_ACTORS)
-merge_actor_list = loadlist('merge_actor_list')
-
-# IMPORT ALL ACTORS FROM THE MINIMUM LIST
-for name in merge_actor_list:
-
-    err = import_actor(name,0)
 
 # -------------------------------------------------------------------------------------------------
 
@@ -47,10 +39,11 @@ def hcd_workflow(BNDL_in,workflow_xml):
 
     # STEP 3: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION_SOURCES and WAVES
     print('-- Step 3: Mergers')
-    distrib_nbi_ic     = merge_distributions(BNDL_nbi['distributions'],BNDL_ic['distributions'])
-    distrib_fus_nbi_ic = merge_distributions(BNDL_nuc['distributions'],distrib_nbi_ic)
-    waves_ec_ic        = merge_waves(BNDL_ec['waves'],BNDL_ic['waves'])
-    dsources_fus_nbi   = merge_distribution_sources(BNDL_nuc['distribution_sources'], \
+    distrib_nbi_ic     = actors.merge_distributions(BNDL_nbi['distributions'], \
+                                                    BNDL_ic['distributions'])
+    distrib_fus_nbi_ic = actors.merge_distributions(BNDL_nuc['distributions'],distrib_nbi_ic)
+    waves_ec_ic        = actors.merge_waves(BNDL_ec['waves'],BNDL_ic['waves'])
+    dsources_fus_nbi   = actors.merge_distribution_sources(BNDL_nuc['distribution_sources'], \
                                                     BNDL_nbi['distribution_sources'])
 
     # INTERMEDIATE STEP: COPY H&CD RESULTS INTO THE BUNDLES FOR CORE_SOURCES AND CORE_PROFILES

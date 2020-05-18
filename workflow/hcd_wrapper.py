@@ -2,7 +2,7 @@ def hcd_wrapper(par_path):
   import os,imas,sys
   from lxml import etree
   import xml.etree.ElementTree as ET
-  from hcd_tools import import_actor, read_actor_ids, \
+  from hcd_tools import read_actor_ids, \
     bundle_copy, create_dict_from_idslist, create_maindict, \
     check_for_dependencies
   from hcd_workflow import hcd_workflow
