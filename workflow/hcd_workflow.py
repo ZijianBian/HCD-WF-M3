@@ -1,3 +1,4 @@
+import generate_actors
 import auto_hcd_actors as actors
 from hcd_tools import bundle_copy, import_actor, loadlist
 

@@ -6,6 +6,7 @@ def hcd_wrapper(par_path):
     bundle_copy, create_dict_from_idslist, create_maindict, \
     check_for_dependencies
   from hcd_workflow import hcd_workflow
+  from create_workflow_param import create_workflow_param_from_file
   import numpy as np
 
   ##################################################################
@@ -18,24 +19,7 @@ def hcd_wrapper(par_path):
     workflow_xml = par_path+'/input_workflow.xml'
     tree = ET.parse(workflow_xml)
     root = tree.getroot()
-
-    param = {}  
-    for elem in root.iter():
-      if len(elem) == 0:
-        try:
-          param[elem.tag] = int(elem.text)
-        except:
-          try:
-            param[elem.tag] = float(elem.text)
-          except:
-            param[elem.tag] = elem.text
-
-        param['input_path'] = par_path
-
-    # HARDCODED UNTIL THESE VARIABLES DISAPPEAR (TO REMOVE THEM FROM THE INTERFACE)
-    param['run_simpletrans'] = 0
-    param['ic_wave_nr_toroidal_modes'] = 1
-    param['fokker_flag'] = 0
+    param = create_workflow_param_from_file(workflow_xml,2)
 
     ##################################################################
 
