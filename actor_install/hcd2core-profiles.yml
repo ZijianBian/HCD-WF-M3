@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/hcd2core-profiles.git
-    VERSION: feature/xml_validate
+    VERSION: develop
     DIR:     hcd2core-profiles
 
 MODULES: []
