@@ -1,13 +1,11 @@
-from tkinter import *
-from hover_class import *
-cb = 'LavenderBlush3'
-c_arr=['red', 'blue','yellow','green']
+import tkinter
+
+cb     = 'LavenderBlush3'
+c_arr  = ['red', 'blue','yellow','green']
 mergec = ['red4', 'blue4', 'yellow4']
 
 def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  c1, c2, c3, c4, c5):
-#--------------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------------
+
     infolabelcolor = c2
 
     actors_ref = list(maindict.keys())[0]
@@ -81,9 +79,9 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
         dy = line_end_y - line_start_y
 
         if arrow_yn:
-            arrow_yn = LAST
+            arrow_yn = tkinter.LAST
         else:
-            arrow_yn = NONE
+            arrow_yn = tkinter.NONE
 
         if ((dir1 == 'n' or dir1 == 's') and (dir2 == 'e' or dir2 == 'w')) or ((dir1 == 'e' or dir1 == 'w') and(dir2 == 'n' or dir2 == 's')):
             canvas.create_line(line_start_x, line_start_y,
@@ -109,7 +107,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
 #--------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------
  
-    base = Canvas(window, width = 100, height = 100, bg = c1)
+    base = tkinter.Canvas(window, width = 100, height = 100, bg = c1)
     base.grid(row = 0, column = 2, sticky = 'news')
     base.rowconfigure(0, minsize = 30)
     base.columnconfigure(0, minsize = 30)
@@ -119,7 +117,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     
     conn_list = []
     
-    exitbutton = Button(base, text = 'close')
+    exitbutton = tkinter.Button(base, text = 'close')
     exitbutton.grid(row = 0, column = 3, padx = 2, pady = 2)
     exitbutton.configure(command = lambda: hide_display())
     def hide_display():
@@ -128,18 +126,18 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
             b.grid_forget()
 
     ## CREATE BASIC LAYOUT FOR THE FLOWCHART)
-    initla = Label(base, bg = c2, text = 'INITIALIZING', font = '14', relief = 'solid', pady = 5, width = 25)
-    initfr = Canvas(base, bg = c1, height = 1)
-    hcdla  = Label(base, bg = c2, text = 'H&CD', font = '14', relief = 'solid', pady = 5)
-    hcdfr  = Canvas(base, bg = c1, height = 1)
-    mergela = Label(base, bg = c2, text = 'MERGING', font = '14', relief = 'solid')
-    mergefr = Canvas(base, bg = c1, height = 1)
-    corela  = Label(base, bg = c2, text = 'MAKE CORE IDS', font = '14', relief = 'solid', pady = 5)
-    corefr  = Canvas(base, bg = c1, height = 1)
-    tcontla = Label(base, bg = c2, text = 'CONTROL BLOCK FOR TIMELOOP', font = '14', relief = 'solid', pady = 0)
-    tcontfr = Canvas(base, bg = c1, height = 1)
-    finalla = Label(base, bg = c2, text = 'FINALISING', font = '14', relief = 'solid', pady = 5)
-    finalfr = Canvas(base, bg = c1, height = 1)
+    initla = tkinter.Label(base, bg = c2, text = 'INITIALIZING', font = '14', relief = 'solid', pady = 5, width = 25)
+    initfr = tkinter.Canvas(base, bg = c1, height = 1)
+    hcdla  = tkinter.Label(base, bg = c2, text = 'H&CD', font = '14', relief = 'solid', pady = 5)
+    hcdfr  = tkinter.Canvas(base, bg = c1, height = 1)
+    mergela = tkinter.Label(base, bg = c2, text = 'MERGING', font = '14', relief = 'solid')
+    mergefr = tkinter.Canvas(base, bg = c1, height = 1)
+    corela  = tkinter.Label(base, bg = c2, text = 'MAKE CORE IDS', font = '14', relief = 'solid', pady = 5)
+    corefr  = tkinter.Canvas(base, bg = c1, height = 1)
+    tcontla = tkinter.Label(base, bg = c2, text = 'CONTROL BLOCK FOR TIMELOOP', font = '14', relief = 'solid', pady = 0)
+    tcontfr = tkinter.Canvas(base, bg = c1, height = 1)
+    finalla = tkinter.Label(base, bg = c2, text = 'FINALISING', font = '14', relief = 'solid', pady = 5)
+    finalfr = tkinter.Canvas(base, bg = c1, height = 1)
 
     conn_list.append([initla, 's', hcdla, 'n', False,  1, 1])
     conn_list.append([hcdla, 's', mergela, 'n', False, 1, 1])
@@ -186,11 +184,11 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
 
     ## INITIALISE FRAME----------------------------------------------------------------------------
 
-    il = Label(initfr, text = 
+    il = tkinter.Label(initfr, text = 
                'reading input from database\n- shot:   '+ workflow_param[wfp_ref]['shot_nr']+  '\n- run:   '+ workflow_param[wfp_ref]['run_in']+'\n- machine:   '+ workflow_param[wfp_ref]['input_database']+' \n- start time:   '+ workflow_param[wfp_ref]['tbegin']+'s \n- timestep:   '+ workflow_param[wfp_ref]['dt_required']+'s \n- end time:   '+ workflow_param[wfp_ref]['tend']+'s', 
-               bg = infolabelcolor, anchor = W,  justify = LEFT, padx = 4 , pady = 4)
+               bg = infolabelcolor, anchor = tkinter.W,  justify = tkinter.LEFT, padx = 4 , pady = 4)
 
-    il.pack(side = TOP)
+    il.pack(side = tkinter.TOP)
 
     ## HCD FRAME-----------------------------------------------------------------------------------
     ccol = 1
@@ -198,7 +196,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     rrow_max = 0
     conn_list_hcd = []
     isys = 0
-    inv = Frame(hcdfr, height = 1, width = 1, bg = c5)
+    inv = tkinter.Frame(hcdfr, height = 1, width = 1, bg = c5)
     inv.grid(row = 0, columnspan = 50, pady = 0)
     inv1 = []
 
@@ -209,7 +207,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
             isys += 1
             oldlabel = hcdla
 
-            inv1.append(Frame(hcdfr, height = 1, width = 1, bg = c5))
+            inv1.append(tkinter.Frame(hcdfr, height = 1, width = 1, bg = c5))
             inv1[-1].grid(row = 50, column = ccol, pady = (50,0))
 
             for cat in maindict[actors_ref][hsys]:
@@ -221,14 +219,14 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
 
                     hcdfr.rowconfigure(rrow, minsize = 30)
 
-                    l1 = Label(hcdfr, text = ' - '+input_text, bg = 'ivory',anchor = W,  justify = LEFT)
+                    l1 = tkinter.Label(hcdfr, text = ' - '+input_text, bg = 'ivory',anchor = tkinter.W,  justify = tkinter.LEFT)
                     l1.grid(column = ccol, row = rrow+1, sticky = 'sew')
                     l1.grid_remove()
                     
-                    l0 = Label(hcdfr, text = curval, bg = c4, relief = 'solid')
+                    l0 = tkinter.Label(hcdfr, text = curval, bg = c4, relief = 'solid')
                     l0.grid(column = ccol, row = rrow+2, sticky = 'nsew')
                     
-                    l2 = Label(hcdfr, text = ' - '+ output_text, bg = 'floral white',anchor = W,  justify = LEFT)
+                    l2 = tkinter.Label(hcdfr, text = ' - '+ output_text, bg = 'floral white',anchor = tkinter.W,  justify = tkinter.LEFT)
                     l2.grid(column = ccol, row = rrow+3, sticky = 'new')
                     l2.grid_remove()
                     
@@ -270,10 +268,10 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     ccol = 1
     inv = {}
 
-    invrow = Frame(mergefr, bg = c1)
+    invrow = tkinter.Frame(mergefr, bg = c1)
     invrow.grid(row = 1, column = 1, sticky = 'ew')
     isys = -1
-    inv_bot = Frame(mergefr, height = 1, width = 2, bg = c5 )
+    inv_bot = tkinter.Frame(mergefr, height = 1, width = 2, bg = c5 )
     inv_bot.grid(row = 50, column = 0, columnspan = 50)
     
     for hsys in maindict[actors_ref]:
@@ -282,11 +280,11 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
             if ccol > 1:
                 invrow.columnconfigure(ccol, minsize = 20)
             invrow.columnconfigure(ccol+1, minsize = 127)
-            inv[hsys] = Frame(invrow, height = 2, width = 10, bg = c1 )
+            inv[hsys] = tkinter.Frame(invrow, height = 2, width = 10, bg = c1 )
             inv[hsys].grid(row = 1, column = ccol+1, sticky  = 'ew')
             ccol += 2
           
-    labelrow = Frame(mergefr, bg = c1)
+    labelrow = tkinter.Frame(mergefr, bg = c1)
     labelrow.grid(row = 3, column = 1)
 
     minsize_row = 40
@@ -310,7 +308,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     no_merge_waves = False
                    
     if merge_waves > 1:
-        mwave = Label(labelrow, text = 'merge waves', bg = c4, relief = 'solid', padx = 2, pady = 4)
+        mwave = tkinter.Label(labelrow, text = 'merge waves', bg = c4, relief = 'solid', padx = 2, pady = 4)
         mwave.grid(row = 1, column = 0)
         conn_list_merge.append([inv['ECRH'], mwave, mergec[2]])
         conn_list_merge.append([inv['ICRH'], mwave, mergec[2]])
@@ -323,7 +321,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
         no_merge_waves = True
     
     if merge_distributions > 1:
-        mdist = Label(labelrow, text = 'merge distributions', bg = c4, relief = 'solid', padx = 2, pady = 4)
+        mdist = tkinter.Label(labelrow, text = 'merge distributions', bg = c4, relief = 'solid', padx = 2, pady = 4)
         mdist.grid(row =  1, column = 2)
 
         if  int(workflow_param[cod_ref]['nbi_fp']) is not 0:
@@ -342,7 +340,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
         no_merge_dist = True
 
     if merge_distribution_sources > 1:
-        msour = Label(labelrow, text = 'merge sources', bg = c4, relief = 'solid', padx =2, pady = 4)
+        msour = tkinter.Label(labelrow, text = 'merge sources', bg = c4, relief = 'solid', padx =2, pady = 4)
         msour.grid(row = 1, column = 4)
         conn_list_merge.append([inv['NBI'], msour, mergec[1]])
         conn_list_merge.append([inv['NUCLEAR'], msour, mergec[1]])
@@ -352,7 +350,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
         no_merge_sources = True
     
     if no_merge_waves == True  and no_merge_sources == True and no_merge_dist == True: 
-        l = Label(mergefr, text = 'no merges necessary', bg = infolabelcolor, padx = 4, pady = 4)
+        l = tkinter.Label(mergefr, text = 'no merges necessary', bg = infolabelcolor, padx = 4, pady = 4)
         l.grid(row = 3, column = 0 , columnspan = 30, sticky = 'ns')
         conn_list_merge_others.append([l, 's', inv_bot, 'n', False, 1, 1])
         invrow.grid(column = 0)
@@ -439,10 +437,10 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     rrow_max = 0
     conn_list_core = []
 
-    inv = Frame(corefr, height = 2, width = 2, bg = c5)
+    inv = tkinter.Frame(corefr, height = 2, width = 2, bg = c5)
     inv.grid(row = 0, column = 0, columnspan = 50)
 
-    bl = Frame(corefr, height = 1, width = 1,bg = c1)
+    bl = tkinter.Frame(corefr, height = 1, width = 1,bg = c1)
     bl.grid(row = 50, column = 0, columnspan = 50, padx = 10)
 
     for hsys in maindict[make_core_ids_ref]:
@@ -460,13 +458,13 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
 
                     corefr.rowconfigure(rrow, minsize = 25)
 
-                    l1 = Label(corefr, text = input_text, bg = c1, relief = 'solid')
+                    l1 = tkinter.Label(corefr, text = input_text, bg = c1, relief = 'solid')
                     l1.grid(column = ccol, row = rrow, sticky = 'sew')
                     l1.grid_remove()
-                    l0 = Label(corefr, text = curval, bg = c4, relief = 'solid')
+                    l0 = tkinter.Label(corefr, text = curval, bg = c4, relief = 'solid')
                     l0.grid(column = ccol, row = rrow+1, sticky = 'nsew')
                     
-                    l2 = Label(corefr, text = output_text, bg = c1, relief = 'solid')
+                    l2 = tkinter.Label(corefr, text = output_text, bg = c1, relief = 'solid')
                     l2.grid(column = ccol, row = rrow+2, sticky = 'new')
                     l2.grid_remove()
                     
@@ -487,7 +485,7 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
 
     if len(conn_list_core) ==0 :
         
-        l = Label(corefr, text = 'no make core ids actors selected', bg = infolabelcolor, padx = 4, pady = 4)
+        l = tkinter.Label(corefr, text = 'no make core ids actors selected', bg = infolabelcolor, padx = 4, pady = 4)
         l.grid(row = 2, sticky = 'ew')
         conn_list_core.append([inv, 's', l, 'n', False, 1, 1])
         conn_list_core.append([l, 's', bl, 'n', False, 1, 1])
@@ -505,10 +503,10 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     tcontfr.columnconfigure(2, minsize = 400)
     tcontfr.columnconfigure(3, minsize = 100)
 
-    inv =  Frame(base, height = 1, width =1 , bg = c1)
-    inv1 = Frame(base, height = 1, width =1, bg = c1)
-    inv2 = Frame(base, height = 1, width = 1, bg = c1)
-    inv3 = Frame(base, height = 1, width = 1, bg = c1)
+    inv =  tkinter.Frame(base, height = 1, width =1 , bg = c1)
+    inv1 = tkinter.Frame(base, height = 1, width =1, bg = c1)
+    inv2 = tkinter.Frame(base, height = 1, width = 1, bg = c1)
+    inv3 = tkinter.Frame(base, height = 1, width = 1, bg = c1)
 
     inv.grid(row = 13,  column = 2, sticky = 'nsw', rowspan = 2)
     inv1.grid(row = 13, column = 3, sticky = 'w', rowspan = 2)
@@ -519,10 +517,10 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     conn_list.append([inv1, 'n', inv2, 's', False, 1, 1])
     conn_list.append([inv2, 'w', inv3, 'e', True, 1, 1])
 
-    inv5 = Frame(tcontfr, height = 3, width = 3, bg = c5)
+    inv5 = tkinter.Frame(tcontfr, height = 3, width = 3, bg = c5)
     inv5.grid(row = 1, column = 3, sticky = 'e')
 
-    tla = Label(tcontfr, text = 'increase timestep \n test if workflow time is smaller than tend', bg = infolabelcolor, padx = 4, pady = 4)
+    tla = tkinter.Label(tcontfr, text = 'increase timestep \n test if workflow time is smaller than tend', bg = infolabelcolor, padx = 4, pady = 4)
     
     tla.grid(row = 1, column = 2)
 
@@ -534,9 +532,9 @@ def make_flowchart(removed_by_close_button, window,  maindict, workflow_param,  
     connect_labels(tcontfr, tla, 'e', inv5, 'w', False, 1, 1)
 
     ## FINALISE
-    il = Label(finalfr, text = 
+    il = tkinter.Label(finalfr, text = 
                'saving output to database\n- output run nr:   '+ workflow_param[wfp_ref]['run_out'], bg = infolabelcolor, padx = 4, pady = 4)
-    il.pack(side = TOP)
+    il.pack(side = tkinter.TOP)
        
     ### CONNECT LINE BASELEVEL
     for elem in conn_list:

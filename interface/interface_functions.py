@@ -112,7 +112,7 @@ def save_codeparam_to_file(filepath, codeparam_dict):
         if elem.tag is not etree.Comment and len(elem) == 0:
             elem.text = codeparam_dict[elem.tag]
     tree.write(filepath)
-    print('--> Configuration saved in '+filepath)
+    print('---> Configuration saved in '+filepath)
 
 # --------------------------------------------------------------------------------------------
 def destr_and_make(removed_by_close_button, window, maindict,
@@ -149,3 +149,14 @@ def update_workflow_param(workflow_param,ref,elem,newvalue):
     return workflow_param
 
 # --------------------------------------------------------------------------------------------
+
+def update_codeparam_dict(codeparam_dict,elem,root,newvalue,xmlschema,c1,entry1):
+    codeparam_dict[elem] = newvalue
+    for i in root.iter():
+        if elem in [str(i.tag)] and i.tag is not etree.Comment:
+            i.text = newvalue
+        if xmlschema.validate(root):
+            entry1.config(bg=c1)
+        else:
+            entry1.config(bg='salmon1')
+
