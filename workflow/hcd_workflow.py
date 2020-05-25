@@ -1,7 +1,6 @@
 import generate_actors
 import auto_hcd_actors as actors
-from hcd_tools import bundle_copy
-from create_workflow_param import create_workflow_param_from_file
+from hcd_tools import bundle_copy, create_workflow_param_from_file
 
 # -------------------------------------------------------------------------------------------------
 

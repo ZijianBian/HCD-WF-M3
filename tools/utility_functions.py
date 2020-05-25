@@ -35,9 +35,10 @@ def save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors
                                '_default_xml_location' not in iline:
                                 xml_name = iline.split('+')[-1].replace("'","")\
                                            .replace(" ","").replace("\n","")
-                                # IF XML_NAME TOO SMALL: MEANS NO INPUT XML FILE (NOTHING TO COPY)
+                                # IF XML_NAME TOO SMALL: MEANS NO INPUT XML (NOTHING TO COPY)
                                 if len(xml_name) > 5:
-                                    copy2(actor_python_folder+xml_name,dest_file,follow_symlinks=True)
+                                    copy2(actor_python_folder+xml_name,dest_file,\
+                                          follow_symlinks=True)
                                 break
     tree = etree.parse(current_config_folder+'/input_workflow.xml')
     root = tree.getroot()
@@ -50,9 +51,11 @@ def save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors
     return True
 
 # --------------------------------------------------------------------------------------------
-def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat):
+def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,workflow_param,\
+         wfp_ref,fur_ref,cod_ref,cat):
 
-    # Define the current folder (either chosen by the system with 'save' or by the user with 'save as')
+    # Define the current folder (either chosen by the system with 'save' 
+    # or by the user with 'save as')
     if current_config_folder is None:
         current_config_folder = os.path.join(os.getenv('HCD_FOLDER'),'data/run_'\
                                 +datetime.now().strftime('D%d_M%m_Y%y_H%H%M%S'))
@@ -92,8 +95,10 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     # Copy the default workflow parameter file into the current one
     copy2(default_wf_param_file,current_wf_param_file,follow_symlinks=True)
 
-    # Copy the code parameter files for the actors of the chosen configuration into their respective sub-folders
-    save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+    # Copy the code parameter files for the actors of the chosen configuration into their 
+    # respective sub-folders
+    save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors, \
+                                workflow_param,wfp_ref,fur_ref,cod_ref,cat)
 
     print('---> Configuration saved in '+current_config_folder)
 
@@ -101,7 +106,6 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     
 # --------------------------------------------------------------------------------------------
 def run(current_config_folder):
-
     hcd_wrapper(current_config_folder)
 
 # --------------------------------------------------------------------------------------------
@@ -132,12 +136,14 @@ def load(chosen_folder,open_gui):
     # Check if the chosen folder is a valid configuration folder
     if not os.path.exists(chosen_folder+'/input_workflow.xml'):
         print('The selected folder '+chosen_folder+' does not appear to be a proper')
-        print('configuration folder since it contains no input_workflow.xml file --> Nothing loaded.')
+        print('configuration folder since it contains no input_workflow.xml file '\
+              +'--> Nothing loaded.')
         return
     for hcd_process in ['ECRH','ICRH','NBI','NUCLEAR']:
         if not os.path.exists(chosen_folder+'/'+hcd_process):
             print('The selected folder '+chosen_folder+' does not appear to be a proper')
-            print('configuration folder since it contains no '+hcd_process+' folder --> Nothing loaded.')
+            print('configuration folder since it contains no '+hcd_process+' folder '\
+                  +'--> Nothing loaded.')
             return
 
     print('---> Configuration loaded from '+chosen_folder)

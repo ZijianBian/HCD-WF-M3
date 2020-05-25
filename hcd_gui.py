@@ -1,6 +1,4 @@
-import os, sys, copy
-from shutil import copy2, copytree, rmtree
-from inspect import getfile
+import os, sys
 
 try:
     import tkinter
@@ -19,13 +17,14 @@ except:
     sys.exit()
 
 try:
-    from create_workflow_param import create_workflow_param_from_file
-    from hcd_tools import import_actor, create_maindict, loadlist
-    from edit_code_parameters import edit_codeparam
-    from interface_functions import save_workflow_param_to_file, \
+    from hcd_tools import import_actor, create_maindict, loadlist, \
+        create_workflow_param_from_file
+    from codeparam_edit import edit_codeparam
+    from utility_functions import save_workflow_param_to_file, \
         save, run, save_codeparam_to_file, destr_and_make, \
         update_workflow_param,load
 except:
+    raise
     print('ERROR while loading internal HCD modules')
     print('---> TIP: source the HCD configuration file')
     sys.exit()
