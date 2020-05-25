@@ -42,7 +42,7 @@ else:
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
 
-default_wf_param_file = os.getenv('HCD_FOLDER')+'/input_workflow_default.xml'
+default_wf_param_file = os.getenv('HCD_FOLDER')+'/global_configuration/input_workflow_default.xml'
 
 # --------------------------------------------------------------------------------------------
 # Create the main window (define font, title and background colour)
