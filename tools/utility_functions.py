@@ -1,14 +1,13 @@
 import os
+import colour_definitions as col
 from lxml import etree
-from hcd_tools import import_actor
-from shutil import copy2, rmtree
-from hcd_wrapper import hcd_wrapper
-from datetime import datetime
-from simple_flowchart import make_flowchart
 
-# --------------------------------------------------------------------------------------------
+############################################################################################
 def save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors, \
     workflow_param,wfp_ref,fur_ref,cod_ref,cat):
+
+    from hcd_tools import import_actor
+    from shutil import copy2
 
     for hsys in maindict:
         for cat in maindict[hsys]:
@@ -50,9 +49,12 @@ def save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors
     tree.write(current_config_folder+'/input_workflow.xml')
     return True
 
-# --------------------------------------------------------------------------------------------
+############################################################################################
 def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,workflow_param,\
          wfp_ref,fur_ref,cod_ref,cat):
+
+    from datetime import datetime
+    from shutil import copy2
 
     # Define the current folder (either chosen by the system with 'save' 
     # or by the user with 'save as')
@@ -104,11 +106,14 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
 
     return current_config_folder
     
-# --------------------------------------------------------------------------------------------
+############################################################################################
 def run(current_config_folder):
+
+    from hcd_wrapper import hcd_wrapper
+
     hcd_wrapper(current_config_folder)
 
-# --------------------------------------------------------------------------------------------
+############################################################################################
 def save_codeparam_to_file(filepath, codeparam_dict):
     tree = etree.parse(filepath)
     root = tree.getroot()
@@ -118,15 +123,16 @@ def save_codeparam_to_file(filepath, codeparam_dict):
     tree.write(filepath)
     print('---> Configuration saved in '+filepath)
 
-# --------------------------------------------------------------------------------------------
-def destr_and_make(removed_by_close_button, window, maindict,
-                   workflow_param, c1, c2, c3, c4, c5):
+############################################################################################
+def destr_and_make(removed_by_close_button, window, maindict,workflow_param):
+
+    from flowchart_display import make_flowchart
 
     base = make_flowchart(removed_by_close_button, window, maindict,
-                          workflow_param, c1, c2, c3, c4, c5)
+                          workflow_param)
     removed_by_close_button.append(base)
 
-# --------------------------------------------------------------------------------------------
+############################################################################################
 def load(chosen_folder,open_gui):
 
     if chosen_folder is () or chosen_folder == '':
@@ -149,20 +155,20 @@ def load(chosen_folder,open_gui):
     print('---> Configuration loaded from '+chosen_folder)
     open_gui(chosen_folder+'/input_workflow.xml')
 
-# --------------------------------------------------------------------------------------------
+############################################################################################
 def update_workflow_param(workflow_param,ref,elem,newvalue):
     workflow_param[ref][elem] = newvalue
     return workflow_param
 
-# --------------------------------------------------------------------------------------------
+############################################################################################
 
-def update_codeparam_dict(codeparam_dict,elem,root,newvalue,xmlschema,c1,entry1):
+def update_codeparam_dict(codeparam_dict,elem,root,newvalue,xmlschema,entry1):
     codeparam_dict[elem] = newvalue
     for i in root.iter():
         if elem in [str(i.tag)] and i.tag is not etree.Comment:
             i.text = newvalue
         if xmlschema.validate(root):
-            entry1.config(bg=c1)
+            entry1.config(bg=col.c1)
         else:
             entry1.config(bg='salmon1')
 

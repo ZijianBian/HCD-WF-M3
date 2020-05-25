@@ -17,6 +17,7 @@ except:
     sys.exit()
 
 try:
+    import colour_definitions as col
     from hcd_tools import import_actor, create_maindict, loadlist, \
         create_workflow_param_from_file
     from codeparam_edit import edit_codeparam
@@ -44,16 +45,6 @@ else:
 default_wf_param_file = os.getenv('HCD_FOLDER')+'/input_workflow_default.xml'
 
 # --------------------------------------------------------------------------------------------
-# Colors to be used later
-
-c1 = 'white'
-c2 = 'white smoke'
-c3 = 'azure2'
-c4 = 'ghost white'
-c5 = 'azure4'
-cb = 'LavenderBlush3'
-
-# --------------------------------------------------------------------------------------------
 # Create the main window (define font, title and background colour)
 window = tkinter.Tk()
 fontsize = int(window.winfo_screenheight()/100)+3 # Adjusted with screen size
@@ -63,7 +54,7 @@ if fontsize < 5:
     fontsize = 5
 window.option_add('*font','courier '+str(fontsize))
 window.title('HCD WORKFLOW')
-window.configure(bg=c1)
+window.configure(bg=col.c1)
 
 # --------------------------------------------------------------------------------------------
 def open_gui(wf_param_file):
@@ -102,13 +93,13 @@ def open_gui(wf_param_file):
 
     ### setup
 
-    fr_wfp = tkinter.Frame(window, width=300, height=500, background=c3)
+    fr_wfp = tkinter.Frame(window, width=300, height=500, background=col.c3)
     fr_wfp.grid(row=0, column=0, rowspan=2, sticky='nwes', padx=3, pady=3)
 
-    fr_as = tkinter.Frame(window, width=500, height=500, background=c1)
+    fr_as = tkinter.Frame(window, width=500, height=500, background=col.c1)
     fr_as.grid(row=0, column=1, rowspan=2, sticky='nwes', padx=3, pady=3)
 
-    fr_fc = tkinter.Frame(window, width=500, height=500, background=c1)
+    fr_fc = tkinter.Frame(window, width=500, height=500, background=col.c1)
     fr_fc.grid(row=0, column=2, rowspan=2, sticky='nwes', padx=3, pady=3)
 
     removed_by_close_button = [fr_fc]
@@ -126,7 +117,7 @@ def open_gui(wf_param_file):
     irow = 0
     for ref in [wfp_ref, fur_ref]:
 
-        tkinter.Label(fr_wfp, text=ref, bg=c3, font='15').grid(row=irow,
+        tkinter.Label(fr_wfp, text=ref, bg=col.c3, font='15').grid(row=irow,
                                                        column=0,
                                                        columnspan=3,
                                                        pady=10,
@@ -136,7 +127,7 @@ def open_gui(wf_param_file):
 
         for elem in workflow_param[ref]:
 
-            tkinter.Label(fr_wfp, text=elem, bg=c3).grid(row=irow,
+            tkinter.Label(fr_wfp, text=elem, bg=col.c3).grid(row=irow,
                                                  column=0,
                                                  padx=1,
                                                  pady=2,
@@ -151,7 +142,7 @@ def open_gui(wf_param_file):
                                                                          entrystring.get()))
             # if an entry is changed, the new values should immediately be changed
             # in the workflow_param dictionary
-            tkinter.Entry(fr_wfp, textvariable=entrystring, bg=c1).grid(row=irow,
+            tkinter.Entry(fr_wfp, textvariable=entrystring, bg=col.c1).grid(row=irow,
                                                                 column=1,
                                                                 padx=1,
                                                                 pady=2,
@@ -163,21 +154,19 @@ def open_gui(wf_param_file):
     rrow = 0
     for ref in [actors_ref, make_core_ref]:
         for hsys in maindict[ref]:
-            tkinter.Label(fr_as, text=hsys, bg=c1, font='15').grid(row=rrow,
+            tkinter.Label(fr_as, text=hsys, bg=col.c1, font='15').grid(row=rrow,
                                                            column=0,
                                                            columnspan=2,
                                                            sticky='ew')
             rrow += 1
             for cat in maindict[ref][hsys]:
-                tkinter.Label(fr_as,text=cat,bg=c1,anchor=tkinter.W,\
+                tkinter.Label(fr_as,text=cat,bg=col.c1,anchor=tkinter.W,\
                               justify=tkinter.LEFT).grid(row=rrow,column=0,sticky=tkinter.W)
                 cb = tkinter.ttk.Combobox(fr_as, value=['']+list(maindict[ref][hsys][cat]))
                 cb.grid(row=rrow, column=1, padx=20, pady=5, sticky='ew')
                 cb.current(workflow_param[cod_ref][cat])
-                cb.bind('<<ComboboxSelected>>',
-                        lambda event, cat=cat, cb=cb: update_workflow_param(workflow_param,cod_ref,
-                                                                            cat,
-                                                                            str(cb.current())))
+                cb.bind('<<ComboboxSelected>>',lambda event, cat=cat, cb=cb: \
+                        update_workflow_param(workflow_param,cod_ref,cat,str(cb.current())))
                 rrow += 1
 
     # -------------------------------------------------------------------------------------
@@ -190,16 +179,22 @@ def open_gui(wf_param_file):
             self.value = self.value
         def Save(self,chosen_folder,init_folder):
             if chosen_folder == init_folder: # 1st SAVE, or SAVE after a LOAD (but before a SAVE AS)
-                self.value=save(self.value,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+                self.value=save(self.value,default_wf_param_file,maindict[actors_ref],\
+                        uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
             else:
                 if chosen_folder is None:
                     if self.value is None: # 1st SAVE after a LOAD
-                        self.value=save(init_folder,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+                        self.value=save(init_folder,default_wf_param_file,\
+                            maindict[actors_ref],uncompiled_actors,workflow_param, \
+                            wfp_ref,fur_ref,cod_ref,cat)
                     else: # SAVE after a SAVE AS which is after a LOAD
-                        self.value=save(self.value,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+                        self.value=save(self.value,default_wf_param_file, \
+                            maindict[actors_ref],uncompiled_actors,workflow_param, \
+                            wfp_ref,fur_ref,cod_ref,cat)
                 else: # SAVE AS
                     if_cancelled = self.value
-                    self.value=save(chosen_folder,default_wf_param_file,maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+                    self.value=save(chosen_folder,default_wf_param_file,maindict[actors_ref], \
+                            uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
                     if self.value is None:
                         self.value = if_cancelled
             return self.value
@@ -219,23 +214,25 @@ def open_gui(wf_param_file):
     ## RIGHT - FLOWCHART
 
     # Left panel
-    button_loadconfig = tkinter.Button(fr_wfp, text='Load', bg=c2)
+    button_loadconfig = tkinter.Button(fr_wfp, text='Load', bg=col.c2)
     button_loadconfig.grid(row=51, column=0, padx=5, pady=5, sticky='ew')
-    button_loadconfig.configure(command=lambda: load(tkinter.filedialog.askdirectory(initialdir=os.path.join(os.getcwd(),'data')),open_gui))
+    button_loadconfig.configure(command=lambda: load(tkinter.filedialog.\
+                                askdirectory(initialdir=os.path.join(os.getcwd(),'data')),open_gui))
 
-    button_saveconfig = tkinter.Button(fr_wfp, text='Save', bg=c2)
+    button_saveconfig = tkinter.Button(fr_wfp, text='Save', bg=col.c2)
     button_saveconfig.grid(row=52, column=0, padx=5, pady=5, sticky='ew')
     button_saveconfig.configure(command=lambda: saved_folder.Save(None,init_folder))
 
-    button_saveas = tkinter.Button(fr_wfp, text='Save as', bg=c2)
+    button_saveas = tkinter.Button(fr_wfp, text='Save as', bg=col.c2)
     button_saveas.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
-    button_saveas.configure(command=lambda: saved_folder.Save(tkinter.filedialog.askdirectory(initialdir=os.path.join(os.getcwd(),'data')),init_folder))
+    button_saveas.configure(command=lambda: saved_folder.Save(tkinter.filedialog.\
+                            askdirectory(initialdir=os.path.join(os.getcwd(),'data')),init_folder))
 
-    button_saveandrun = tkinter.Button(fr_wfp, text='Run', bg=c2, state='normal')
+    button_saveandrun = tkinter.Button(fr_wfp, text='Run', bg=col.c2, state='normal')
     button_saveandrun.grid(row=51, column=1, padx=5, pady=5, sticky='ew')
     button_saveandrun.configure(command=lambda: run(saved_folder.Save(None,init_folder)))
 
-    button_restore_def = tkinter.Button(fr_wfp, text='Restore Default', bg=c2)
+    button_restore_def = tkinter.Button(fr_wfp, text='Restore Default', bg=col.c2)
     button_restore_def.grid(row=52, column=1, padx=5, pady=5, sticky='ew')
     button_restore_def.configure(command=lambda: open_gui(default_wf_param_file))
 
@@ -244,14 +241,15 @@ def open_gui(wf_param_file):
     button_exit.configure(command=lambda: sys.exit())
 
     # Middle panel
-    button_edit_codeparameters = tkinter.Button(fr_as, text='Edit Code Parameters', bg=c2)
+    button_edit_codeparameters = tkinter.Button(fr_as, text='Edit Code Parameters', bg=col.c2)
     button_edit_codeparameters.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
-    button_edit_codeparameters.configure(command=lambda: edit_codeparam(c1,c2,c3,c4,maindict,actors_ref,workflow_param,cod_ref,saved_folder.Save(None,init_folder)))
-    #saved_folder.NoAction()))
+    button_edit_codeparameters.configure(command=lambda: edit_codeparam\
+    (maindict,actors_ref,workflow_param,cod_ref,saved_folder.Save(None,init_folder)))
 
-    button_create_flowchart = tkinter.Button(fr_as, text='Show Flowchart', bg=c2)
+    button_create_flowchart = tkinter.Button(fr_as, text='Show Flowchart', bg=col.c2)
     button_create_flowchart.grid(row=53, column=1, padx=5, pady=5, sticky='ew')
-    button_create_flowchart.configure(command=lambda: destr_and_make(removed_by_close_button, window, maindict,workflow_param,c1,c2,c3,c4,c5))
+    button_create_flowchart.configure(command=lambda: destr_and_make\
+                (removed_by_close_button, window, maindict,workflow_param))
 
     window.mainloop()
 

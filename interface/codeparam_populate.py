@@ -1,10 +1,11 @@
 import os,tkinter
+import colour_definitions as col
 from utility_functions import update_codeparam_dict
 from hcd_tools import import_actor
 from lxml import etree
 from shutil import copy2
 
-def populate(frame,current_config_folder,hsys,actor_name,c1,v_scroll,default):
+def populate(frame,current_config_folder,hsys,actor_name,v_scroll,default):
 
     # NAME OF THE CODEPARAM FILE FOR THIS ACTOR IN THE CURRENT CONFIGURATION FOLDER
     destination_file = current_config_folder+'/'+hsys+'/input_'+actor_name+'.xml'
@@ -66,18 +67,18 @@ def populate(frame,current_config_folder,hsys,actor_name,c1,v_scroll,default):
     for elem in root.iter():
         if elem.tag is not etree.Comment and len(elem) == 0:
             l = tkinter.Label(frame,text=elem.tag.strip(),\
-                      bg=c1,wraplength='200', anchor='w', justify=tkinter.LEFT)
+                      bg=col.c1,wraplength='200', anchor='w', justify=tkinter.LEFT)
             l.grid(row=rrow, column=ccolumn, sticky='w')
 
             entrystring = tkinter.StringVar()
             entrystring.set(elem.text.strip())
-            e = tkinter.Entry(frame, textvar=entrystring, bg=c1)
+            e = tkinter.Entry(frame, textvar=entrystring, bg=col.c1)
             e.grid(row=rrow, column=ccolumn+1, padx=3, pady=3)
             codeparam_dict[elem.tag] = entrystring.get()
 
             entrystring.trace('w', lambda name,index,mode,elem=elem.tag,\
                               entrystring=entrystring,e=e: update_codeparam_dict\
-                              (codeparam_dict,elem,root,entrystring.get(),xmlschema,c1,e))
+                              (codeparam_dict,elem,root,entrystring.get(),xmlschema,e))
             try:
                 CreateToolTip(l, docum_dict[l.cget('text')])
             except:
