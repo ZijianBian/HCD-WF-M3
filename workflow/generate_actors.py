@@ -40,7 +40,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                         file.write('   if parameters["'+cat +'"] == '+str(i)+':\n')
                     else: 
                         file.write('   elif parameters["'+cat +'"] == '+str(i)+':\n')
-                    file.write('       print("-- '+code.upper()+' --", file=sys.stderr)\n')
+                    file.write('       print("-- '+code.upper()+' --", file=sys.stdout)\n')
                     if len(maindict[proc][sys][cat][code][1]) > 0:
                         output_ids_list = maindict[proc][sys][cat][code][1]
                         file.write('       '+",".join(str(x)+'_temp' \
