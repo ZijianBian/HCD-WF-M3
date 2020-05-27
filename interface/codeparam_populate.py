@@ -1,4 +1,4 @@
-import os,tkinter
+import os,tkinter,codeparam_properties
 import colour_definitions as col
 from utility_functions import update_codeparam_dict
 from hcd_tools import import_actor
@@ -79,10 +79,7 @@ def populate(frame,current_config_folder,hsys,actor_name,v_scroll,default):
             entrystring.trace('w', lambda name,index,mode,elem=elem.tag,\
                               entrystring=entrystring,e=e: update_codeparam_dict\
                               (codeparam_dict,elem,root,entrystring.get(),xmlschema,e))
-            try:
-                CreateToolTip(l, docum_dict[l.cget('text')])
-            except:
-                pass
+            codeparam_properties.CreateToolTip(l, docum_dict[l.cget('text')])
 
             rrow += 1
 
