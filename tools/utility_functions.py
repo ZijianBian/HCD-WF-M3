@@ -60,7 +60,7 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     # or by the user with 'save as')
     if current_config_folder is None:
         current_config_folder = os.path.join(os.getenv('HCD_FOLDER'),'data/run_'\
-                                +datetime.now().strftime('D%d_M%m_Y%y_H%H%M%S'))
+                                +datetime.now().strftime('%y%m%d_%H:%M:%S'))
 
     # When operation is cancelled from the interface
     if current_config_folder is () or current_config_folder == '':
