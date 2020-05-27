@@ -1,0 +1,11 @@
+#!/bin/sh
+#SBATCH  --ntasks-per-node=8
+#SBATCH  --cpus-per-task=1
+#SBATCH  --time=1:00:00
+#SBATCH  --mail-user=mireille.schneider@iter.org
+#SBATCH  --mail-type=END
+#SBATCH  --job-name=HCD_wf
+#SBATCH  --partition=gen9_ib-short
+
+./hcd_nogui -c /home/ITER/schneim/public/git/hcd/data/batch_test
+

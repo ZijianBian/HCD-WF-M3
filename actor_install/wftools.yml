@@ -2,18 +2,18 @@
 ---
 SOURCES:
   - VCS:     git
-    REPO:    ssh://git@git.iter.org/imex/ids-tools.git
+    REPO:    ssh://git@git.iter.org/imas/wftools.git
     VERSION: develop
-    DIR:    ids-tools
+    DIR:     wftools
 
 MODULES: []
 
 BUILDS: 
-  - DIR: ids-tools
+  - DIR: wftools
     CMD: ./build.sh
 
 ACTORS: 
-  - DIR: ids-tools
+  - DIR: wftools
     XML: 
       - empty_IDSs/fc2k/empty_core_profiles.xml
       - empty_IDSs/fc2k/empty_core_sources.xml

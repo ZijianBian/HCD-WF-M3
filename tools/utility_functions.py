@@ -1,4 +1,4 @@
-import os
+import os, sys
 import colour_definitions as col
 from lxml import etree
 
@@ -19,7 +19,7 @@ def save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors
                     print('ERROR:', actor_name, 'is selected as an active actor, '
                           'but it has not been found. \n'
                           'Please change your actor selection or load',
-                          actor_name, 'and try again')
+                          actor_name, 'and try again', file=sys.stderr)
                     return False
                 dest_file = os.path.join(current_config_folder+'/'+hsys+'/input_'
                                          +actor_name+'.xml')
@@ -64,7 +64,7 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
 
     # When operation is cancelled from the interface
     if current_config_folder is () or current_config_folder == '':
-        print('Save_as cancelled.')
+        print('Save_as cancelled.', file=sys.stderr)
         return None
 
     # Define the workflow parameter file within the current folder
@@ -76,7 +76,7 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     # Dont want to write configuration directly in $HCD_FOLDER or $HCD_FOLDER/data
     if current_config_folder == os.getenv('HCD_FOLDER')+'/data' or \
        current_config_folder == os.getenv('HCD_FOLDER'):
-         print('Refuse to write directly in folder '+current_config_folder)
+         print('Refuse to write directly in folder '+current_config_folder, file=sys.stderr)
          return None
 
     # Dont want to write configuration in folders called ECRH, ICRH, NBI, NUCLEAR 
@@ -84,7 +84,7 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     folder_name = current_config_folder.split('/')[-1]
     if folder_name in ['ECRH','ICRH','NBI','NUCLEAR']:
         print('Refuse to write directly in a folder named '+folder_name+ \
-              ' because it could be mixed with process sub-folders')
+              ' because it could be mixed with process sub-folders', file=sys.stderr)
         return None
 
     # Create the current configuration folder and its sub-folders for each HCD process
@@ -102,7 +102,7 @@ def save(current_config_folder,default_wf_param_file,maindict,uncompiled_actors,
     save_workflow_param_to_file(current_config_folder,maindict,uncompiled_actors, \
                                 workflow_param,wfp_ref,fur_ref,cod_ref,cat)
 
-    print('---> Configuration saved in '+current_config_folder)
+    print('---> Configuration saved in '+current_config_folder, file=sys.stdout)
 
     return current_config_folder
     
@@ -121,7 +121,7 @@ def save_codeparam_to_file(filepath, codeparam_dict):
         if elem.tag is not etree.Comment and len(elem) == 0:
             elem.text = codeparam_dict[elem.tag]
     tree.write(filepath)
-    print('---> Configuration saved in '+filepath)
+    print('---> Configuration saved in '+filepath, file=sys.stdout)
 
 ############################################################################################
 def destr_and_make(removed_by_close_button, window, maindict,workflow_param):
@@ -136,23 +136,23 @@ def destr_and_make(removed_by_close_button, window, maindict,workflow_param):
 def load(chosen_folder,open_gui):
 
     if chosen_folder is () or chosen_folder == '':
-        print('Load cancelled')
+        print('Load cancelled', file=sys.stderr)
         return
 
     # Check if the chosen folder is a valid configuration folder
     if not os.path.exists(chosen_folder+'/input_workflow.xml'):
-        print('The selected folder '+chosen_folder+' does not appear to be a proper')
+        print('The selected folder '+chosen_folder+' does not appear to be a proper', file=sys.stderr)
         print('configuration folder since it contains no input_workflow.xml file '\
-              +'--> Nothing loaded.')
+              +'--> Nothing loaded.', file=sys.stderr)
         return
     for hcd_process in ['ECRH','ICRH','NBI','NUCLEAR']:
         if not os.path.exists(chosen_folder+'/'+hcd_process):
-            print('The selected folder '+chosen_folder+' does not appear to be a proper')
+            print('The selected folder '+chosen_folder+' does not appear to be a proper', file=sys.stderr)
             print('configuration folder since it contains no '+hcd_process+' folder '\
-                  +'--> Nothing loaded.')
+                  +'--> Nothing loaded.', file=sys.stderr)
             return
 
-    print('---> Configuration loaded from '+chosen_folder)
+    print('---> Configuration loaded from '+chosen_folder, file=sys.stdout)
     open_gui(chosen_folder+'/input_workflow.xml')
 
 ############################################################################################

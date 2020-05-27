@@ -23,7 +23,7 @@ def __syspath_import_actor(actor_folder,actor_name,verbose):
     actor_folder_name = actor_folder+"/"+actor_name
     if not os.path.isdir(actor_folder_name):
         if verbose == 1:
-            print('Actor '+actor_name.upper()+' not found.')
+            print('Actor '+actor_name.upper()+' not found.', file=sys.stderr)
         error = 1
         return actor_function,error
     version = [f for f in os.listdir(actor_folder_name) \
@@ -58,9 +58,11 @@ def import_actor(actor_input,verbose):
     ACTOR_FOLDER = os.environ.get('ACTOR_FOLDER')
     if ACTOR_FOLDER is None:
         if type(actor_input) is str:
-            print('$ACTOR_FOLDER not defined --> '+actor_input+' not loaded.')
+            print('$ACTOR_FOLDER not defined --> '+actor_input+' not loaded.',\
+                  file=sys.stderr)
         else:
-            print('$ACTOR_FOLDER not defined --> '+', '.join(actor_input)+' not loaded.')
+            print('$ACTOR_FOLDER not defined --> '+', '.join(actor_input)+' not loaded.',\
+                  file=sys.stderr)
         return
 
     # Import the actor(s) and put into a dictionary
@@ -175,7 +177,7 @@ def loadlist(listname):
     elif listname=='extra_arguments':
         output_list = data['extra_arguments']
     else:
-        print('Error: bad listname in loadlist()')
+        print('Error: bad listname in loadlist()', file=sys.stderr)
         output_list=[]
 
     return output_list
@@ -338,8 +340,8 @@ def check_for_dependencies(workflow_xml):
                   print('ERROR: '+code.upper()+' needs any code as '+str(i), file=sys.stderr)
                 else:
                   if len(dep[i]) < 2:
-                    print('ERROR: '+code.upper()+' needs the '+str(dep[i][0]).upper()+' code as '+str(i), \
-                          file=sys.stderr)
+                    print('ERROR: '+code.upper()+' needs the '+str(dep[i][0]).upper()\
+                          +' code as '+str(i),file=sys.stderr)
                   else:
                     print('ERROR: '+code.upper()+' needs the '+ \
                           ' or '.join(dep[i]).upper().replace('OR','or') \
@@ -361,7 +363,7 @@ def check_for_dependencies(workflow_xml):
             global_error = global_error + err
 
     if global_error == 0:
-        print('Selection fulfills all actor selection rules', file=sys.stderr)
+        print('Selection fulfills all actor selection rules', file=sys.stdout)
     else:
         print('Please change the actor selection and try again.', file=sys.stderr)
 

@@ -18,6 +18,7 @@ extra_argument_list = loadlist('extra_arguments')
 # GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
 with open('workflow/auto_hcd_actors.py', 'w') as file:
 
+    file.write('import sys\n')
     file.write('from hcd_tools import import_actor, loadlist\n\n')
     file.write('list_of_actors = ["'+'","'.join(compiled_actors\
                +empty_actor_list+merge_actor_list)+'"]\n\n')
@@ -39,7 +40,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
                         file.write('   if parameters["'+cat +'"] == '+str(i)+':\n')
                     else: 
                         file.write('   elif parameters["'+cat +'"] == '+str(i)+':\n')
-                    file.write('       print("-- '+code.upper()+' --")\n')
+                    file.write('       print("-- '+code.upper()+' --", file=sys.stderr)\n')
                     if len(maindict[proc][sys][cat][code][1]) > 0:
                         output_ids_list = maindict[proc][sys][cat][code][1]
                         file.write('       '+",".join(str(x)+'_temp' \
@@ -73,7 +74,7 @@ with open('workflow/auto_hcd_actors.py', 'w') as file:
 
                         file.write(')\n')
                     else:
-                        file.write('       print("Code not installed")\n\n')
+                        file.write('       print("Code not installed", file=sys.stderr)\n\n')
                         output_ids_list = ['core_profiles'] # DEFAULT
 
                 file.write('   else: \n')

@@ -3,3 +3,5 @@ data/
 *~
 .idea
 *.pyc
+hcd_batch.*
+workflow/auto_hcd_actors.py

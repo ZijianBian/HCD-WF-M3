@@ -35,7 +35,7 @@ def hcd_wrapper(par_path):
       if code is not None:
         list_of_actors.append(code)
     if len(list_of_actors) == 0:
-       print('ERROR: no actor selected --> The H&CD workflow will not be executed')
+       print('ERROR: no actor selected --> The H&CD workflow will not be executed', file=sys.stderr)
        return
 
     # DEFINE THE TOTAL LIST OF INVOLVED INPUT AND OUTPUT IDSS ACCORDING TO THE ACTOR SELECTION
@@ -88,18 +88,18 @@ def hcd_wrapper(par_path):
     else:
       output_folder = output_user_or_path+'/'+output_database+'/3/0'
     if os.path.isdir(output_folder) == False:
-      print('-- Create local database for output file '+output_folder)
+      print('-- Create local database for output file '+output_folder, file=sys.stdout)
       os.makedirs(output_folder)
 
     # OPEN INPUT DATAFILE
-    print('-- Open input and output file --')
+    print('-- Open input and output file --', file=sys.stdout)
     input = imas.ids(param['shot_nr'], param['run_in'])
     retstatus,idx_in = input.open_env(input_user_or_path,input_database,version)
     if retstatus < 0:
       print('   ERROR while reading the input shot='+str(param['shot_nr'])\
             +' and run='+str(param['run_in'])+'\n   for user_or_path = '+input_user_or_path\
-            +' and database = '+input_database)
-      print('   Please check that the file exists.')
+            +' and database = '+input_database, file=sys.stderr)
+      print('   Please check that the file exists.', file=sys.stderr)
       return
 
     # CREATE OUTPUT DATAFILE
@@ -108,8 +108,8 @@ def hcd_wrapper(par_path):
     if retstatus < 0:
       print('   ERROR while creating the output shot='+str(param['shot_nr'])\
             +' and run='+str(param['run_out'])+'\n   for user_or_path = '+output_user_or_path\
-            +' and database = '+output_database)
-      print('   --> Aborted.')
+            +' and database = '+output_database, file=sys.stderr)
+      print('   --> Aborted.', file=sys.stderr)
       return
 
     ##################################################################
@@ -146,20 +146,20 @@ def hcd_wrapper(par_path):
     if param['tbegin'] < 0:
         param['tbegin'] = time_array[0]
         print('Initial time tbegin set to core_profiles first time slice. tbegin = ',\
-              param['tbegin'])
+              param['tbegin'], file=sys.stdout)
 
     if param['tbegin'] > 0 and param['tbegin'] < time_array[0]:
        print('ERROR: tbegin out of range ('+str(param['tbegin'])\
-             +'s is less than first time in core_profiles)')
+             +'s is less than first time in core_profiles)', file=sys.stderr)
        return
 
     if param['tend'] < 0:
         param['tend'] = time_array[-1]
-        print('Final time tend set to core_profiles final time slice, tend = ', param['tend'])
+        print('Final time tend set to core_profiles final time slice, tend = ', param['tend'], file=sys.stdout)
 
     if param['tend'] > 0 and param['tend'] > time_array[-1]:
        print('ERROR: tend out of range  ('+str(param['tend'])\
-             + 's is greater than last time in core_profiles)')
+             + 's is greater than last time in core_profiles)', file=sys.stderr)
        return
 
     ##################################################################
@@ -168,8 +168,8 @@ def hcd_wrapper(par_path):
     # BEGIN TIME LOOP 
     #-----------------
 
-    print('---------------------------------------------')
-    print('---- Enter time loop of the H&CD wrapper ----')
+    print('---------------------------------------------', file=sys.stdout)
+    print('---- Enter time loop of the H&CD wrapper ----', file=sys.stdout)
 
     timenow = param['tbegin']
     nsteps  = int((param['tend']-param['tbegin'])/param['dt_required'])+1
@@ -179,14 +179,14 @@ def hcd_wrapper(par_path):
 
         step+=1
 
-        print('---------------------------------------------')
-        print('Step = '+str(step)+'/'+str(nsteps))
-        print('Time = %5.2f' % timenow, 's')
-        print('dt   = %5.2f' % param['dt_required'], 's')
+        print('---------------------------------------------', file=sys.stdout)
+        print('Step = '+str(step)+'/'+str(nsteps), file=sys.stdout)
+        print('Time = %5.2f' % timenow, 's', file=sys.stdout)
+        print('dt   = %5.2f' % param['dt_required'], 's', file=sys.stdout)
 
         # READ ALL INPUT IDSS FOR THE CURRENT TIME SLICE
         for elem in input_ids_list:
-          print('  Get', elem)
+          print('  Get', elem, file=sys.stdout)
           try:
             ids_bundle_input[elem].getSlice(timenow,1)
           except:
@@ -216,9 +216,9 @@ def hcd_wrapper(par_path):
                                                               ids_bundle_work['waves'], \
                                                               ids_bundle_work['distributions'])
           except: 
-               print('Failed to load or run SimpleTrans')
+               print('Failed to load or run SimpleTrans', file=sys.stderr)
                print('WARNING - Skipping SimpleTrans even though it has been'+\
-                     ' choosen in the configuration!')
+                     ' choosen in the configuration!', file=sys.stdout)
 
         # COPY WORK BUNDLE TO OUTPUT BUNDLE TO SAVE THE RESULTS TO DISK
         ids_bundle_output = bundle_copy(ids_bundle_work)
@@ -253,16 +253,16 @@ def hcd_wrapper(par_path):
     input.close()
     output.close()
 
-    print('---------------------------------------------')
-    print('End of H&CD workflow.')      
-    print('---------------------')
+    print('---------------------------------------------', file=sys.stdout)
+    print('End of H&CD workflow.', file=sys.stdout)      
+    print('---------------------', file=sys.stdout)
 
   except (KeyboardInterrupt, SystemExit):
-    print(' hcd_wrapper.py aborted by the user')
+    print(' hcd_wrapper.py aborted by the user', file=sys.stderr)
     input.close()
     output.close()
 
   except:
-    print('ERROR in hcd_wrapper.py')
+    print('ERROR in hcd_wrapper.py', file=sys.stderr)
     raise
 

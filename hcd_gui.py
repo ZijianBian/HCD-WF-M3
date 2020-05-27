@@ -5,15 +5,15 @@ try:
     import tkinter.ttk
     import tkinter.filedialog
 except:
-    print('ERROR: tkinter not found')
-    print('---> TIP: source the HCD configuration file')
+    print('ERROR: tkinter not found', file=sys.stderr)
+    print('---> TIP: source the HCD configuration file', file=sys.stderr)
     sys.exit()
 
 try:
     from lxml import etree
 except:
-    print('ERROR: lxml module not found')
-    print('---> TIP: source the HCD configuration file')
+    print('ERROR: lxml module not found', file=sys.stderr)
+    print('---> TIP: source the HCD configuration file', file=sys.stderr)
     sys.exit()
 
 try:
@@ -26,15 +26,15 @@ try:
         update_workflow_param,load
 except:
     raise
-    print('ERROR while loading internal HCD modules')
-    print('---> TIP: source the HCD configuration file')
+    print('ERROR while loading internal HCD modules', file=sys.stderr)
+    print('---> TIP: source the HCD configuration file', file=sys.stderr)
     sys.exit()
 
 #---------------------------------------------------------------------------------------------
 # Folder from which to find the compiled HCD actors
 
 if os.getenv('ACTOR_FOLDER') is None:
-    print('ERROR: the environment variable ACTOR_FOLDER has not been set up')
+    print('ERROR: the environment variable ACTOR_FOLDER has not been set up', file=sys.stderr)
     sys.exit()
 else:
     ACTOR_FOLDER = os.getenv('ACTOR_FOLDER')
@@ -70,10 +70,10 @@ def open_gui(wf_param_file):
         err = import_actor(actor,1)
         err_global = err_global + err
     if err_global!=0:
-        print('---------------------------------------------')
-        print('One or more mandatory actor(s) not accessible')
-        print('--> Program stopped.')
-        print('---------------------------------------------')
+        print('---------------------------------------------', file=sys.stderr)
+        print('One or more mandatory actor(s) not accessible', file=sys.stderr)
+        print('--> Program stopped.'                         , file=sys.stderr)
+        print('---------------------------------------------', file=sys.stderr)
         return
 
     try:

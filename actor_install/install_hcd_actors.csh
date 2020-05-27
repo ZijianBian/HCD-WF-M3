@@ -20,7 +20,7 @@ cp actor_install.py *.yml ${ACTOR_RELEASE_DIRECTORY}
 cd ${ACTOR_RELEASE_DIRECTORY}
 
 set actor_list=(cyrano gray hcd2core-profiles \
-  hcd2core-sources iccoup ids-tools lion risk spot stixredist ascot \
+  hcd2core-sources iccoup wftools lion risk spot stixredist ascot \
   tomcat nemo genray pion grayscale)
 
 foreach actor ($actor_list)

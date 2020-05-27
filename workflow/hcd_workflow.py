@@ -1,4 +1,4 @@
-import generate_actors
+import generate_actors, sys
 import auto_hcd_actors as actors
 from hcd_tools import bundle_copy, create_workflow_param_from_file
 
@@ -6,7 +6,7 @@ from hcd_tools import bundle_copy, create_workflow_param_from_file
 
 def hcd_workflow(BNDL_in,workflow_xml):
 
-    print('Execute H&CD workflow for current time slice')
+    print('Execute H&CD workflow for current time slice', file=sys.stdout)
 
     # EXTRACT PARAMETERS FROM INPUT XML FILE
     parameters = create_workflow_param_from_file(workflow_xml,2)
@@ -21,7 +21,7 @@ def hcd_workflow(BNDL_in,workflow_xml):
     BNDL_out  = bundle_copy(BNDL_in)
 
     # STEP 1: SOURCE CODES, ICCOUP (FOR IC COUPLING) AND WAVE SOLVERS
-    print('-- Step 1: Source codes and Wave solvers')
+    print('-- Step 1: Source codes and Wave solvers', file=sys.stdout)
     BNDL_nbi ['distribution_sources'] = actors.nbi_source     ( BNDL_nbi, parameters )
     BNDL_nuc ['distribution_sources'] = actors.nuclear_source ( BNDL_nuc, parameters )
     BNDL_ic  ['waves']                = actors.ic_coup        ( BNDL_ic,  parameters )
@@ -33,13 +33,13 @@ def hcd_workflow(BNDL_in,workflow_xml):
     BNDL_ic ['distribution_sources'] = BNDL_nbi['distribution_sources']
 
     # STEP 2: FOKKER PLANK SOLVERS
-    print('-- Step 2: Fokker Planck solvers')
+    print('-- Step 2: Fokker Planck solvers', file=sys.stdout)
     BNDL_ic  ['distributions'] = actors.ic_wave_fp ( BNDL_ic,  parameters)
     BNDL_nuc ['distributions'] = actors.nuclear_fp ( BNDL_nuc, parameters)
     BNDL_nbi ['distributions'] = actors.nbi_fp     ( BNDL_nbi, parameters)
 
     # STEP 3: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION_SOURCES and WAVES
-    print('-- Step 3: Mergers')
+    print('-- Step 3: Mergers', file=sys.stdout)
     distrib_nbi_ic     = actors.merge_distributions(BNDL_nbi['distributions'], \
                                                     BNDL_ic['distributions'])
     distrib_fus_nbi_ic = actors.merge_distributions(BNDL_nuc['distributions'],distrib_nbi_ic)
@@ -53,7 +53,7 @@ def hcd_workflow(BNDL_in,workflow_xml):
     BNDL_core ['waves']                = waves_ec_ic 
 
     # STEP 4: MAKE CORE_SOURCES AND CORE_PROFILES IDS:
-    print('-- Step 4: Make core_sources and/or core_profiles')
+    print('-- Step 4: Make core_sources and/or core_profiles', file=sys.stdout)
     BNDL_core ['core_sources']  = actors.fill_core_sources  ( BNDL_core, parameters )
     BNDL_core ['core_profiles'] = actors.fill_core_profiles ( BNDL_core, parameters )
 
@@ -64,6 +64,6 @@ def hcd_workflow(BNDL_in,workflow_xml):
     BNDL_out['core_sources']         = BNDL_core ['core_sources']
     BNDL_out['core_profiles']        = BNDL_core ['core_profiles']
 
-    print('End of time slice')
+    print('End of time slice', file=sys.stdout)
 
     return BNDL_out
