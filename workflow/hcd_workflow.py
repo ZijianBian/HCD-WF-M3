@@ -11,6 +11,14 @@ def hcd_workflow(BNDL_in,workflow_xml):
     # EXTRACT PARAMETERS FROM INPUT XML FILE
     parameters = create_workflow_param_from_file(workflow_xml,2)
 
+    # ARTIFICIALLY REMOVE WARNINGS
+    warning_list = ['distribution_sources','distributions','ec_launchers',\
+                    'ic_antennas','nbi','wall']
+    for ids in warning_list:
+        if ids in BNDL_in:
+            BNDL_in[ids].ids_properties.homogeneous_time = 1
+            BNDL_in[ids].time = BNDL_in['core_profiles'].time
+
     # STEP 0: PREPARATION OF SUB-BUNDLES FOR EACH TYPE OF H&CD CALCULATION
     # BNDL_OUT WILL HOLD THE FINAL RESULT
     BNDL_nbi  = bundle_copy(BNDL_in)
@@ -19,14 +27,6 @@ def hcd_workflow(BNDL_in,workflow_xml):
     BNDL_ec   = bundle_copy(BNDL_in)
     BNDL_core = bundle_copy(BNDL_in)
     BNDL_out  = bundle_copy(BNDL_in)
-
-    # ARTIFICIALLY REMOVE WARNINGS
-    warning_list = ['distribution_sources','distributions','ec_launchers',\
-                    'ic_antennas','nbi','wall']
-    for ids in warning_list:
-        if ids in ids_bundle_work:
-            ids_bundle_work[ids].ids_properties.homogeneous_time = 1
-            ids_bundle_work[ids].time = ids_bundle_input['core_profiles'].time
 
     # STEP 1: SOURCE CODES, ICCOUP (FOR IC COUPLING) AND WAVE SOLVERS
     print('-- Step 1: Source codes and Wave solvers', file=sys.stdout)
