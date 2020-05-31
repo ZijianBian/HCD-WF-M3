@@ -1,7 +1,7 @@
 import tkinter
 import colour_definitions as col
-from codeparam_populate import populate
-from utility_functions import save_codeparam_to_file
+from codeparam_populate import codeparam_interface
+from utility_functions import save_codeparam_to_file2, read_and_save_codeparam
 
 # CREATE THE WINDOW TO EDIT CODE PARAMETERS
 def make_frame(hsys,fr_top,actor_name,previous_frame,cp_top,current_config_folder,default):
@@ -14,13 +14,17 @@ def make_frame(hsys,fr_top,actor_name,previous_frame,cp_top,current_config_folde
     canvas.grid(row=1,column=2,sticky=' news')
     canvas.create_window((4,4),window=frame, anchor='nw')
 
-    # CREATE THE INTERFACE FOR ALL PARAMETERS, RETURN THEIR LIST AND LOCATION
-    destination_file,codeparam_dict = populate(frame,current_config_folder,hsys,actor_name,\
-                                               v_scroll,default)
+    # READ CODEPARAM STRUCTURE FROM XML AND XSD FILES
+    destination_file,codeparam_dict,docum_dict,codeparam_xml_path,xmlschema \
+        = read_and_save_codeparam(current_config_folder,None,hsys,actor_name,default)
+
+    # CREATE/UPDATE THE INTERFACE FOR ALL PARAMETERS, RETURN THEIR UPDATED LIST
+    updated_codeparam_dict = codeparam_interface(frame,destination_file,codeparam_dict,\
+                             docum_dict,codeparam_xml_path,xmlschema,v_scroll,default)
 
     # SAVE NEW CODEPARAM CONFIGURATION
     tkinter.Button(fr_top, text='Save', bg=col.c2, command=lambda:
-           save_codeparam_to_file(destination_file, codeparam_dict))\
+           save_codeparam_to_file2(destination_file,updated_codeparam_dict))\
            .grid(row=0, column=1, padx=5, pady=5)
 
     # RESTORE DEFAULT CODEPARAM CONFIGURATION

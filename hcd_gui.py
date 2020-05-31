@@ -21,8 +21,7 @@ try:
     from hcd_tools import import_actor, create_maindict, loadlist, \
         create_workflow_param_from_file
     from codeparam_edit import edit_codeparam
-    from utility_functions import save_workflow_param_to_file, \
-        save, run, save_codeparam_to_file, destr_and_make, \
+    from utility_functions import save, run, destr_and_make, \
         update_workflow_param,load
 except:
     raise
@@ -133,20 +132,15 @@ def open_gui(wf_param_file):
                                                  pady=2,
                                                  sticky='w')
 
+            # Catch any update of the variable from the interface
             entrystring = tkinter.StringVar()
             entrystring.set(workflow_param[ref][elem])
-            entrystring.trace('w', lambda name, index, mode,
-                                          elem=elem, entrystring=entrystring,
-                                          ref=ref: update_workflow_param(workflow_param,ref,
-                                                                         elem,
-                                                                         entrystring.get()))
+            entrystring.trace('w', lambda name, index, mode, elem=elem, entrystring=entrystring,\
+               ref=ref: update_workflow_param(workflow_param,ref,elem,entrystring.get()))
             # if an entry is changed, the new values should immediately be changed
             # in the workflow_param dictionary
-            tkinter.Entry(fr_wfp, textvariable=entrystring, bg=col.c1).grid(row=irow,
-                                                                column=1,
-                                                                padx=1,
-                                                                pady=2,
-                                                                sticky='e')
+            tkinter.Entry(fr_wfp, textvariable=entrystring, bg=col.c1)\
+                   .grid(row=irow,column=1,padx=1,pady=2,sticky='e')
             irow += 1
 
 
@@ -178,23 +172,25 @@ def open_gui(wf_param_file):
         def NoAction(self):
             self.value = self.value
         def Save(self,chosen_folder,init_folder):
-            if chosen_folder == init_folder: # 1st SAVE, or SAVE after a LOAD (but before a SAVE AS)
-                self.value=save(self.value,default_wf_param_file,maindict[actors_ref],\
-                        uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+            previous_folder = init_folder
+            if chosen_folder == init_folder: # Very first SAVE, or SAVE after a SAVE_AS
+                self.value=save(self.value,default_wf_param_file,previous_folder,\
+                maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
             else:
                 if chosen_folder is None:
                     if self.value is None: # 1st SAVE after a LOAD
-                        self.value=save(init_folder,default_wf_param_file,\
+                        self.value=save(init_folder,default_wf_param_file,previous_folder,\
                             maindict[actors_ref],uncompiled_actors,workflow_param, \
                             wfp_ref,fur_ref,cod_ref,cat)
-                    else: # SAVE after a SAVE AS which is after a LOAD
-                        self.value=save(self.value,default_wf_param_file, \
+                    else: # Next SAVEs after a LOAD; SAVE after a SAVE AS which is after a LOAD; 
+                        self.value=save(self.value,default_wf_param_file,previous_folder, \
                             maindict[actors_ref],uncompiled_actors,workflow_param, \
                             wfp_ref,fur_ref,cod_ref,cat)
                 else: # SAVE AS
                     if_cancelled = self.value
-                    self.value=save(chosen_folder,default_wf_param_file,maindict[actors_ref], \
-                            uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref,cat)
+                    self.value=save(chosen_folder,default_wf_param_file,previous_folder,\
+                        maindict[actors_ref],uncompiled_actors,workflow_param,\
+                        wfp_ref,fur_ref,cod_ref,cat)
                     if self.value is None:
                         self.value = if_cancelled
             return self.value
