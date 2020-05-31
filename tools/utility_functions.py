@@ -91,10 +91,27 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
         xmlschema
 
 ############################################################################################
+def update_codeparam_file(destination_file,codeparam_dict,verbose):
+
+    tree = etree.parse(destination_file)
+    root = tree.getroot()
+    for elem in root.iter():
+        if elem.tag is not etree.Comment and len(elem) == 0:
+            elem.text = codeparam_dict[elem.tag]
+    tree.write(destination_file)
+
+    if verbose == 1:
+        print('---> Configuration saved in '+destination_file, file=sys.stdout)
+
+    return 0
+
+############################################################################################
 def save_codeparam_to_file(current_config_folder,previous_folder,maindict,uncompiled_actors, \
-                           workflow_param,cod_ref,cat,verbose):
+                           workflow_param,verbose):
 
     from hcd_tools import import_actor
+
+    cod_ref = list(workflow_param.keys())[2]
 
     for hsys in maindict:
         for cat in maindict[hsys]:
@@ -113,33 +130,13 @@ def save_codeparam_to_file(current_config_folder,previous_folder,maindict,uncomp
                                             hsys,actor_name,False)
 
                 # Update code parameter files if changed from interface
-                tree = etree.parse(destination_file)
-                root = tree.getroot()
-                for elem in root.iter():
-                    if elem.tag is not etree.Comment and len(elem) == 0:
-                        elem.text = codeparam_dict[elem.tag]
-                tree.write(destination_file)
-
-    if verbose == 1:
-        print('---> Configuration saved in '+destination_file, file=sys.stdout)
+                update_codeparam_file(destination_file,codeparam_dict,verbose)
 
     return 0
 
 ############################################################################################
-def save_codeparam_to_file2(destination_file,codeparam_dict):
-
-    tree = etree.parse(destination_file)
-    root = tree.getroot()
-    for elem in root.iter():
-        if elem.tag is not etree.Comment and len(elem) == 0:
-            elem.text = codeparam_dict[elem.tag]
-    tree.write(destination_file)
-
-    print('---> Configuration saved in '+destination_file, file=sys.stdout)
-
-############################################################################################
 def save(current_config_folder,default_wf_param_file,previous_folder,maindict,uncompiled_actors,\
-         workflow_param,wfp_ref,fur_ref,cod_ref,cat):
+         workflow_param,wfp_ref,fur_ref,cod_ref):
 
     from datetime import datetime
 
@@ -189,8 +186,8 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
         workflow_param,wfp_ref,fur_ref,cod_ref)
 
     # Copy/update code parameter files for chosen actors in their respective sub-folders
-    err = save_codeparam_to_file(current_config_folder,previous_folder,maindict,uncompiled_actors, \
-                                 workflow_param,cod_ref,cat,0)
+    err = save_codeparam_to_file(current_config_folder,previous_folder,maindict,\
+        uncompiled_actors,workflow_param,0)
 
     if err == 0:
         print('---> Configuration saved in '+current_config_folder, file=sys.stdout)
