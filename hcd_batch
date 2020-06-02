@@ -1,11 +1,45 @@
-#!/bin/sh
-#SBATCH  --ntasks-per-node=8
-#SBATCH  --cpus-per-task=1
-#SBATCH  --time=1:00:00
-#SBATCH  --mail-user=mireille.schneider@iter.org
-#SBATCH  --mail-type=END
-#SBATCH  --job-name=HCD_wf
-#SBATCH  --partition=gen9_ib-short
+#!/usr/bin/env python
 
-./hcd_nogui -c /home/ITER/schneim/public/git/hcd/data/batch_test
+# -----------------------------------------------------
+# AUTO-GENERATE BATCH SCRIPT TO RUN THE H&CD WORKFLOW,
+# AND LAUNCH IT VIA QSUB
+# -----------------------------------------------------
+
+import argparse, subprocess
+
+from datetime import datetime
+
+# Management of input arguments
+parser = argparse.ArgumentParser(description='---- Run the H&CD workflow without the interface')
+parser.add_argument("-n","--nproc",help="Number of processors", required=True)
+parser.add_argument("-t","--time",help="Required cpu time in hours", required=True)
+parser.add_argument("-e","--email",help="E-mail where to send job resulting status", required=True)
+parser.add_argument("-q","--queue",help="Name of the batch queue", required=True)
+parser.add_argument("-c","--config_folder",help="input configuration folder", required=True)
+
+args          = vars(parser.parse_args())
+nproc         = args["nproc"]
+time          = args["time"]
+email         = args["email"]
+queue         = args["queue"]
+config_folder = args["config_folder"]
+
+auto_batch_name = str('auto_batch_'+datetime.now().strftime('%y%m%d_%H%M%S'))
+
+with open(auto_batch_name, 'w') as file:
+
+   file.write('#!/bin/sh\n\n')
+   file.write('#SBATCH  --ntasks-per-node='+nproc+'\n')
+   file.write('#SBATCH  --cpus-per-task=1'+'\n')
+   file.write('#SBATCH  --time='+time+':00:00'+'\n')
+   file.write('#SBATCH  --mail-user='+email+'\n')
+   file.write('#SBATCH  --mail-type=END'+'\n')
+   file.write('#SBATCH  --job-name=HCD_wf'+'\n')
+   file.write('#SBATCH  --partition='+queue+'\n\n')
+   file.write('./hcd_nogui -c '+config_folder+'\n\n')
+
+file.close()
+
+subprocess.call(['qsub '+auto_batch_name],shell=True)
+print(auto_batch_name+' submitted.')
 
