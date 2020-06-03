@@ -45,17 +45,19 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
                 # CHECK IF THE XML FILE EXISTS IN THE DESTINATION FOLDER ALREADY
                 if os.path.exists(destination_file) and default is False:
                     codeparam_xml_path = destination_file
-                # IF NOT, OR IF DEFAULT IS REQUIRED, COPY IT FROM THE ACTOR LOCATION
+                # IF NOT, COPY IT FROM THE ACTOR LOCATION
                 else:
-                    if previous_folder is None or default is True:
-                        xml_name = iline.split('+')[-1].replace("'","").replace(" ","")\
-                                   .replace("\n","")
-                        codeparam_xml_path = actor_python_folder+xml_name
-                    else:
+                    xml_name = iline.split('+')[-1].replace("'","").replace(" ","")\
+                               .replace("\n","")
+                    codeparam_xml_path = actor_python_folder+xml_name
+                    copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
+                    # IF DEFAULT IS NOT REQUIRED AND IF CONFIGURATION LOADED FROM A PREVIOUS RUN,
+                    # REPLACE THE XML FILE BY THE ONE OF THE PREVIOUS CONFIGURATION
+                    if previous_folder is not None and default is False:
                         xml_name = hsys+'/input_'+actor_name+'.xml'
                         codeparam_xml_path = previous_folder+'/'+xml_name
-                if codeparam_xml_path != destination_file:
-                    copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
+                        if codeparam_xml_path != destination_file:
+                            copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
                 found_xml = True
 
             if 'xsd_location = ' in iline:
