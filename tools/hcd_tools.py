@@ -254,6 +254,18 @@ def create_maindict(workflow_parameters,input_option,verbose):
     compiled_list = []
     not_compiled_list = []
     maindict = {}
+
+    # DISPLAY FOR TEST PURPOSES
+    #for main_key in actor_selection:
+    #    print('main_key',main_key)
+    #    for system in main_key:
+    #        print('  system',system)
+    #        for category in system:
+    #            print('    category',category)
+    #            if category.tag is not etree.Comment:
+    #                for actor_name in category.attrib['list'].split():
+    #                    print('     actor_name',actor_name)
+
     for main_key in actor_selection:
         dict_system = {}
         for system in main_key:
@@ -266,7 +278,7 @@ def create_maindict(workflow_parameters,input_option,verbose):
                           verbose_eff = 0
                         else:
                           verbose_eff = verbose
-                        (input_ids_list, input_arg_list, output_ids_list, err) = \
+                          (input_ids_list, input_arg_list, output_ids_list, err) = \
                             read_actor_ids(actor_name,verbose_eff)
                         if err == 0:
                             compiled_list.append(actor_name)
@@ -277,16 +289,17 @@ def create_maindict(workflow_parameters,input_option,verbose):
                         else:
                             dict_actor[actor_name] = [input_arg_list, output_ids_list]
                     if category.text is not '0':
-                      code_selection[category.tag] = category.attrib['list'].split(' ')[int(category.text)-1]
+                      code_selection[category.tag] = category.attrib['list'].split(' ')\
+                                                     [int(category.text)-1]
                     else:
                       code_selection[category.tag] = None
                     dict_category[category.tag] = dict_actor
             dict_system[system.tag] = dict_category
         maindict[main_key.tag] = dict_system
 
-        # Remove duplicates
-        compiled_list     = list( dict.fromkeys(compiled_list) )
-        not_compiled_list = list( dict.fromkeys(not_compiled_list) )
+    # Remove duplicates
+    compiled_list     = list( dict.fromkeys(compiled_list) )
+    not_compiled_list = list( dict.fromkeys(not_compiled_list) )
 
     return(maindict,compiled_list,not_compiled_list,code_selection)
 
@@ -418,3 +431,13 @@ def create_workflow_param_from_file(filepath,option):
     workflow_param['input_path'] = '/'.join(filepath.split('/')[:-1])
 
     return(workflow_param)
+
+#####################################################################################
+
+# -------------------
+# Merge dictionaries
+# -------------------
+def dict_merge(dict1, dict2): 
+  res = {**dict1, **dict2} 
+  return res 
+

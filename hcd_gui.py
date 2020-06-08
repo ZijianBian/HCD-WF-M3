@@ -19,7 +19,7 @@ except:
 try:
     import colour_definitions as col
     from hcd_tools import import_actor, create_maindict, loadlist, \
-        create_workflow_param_from_file
+        create_workflow_param_from_file, dict_merge
     from codeparam_edit import edit_codeparam
     from utility_functions import save, run, destr_and_make, \
         update_workflow_param,load
@@ -109,8 +109,11 @@ def open_gui(wf_param_file):
     fur_ref = list(workflow_param.keys())[1]
     cod_ref = list(workflow_param.keys())[2]
 
-    actors_ref = list(maindict.keys())[0]
-    make_core_ref = list(maindict.keys())[1]
+    hcd_actors_ref = list(maindict.keys())[0]
+    make_core_ref  = list(maindict.keys())[1]
+    all_actors_ref = [hcd_actors_ref,make_core_ref]
+
+    global_dict = dict_merge(maindict[hcd_actors_ref],maindict[make_core_ref])
 
     ## LEFT - CONFIGURING THE WORKFLOW PARAMETERS
     irow = 0
@@ -146,7 +149,7 @@ def open_gui(wf_param_file):
 
     ## MIDDLE - SELECTING THE ACTORS
     rrow = 0
-    for ref in [actors_ref, make_core_ref]:
+    for ref in all_actors_ref:
         for hsys in maindict[ref]:
             tkinter.Label(fr_as, text=hsys, bg=col.c1, font='15').grid(row=rrow,
                                                            column=0,
@@ -175,21 +178,21 @@ def open_gui(wf_param_file):
             previous_folder = init_folder
             if chosen_folder == init_folder: # Very first SAVE, or SAVE after a SAVE_AS
                 self.value=save(self.value,default_wf_param_file,previous_folder,\
-                maindict[actors_ref],uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref)
+                global_dict,uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref)
             else:
                 if chosen_folder is None:
                     if self.value is None: # 1st SAVE after a LOAD
                         self.value=save(init_folder,default_wf_param_file,previous_folder,\
-                            maindict[actors_ref],uncompiled_actors,workflow_param, \
+                            global_dict,uncompiled_actors,workflow_param, \
                             wfp_ref,fur_ref,cod_ref)
                     else: # Next SAVEs after a LOAD; SAVE after a SAVE AS which is after a LOAD; 
                         self.value=save(self.value,default_wf_param_file,previous_folder, \
-                            maindict[actors_ref],uncompiled_actors,workflow_param, \
+                            global_dict,uncompiled_actors,workflow_param, \
                             wfp_ref,fur_ref,cod_ref)
                 else: # SAVE AS
                     if_cancelled = self.value
                     self.value=save(chosen_folder,default_wf_param_file,previous_folder,\
-                        maindict[actors_ref],uncompiled_actors,workflow_param,\
+                        global_dict,uncompiled_actors,workflow_param,\
                         wfp_ref,fur_ref,cod_ref)
                     if self.value is None:
                         self.value = if_cancelled
@@ -240,12 +243,12 @@ def open_gui(wf_param_file):
     button_edit_codeparameters = tkinter.Button(fr_as, text='Edit Code Parameters', bg=col.c2)
     button_edit_codeparameters.grid(row=53, column=0, padx=5, pady=5, sticky='ew')
     button_edit_codeparameters.configure(command=lambda: edit_codeparam\
-    (maindict,actors_ref,workflow_param,cod_ref,saved_folder.Save(None,init_folder)))
+    (maindict,all_actors_ref,workflow_param,cod_ref,saved_folder.Save(None,init_folder)))
 
     button_create_flowchart = tkinter.Button(fr_as, text='Show Flowchart', bg=col.c2)
     button_create_flowchart.grid(row=53, column=1, padx=5, pady=5, sticky='ew')
     button_create_flowchart.configure(command=lambda: destr_and_make\
-                (removed_by_close_button, window, maindict,workflow_param))
+                (removed_by_close_button, window, maindict, workflow_param))
 
     window.mainloop()
 

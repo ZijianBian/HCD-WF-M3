@@ -168,7 +168,7 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
     # Dont want to write configuration in folders called ECRH, ICRH, NBI, NUCLEAR 
     # because it would be too confusing
     folder_name = current_config_folder.split('/')[-1]
-    if folder_name in ['ECRH','ICRH','NBI','NUCLEAR']:
+    if folder_name in ['ECRH','ICRH','NBI','NUCLEAR','source','profiles']:
         print('Refuse to write directly in a folder named '+folder_name+ \
               ' because it could be mixed with process sub-folders', file=sys.stderr)
         return None
@@ -176,12 +176,15 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
     # Read the default workflow parameters file
     root = etree.parse(default_wf_param_file).getroot()
 
-    # Create the current configuration folder and its sub-folders for each HCD process
+    # Create the current configuration folder and its sub-folders for each process
     if not os.path.exists(current_config_folder):
         os.makedirs(current_config_folder)
-    for systemname in root[2][0]:
+    for systemname in root[2][0]: # HCD process
         if not os.path.exists(current_config_folder+'/'+systemname.tag):
             os.makedirs(current_config_folder+'/'+systemname.tag)
+    for postproc in root[2][1]: # Post-processins
+        if not os.path.exists(current_config_folder+'/'+postproc.tag):
+            os.makedirs(current_config_folder+'/'+postproc.tag)
 
     # Copy/update the workflow parameter file if changed from the interface
     err = save_workflow_param_to_file(default_wf_param_file,current_wf_param_file,\
@@ -230,7 +233,7 @@ def load(chosen_folder,open_gui):
         print('configuration folder since it contains no input_workflow.xml file '\
               +'--> Nothing loaded.', file=sys.stderr)
         return
-    for hcd_process in ['ECRH','ICRH','NBI','NUCLEAR']:
+    for hcd_process in ['ECRH','ICRH','NBI','NUCLEAR','source','profiles']:
         if not os.path.exists(chosen_folder+'/'+hcd_process):
             print('The selected folder '+chosen_folder+' does not appear to be a proper', \
                   file=sys.stderr)
