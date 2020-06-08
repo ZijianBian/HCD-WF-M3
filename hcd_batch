@@ -4,6 +4,8 @@
 # AUTO-GENERATE BATCH SCRIPT TO RUN THE H&CD WORKFLOW,
 # AND LAUNCH IT VIA QSUB
 # -----------------------------------------------------
+# EXAMPLE:
+# ./hcd_batch -n 1 -t 1 -e mireille.schneider@iter.org -q gen9_ib-short -c data/batch_test/
 
 import argparse, subprocess
 
