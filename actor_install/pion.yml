@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/pion.git
-    VERSION: feature/no_kepler_option
+    VERSION: develop
     DIR: pion
 
 MODULES: [INTERPOS/9.0.2-intel-2018a, NAG/26-intel-2018a XMLlib/3.2.0-intel-2018a]
