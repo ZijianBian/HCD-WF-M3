@@ -27,7 +27,6 @@ module load FRUIT_processor/3.4.3-intel-2018a-Ruby-2.5.1
 module load INTERPOS/9.0.2-intel-2018a
 module load XMLlib/3.2.0-intel-2018a
 module load PSPLINE/2.0.0-intel-2018a
-module load PyAL/1.3.1-intel-2018a-Python-3.6.4
 module load NAG/26-intel-2018a
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
