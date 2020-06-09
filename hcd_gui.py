@@ -32,11 +32,11 @@ except:
 #---------------------------------------------------------------------------------------------
 # Folder from which to find the compiled HCD actors
 
-if os.getenv('ACTOR_FOLDER') is None:
-    print('ERROR: the environment variable ACTOR_FOLDER has not been set up', file=sys.stderr)
-    sys.exit()
-else:
-    ACTOR_FOLDER = os.getenv('ACTOR_FOLDER')
+#if os.getenv('ACTOR_FOLDER') is None:
+#    print('ERROR: the environment variable ACTOR_FOLDER has not been set up', file=sys.stderr)
+#    sys.exit()
+#else:
+#    ACTOR_FOLDER = os.getenv('ACTOR_FOLDER')
 
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file

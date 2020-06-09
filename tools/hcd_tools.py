@@ -11,39 +11,60 @@ def __foo():
 
 #####################################################################################
 
+# -----------------------------------------------------
+# Function to read the yaml file containing the global
+# lists used in many places of the H&CD workflow
+# -----------------------------------------------------
+
+# Create lists from the global configuration yaml file
+def loadlist(listname):
+
+    path_file = os.path.abspath(inspect.getfile(__foo))
+    path = '/'.join(path_file.split('/')[:-1])
+
+    file = open(path+'/../global_configuration/'+'global_lists.yaml', 'r')
+    data = yaml.load(file, Loader=yaml.CLoader)
+
+    if listname=='ids_list':
+        output_list = data['ids_list'].split(' ')
+    elif listname=='actor_list':
+        output_list = data['actor_list'].split(' ')
+    elif listname=='merge_actor_list':
+        output_list = data['merge_actor_list'].split(' ')
+    elif listname=='empty_actor_list':
+        output_list = data['empty_actor_list'].split(' ')
+    elif listname=='dependencies':
+        output_list = data['dependencies']
+    elif listname=='extra_arguments':
+        output_list = data['extra_arguments']
+    else:
+        print('Error: bad listname in loadlist()', file=sys.stderr)
+        output_list=[]
+
+    return output_list
+
 # ---------------------------------------------------------------------------------
 # Function used in import_actor, to add the actor folder to the path and import it
 # ---------------------------------------------------------------------------------
-def __syspath_import_actor(actor_folder,actor_name,verbose):
+def __syspath_import_actor(actor_name,verbose):
 
-    actor_function=[]
-    error = 0
+    from importlib import import_module
+
+    # Import the module of the actor
+    try:
+      actor_module = import_module(actor_name)
+    except:
+      if verbose == 1:
+        print('Actor '+actor_name.upper()+' not found.', file=sys.stderr)
+      return [],1
+
+    # Import the actor function
+    actor_function = getattr(import_module(actor_name+'.wrapper'), actor_name+'_actor')
 
     # Folder where the actor is located
-    actor_folder_name = actor_folder+"/"+actor_name
-    if not os.path.isdir(actor_folder_name):
-        if verbose == 1:
-            print('Actor '+actor_name.upper()+' not found.', file=sys.stderr)
-        error = 1
-        return actor_function,error
-    version = [f for f in os.listdir(actor_folder_name) \
-        if os.path.isdir(os.path.join(actor_folder_name,f))][0]
+    actor_function.location = '/'.join(getattr(actor_module,'__file__').split('/')[:-1])
 
-    # Determine the actor location
-    # 1) Actors with version number
-    if os.path.isfile(actor_folder_name+'/'+version+'/'+actor_name+'/'+'wrapper.py'): 
-        actor_location = actor_folder_name+'/'+version+'/'+actor_name
-        sys.path.insert(0,actor_folder_name+'/'+version)
-    # 2) Actors without version number
-    else:
-        actor_location = actor_folder_name+'/'+actor_name
-        sys.path.insert(0,actor_folder_name)
-
-    # Import the actor and save its location
-    actor_function = getattr(import_module(actor_name+'.wrapper'),actor_name+'_actor')
-    actor_function.location = actor_location
-
-    return actor_function,error
+    return actor_function,0
 
 #####################################################################################
 
@@ -54,24 +75,13 @@ def import_actor(actor_input,verbose):
 
     error=0
 
-    # Check if ACTOR_FOLDER is defined
-    ACTOR_FOLDER = os.environ.get('ACTOR_FOLDER')
-    if ACTOR_FOLDER is None:
-        if type(actor_input) is str:
-            print('$ACTOR_FOLDER not defined --> '+actor_input+' not loaded.',\
-                  file=sys.stderr)
-        else:
-            print('$ACTOR_FOLDER not defined --> '+', '.join(actor_input)+' not loaded.',\
-                  file=sys.stderr)
-        return
-
     # Import the actor(s) and put into a dictionary
     dictactor = {}
     if type(actor_input) is str:
-        dictactor[actor_input],error = __syspath_import_actor(ACTOR_FOLDER,actor_input,verbose)
+        dictactor[actor_input],error = __syspath_import_actor(actor_input,verbose)
     else:
         for actor_name in actor_input:
-            dictactor[actor_name],err = __syspath_import_actor(ACTOR_FOLDER,actor_name,verbose)
+            dictactor[actor_name],err = __syspath_import_actor(actor_name,verbose)
             if err==1:
                 error=1
 
@@ -150,40 +160,6 @@ def bundle_copy(input_bundle,idslist=None):
 
 #####################################################################################
 
-# -----------------------------------------------------
-# Function to read the yaml file containing the global
-# lists used in many places of the H&CD workflow
-# -----------------------------------------------------
-
-# Create lists from the global configuration yaml file
-def loadlist(listname):
-
-    path_file = os.path.abspath(inspect.getfile(__foo))
-    path = '/'.join(path_file.split('/')[:-1])
-
-    file = open(path+'/../global_configuration/'+'global_lists.yaml', 'r')
-    data = yaml.load(file, Loader=yaml.CLoader)
-
-    if listname=='ids_list':
-        output_list = data['ids_list'].split(' ')
-    elif listname=='actor_list':
-        output_list = data['actor_list'].split(' ')
-    elif listname=='merge_actor_list':
-        output_list = data['merge_actor_list'].split(' ')
-    elif listname=='empty_actor_list':
-        output_list = data['empty_actor_list'].split(' ')
-    elif listname=='dependencies':
-        output_list = data['dependencies']
-    elif listname=='extra_arguments':
-        output_list = data['extra_arguments']
-    else:
-        print('Error: bad listname in loadlist()', file=sys.stderr)
-        output_list=[]
-
-    return output_list
-
-#####################################################################################
-
 # ---------------------------------------------------------------------
 # Returns the input IDSs, input arguments, and output IDSs of an actor
 # ---------------------------------------------------------------------
@@ -195,7 +171,7 @@ def read_actor_ids(name,verbose):
     output_ids_list = []
     err = import_actor(name,verbose)
     if err == 0:
-        parstr = globals()[name].__doc__
+        parstr = eval(name+'.__doc__')
 
         for elem in parstr.split('\n'):
 
@@ -413,7 +389,7 @@ def create_workflow_param_from_file(filepath,option):
     else:
         workflow_param = {}
         for elem in root.iter():
-          if len(elem) == 0:
+          if len(elem) == 0 and elem.tag is not etree.Comment:
             try:
               workflow_param[elem.tag] = int(elem.text)
             except:

@@ -49,21 +49,23 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
                 else:
                     xml_name = iline.split('+')[-1].replace("'","").replace(" ","")\
                                .replace("\n","")
-                    codeparam_xml_path = actor_python_folder+xml_name
-                    copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
-                    # IF DEFAULT IS NOT REQUIRED AND IF CONFIGURATION LOADED FROM A PREVIOUS RUN,
-                    # REPLACE THE XML FILE BY THE ONE OF THE PREVIOUS CONFIGURATION
-                    if previous_folder is not None and default is False:
-                        xml_name = hsys+'/input_'+actor_name+'.xml'
-                        codeparam_xml_path = previous_folder+'/'+xml_name
-                        if codeparam_xml_path != destination_file:
-                            copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
-                found_xml = True
+                    if not 'None' in xml_name:
+                        codeparam_xml_path = actor_python_folder+xml_name
+                        copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
+                        # IF DEFAULT IS NOT REQUIRED AND IF CONFIG LOADED FROM A PREVIOUS RUN,
+                        # REPLACE THE XML FILE BY THE ONE OF THE PREVIOUS CONFIGURATION
+                        if previous_folder is not None and default is False:
+                            xml_name = hsys+'/input_'+actor_name+'.xml'
+                            codeparam_xml_path = previous_folder+'/'+xml_name
+                            if codeparam_xml_path != destination_file:
+                                copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
+                        found_xml = True
 
             if 'xsd_location = ' in iline:
                 xsd_name = iline.split('+')[-1].replace("'","").replace(" ","").replace("\n","")
-                codeparam_xsd_path = actor_python_folder+xsd_name
-                found_xsd = True
+                if not 'None' in xsd_name:
+                    codeparam_xsd_path = actor_python_folder+xsd_name
+                    found_xsd = True
 
             if found_xml is True and found_xsd is True:
                 break
@@ -79,15 +81,20 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
                 for i in elem.iter():
                     if i.tag == '{http://www.w3.org/2001/XMLSchema}documentation':
                         docum_dict[elem.attrib.values()[0]] = i.text
+    else:
+        xmlschema  = {}
+        docum_dict = {}
 
     # LOAD THE LIST OF CODE PARAMETERS, CREATE THE LABELS AND ENTRIES
-    tree = etree.parse(codeparam_xml_path)
-    root = tree.getroot()
-
-    codeparam_dict = {}
-    for elem in root.iter():
-        if elem.tag is not etree.Comment and len(elem) == 0:
-            codeparam_dict[elem.tag] = elem.text
+    if found_xml:
+        tree = etree.parse(codeparam_xml_path)
+        root = tree.getroot()
+        codeparam_dict = {}
+        for elem in root.iter():
+            if elem.tag is not etree.Comment and len(elem) == 0:
+                codeparam_dict[elem.tag] = elem.text
+    else:
+        codeparam_dict = {}
 
     return destination_file,codeparam_dict,docum_dict,codeparam_xml_path, \
         xmlschema
@@ -121,18 +128,19 @@ def save_codeparam_to_file(current_config_folder,previous_folder,maindict,uncomp
                 actor_name = list(maindict[hsys][cat].keys())[
                     int(workflow_param[cod_ref][cat])-1]
                 if actor_name in uncompiled_actors:
-                    print('ERROR:', actor_name, 'is selected as an active actor, '
+                    print('ERROR:', actor_name.upper(), 'is selected as an active actor, '
                           'but it has not been found. \n'
                           'Please change your actor selection or load',
-                          actor_name, 'and try again', file=sys.stderr)
+                          actor_name.upper(), 'and try again', file=sys.stderr)
                     return -1
 
                 destination_file,codeparam_dict,docum_dict,codeparam_xml_path,xmlschema = \
                     read_and_save_codeparam(current_config_folder,previous_folder,\
                                             hsys,actor_name,False)
 
-                # Update code parameter files if changed from interface
-                update_codeparam_file(destination_file,codeparam_dict,verbose)
+                # Update code parameter files if changed from interface (and if exists)
+                if codeparam_dict != {}:
+                    update_codeparam_file(destination_file,codeparam_dict,verbose)
 
     return 0
 
