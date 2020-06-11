@@ -1,19 +1,23 @@
 import os, sys
 
+if sys.version_info[0] < 3:
+    print('The HCD GUI must be used with Python 3 --> Aborted.')
+    sys.exit()
+
 try:
     import tkinter
     import tkinter.ttk
     import tkinter.filedialog
 except:
     print('ERROR: tkinter not found', file=sys.stderr)
-    print('---> TIP: source the HCD configuration file', file=sys.stderr)
+    print('---> TIP: load the HCD module', file=sys.stderr)
     sys.exit()
 
 try:
     from lxml import etree
 except:
     print('ERROR: lxml module not found', file=sys.stderr)
-    print('---> TIP: source the HCD configuration file', file=sys.stderr)
+    print('---> TIP: load the HCD module', file=sys.stderr)
     sys.exit()
 
 try:
@@ -26,7 +30,7 @@ try:
 except:
     raise
     print('ERROR while loading internal HCD modules', file=sys.stderr)
-    print('---> TIP: source the HCD configuration file', file=sys.stderr)
+    print('---> TIP: load the HCD module', file=sys.stderr)
     sys.exit()
 
 #---------------------------------------------------------------------------------------------
@@ -41,7 +45,8 @@ except:
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
 
-default_wf_param_file = os.getenv('HCD_FOLDER')+'/global_configuration/input_workflow_default.xml'
+hcd_path = '/'.join(os.path.realpath(__file__).split('/')[:-1])
+default_wf_param_file = hcd_path+'/global_configuration/input_workflow_default.xml'
 
 # --------------------------------------------------------------------------------------------
 # Create the main window (define font, title and background colour)
