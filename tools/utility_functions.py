@@ -146,7 +146,7 @@ def save_codeparam_to_file(current_config_folder,previous_folder,maindict,uncomp
 
 ############################################################################################
 def save(current_config_folder,default_wf_param_file,previous_folder,maindict,uncompiled_actors,\
-         workflow_param,wfp_ref,fur_ref,cod_ref,hcd_path):
+         workflow_param,wfp_ref,fur_ref,cod_ref):
 
     from datetime import datetime
 
@@ -154,7 +154,7 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
     # or by the user with 'save as')
     if current_config_folder is None:
         first_save = 1
-        current_config_folder = os.path.join(hcd_path,'data/run_'\
+        current_config_folder = os.path.join(os.getcwd(),'data/run_'\
                                 +datetime.now().strftime('%y%m%d_%H:%M:%S'))
     else:
         first_save = 0
@@ -167,8 +167,8 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
     # Define the workflow parameter file within the current folder
     current_wf_param_file = current_config_folder+ '/input_workflow.xml'
 
-    # Dont want to write configuration directly in hcd_path or hcd_path/data
-    if current_config_folder == hcd_path+'/data' or current_config_folder == hcd_path:
+    # Dont want to write configuration directly in $PWD or $PWD/data
+    if current_config_folder == os.getcwd()+'/data' or current_config_folder == os.getcwd():
          print('Refuse to write directly in folder '+current_config_folder, file=sys.stderr)
          return None
 
