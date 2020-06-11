@@ -3,12 +3,13 @@
 #          ACCORDING TO THE ACTOR SELECTION FROM THE GUI
 # -------------------------------------------------------
 from hcd_tools import import_actor, loadlist, create_maindict, is_compiled_for_mpi
-from os import getenv
+import os
 
 # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
 # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
+hcd_path = '/'.join(os.path.realpath(__file__).split('/')[:-2])
 (maindict, compiled_actors, uncompiled_actors, code_selection) = \
-    create_maindict(getenv('HCD_FOLDER')+'/global_configuration/input_workflow_default.xml',2,0)
+    create_maindict(hcd_path+'/global_configuration/input_workflow_default.xml',2,0)
 
 # LIST OF EMPTY ACTORS AND OF EXTRA (NON-IDS) ARGUMENTS FOR EACH ACTOR
 empty_actor_list    = loadlist('empty_actor_list')
@@ -16,7 +17,7 @@ merge_actor_list    = loadlist('merge_actor_list')
 extra_argument_list = loadlist('extra_arguments')
 
 # GENERATE THE WORKFLOW/AUTO_HCD_ACTORS.PY FILE 
-with open('workflow/auto_hcd_actors.py', 'w') as file:
+with open('auto_hcd_actors.py', 'w') as file:
 
     file.write('import sys\n')
     file.write('from hcd_tools import import_actor, loadlist\n\n')
