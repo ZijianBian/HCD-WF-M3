@@ -1,23 +1,19 @@
 import os, sys
 
-if sys.version_info[0] < 3:
-    print('The HCD GUI must be used with Python 3 --> Aborted.')
-    sys.exit()
-
 try:
     import tkinter
     import tkinter.ttk
     import tkinter.filedialog
 except:
     print('ERROR: tkinter not found', file=sys.stderr)
-    print('---> TIP: load the HCD module', file=sys.stderr)
+    print('---> TIP: load the HCD module or source the configuration file', file=sys.stderr)
     sys.exit()
 
 try:
     from lxml import etree
 except:
     print('ERROR: lxml module not found', file=sys.stderr)
-    print('---> TIP: load the HCD module', file=sys.stderr)
+    print('---> TIP: load the HCD module or source the configuration file', file=sys.stderr)
     sys.exit()
 
 try:
@@ -30,7 +26,7 @@ try:
 except:
     raise
     print('ERROR while loading internal HCD modules', file=sys.stderr)
-    print('---> TIP: load the HCD module', file=sys.stderr)
+    print('---> TIP: load the HCD module or source the configuration file', file=sys.stderr)
     sys.exit()
 
 #---------------------------------------------------------------------------------------------

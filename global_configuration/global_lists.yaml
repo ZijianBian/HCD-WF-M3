@@ -67,5 +67,5 @@ extra_arguments:
    spot:   [dt_required]
    pion:   [tbegin,tend,dt_required]
    iccoup: [ic_wave_nr_toroidal_modes]
-   bbnbi:  [fokker_flag]
+   bbnbi:  [nmarkers_bbnbi_ascot]
 

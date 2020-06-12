@@ -15,6 +15,7 @@
 
   <further_settings display="FURTHER SETTINGS">
     <nproc_ion_fp>8</nproc_ion_fp>
+    <nmarkers_bbnbi_ascot>100</nmarkers_bbnbi_ascot>
   </further_settings>
 
   <actor_selection display="ACTOR SELECTION">
