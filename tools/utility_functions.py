@@ -150,8 +150,6 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
 
     from datetime import datetime
 
-    print('current folder',os.getcwd())
-
     # Define the current folder (either chosen by the system with 'save' 
     # or by the user with 'save as')
     if current_config_folder is None:
