@@ -5,7 +5,7 @@
 # AND LAUNCH IT VIA QSUB
 # -----------------------------------------------------
 # EXAMPLE:
-# ./hcd_batch -n 1 -t 1 -e mireille.schneider@iter.org -q gen9_ib-short -c data/batch_test/
+# hcd_batch -n 1 -t 1 -e mireille.schneider@iter.org -q gen9_ib-short -c data/batch_test/
 
 import argparse, subprocess
 
@@ -38,7 +38,7 @@ with open(auto_batch_name, 'w') as file:
    file.write('#SBATCH  --mail-type=END'+'\n')
    file.write('#SBATCH  --job-name=HCD_wf'+'\n')
    file.write('#SBATCH  --partition='+queue+'\n\n')
-   file.write('./hcd_nogui -c '+config_folder+'\n\n')
+   file.write('hcd_nogui -c '+config_folder+'\n\n')
 
 file.close()
 
