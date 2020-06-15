@@ -25,8 +25,8 @@ for actor in ${actor_list[@]}; do
   export local_${actor}=0
 done
 
-# To replace specific modules by local ones --> taken from ~/public/PYTHON_ACTORS instead
-#export local_ASCOT=1
+# To replace specific modules by local ones --> taken from ~/public/PYTHON_ACTORS 
+# instead export local_ASCOT=1
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
