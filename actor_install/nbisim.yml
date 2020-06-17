@@ -1,0 +1,16 @@
+SOURCES:
+  - VCS:     git
+    REPO:    ssh://git@git.iter.org/heat/nbisim.git
+    VERSION: develop
+    DIR:     nbisim
+
+MODULES: [IMAS, FC2K, INTERPOS/9.0.2-intel-2018a, XMLlib/3.3.1-intel-2018a]
+
+BUILDS: 
+  - DIR: nbisim
+    CMD: ./build_imas.sh
+
+ACTORS: 
+  - DIR: nbisim
+    XML: fc2k/imas_nbisim2.xml
+

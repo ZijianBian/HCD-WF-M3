@@ -23,7 +23,8 @@ actor_list:
     hcd2core_sources 
     hcd2core_profiles  
     iccoup 
-    lion 
+    lion
+    nbisim2
     nemo 
     pion 
     risk 

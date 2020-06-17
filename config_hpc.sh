@@ -19,14 +19,14 @@ module load IMAS FC2K
 
 # Module for all needed HCD or WF actors are loaded
 actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
-            HCD2CORE_SOURCES LION NEMO PION RISK StixReDist TOMCAT WFtools)
+            HCD2CORE_SOURCES LION NBISIM2 NEMO PION RISK StixReDist TOMCAT WFtools)
 for actor in ${actor_list[@]}; do
   module load $actor
   export local_${actor}=0
 done
 
-# To replace specific modules by local ones --> taken from ~/public/PYTHON_ACTORS 
-# instead export local_ASCOT=1
+# Change local_XXX=1 to replace XXX module by the local one in ~/public/PYTHON_ACTORS
+#export local_ASCOT=1
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -34,10 +34,12 @@ export PYTHONPATH=$HCD_FOLDER:$PYTHONPATH
 export PYTHONPATH=$HCD_FOLDER/tools:$PYTHONPATH
 export PYTHONPATH=$HCD_FOLDER/interface:$PYTHONPATH
 export PYTHONPATH=$HCD_FOLDER/workflow:$PYTHONPATH
-export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
 
-# ---------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 
+# Optionally replace modules by locally compiled versions for H&CD codes and WF tools
 if [ $local_ASCOT == 1 ]; then
     echo Warning: BBNBI,ASCOT and AFSI modules replaced by actor from \~/public/PYTHON_ACTORS
     module unload ASCOT
@@ -92,8 +94,13 @@ if [ $local_LION == 1 ]; then
     module unload LION
     export PYTHONPATH=$ACTOR_FOLDER/lion/0:$PYTHONPATH
 fi
+if [ $local_NBISIM2 == 1 ]; then
+    echo Warning: NBISIM2 module replaced by actor from \~/public/PYTHON_ACTORS
+    module unload NBISIM2
+    export PYTHONPATH=$ACTOR_FOLDER/nbisim2:$PYTHONPATH
+fi
 if [ $local_NEMO == 1 ]; then
-    echo Warning: NEMOT module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: NEMO module replaced by actor from \~/public/PYTHON_ACTORS
     module unload NEMO
     export PYTHONPATH=$ACTOR_FOLDER/nemo:$PYTHONPATH
 fi
@@ -130,3 +137,6 @@ if [ $local_WFtools == 1 ]; then
     export PYTHONPATH=$ACTOR_FOLDER/merge_distribution_sources:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/merge_waves:$PYTHONPATH
 fi
+
+# Avoid doublons in PYTHONPATH
+export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
