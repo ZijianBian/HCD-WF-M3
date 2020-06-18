@@ -19,7 +19,7 @@ module load IMAS FC2K
 
 # Module for all needed HCD or WF actors are loaded
 actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
-            HCD2CORE_SOURCES LION NBISIM2 NEMO PION RISK StixReDist TOMCAT WFtools)
+            HCD2CORE_SOURCES LION NBISIM NEMO PION RISK StixReDist TOMCAT WFtools)
 for actor in ${actor_list[@]}; do
   module load $actor
   export local_${actor}=0
@@ -27,6 +27,7 @@ done
 
 # Change local_XXX=1 to replace XXX module by the local one in ~/public/PYTHON_ACTORS
 #export local_ASCOT=1
+export local_NBISIM=1
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -94,9 +95,9 @@ if [ $local_LION == 1 ]; then
     module unload LION
     export PYTHONPATH=$ACTOR_FOLDER/lion/0:$PYTHONPATH
 fi
-if [ $local_NBISIM2 == 1 ]; then
-    echo Warning: NBISIM2 module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload NBISIM2
+if [ $local_NBISIM == 1 ]; then
+    echo Warning: NBISIM module replaced by actor from \~/public/PYTHON_ACTORS
+    module unload NBISIM
     export PYTHONPATH=$ACTOR_FOLDER/nbisim2:$PYTHONPATH
 fi
 if [ $local_NEMO == 1 ]; then
