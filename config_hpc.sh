@@ -15,19 +15,20 @@ export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
 
 # IMAS and FC2K
-module load IMAS FC2K
+#module load FC2K
 
 # Module for all needed HCD or WF actors are loaded
 actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
-            HCD2CORE_SOURCES LION NBISIM NEMO PION RISK StixReDist TOMCAT WFtools)
+            HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT WFtools)
 for actor in ${actor_list[@]}; do
+  echo "load" $actor
   module load $actor
   export local_${actor}=0
 done
 
 # Change local_XXX=1 to replace XXX module by the local one in ~/public/PYTHON_ACTORS
 #export local_ASCOT=1
-export local_NBISIM=1
+#export local_NBISIM=1
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -141,3 +142,11 @@ fi
 
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
+
+# Load the default IMAS version, no matter what was loaded through the HCD modules themselves
+module unload IMAS
+module load IMAS
+
+# FC2K to re-compile the actors if necessary
+module load FC2K
+
