@@ -186,10 +186,10 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
     # Create the current configuration folder and its sub-folders for each process
     if not os.path.exists(current_config_folder):
         os.makedirs(current_config_folder)
-    for systemname in root[2][0]: # HCD process
+    for systemname in root[2][1]: # HCD process
         if not os.path.exists(current_config_folder+'/'+systemname.tag):
             os.makedirs(current_config_folder+'/'+systemname.tag)
-    for postproc in root[2][1]: # Post-processins
+    for postproc in root[2][2]: # Post-processing
         if not os.path.exists(current_config_folder+'/'+postproc.tag):
             os.makedirs(current_config_folder+'/'+postproc.tag)
 

@@ -110,8 +110,8 @@ def open_gui(wf_param_file):
     fur_ref = list(workflow_param.keys())[1]
     cod_ref = list(workflow_param.keys())[2]
 
-    hcd_actors_ref = list(maindict.keys())[0]
-    make_core_ref  = list(maindict.keys())[1]
+    hcd_actors_ref = list(maindict.keys())[1]
+    make_core_ref  = list(maindict.keys())[2]
     all_actors_ref = [hcd_actors_ref,make_core_ref]
 
     global_dict = dict_merge(maindict[hcd_actors_ref],maindict[make_core_ref])
