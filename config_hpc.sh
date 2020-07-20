@@ -144,6 +144,9 @@ if [ $local_WFtools == 1 ]; then
     export PYTHONPATH=$ACTOR_FOLDER/merge_waves:$PYTHONPATH
 fi
 
+# To find shell scripts in current local folder
+export PATH=$PWD:$PATH
+
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
 
