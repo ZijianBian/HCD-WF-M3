@@ -23,10 +23,10 @@ set actor_list=(cyrano gray hcd2core-profiles \
   hcd2core-sources iccoup wftools lion nbisim risk spot stixredist ascot \
   tomcat nemo genray pion grayscale)
 
-set actor_list=(nbisim)
+#set actor_list=(ascot)
 
 foreach actor ($actor_list)
   python actor_install.py $actor.yml
 end
 
-cd ${PWD}
+
