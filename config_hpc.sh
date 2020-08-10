@@ -33,6 +33,10 @@ done
 #export local_NBISIM=1
 #export local_StixReDist=1
 #export local_CYRANO=1
+#export local_GRAY=1
+
+# Force to use exclusively local actors (1) or not (0)
+#export all_local=0
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -46,93 +50,93 @@ export PYTHONPATH=$HCD_FOLDER/workflow:$PYTHONPATH
 # ---------------------------------------------------------------------------------------
 
 # Optionally replace modules by locally compiled versions for H&CD codes and WF tools
-if [ $local_ASCOT == 1 ]; then
+if [ $local_ASCOT == 1 ] || [ $all_local == 1 ]; then
     echo Warning: BBNBI,ASCOT and AFSI modules replaced by actor from \~/public/PYTHON_ACTORS
-    module unload ASCOT
+    module unload ASCOT >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/bbnbi:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/ascot4serial:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/ascot4parallel:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/afsi:$PYTHONPATH
 fi
 
-if [ $local_SPOT == 1 ]; then
+if [ $local_SPOT == 1 ] || [ $all_local == 1 ]; then
     echo Warning: SPOT module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload SPOT
+    module unload SPOT >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/spot:$PYTHONPATH
 fi
-if [ $local_CYRANO == 1 ]; then
+if [ $local_CYRANO == 1 ] || [ $all_local == 1 ]; then
     echo Warning: CYRANO module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload CYRANO
+    module unload CYRANO >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/Cyrano:$PYTHONPATH
 fi
-if [ $local_FPSIM == 1 ]; then
+if [ $local_FPSIM == 1 ] || [ $all_local == 1 ]; then
     echo Warning: FPSIM \(ICCOUP\) module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload FPSIM
+    module unload FPSIM >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/iccoup:$PYTHONPATH
 fi
-if [ $local_GENRAY == 1 ]; then
+if [ $local_GENRAY == 1 ] || [ $all_local == 1 ]; then
     echo Warning: GENRAY module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload GENRAY
+    module unload GENRAY >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/genray:$PYTHONPATH
 fi
-if [ $local_GRAY == 1 ]; then
+if [ $local_GRAY == 1 ] || [ $all_local == 1 ]; then
     echo Warning: GRAY module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload GRAY
+    module unload GRAY >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/gray:$PYTHONPATH
 fi
-if [ $local_GRAYSCALE == 1 ]; then
+if [ $local_GRAYSCALE == 1 ] || [ $all_local == 1 ]; then
     echo Warning: GRAYSCALE module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload GRAYSCALE
+    module unload GRAYSCALE >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/grayscale:$PYTHONPATH
 fi
 if [ $local_HCD2CORE_PROFILES == 1 ]; then
     echo Warning: HCD2CORE_PROFILES module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload HCD2CORE_PROFILES
+    module unload HCD2CORE_PROFILES >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/hcd2core_profiles:$PYTHONPATH
 fi
-if [ $local_HCD2CORE_SOURCES == 1 ]; then
+if [ $local_HCD2CORE_SOURCES == 1 ] || [ $all_local == 1 ]; then
     echo Warning: HCD2CORE_SOURCES module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload HCD2CORE_SOURCES
+    module unload HCD2CORE_SOURCES >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/hcd2core_sources:$PYTHONPATH
 fi
-if [ $local_LION == 1 ]; then
+if [ $local_LION == 1 ] || [ $all_local == 1 ]; then
     echo Warning: LION module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload LION
+    module unload LION >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/lion/0:$PYTHONPATH
 fi
-if [ $local_NBISIM == 1 ]; then
+if [ $local_NBISIM == 1 ] || [ $all_local == 1 ]; then
     echo Warning: NBISIM module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload NBISIM
+    module unload NBISIM >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/nbisim2:$PYTHONPATH
 fi
-if [ $local_NEMO == 1 ]; then
+if [ $local_NEMO == 1 ] || [ $all_local == 1 ]; then
     echo Warning: NEMO module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload NEMO
+    module unload NEMO >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/nemo:$PYTHONPATH
 fi
-if [ $local_PION == 1 ]; then
+if [ $local_PION == 1 ] || [ $all_local == 1 ]; then
     echo Warning: PION module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload PION
+    module unload PION >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/pion:$PYTHONPATH
 fi
-if [ $local_RISK == 1 ]; then
+if [ $local_RISK == 1 ] || [ $all_local == 1 ]; then
     echo Warning: RISK module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload RISK
+    module unload RISK >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/:$PYTHONPATH
 fi
-if [ $local_StixReDist == 1 ]; then
+if [ $local_StixReDist == 1 ] || [ $all_local == 1 ]; then
     echo Warning: StixReDist module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload StixReDist
+    module unload StixReDist >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/StixReDist:$PYTHONPATH
 fi
-if [ $local_TOMCAT == 1 ]; then
+if [ $local_TOMCAT == 1 ] || [ $all_local == 1 ]; then
     echo Warning: TOMCAT module replaced by actor from \~/public/PYTHON_ACTORS
-    module unload TOMCAT
+    module unload TOMCAT >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/tomcat:$PYTHONPATH
 fi
-if [ $local_WFtools == 1 ]; then
+if [ $local_WFtools == 1 ] || [ $all_local == 1 ]; then
     echo Warning: empty and mergers modules replaced by actor from \~/public/PYTHON_ACTORS
-    module unload WFtools
+    module unload WFtools >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/empty_core_profiles:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/empty_core_sources:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/empty_distributions:$PYTHONPATH
@@ -152,6 +156,9 @@ export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/
 
 # Load the default IMAS version, no matter what was loaded through the HCD modules themselves
 module load IMAS
+
+# For local re-compilation of actors
+module load XMLlib/3.3.1-intel-2018a
 
 # FC2K to re-compile the actors if necessary
 module load FC2K
