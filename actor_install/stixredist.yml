@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR: stixredist
 
-MODULES: []
+MODULES: [IMAS, FC2K]
 
 BUILDS:
   - DIR: stixredist 

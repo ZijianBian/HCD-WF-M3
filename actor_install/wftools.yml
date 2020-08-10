@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR:     wftools
 
-MODULES: []
+MODULES: [IMAS, FC2K]
 
 BUILDS: 
   - DIR: wftools

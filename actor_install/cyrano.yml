@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR: cyrano
 
-MODULES: []
+MODULES: [IMAS, FC2K]
 
 BUILDS: 
   - DIR: cyrano

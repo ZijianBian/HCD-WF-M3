@@ -4,7 +4,7 @@ SOURCES:
     VERSION: develop
     DIR:     nbisim
 
-MODULES: [IMAS, FC2K, INTERPOS/9.0.2-intel-2018a, XMLlib/3.3.1-intel-2018a]
+MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: nbisim

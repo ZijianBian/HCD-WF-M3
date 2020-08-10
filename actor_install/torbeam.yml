@@ -1,0 +1,21 @@
+#example
+---
+SOURCES:
+  - VCS:  git
+    REPO: ssh://git@git.iter.org/heat/torbeam.git
+    VERSION: feature/imas_adaptation
+    DIR: torbeam
+
+MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
+
+BUILDS: 
+  - DIR: torbeam/build
+    CMD: ./build_imas.sh
+
+ACTORS: 
+  - DIR: torbeam/build
+    XML: fc2k/torbeam.xml
+
+#COMMENTS:  
+...
+  
