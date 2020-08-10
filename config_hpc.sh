@@ -148,6 +148,9 @@ if [ $local_WFtools == 1 ] || [ $all_local == 1 ]; then
     export PYTHONPATH=$ACTOR_FOLDER/merge_distribution_sources:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/merge_waves:$PYTHONPATH
 fi
+# Local TORBEAM
+echo Warning: local version of TORBEAM module
+export PYTHONPATH=$ACTOR_FOLDER/torbeam:$PYTHONPATH
 
 # To find shell scripts in current local folder
 export PATH=$PWD:$PATH
