@@ -39,7 +39,7 @@
     
 
       <NUCLEAR>
-	<nuclear_source list="afsi">0</nuclear_source> <!-- 0: none 1: AFSI -->
+	<nuclear_source list="bbnbi">0</nuclear_source> <!-- 0: none 1: AFSI -->
 	<nuclear_fp list="spot ascot4serial ascot4parallel">0</nuclear_fp>
       </NUCLEAR>
     </systems> 

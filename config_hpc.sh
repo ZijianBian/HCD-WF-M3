@@ -36,7 +36,7 @@ done
 #export local_GRAY=1
 
 # Force to use exclusively local actors (1) or not (0)
-#export all_local=0
+export all_local=1
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -77,6 +77,7 @@ fi
 if [ $local_GENRAY == 1 ] || [ $all_local == 1 ]; then
     echo Warning: GENRAY module replaced by actor from \~/public/PYTHON_ACTORS
     module unload GENRAY >& /dev/null
+    module switch netCDF-Fortran
     export PYTHONPATH=$ACTOR_FOLDER/genray:$PYTHONPATH
 fi
 if [ $local_GRAY == 1 ] || [ $all_local == 1 ]; then
@@ -89,7 +90,7 @@ if [ $local_GRAYSCALE == 1 ] || [ $all_local == 1 ]; then
     module unload GRAYSCALE >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/grayscale:$PYTHONPATH
 fi
-if [ $local_HCD2CORE_PROFILES == 1 ]; then
+if [ $local_HCD2CORE_PROFILES == 1 ] || [ $all_local == 1 ]; then
     echo Warning: HCD2CORE_PROFILES module replaced by actor from \~/public/PYTHON_ACTORS
     module unload HCD2CORE_PROFILES >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/hcd2core_profiles:$PYTHONPATH
@@ -122,7 +123,7 @@ fi
 if [ $local_RISK == 1 ] || [ $all_local == 1 ]; then
     echo Warning: RISK module replaced by actor from \~/public/PYTHON_ACTORS
     module unload RISK >& /dev/null
-    export PYTHONPATH=$ACTOR_FOLDER/:$PYTHONPATH
+    export PYTHONPATH=$ACTOR_FOLDER/risk:$PYTHONPATH
 fi
 if [ $local_StixReDist == 1 ] || [ $all_local == 1 ]; then
     echo Warning: StixReDist module replaced by actor from \~/public/PYTHON_ACTORS
@@ -158,7 +159,7 @@ export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/
 module load IMAS
 
 # For local re-compilation of actors
-module load XMLlib/3.3.1-intel-2018a
+module load XMLlib
 
 # FC2K to re-compile the actors if necessary
 module load FC2K

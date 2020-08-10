@@ -12,7 +12,6 @@ ids_list:
     waves
 
 actor_list:
-    afsi 
     ascot4parallel 
     ascot4serial 
     bbnbi 
