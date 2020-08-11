@@ -223,8 +223,8 @@ def create_maindict(workflow_parameters,input_option,verbose):
     #                                                                         SOURCE, PROFILES
     # --------------------------------------------------------------------------------------------
     # INSIDE EACH CATEGORY (EC_WAVE_SOLVER, IC_WAVE_SOLVER, IC_WAVE_FP, ...):
-    # - KEYS ARE ACTOR NAMES
-    # - VALUES ARE INPUT/OUTPUT IDSS
+    # - LIST OF CODES, EACH BEING DESCRIBED BY A DICTIONARY CONTAINING NAME, INPUT and OUTPUT, 
+    #   INCLUDING THE EMPTY GENERATOR (ORDER IN THE LIST CORRESPONDS TO XML ORDER)
     # --------------------------------------------------------------------------------------------
     code_selection = {}
     compiled_list = []
@@ -247,7 +247,7 @@ def create_maindict(workflow_parameters,input_option,verbose):
         for system in main_key:
             dict_category = {}
             for category in system:
-                dict_actor = {}
+                list_actor = {}
                 if category.tag is not etree.Comment:
                     for actor_name in category.attrib['list'].split():
                         if actor_name in not_compiled_list:
@@ -261,9 +261,11 @@ def create_maindict(workflow_parameters,input_option,verbose):
                         else:
                             not_compiled_list.append(actor_name)
                         if input_option==1:
-                            dict_actor[actor_name] = [input_ids_list, output_ids_list]
+                            list_actor.append({'name':actor_name, 'input':input_ids_list, 'output':output_ids_list})
                         else:
-                            dict_actor[actor_name] = [input_arg_list, output_ids_list]
+                            list_actor.append({'name':actor_name, 'input':input_arg_list, 'output'output_ids_list})
+                    # Prepend empty_* code
+                    list_actor.insert(0,{'name':'empty_'+output_ids_list[0], 'input':['core_profiles'], 'output':[output_ids_list[0]]})
                     if category.text is not '0':
                       code_selection[category.tag] = category.attrib['list'].split(' ')\
                                                      [int(category.text)-1]
