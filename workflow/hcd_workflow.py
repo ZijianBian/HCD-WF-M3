@@ -63,8 +63,8 @@ def hcd_workflow(BNDL_in,workflow_xml):
 
     # STEP 4: MAKE CORE_SOURCES AND CORE_PROFILES IDS:
     print('-- Step 4: Make core_sources and/or core_profiles', file=sys.stdout)
-    BNDL_core ['core_sources']  = actors.fill_core_sources  ( BNDL_core, parameters )
-    BNDL_core ['core_profiles'] = actors.fill_core_profiles ( BNDL_core, parameters )
+    BNDL_core ['core_sources']  = actors.run ( 'fill_core_sources',  BNDL_core, parameters )
+    BNDL_core ['core_profiles'] = actors.run ( 'fill_core_profiles', BNDL_core, parameters )
 
     # FILL THE OUTPUT BUNDLE WITH THE RESULTS OF H&CD CALCUATIONS
     BNDL_out['distribution_sources'] = BNDL_core ['distribution_sources']
