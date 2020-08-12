@@ -247,7 +247,7 @@ def create_maindict(workflow_parameters,input_option,verbose):
         for system in main_key:
             dict_category = {}
             for category in system:
-                list_actor = {}
+                list_actor = []
                 if category.tag is not etree.Comment:
                     for actor_name in category.attrib['list'].split():
                         if actor_name in not_compiled_list:
@@ -261,17 +261,17 @@ def create_maindict(workflow_parameters,input_option,verbose):
                         else:
                             not_compiled_list.append(actor_name)
                         if input_option==1:
-                            list_actor.append({'name':actor_name, 'input':input_ids_list, 'output':output_ids_list})
+                            list_actor.append({'name':actor_name, 'input':input_ids_list, 'output':output_ids_list, 'system':system.tag})
                         else:
-                            list_actor.append({'name':actor_name, 'input':input_arg_list, 'output'output_ids_list})
+                            list_actor.append({'name':actor_name, 'input':input_arg_list, 'output':output_ids_list, 'system':system.tag})
                     # Prepend empty_* code
-                    list_actor.insert(0,{'name':'empty_'+output_ids_list[0], 'input':['core_profiles'], 'output':[output_ids_list[0]]})
+                    list_actor.insert(0,{'name':'empty_'+output_ids_list[0], 'input':['core_profiles'], 'output':[output_ids_list[0]], 'system':system.tag})
                     if category.text is not '0':
                       code_selection[category.tag] = category.attrib['list'].split(' ')\
                                                      [int(category.text)-1]
                     else:
                       code_selection[category.tag] = None
-                    dict_category[category.tag] = dict_actor
+                    dict_category[category.tag] = list_actor
             dict_system[system.tag] = dict_category
         maindict[main_key.tag] = dict_system
 
