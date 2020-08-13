@@ -26,7 +26,7 @@ def hcd_wrapper(par_path):
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-    (maindict, compiled_actors, uncompiled_actors, code_selection) = \
+    (maindict, compiled_actors, uncompiled_actors, code_selection, catlist) = \
             create_maindict(workflow_xml,1,0)
 
     # LIST OF SELECTED ACTORS

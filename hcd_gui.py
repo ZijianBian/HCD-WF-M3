@@ -91,7 +91,7 @@ def open_gui(wf_param_file):
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-    (maindict, compiled_actors, uncompiled_actors, code_selection) = \
+    (maindict, compiled_actors, uncompiled_actors, code_selection, catlist) = \
         create_maindict(wf_param_file,1,1)
     workflow_param = create_workflow_param_from_file(wf_param_file,1)
 

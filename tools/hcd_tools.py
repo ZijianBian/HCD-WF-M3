@@ -230,6 +230,7 @@ def create_maindict(workflow_parameters,input_option,verbose):
     compiled_list = []
     not_compiled_list = []
     maindict = {}
+    catdict = {}
 
     # DISPLAY FOR TEST PURPOSES
     #for main_key in actor_selection:
@@ -248,6 +249,7 @@ def create_maindict(workflow_parameters,input_option,verbose):
             dict_category = {}
             for category in system:
                 list_actor = []
+                dict_actor = {}
                 if category.tag is not etree.Comment:
                     for actor_name in category.attrib['list'].split():
                         if actor_name in not_compiled_list:
@@ -261,8 +263,10 @@ def create_maindict(workflow_parameters,input_option,verbose):
                         else:
                             not_compiled_list.append(actor_name)
                         if input_option==1:
+                            dict_actor[actor_name] = [input_ids_list, output_ids_list]                           
                             list_actor.append({'name':actor_name, 'input':input_ids_list, 'output':output_ids_list, 'system':system.tag})
                         else:
+                            dict_actor[actor_name] = [input_arg_list, output_ids_list]
                             list_actor.append({'name':actor_name, 'input':input_arg_list, 'output':output_ids_list, 'system':system.tag})
                     # Prepend empty_* code
                     list_actor.insert(0,{'name':'empty_'+output_ids_list[0], 'input':['core_profiles'], 'output':[output_ids_list[0]], 'system':system.tag})
@@ -271,7 +275,8 @@ def create_maindict(workflow_parameters,input_option,verbose):
                                                      [int(category.text)-1]
                     else:
                       code_selection[category.tag] = None
-                    dict_category[category.tag] = list_actor
+                    dict_category[category.tag] = dict_actor
+                    catdict[category.tag] = list_actor
             dict_system[system.tag] = dict_category
         maindict[main_key.tag] = dict_system
 
@@ -279,7 +284,7 @@ def create_maindict(workflow_parameters,input_option,verbose):
     compiled_list     = list( dict.fromkeys(compiled_list) )
     not_compiled_list = list( dict.fromkeys(not_compiled_list) )
 
-    return(maindict,compiled_list,not_compiled_list,code_selection)
+    return(maindict,compiled_list,not_compiled_list,code_selection,catdict)
 
 #####################################################################################
 
@@ -341,7 +346,7 @@ def check_for_dependencies(workflow_xml):
         return err
 
     # FIND THE ACTUAL ACTOR SELECTION
-    (maindict, compiled_actors, uncompiled_actors, code_selection) = create_maindict(workflow_xml,1,0)
+    (maindict, compiled_actors, uncompiled_actors, code_selection, catdict) = create_maindict(workflow_xml,1,0)
 
     # LOAD THE LIST OF DEPENDENCIES BETWEEN THE CODES
     dependencies = loadlist('dependencies')

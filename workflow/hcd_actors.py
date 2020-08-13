@@ -7,7 +7,7 @@ from lxml import etree
 # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
 hcd_path = '/'.join(os.path.realpath(__file__).split('/')[:-2])
 workflow_xml = hcd_path+'/global_configuration/input_workflow_default.xml'
-(maindict, compiled_actors, uncompiled_actors, code_selection) = \
+(maindict, compiled_actors, uncompiled_actors, code_selection, catdict) = \
     create_maindict(workflow_xml,2,0)
 
 # LIST OF EMPTY ACTORS AND OF EXTRA (NON-IDS) ARGUMENTS FOR EACH ACTOR
@@ -21,8 +21,8 @@ for name in list_of_actors:
 
 def run(cat, bundle, parameters):
     # Get list of all codes in that category
-    catlist = next(gen_dict_extract(cat,maindict))
-    codeinfo = catlist[parameters[cat]]
+    codeslist = catdict[cat] #next(gen_dict_extract(cat,maindict))
+    codeinfo = codeslist[parameters[cat]]
     code = codeinfo['name']
     inputids = []
     inputextra = []
