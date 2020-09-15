@@ -19,7 +19,8 @@ mkdir -p $ACTOR_FOLDER
 
 # Module for all needed HCD or WF actors are loaded
 actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
-            HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist WFtools)
+		  HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist \
+		  WFtools TORBEAM)
 # StixReDist not available with same IMAS version
 for actor in ${actor_list[@]}; do
   #echo "load" $actor
@@ -136,7 +137,7 @@ if [ $local_TOMCAT == 1 ] || [ $all_local == 1 ]; then
     export PYTHONPATH=$ACTOR_FOLDER/tomcat:$PYTHONPATH
 fi
 if [ $local_WFtools == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: empty and mergers modules replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: empty and mergers modules replaced by actors from \~/public/PYTHON_ACTORS
     module unload WFtools >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/empty_core_profiles:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/empty_core_sources:$PYTHONPATH
@@ -148,9 +149,11 @@ if [ $local_WFtools == 1 ] || [ $all_local == 1 ]; then
     export PYTHONPATH=$ACTOR_FOLDER/merge_distribution_sources:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/merge_waves:$PYTHONPATH
 fi
-# Local TORBEAM
-echo Warning: local version of TORBEAM module
-export PYTHONPATH=$ACTOR_FOLDER/torbeam:$PYTHONPATH
+
+if [ $local_TORBEAM == 1 ] || [ $all_local == 1 ]; then
+    echo Warning: TORBEAM module replaced by actor from \~/public/PYTHON_ACTORS
+    export PYTHONPATH=$ACTOR_FOLDER/torbeam:$PYTHONPATH
+fi
 
 # To find shell scripts in current local folder
 export PATH=$PWD:$PATH
