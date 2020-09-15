@@ -12,7 +12,7 @@ ids_list:
     waves
 
 actor_list:
-    afsi 
+    afsi
     ascot4parallel 
     ascot4serial 
     bbnbi 
@@ -23,13 +23,15 @@ actor_list:
     hcd2core_sources 
     hcd2core_profiles  
     iccoup 
-    lion 
+    lion
+    nbisim2
     nemo 
     pion 
     risk 
     spot 
     StixReDist 
     tomcat 
+    torbeam
 
 merge_actor_list:
     merge_waves
@@ -67,5 +69,5 @@ extra_arguments:
    spot:   [dt_required]
    pion:   [tbegin,tend,dt_required]
    iccoup: [ic_wave_nr_toroidal_modes]
-   bbnbi:  [fokker_flag]
+   bbnbi:  [nmarkers_bbnbi_ascot]
 

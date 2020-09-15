@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR:     hcd2core-profiles
 
-MODULES: []
+MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: hcd2core-profiles

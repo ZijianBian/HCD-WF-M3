@@ -1,0 +1,3 @@
+Notes in view of the next release
+- Corrections to make BBNBI/ASCOT work
+- Addition of NBISIM2 as NBI Fokker-Planck code

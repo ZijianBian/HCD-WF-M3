@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR:     nemo
 
-MODULES: [FRUIT/3.4.3-intel-2018a-Ruby-2.5.1, FRUIT_processor/3.4.3-intel-2018a-Ruby-2.5.1, INTERPOS/9.0.2-intel-2018a XMLlib/3.2.0-intel-2018a]
+MODULES: [IMAS, FC2K, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: nemo

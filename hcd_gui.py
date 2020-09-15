@@ -1,23 +1,19 @@
 import os, sys
 
-if sys.version_info[0] < 3:
-    print('The HCD GUI must be used with Python 3 --> Aborted.')
-    sys.exit()
-
 try:
     import tkinter
     import tkinter.ttk
     import tkinter.filedialog
 except:
     print('ERROR: tkinter not found', file=sys.stderr)
-    print('---> TIP: load the HCD module', file=sys.stderr)
+    print('---> TIP: load the HCD module or source the configuration file', file=sys.stderr)
     sys.exit()
 
 try:
     from lxml import etree
 except:
     print('ERROR: lxml module not found', file=sys.stderr)
-    print('---> TIP: load the HCD module', file=sys.stderr)
+    print('---> TIP: load the HCD module or source the configuration file', file=sys.stderr)
     sys.exit()
 
 try:
@@ -30,7 +26,7 @@ try:
 except:
     raise
     print('ERROR while loading internal HCD modules', file=sys.stderr)
-    print('---> TIP: load the HCD module', file=sys.stderr)
+    print('---> TIP: load the HCD module or source the configuration file', file=sys.stderr)
     sys.exit()
 
 #---------------------------------------------------------------------------------------------
@@ -114,8 +110,8 @@ def open_gui(wf_param_file):
     fur_ref = list(workflow_param.keys())[1]
     cod_ref = list(workflow_param.keys())[2]
 
-    hcd_actors_ref = list(maindict.keys())[0]
-    make_core_ref  = list(maindict.keys())[1]
+    hcd_actors_ref = list(maindict.keys())[1]
+    make_core_ref  = list(maindict.keys())[2]
     all_actors_ref = [hcd_actors_ref,make_core_ref]
 
     global_dict = dict_merge(maindict[hcd_actors_ref],maindict[make_core_ref])

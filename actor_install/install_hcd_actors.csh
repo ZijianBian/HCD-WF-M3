@@ -1,7 +1,7 @@
 #!/bin/tcsh
 
 echo ''
-echo 'Compiles of actors needed for the HCD workflows (Kepler and Python)'
+echo 'Compile actors needed for the HCD workflow'
 echo ''
 
 set ACTOR_RELEASE_DIRECTORY=/tmp/${USER}/actor_release/
@@ -20,11 +20,13 @@ cp actor_install.py *.yml ${ACTOR_RELEASE_DIRECTORY}
 cd ${ACTOR_RELEASE_DIRECTORY}
 
 set actor_list=(cyrano gray hcd2core-profiles \
-  hcd2core-sources iccoup wftools lion risk spot stixredist ascot \
+  hcd2core-sources iccoup wftools lion nbisim risk spot stixredist ascot \
   tomcat nemo genray pion grayscale)
 
+#set actor_list=(ascot)
+
 foreach actor ($actor_list)
-  python actor_install.py --skipModules $actor.yml
+  python actor_install.py $actor.yml
 end
 
-cd ${PWD}
+
