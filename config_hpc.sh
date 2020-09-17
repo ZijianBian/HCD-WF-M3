@@ -14,9 +14,6 @@ module load lxml/4.2.0-intel-2018a-Python-3.6.4
 export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
 
-# IMAS and FC2K
-#module load FC2K
-
 # Module for all needed HCD or WF actors are loaded
 actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
 		  HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist \
@@ -156,7 +153,7 @@ if [ $local_TORBEAM == 1 ] || [ $all_local == 1 ]; then
 fi
 
 # To find shell scripts in current local folder
-export PATH=$PWD:$PATH
+#export PATH=$PWD:$PATH
 
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
