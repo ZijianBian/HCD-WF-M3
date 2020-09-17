@@ -21,9 +21,9 @@ cd ${ACTOR_RELEASE_DIRECTORY}
 
 set actor_list=(cyrano gray hcd2core-profiles \
   hcd2core-sources iccoup wftools lion nbisim risk spot stixredist ascot \
-  tomcat nemo genray pion grayscale)
+  tomcat nemo genray pion grayscale torbeam)
 
-#set actor_list=(ascot)
+#set actor_list=(pion)
 
 foreach actor ($actor_list)
   python actor_install.py $actor.yml
