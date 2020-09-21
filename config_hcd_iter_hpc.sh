@@ -153,7 +153,7 @@ if [ $local_TORBEAM == 1 ] || [ $all_local == 1 ]; then
 fi
 
 # To find shell scripts in current local folder
-#export PATH=$PWD:$PATH
+export PATH=$PWD:$PATH
 
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
