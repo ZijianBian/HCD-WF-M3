@@ -21,7 +21,7 @@
   <actor_selection display="ACTOR SELECTION"> <!-- 0: none - Higher indices: following code ordering -->
     <systems>
       <ECRH>
-	<ec_wave_solver list="genray gray grayscale torbeam">2</ec_wave_solver>
+	<ec_wave_solver list="genray gray grayscale torbeam">4</ec_wave_solver>
 
       </ECRH>
 
