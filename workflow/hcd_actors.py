@@ -44,7 +44,7 @@ def run(cat, bundle, parameters):
                   +code+'.so'
     if is_compiled_for_mpi(libmpi_path, 'libmpi'):
         if cat == 'nbi_fp':
-            inputmpi.append(['mpi_local','mpi_processes='+parameters["nproc_ion_fp"]])
+            inputmpi.append(['mpi_local','mpi_processes='+str(parameters["nproc_ion_fp"])])
         else:
             inputmpi.append(['mpi_local']) # FOR NON-FP CODES, DEFAULT IS NPROC=4
 
