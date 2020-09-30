@@ -42,13 +42,13 @@ def run(cat, bundle, parameters):
     inputmpi = []
     libmpi_path = eval(code+'.location')+'/native_wrapper/lib/lib'\
                   +code+'.so'
+    args_np = {}
     if is_compiled_for_mpi(libmpi_path, 'libmpi'):
         if cat == 'nbi_fp':
-            inputmpi.append(['mpi_local','mpi_processes='+str(parameters["nproc_ion_fp"])])
-        else:
-            inputmpi.append(['mpi_local']) # FOR NON-FP CODES, DEFAULT IS NPROC=4
+            args_np = {'mpi_processes':parameters["nproc_ion_fp"]}
+        inputmpi.append('mpi_local') # FOR NON-FP CODES, DEFAULT IS NPROC=4
 
     inputs = inputargs + inputxml + inputmpi
     # Call of the chosen code
-    return globals()[code](*inputs)
+    return globals()[code](*inputs, **args_np)
 
