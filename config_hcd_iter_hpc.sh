@@ -101,7 +101,7 @@ fi
 if [ $local_LION == 1 ] || [ $all_local == 1 ]; then
     echo Warning: LION module replaced by actor from \~/public/PYTHON_ACTORS
     module unload LION >& /dev/null
-    export PYTHONPATH=$ACTOR_FOLDER/lion/0:$PYTHONPATH
+    export PYTHONPATH=$ACTOR_FOLDER/lion:$PYTHONPATH
 fi
 if [ $local_NBISIM == 1 ] || [ $all_local == 1 ]; then
     echo Warning: NBISIM module replaced by actor from \~/public/PYTHON_ACTORS
