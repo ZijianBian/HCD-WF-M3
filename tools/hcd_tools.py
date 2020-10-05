@@ -1,5 +1,6 @@
 # Load necessary modules
 import os, sys, yaml, inspect, imas
+import numpy as np
 from importlib import import_module
 from inspect import getmodule,stack
 from lxml import etree
@@ -10,6 +11,12 @@ def __foo():
   pass
 
 #####################################################################################
+
+# Function to find the index of a value in a time array, and the closest array value
+def find_nearest(a, a0):
+    "Element in nd array `a` closest to the scalar value `a0`"
+    idx = np.abs(a - a0).argmin()
+    return a.flat[idx],idx
 
 # -----------------------------------------------------
 # Function to read the yaml file containing the global
@@ -423,4 +430,82 @@ def create_workflow_param_from_file(filepath,option):
 def dict_merge(dict1, dict2): 
   res = {**dict1, **dict2} 
   return res 
+
+#####################################################################################
+
+# ------------------------------------------------------
+# IS THE NBI SYSTEM ON? 
+# --> CHECK THE POWER ON ALL UNITS FOR THIS TIME SLICE
+# ------------------------------------------------------
+
+def is_nbi_on(nbi,time_slice):
+  if len(nbi.time)>0:
+      time_array = nbi.time
+  else:
+      return False
+  [tc,it] = find_nearest(time_array,time_slice)
+  nunit = len(nbi.unit)
+  power = 0.
+  if nunit > 0:
+      for iunit in range(nunit):
+          if nbi.unit[iunit].power_launched.data[it]>0:
+              power = power + nbi.unit[iunit].power_launched.data[it]
+      if power == 0:
+          return False
+      else:
+          return True
+  else:
+      return False
+
+#####################################################################################
+
+# ------------------------------------------------------
+# IS THE EC SYSTEM ON? 
+# --> CHECK THE POWER ON ALL LAUNCHERS FOR THIS TIME SLICE
+# ------------------------------------------------------
+
+def is_ec_on(ec_launchers,time_slice):
+    if len(ec_launchers.time)>0:
+        time_array = ec_launchers.time
+    else:
+        return False
+    [tc,it] = find_nearest(time_array,time_slice)
+    nlauncher = len(ec_launchers.launcher)
+    power = 0.
+    if nlauncher > 0:
+        for ilauncher in range(nlauncher):
+            if ec_launchers.launcher[ilauncher].power_launched.data[it]>0:
+                power = power + ec_launchers.launcher[ilauncher].power_launched.data[it]
+        if power == 0:
+            return False
+        else:
+            return True
+    else:
+        return False
+
+#####################################################################################
+
+# ------------------------------------------------------
+# IS THE IC SYSTEM ON? 
+# --> CHECK THE POWER ON ALL ANTENNAS FOR THIS TIME SLICE
+# ------------------------------------------------------
+
+def is_ic_on(ic_antennas,time_slice):
+    if len(ic_antennas.time)>0:
+        time_array = ic_antennas.time
+    else:
+        return False
+    [tc,it] = find_nearest(time_array,time_slice)
+    nantenna = len(ic_antennas.antenna)
+    power = 0.
+    if nantenna > 0:
+        for iantenna in range(nantenna):
+            if ic_antennas.antenna[iantenna].power_launched.data[it]>0:
+                power = power + ic_antennas.antenna[iantenna].power_launched.data[it]
+        if power == 0:
+            return False
+        else:
+            return True
+    else:
+        return False
 
