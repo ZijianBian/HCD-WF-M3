@@ -1,6 +1,6 @@
 import sys
 import hcd_actors as actors
-from hcd_tools import bundle_copy, create_workflow_param_from_file
+from hcd_tools import bundle_copy, create_workflow_param_from_file, is_nbi_on, is_ec_on, is_ic_on
 
 # -------------------------------------------------------------------------------------------------
 
@@ -30,11 +30,20 @@ def hcd_workflow(BNDL_in,workflow_xml):
 
     # STEP 1: SOURCE CODES, ICCOUP (FOR IC COUPLING) AND WAVE SOLVERS
     print('-- Step 1: Source codes and Wave solvers', file=sys.stdout)
-    BNDL_nbi ['distribution_sources'] = actors.run ( 'nbi_source',     BNDL_nbi, parameters )
+    if is_nbi_on(BNDL_nbi['nbi'],BNDL_nbi['nbi'].time):
+        BNDL_nbi['distribution_sources'] = actors.run ( 'nbi_source', BNDL_nbi, parameters )
+    else:
+        print('  No NBI power for this time slice')
+    if is_ic_on(BNDL_nbi['ic_antennas'],BNDL_nbi['ic_antennas'].time):
+        BNDL_ic['waves'] = actors.run ( 'ic_coup', BNDL_ic, parameters )
+        BNDL_ic['waves'] = actors.run ( 'ic_wave_solver', BNDL_ic, parameters )
+    else:
+        print('  No IC power for this time slice')
+    if is_ec_on(BNDL_nbi['ec_launchers'],BNDL_nbi['ec_launchers'].time):
+        BNDL_ec['waves'] = actors.run ( 'ec_wave_solver', BNDL_ec,  parameters )
+    else:
+        print('  No EC power for this time slice')
     BNDL_nuc ['distribution_sources'] = actors.run ( 'nuclear_source', BNDL_nuc, parameters )
-    BNDL_ic  ['waves']                = actors.run ( 'ic_coup',        BNDL_ic,  parameters )
-    BNDL_ic  ['waves']                = actors.run ( 'ic_wave_solver', BNDL_ic,  parameters )
-    BNDL_ec  ['waves']                = actors.run ( 'ec_wave_solver', BNDL_ec,  parameters )
 
     # INTERMEDIATE STEP: SYSTEMATICALLY COPY THE NBI DISTRIBUTION_SOURCES TO 
     # THE IC BUNDLE IN CASE SYNERGY IS MODELLED
@@ -42,9 +51,15 @@ def hcd_workflow(BNDL_in,workflow_xml):
 
     # STEP 2: FOKKER PLANK SOLVERS
     print('-- Step 2: Fokker Planck solvers', file=sys.stdout)
-    BNDL_ic  ['distributions'] = actors.run ( 'ic_wave_fp', BNDL_ic,  parameters)
+    if is_ic_on(BNDL_nbi['ic_antennas'],BNDL_nbi['ic_antennas'].time):
+        BNDL_ic['distributions'] = actors.run ( 'ic_wave_fp', BNDL_ic, parameters)
+    else:
+        print('  No IC power for this time slice')
+    if is_nbi_on(BNDL_nbi['nbi'],BNDL_nbi['nbi'].time):
+        BNDL_nbi['distributions'] = actors.run ( 'nbi_fp', BNDL_nbi, parameters)
+    else:
+        print('  No NBI power for this time slice')
     BNDL_nuc ['distributions'] = actors.run ( 'nuclear_fp', BNDL_nuc, parameters)
-    BNDL_nbi ['distributions'] = actors.run ( 'nbi_fp',     BNDL_nbi, parameters)
 
     # STEP 3: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION_SOURCES and WAVES
     print('-- Step 3: Mergers', file=sys.stdout)
