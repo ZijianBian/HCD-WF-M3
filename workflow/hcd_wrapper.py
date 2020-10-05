@@ -149,8 +149,9 @@ def hcd_wrapper(par_path):
               param['tbegin'], file=sys.stdout)
 
     if param['tbegin'] > 0 and param['tbegin'] < time_array[0]:
-       print('ERROR: tbegin out of range ('+str(param['tbegin'])\
-             +'s is less than first time in core_profiles)', file=sys.stderr)
+       print('ERROR: tbegin out of range: '+str(param['tbegin'])\
+             +' s is less than first time in core_profiles =', '{:.2f}'.format(time_array[0]),'s',\
+             file=sys.stderr)
        return
 
     if param['tend'] < 0:
@@ -158,8 +159,9 @@ def hcd_wrapper(par_path):
         print('Final time tend set to core_profiles final time slice, tend = ', param['tend'], file=sys.stdout)
 
     if param['tend'] > 0 and param['tend'] > time_array[-1]:
-       print('ERROR: tend out of range  ('+str(param['tend'])\
-             + 's is greater than last time in core_profiles)', file=sys.stderr)
+       print('ERROR: tend out of range: '+str(param['tend'])\
+             + ' s is greater than last time in core_profiles =', '{:.2f}'.format(time_array[-1]),'s',\
+             file=sys.stderr)
        return
 
     ##################################################################
