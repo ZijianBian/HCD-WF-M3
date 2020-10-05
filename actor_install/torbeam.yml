@@ -3,17 +3,17 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/torbeam.git
-    VERSION: feature/imas_adaptation
+    VERSION: feature/imas_relative_folder_adjustment
     DIR: torbeam
 
 MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
 
 BUILDS: 
-  - DIR: torbeam/build
+  - DIR: torbeam/tests/test_imas/build
     CMD: ./build_imas.sh
 
 ACTORS: 
-  - DIR: torbeam/build
+  - DIR: torbeam/tests/test_imas/build
     XML: fc2k/torbeam.xml
 
 #COMMENTS:  
