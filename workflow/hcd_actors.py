@@ -24,32 +24,31 @@ def run(cat, bundle, parameters):
     codeslist = catdict[cat] #next(gen_dict_extract(cat,maindict))
     codeinfo = codeslist[parameters[cat]]
     code = codeinfo['name']
-    inputids = []
-    inputextra = []
+    inputargs = []
     extra_arg_nr = 0
     inputxml = []
     for i in codeinfo['input']:
         if i.find('extra_argument_list') is not -1 \
            and extra_argument_list.get(code) is not None:
-            inputextra.append(parameters[extra_argument_list[code][extra_arg_nr]])
+            inputargs.append(parameters[extra_argument_list[code][extra_arg_nr]])
             extra_arg_nr += 1
         elif i.find('codeparam') is not -1:
             inputxml.append(parameters['input_path']+'/'+ \
                               codeinfo['system']+'/input_'+code+'.xml')
         else:
-            inputids.append(bundle[i])
+            inputargs.append(bundle[i])
 
 
     inputmpi = []
     libmpi_path = eval(code+'.location')+'/native_wrapper/lib/lib'\
                   +code+'.so'
+    args_np = {}
     if is_compiled_for_mpi(libmpi_path, 'libmpi'):
         if cat == 'nbi_fp':
-            inputmpi.append(['mpi_local','mpi_processes='+parameters["nproc_ion_fp"]])
-        else:
-            inputmpi.append(['mpi_local']) # FOR NON-FP CODES, DEFAULT IS NPROC=4
+            args_np = {'mpi_processes':parameters["nproc_ion_fp"]}
+        inputmpi.append('mpi_local') # FOR NON-FP CODES, DEFAULT IS NPROC=4
 
-    inputs = inputids + inputextra + inputxml + inputmpi
+    inputs = inputargs + inputxml + inputmpi
     # Call of the chosen code
-    return globals()[code](*inputs)
+    return globals()[code](*inputs, **args_np)
 
