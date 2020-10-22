@@ -1,5 +1,5 @@
 # Load necessary modules
-import os, sys, yaml, inspect, imas
+import os, sys, yaml, inspect, imas, copy
 import numpy as np
 from importlib import import_module
 from inspect import getmodule,stack
@@ -111,11 +111,11 @@ def import_actor(actor_input,verbose):
 # Create dictionary from IDS list and IMAS object
 # ------------------------------------------------
 
-def create_dict_from_idslist(idslist,imas_object):
+def create_dict_from_idslist(idslist):
 
     imas_dict = {}
     for ids in idslist:
-        imas_dict[ids] = eval('imas_object.'+ids)
+        imas_dict[ids] = eval('imas.'+ids+'()')
 
     return imas_dict
 
@@ -142,26 +142,11 @@ def bundle_copy(input_bundle,idslist=None):
     if idslist == None:
         idslist = input_bundle.keys()
 
-    # EMPTY IMAS STRUCTURE
-    output_imas = imas.ids(0,0)
-    
-    # EMPTY OUTPUT BUNDLE (DICTIONARY)
+    # COPY THE BUNDLE, IDS PER IDS
     output_bundle = dict()
-
-    # LOOP OVER IDSS OF THE BUNDLE TO COPY
     for key in input_bundle.keys():
-
-        # ONLY COPY THE IDSS WE ARE INTERESTED IN
         if key in idslist:
-
-            # IDS TO COPY
-            ids = input_bundle[key]
-
-            # COPY THE IDS INTO THE EMPTY IMAS STRUCTURE
-            eval('output_imas.'+key+'.copyValues(ids)')
-
-            # USE THIS STRUCTURE TO FILL THE DICTIONARY OF THE OUTPUT BUNDLE
-            output_bundle[key] = eval('output_imas.'+key)
+            output_bundle[key] = copy.deepcopy(input_bundle[key])
 
     return output_bundle
 

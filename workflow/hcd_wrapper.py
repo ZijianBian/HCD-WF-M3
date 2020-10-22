@@ -93,8 +93,9 @@ def hcd_wrapper(par_path):
 
     # OPEN INPUT DATAFILE
     print('-- Open input and output file --', file=sys.stdout)
-    input = imas.ids(param['shot_nr'], param['run_in'])
-    retstatus,idx_in = input.open_env(input_user_or_path,input_database,version)
+    input = imas.DBEntry(imas.imasdef.MDSPLUS_BACKEND,input_database,\
+                         param['shot_nr'],param['run_in'],input_user_or_path)
+    retstatus,idx_in = input.open()
     if retstatus < 0:
       print('   ERROR while reading the input shot='+str(param['shot_nr'])\
             +' and run='+str(param['run_in'])+'\n   for user_or_path = '+input_user_or_path\
@@ -103,8 +104,9 @@ def hcd_wrapper(par_path):
       return
 
     # CREATE OUTPUT DATAFILE
-    output = imas.ids(param["shot_nr"], param["run_out"])
-    retstatus,idx_out = output.create_env(output_user_or_path,output_database,version)
+    output = imas.DBEntry(imas.imasdef.MDSPLUS_BACKEND,output_database,\
+                          param["shot_nr"],param["run_out"],output_user_or_path)
+    retstatus,idx_out = output.create()
     if retstatus < 0:
       print('   ERROR while creating the output shot='+str(param['shot_nr'])\
             +' and run='+str(param['run_out'])+'\n   for user_or_path = '+output_user_or_path\
@@ -124,8 +126,8 @@ def hcd_wrapper(par_path):
     # ----------------------------------------------------------------
 
     # TOTAL LIST OF INPUT AND OUTPUT IDSS FOR H&CD CALCULATIONS
-    ids_bundle_input  = create_dict_from_idslist(ids_list,input)
-    ids_bundle_output = create_dict_from_idslist(ids_list,output)
+    ids_bundle_input  = create_dict_from_idslist(ids_list)
+    ids_bundle_output = create_dict_from_idslist(ids_list)
 
     ##################################################################
 
@@ -135,7 +137,7 @@ def hcd_wrapper(par_path):
 
     # INPUT TIME ARRAY
     try:
-      time_array = ids_bundle_input['core_profiles'].partialGet('time')
+      time_array = input.partial_get(ids_name='equilibrium',data_path='time')
     except:
       print('  ERROR while reading the core_profiles IDS: is it really present in the input file?'\
             ,file=sys.stderr)
@@ -190,7 +192,7 @@ def hcd_wrapper(par_path):
         for elem in input_ids_list:
           print('  Get', elem, file=sys.stdout)
           try:
-            ids_bundle_input[elem].getSlice(timenow,1)
+            ids_bundle_input[elem] = input.get_slice(elem,timenow,1)
           except:
             print('  ERROR while reading the '+elem+' IDS:', file=sys.stderr)
             print('  ----> Check the version of the Data Dictionary between the'+ \
@@ -227,22 +229,19 @@ def hcd_wrapper(par_path):
 
         for elem in ids_bundle_output:
 
-          # THE OUTPUT PULSECTX IS NOT PRESERVED IN THE WORKFLOW ITSELF
-          ids_bundle_output[elem].setPulseCtx(idx_out)
-
           # IF THE IDS IS NOT EMPTY (INPUT OR OUTPUT) IT IS GOING TO BE SAVED USING THE TIME OF 
           # THE WORKFLOW (TO AVOID SAVING IDENTICAL TIME VALUES IN CASE THE WORKFLOW TIME 
           # RESOLUTION IS SCARCER THAN THE INPUT ONE)
           if ids_bundle_output[elem].ids_properties.homogeneous_time>=0:
             ids_bundle_output[elem].time = np.array([timenow])
 
-            # FIRST TIME SLICE: PUT() INSTEAD OF PUTSLICE() TO SAVE ALSO STATIC DATA
+            # FIRST TIME SLICE: PUT() INSTEAD OF PUT_SLICE() TO SAVE ALSO STATIC DATA
             if timenow == param['tbegin']:
-              ids_bundle_output[elem].put()
+              output.put(ids_bundle_output[elem])
 
             # OTHER TIME SLICES: SAVE ONLY THE TIME SLICE
             else:
-              ids_bundle_output[elem].putSlice()
+              output.put_slice(ids_bundle_output[elem])
 
         # PREPARE FOR THE NEXT TIME STEP
         timenow += param['dt_required']
