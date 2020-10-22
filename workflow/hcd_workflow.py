@@ -28,38 +28,38 @@ def hcd_workflow(BNDL_in,workflow_xml):
     BNDL_core = bundle_copy(BNDL_in)
     BNDL_out  = bundle_copy(BNDL_in)
 
+    # IF AN H&CD SOURCE IS CONFIGURED BUT IT HAS NO POWER FOR THIS TIME SLICE, 
+    # DO NOT RUN THE CODE(S) FOR THIS SOURCE
+    if 'nbi' in BNDL_nbi.keys() and not is_nbi_on(BNDL_nbi['nbi'],BNDL_nbi['nbi'].time):
+        print('  No NBI power for this time slice')
+        parameters['nbi_source'] = 0
+        parameters['nbi_fp'] = 0
+    if 'ic_antennas' in BNDL_nbi.keys() and not is_ic_on(BNDL_ic['ic_antennas'],BNDL_ic['ic_antennas'].time):
+        print('  No IC power for this time slice')
+        parameters['iccoup'] = 0
+        parameters['ic_wave_solver'] = 0
+        parameters['ic_wave_fp'] = 0
+    if 'ec_launchers' in BNDL_nbi.keys() and not is_ec_on(BNDL_ec['ec_launchers'],BNDL_ec['ec_launchers'].time):
+        print('  No EC power for this time slice')
+        parameters['ec_wave_solver'] = 0
+
     # STEP 1: SOURCE CODES, ICCOUP (FOR IC COUPLING) AND WAVE SOLVERS
     print('-- Step 1: Source codes and Wave solvers', file=sys.stdout)
-    if is_nbi_on(BNDL_nbi['nbi'],BNDL_nbi['nbi'].time):
-        BNDL_nbi['distribution_sources'] = actors.run ( 'nbi_source', BNDL_nbi, parameters )
-    else:
-        print('  No NBI power for this time slice')
-    if is_ic_on(BNDL_nbi['ic_antennas'],BNDL_nbi['ic_antennas'].time):
-        BNDL_ic['waves'] = actors.run ( 'ic_coup', BNDL_ic, parameters )
-        BNDL_ic['waves'] = actors.run ( 'ic_wave_solver', BNDL_ic, parameters )
-    else:
-        print('  No IC power for this time slice')
-    if is_ec_on(BNDL_nbi['ec_launchers'],BNDL_nbi['ec_launchers'].time):
-        BNDL_ec['waves'] = actors.run ( 'ec_wave_solver', BNDL_ec,  parameters )
-    else:
-        print('  No EC power for this time slice')
-    BNDL_nuc ['distribution_sources'] = actors.run ( 'nuclear_source', BNDL_nuc, parameters )
+    BNDL_nbi['distribution_sources'] = actors.run ( 'nbi_source', BNDL_nbi, parameters )
+    BNDL_ic['waves'] = actors.run ( 'ic_coup', BNDL_ic, parameters )
+    BNDL_ic['waves'] = actors.run ( 'ic_wave_solver', BNDL_ic, parameters )
+    BNDL_ec['waves'] = actors.run ( 'ec_wave_solver', BNDL_ec,  parameters )
+    BNDL_nuc['distribution_sources'] = actors.run ( 'nuclear_source', BNDL_nuc, parameters )
 
     # INTERMEDIATE STEP: SYSTEMATICALLY COPY THE NBI DISTRIBUTION_SOURCES TO 
     # THE IC BUNDLE IN CASE SYNERGY IS MODELLED
-    BNDL_ic ['distribution_sources'] = BNDL_nbi['distribution_sources']
+    BNDL_ic['distribution_sources'] = BNDL_nbi['distribution_sources']
 
     # STEP 2: FOKKER PLANK SOLVERS
     print('-- Step 2: Fokker Planck solvers', file=sys.stdout)
-    if is_ic_on(BNDL_nbi['ic_antennas'],BNDL_nbi['ic_antennas'].time):
-        BNDL_ic['distributions'] = actors.run ( 'ic_wave_fp', BNDL_ic, parameters)
-    else:
-        print('  No IC power for this time slice')
-    if is_nbi_on(BNDL_nbi['nbi'],BNDL_nbi['nbi'].time):
-        BNDL_nbi['distributions'] = actors.run ( 'nbi_fp', BNDL_nbi, parameters)
-    else:
-        print('  No NBI power for this time slice')
-    BNDL_nuc ['distributions'] = actors.run ( 'nuclear_fp', BNDL_nuc, parameters)
+    BNDL_ic['distributions']  = actors.run ( 'ic_wave_fp', BNDL_ic, parameters)
+    BNDL_nbi['distributions'] = actors.run ( 'nbi_fp', BNDL_nbi, parameters)
+    BNDL_nuc['distributions'] = actors.run ( 'nuclear_fp', BNDL_nuc, parameters)
 
     # STEP 3: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION_SOURCES and WAVES
     print('-- Step 3: Mergers', file=sys.stdout)
@@ -71,14 +71,14 @@ def hcd_workflow(BNDL_in,workflow_xml):
                                                     BNDL_nbi['distribution_sources'])
 
     # INTERMEDIATE STEP: COPY H&CD RESULTS INTO THE BUNDLES FOR CORE_SOURCES AND CORE_PROFILES
-    BNDL_core ['distribution_sources'] = dsources_fus_nbi
-    BNDL_core ['distributions']        = distrib_fus_nbi_ic
-    BNDL_core ['waves']                = waves_ec_ic 
+    BNDL_core['distribution_sources'] = dsources_fus_nbi
+    BNDL_core['distributions']        = distrib_fus_nbi_ic
+    BNDL_core['waves']                = waves_ec_ic 
 
     # STEP 4: MAKE CORE_SOURCES AND CORE_PROFILES IDS:
     print('-- Step 4: Make core_sources and/or core_profiles', file=sys.stdout)
-    BNDL_core ['core_sources']  = actors.run ( 'fill_core_sources',  BNDL_core, parameters )
-    BNDL_core ['core_profiles'] = actors.run ( 'fill_core_profiles', BNDL_core, parameters )
+    BNDL_core['core_sources']  = actors.run ( 'fill_core_sources',  BNDL_core, parameters )
+    BNDL_core['core_profiles'] = actors.run ( 'fill_core_profiles', BNDL_core, parameters )
 
     # FILL THE OUTPUT BUNDLE WITH THE RESULTS OF H&CD CALCUATIONS
     BNDL_out['distribution_sources'] = BNDL_core ['distribution_sources']
