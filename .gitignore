@@ -4,3 +4,5 @@ data/
 .idea
 *.pyc
 auto_batch_*
+build_*
+actor_install/RELEASE.yaml
