@@ -1,0 +1,21 @@
+#example
+---
+SOURCES:
+  - VCS:  git
+    REPO: ssh://git@git.iter.org/heat/fopla.git
+    VERSION: feature/further_imas_features
+    DIR: fopla
+
+MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
+
+BUILDS: 
+  - DIR: fopla
+    CMD: ./build_imas.sh
+
+ACTORS: 
+  - DIR: fopla
+    XML: fc2k/fopla_ids.xml
+
+#COMMENTS:  
+...
+  

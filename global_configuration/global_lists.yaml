@@ -32,6 +32,7 @@ actor_list:
     StixReDist 
     tomcat 
     torbeam
+    fopla
 
 merge_actor_list:
     merge_waves
