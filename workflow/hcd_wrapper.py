@@ -96,7 +96,7 @@ def hcd_wrapper(par_path):
     input = imas.DBEntry(imas.imasdef.MDSPLUS_BACKEND,input_database,\
                          param['shot_nr'],param['run_in'],input_user_or_path)
     retstatus,idx_in = input.open()
-    if retstatus < 0:
+    if retstatus != 0:
       print('   ERROR while reading the input shot='+str(param['shot_nr'])\
             +' and run='+str(param['run_in'])+'\n   for user_or_path = '+input_user_or_path\
             +' and database = '+input_database, file=sys.stderr)
@@ -107,7 +107,7 @@ def hcd_wrapper(par_path):
     output = imas.DBEntry(imas.imasdef.MDSPLUS_BACKEND,output_database,\
                           param["shot_nr"],param["run_out"],output_user_or_path)
     retstatus,idx_out = output.create()
-    if retstatus < 0:
+    if retstatus != 0:
       print('   ERROR while creating the output shot='+str(param['shot_nr'])\
             +' and run='+str(param['run_out'])+'\n   for user_or_path = '+output_user_or_path\
             +' and database = '+output_database, file=sys.stderr)
