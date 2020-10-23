@@ -17,7 +17,7 @@ mkdir -p $ACTOR_FOLDER
 # Module for all needed HCD or WF actors are loaded
 actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
 		  HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist \
-		  WFtools TORBEAM)
+		  WFtools TORBEAM FOPLA)
 # StixReDist not available with same IMAS version
 for actor in ${actor_list[@]}; do
   #echo "load" $actor
@@ -26,7 +26,7 @@ for actor in ${actor_list[@]}; do
   export local_${actor}=0
 done
 
-# Change local_XXX=1 to replace XXX module by the local one in ~/public/PYTHON_ACTORS
+# Change local_XXX=1 to replace XXX module by the local one in ${ACTOR_FOLDER}
 #export local_ASCOT=1
 #export local_NBISIM=1
 #export local_StixReDist=1
@@ -49,7 +49,7 @@ export PYTHONPATH=$HCD_FOLDER/workflow:$PYTHONPATH
 
 # Optionally replace modules by locally compiled versions for H&CD codes and WF tools
 if [ $local_ASCOT == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: BBNBI,ASCOT and AFSI modules replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: BBNBI,ASCOT and AFSI modules replaced by actor from ${ACTOR_FOLDER}
     module unload ASCOT >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/bbnbi:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/ascot4serial:$PYTHONPATH
@@ -58,83 +58,83 @@ if [ $local_ASCOT == 1 ] || [ $all_local == 1 ]; then
 fi
 
 if [ $local_SPOT == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: SPOT module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: SPOT module replaced by actor from ${ACTOR_FOLDER}
     module unload SPOT >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/spot:$PYTHONPATH
 fi
 if [ $local_CYRANO == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: CYRANO module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: CYRANO module replaced by actor from ${ACTOR_FOLDER}
     module unload CYRANO >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/Cyrano:$PYTHONPATH
 fi
 if [ $local_FPSIM == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: FPSIM \(ICCOUP\) module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: FPSIM \(ICCOUP\) module replaced by actor from ${ACTOR_FOLDER}
     module unload FPSIM >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/iccoup:$PYTHONPATH
 fi
 if [ $local_GENRAY == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: GENRAY module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: GENRAY module replaced by actor from ${ACTOR_FOLDER}
     module unload GENRAY >& /dev/null
     module switch netCDF-Fortran
     export PYTHONPATH=$ACTOR_FOLDER/genray:$PYTHONPATH
 fi
 if [ $local_GRAY == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: GRAY module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: GRAY module replaced by actor from ${ACTOR_FOLDER}
     module unload GRAY >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/gray:$PYTHONPATH
 fi
 if [ $local_GRAYSCALE == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: GRAYSCALE module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: GRAYSCALE module replaced by actor from ${ACTOR_FOLDER}
     module unload GRAYSCALE >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/grayscale:$PYTHONPATH
 fi
 if [ $local_HCD2CORE_PROFILES == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: HCD2CORE_PROFILES module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: HCD2CORE_PROFILES module replaced by actor from ${ACTOR_FOLDER}
     module unload HCD2CORE_PROFILES >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/hcd2core_profiles:$PYTHONPATH
 fi
 if [ $local_HCD2CORE_SOURCES == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: HCD2CORE_SOURCES module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: HCD2CORE_SOURCES module replaced by actor from ${ACTOR_FOLDER}
     module unload HCD2CORE_SOURCES >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/hcd2core_sources:$PYTHONPATH
 fi
 if [ $local_LION == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: LION module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: LION module replaced by actor from ${ACTOR_FOLDER}
     module unload LION >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/lion:$PYTHONPATH
 fi
 if [ $local_NBISIM == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: NBISIM module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: NBISIM module replaced by actor from ${ACTOR_FOLDER}
     module unload NBISIM >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/nbisim2:$PYTHONPATH
 fi
 if [ $local_NEMO == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: NEMO module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: NEMO module replaced by actor from ${ACTOR_FOLDER}
     module unload NEMO >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/nemo:$PYTHONPATH
 fi
 if [ $local_PION == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: PION module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: PION module replaced by actor from ${ACTOR_FOLDER}
     module unload PION >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/pion:$PYTHONPATH
 fi
 if [ $local_RISK == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: RISK module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: RISK module replaced by actor from ${ACTOR_FOLDER}
     module unload RISK >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/risk:$PYTHONPATH
 fi
 if [ $local_StixReDist == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: StixReDist module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: StixReDist module replaced by actor from ${ACTOR_FOLDER}
     module unload StixReDist >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/StixReDist:$PYTHONPATH
 fi
 if [ $local_TOMCAT == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: TOMCAT module replaced by actor from \~/public/PYTHON_ACTORS
+    echo Warning: TOMCAT module replaced by actor from ${ACTOR_FOLDER}
     module unload TOMCAT >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/tomcat:$PYTHONPATH
 fi
 if [ $local_WFtools == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: empty and mergers modules replaced by actors from \~/public/PYTHON_ACTORS
+    echo Warning: empty and mergers modules replaced by actors from ${ACTOR_FOLDER}
     module unload WFtools >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/empty_core_profiles:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/empty_core_sources:$PYTHONPATH
@@ -148,8 +148,15 @@ if [ $local_WFtools == 1 ] || [ $all_local == 1 ]; then
 fi
 
 if [ $local_TORBEAM == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: TORBEAM module replaced by actor from \~/public/PYTHON_ACTORS
+    # module unload TORBEAM (to be activated after the 1st release of TORBEAM)
+    echo Warning: TORBEAM module replaced by actor from ${ACTOR_FOLDER}
     export PYTHONPATH=$ACTOR_FOLDER/torbeam:$PYTHONPATH
+fi
+
+if [ $local_FOPLA == 1 ] || [ $all_local == 1 ]; then
+    # module unload FOPLA (to be activated after the 1st release of FOPLA)
+    echo Warning: FOPLA module replaced by actor from ${ACTOR_FOLDER}
+    export PYTHONPATH=$ACTOR_FOLDER/fopla:$PYTHONPATH
 fi
 
 # To find shell scripts in current local folder
