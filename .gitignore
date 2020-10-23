@@ -4,4 +4,3 @@ data/
 .idea
 *.pyc
 auto_batch_*
-auto_hcd_actors.py
