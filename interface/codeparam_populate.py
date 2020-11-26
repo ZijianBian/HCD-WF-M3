@@ -45,7 +45,8 @@ def codeparam_interface(frame,destination_file,codeparam_dict,docum_dict,codepar
             codeparam_dict[elem.tag] = entrystring.get()
 
             # Display the definition of the variable from the xsd file information
-            codeparam_properties.CreateToolTip(l, docum_dict[l.cget('text')])
+            if l.cget('text') in docum_dict.keys():
+                codeparam_properties.CreateToolTip(l, docum_dict[l.cget('text')])
 
             rrow += 1
 
