@@ -47,6 +47,12 @@ empty_actor_list:
     empty_core_sources 
     empty_core_profiles
 
+algorithm:
+    default:
+        [ec_wave_solver,nbi_source,ic_coup,ic_wave_solver,nuclear_source,nbi_fp,ic_wave_fp,nuclear_fp,fill_core_sources,fill_core_profiles]
+    nbi_ic_synergy:
+        [ec_wave_solver,nbi_source,nbi_fp,nuclear_source,nuclear_fp,ic_coup,ic_wave_solver,ic_wave_fp,fill_core_sources,fill_core_profiles]
+
 dependencies:
    ec_wave_solver: None
    ic_coup: None

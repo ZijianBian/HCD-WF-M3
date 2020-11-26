@@ -6,3 +6,5 @@ data/
 auto_batch_*
 build_*
 actor_install/RELEASE.yaml
+fort.*
+Plot_data*

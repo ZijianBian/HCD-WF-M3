@@ -40,6 +40,8 @@ def loadlist(listname):
         output_list = data['merge_actor_list'].split(' ')
     elif listname=='empty_actor_list':
         output_list = data['empty_actor_list'].split(' ')
+    elif listname=='algorithm':
+        output_list = data['algorithm']
     elif listname=='dependencies':
         output_list = data['dependencies']
     elif listname=='extra_arguments':
@@ -130,12 +132,14 @@ def create_dict_from_idslist(idslist):
 # - input_bundle: initial bundle to copy
 # - idslist (optional): restricted list of idss to copy from
 #   the initial bundle
+# - origin_bundle (optional): existing bundle to which we 
+#   want to copy the initial bundle
 # ------------------------------------------------------------
 # Output argument:
 # - output_bundle: output copied bundle
 # ------------------------------------------------------------
 
-def bundle_copy(input_bundle,idslist=None):
+def bundle_copy(input_bundle,idslist=None,origin_bundle=None):
 
     # OPTIONALLY RESTRICT THE LIST OF IDSS TO BE COPIED
     # IF NO LIST IS SPECIFIED: USE THE FULL LIST OF THE INITIAL BUNDLE
@@ -143,7 +147,11 @@ def bundle_copy(input_bundle,idslist=None):
         idslist = input_bundle.keys()
 
     # COPY THE BUNDLE, IDS PER IDS
-    output_bundle = dict()
+    if origin_bundle == None:
+      output_bundle = dict()
+    else:
+      output_bundle = origin_bundle
+
     for key in input_bundle.keys():
         if key in idslist:
             output_bundle[key] = copy.deepcopy(input_bundle[key])
@@ -493,4 +501,44 @@ def is_ic_on(ic_antennas,time_slice):
             return True
     else:
         return False
+
+#####################################################################################
+
+# ----------------------------------------------------------
+# AUTOMATICALLY ADD THE MERGERS TO THE CHRONOLOGY OF
+# CODES TO BE EXECUTED, WHEN THERE ARE TWO SAME OUTPUT IDSS
+# ----------------------------------------------------------
+def clever_algo(algo_input,parameters,catdict):
+
+  import collections
+
+  ## ADD MERGERS TO THE FLOW
+  output_list = []
+  algo_final  = []
+  code_list   = []
+  for istep in range(len(algo_input)):
+      stepmodel = algo_input[istep]
+      choice    = parameters[stepmodel]
+      for ikey,ivalue in catdict.items():
+          if stepmodel == ikey and choice !=0:
+              algo_final   = algo_final + [stepmodel]
+              output_list  = output_list + ivalue[choice]['output']
+              code_list    = code_list   + [ivalue[choice]['name']]
+              ids_to_merge = [item for item, count \
+                              in collections.Counter(output_list).items() if count > 1]
+              if 'waves' in ids_to_merge:
+                  algo_final = algo_final + ['merge_waves']
+                  code_list  = code_list  + ['merge_waves']
+              if 'distributions' in ids_to_merge:
+                  algo_final = algo_final + ['merge_distributions']
+                  code_list  = code_list  + ['merge_distributions']
+              if 'distribution_sources' in ids_to_merge:
+                  algo_final = algo_final + ['merge_distribution_sources']
+                  code_list  = code_list  + ['merge_distribution_sources']
+              seen = set();
+              output_list = [x for x in output_list if x not in seen and not seen.add(x)]
+
+  print('Algorithm =',algo_final)
+
+  return algo_final
 

@@ -52,3 +52,50 @@ def run(cat, bundle, parameters):
     # Call of the chosen code
     return globals()[code](*inputs, **args_np)
 
+def run_step(name,bundle_in,parameters):
+
+    from hcd_tools import bundle_copy
+
+    bundle_out = bundle_copy(bundle_in)
+
+    if name == 'nbi_source':
+        bundle_out['distribution_sources'] = actors.run(name,bundle_in,parameters)
+
+    if name == 'ic_coup':
+        bundle_out['waves'] = actors.run('ic_coup',bundle_in,parameters)
+
+    if name == 'ic_wave_solver':
+        bundle_out['waves'] = actors.run('ic_wave_solver',bundle_in,parameters)
+
+    if name == 'ec_wave_solver':
+        bundle_out['waves'] = actors.run('ec_wave_solver',bundle_in,parameters)
+
+    if name == 'nuclear_source':
+        bundle_out['distribution_sources'] = actors.run('nuclear_source',bundle_in,parameters)
+
+    if name == 'ic_wave_fp':
+        bundle_out['distributions'] = actors.run('ic_wave_fp',bundle_in,parameters)
+
+    if name == 'nbi_fp':
+        bundle_out['distributions'] = actors.run('nbi_fp',bundle_in,parameters)
+
+    if name == 'nuclear_fp':
+        bundle_out['distributions'] = actors.run('nuclear_fp',bundle_in,parameters)
+
+    if name == 'merge_distributions':
+        bundle_out['distributions'] = actors.merge_distributions(bundle_in['distributions'],bundle_in['distributions'])
+        bundle_out['distributions'] = actors.merge_distributions(bundle_in['distributions'],distrib_nbi_ic)
+
+    if name == 'merge_waves':
+        bundle_out['waves'] = actors.merge_waves(bundle_in['waves'],bundle_in['waves'])
+
+    if name == 'merge_distribution_sources':
+        bundle_out['distribution_sources'] = actors.merge_distribution_sources(bundle_in['distribution_sources'],bundle_in['distribution_sources'])
+
+    if name == 'fill_core_sources':
+        bundle_out['core_sources']  = actors.run('fill_core_sources',bundle_in,parameters)
+
+    if name == 'fill_core_profiles':
+        bundle_out['core_profiles'] = actors.run('fill_core_profiles',bundle_in,parameters)
+
+

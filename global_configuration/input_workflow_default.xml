@@ -28,7 +28,7 @@
       <ICRH>
 	<ic_coup list="iccoup">0</ic_coup> 
 	<ic_wave_solver list="Cyrano tomcat pion lion">0</ic_wave_solver>
-	<ic_wave_fp list="StixReDist">0</ic_wave_fp>
+	<ic_wave_fp list="StixReDist fopla">0</ic_wave_fp>
       </ICRH>
     
 

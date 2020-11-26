@@ -176,7 +176,11 @@ def hcd_wrapper(par_path):
     print('---- Enter time loop of the H&CD wrapper ----', file=sys.stdout)
 
     timenow = param['tbegin']
-    nsteps  = int((param['tend']-param['tbegin'])/param['dt_required'])+1
+
+    nsteps  = int((param['tend']-param['tbegin'])/param['dt_required'])
+    if param['dt_required']*nsteps < int((param['tend']-param['tbegin'])*10**5)/10**5:
+      nsteps = nsteps + 1
+
     step = 0
 
     while timenow < param['tend']:

@@ -1,6 +1,65 @@
-import sys
-import hcd_actors as actors
-from hcd_tools import bundle_copy, create_workflow_param_from_file, is_nbi_on, is_ec_on, is_ic_on
+import sys,os,copy
+#import hcd_actors as actors
+from hcd_tools import bundle_copy, create_workflow_param_from_file, \
+    is_nbi_on, is_ec_on, is_ic_on, import_actor, loadlist, is_compiled_for_mpi, \
+    read_actor_ids, create_workflow_param_from_file, create_maindict, clever_algo
+from utility_functions import gen_dict_extract
+from lxml import etree
+
+# -------------------------------------------------------------------------------------------------
+
+# CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
+# (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
+hcd_path = '/'.join(os.path.realpath(__file__).split('/')[:-2])
+workflow_xml = hcd_path+'/global_configuration/input_workflow_default.xml'
+(maindict, compiled_actors, uncompiled_actors, code_selection, catdict) = \
+    create_maindict(workflow_xml,2,0)
+
+# LIST OF EMPTY ACTORS, MERGERS AND OF EXTRA (NON-IDS) ARGUMENTS FOR EACH ACTOR
+empty_actor_list    = loadlist('empty_actor_list')
+merge_actor_list    = loadlist('merge_actor_list')
+extra_argument_list = loadlist('extra_arguments')
+list_of_actors = compiled_actors+empty_actor_list+merge_actor_list
+for name in list_of_actors:
+    err = import_actor(name,0)
+
+def run(cat, bundle, parameters):
+
+    # For merge, bundle is a list of 2 bundles and the call is simpler
+    if type(bundle) is list:
+        ids_to_merge = cat.replace('merge_','')
+        return globals()[cat](bundle[0][ids_to_merge],bundle[1][ids_to_merge])
+
+    # Get list of all codes in that category
+    codeslist = catdict[cat] #next(gen_dict_extract(cat,maindict))
+    codeinfo = codeslist[parameters[cat]]
+    code = codeinfo['name']
+    inputargs = []
+    extra_arg_nr = 0
+    inputxml = []
+    for i in codeinfo['input']:
+        if i.find('extra_argument_list') is not -1 \
+           and extra_argument_list.get(code) is not None:
+            inputargs.append(parameters[extra_argument_list[code][extra_arg_nr]])
+            extra_arg_nr += 1
+        elif i.find('codeparam') is not -1:
+            inputxml.append(parameters['input_path']+'/'+ \
+                              codeinfo['system']+'/input_'+code+'.xml')
+        else:
+            inputargs.append(bundle[i])
+
+    inputmpi = []
+    libmpi_path = eval(code+'.location')+'/native_wrapper/lib/lib'\
+                  +code+'.so'
+    args_np = {}
+    if is_compiled_for_mpi(libmpi_path, 'libmpi'):
+        if cat == 'nbi_fp':
+            args_np = {'mpi_processes':parameters["nproc_ion_fp"]}
+        inputmpi.append('mpi_local') # FOR NON-FP CODES, DEFAULT IS NPROC=4
+
+    inputs = inputargs + inputxml + inputmpi
+    # Call of the chosen code
+    return globals()[code](*inputs, **args_np)
 
 # -------------------------------------------------------------------------------------------------
 
@@ -11,6 +70,21 @@ def hcd_workflow(BNDL_in,workflow_xml):
     # EXTRACT PARAMETERS FROM INPUT XML FILE
     parameters = create_workflow_param_from_file(workflow_xml,2)
 
+    # IF AN H&CD SOURCE IS CONFIGURED BUT IT HAS NO POWER FOR THIS TIME SLICE, 
+    # DO NOT RUN THE CODE(S) FOR THIS SOURCE
+    if 'nbi' in BNDL_in.keys() and not is_nbi_on(BNDL_in['nbi'],BNDL_in['nbi'].time):
+        print('  No NBI power for this time slice')
+        parameters['nbi_source'] = 0
+        parameters['nbi_fp'] = 0
+    if 'ic_antennas' in BNDL_in.keys() and not is_ic_on(BNDL_in['ic_antennas'],BNDL_in['ic_antennas'].time):
+        print('  No IC power for this time slice')
+        parameters['iccoup'] = 0
+        parameters['ic_wave_solver'] = 0
+        parameters['ic_wave_fp'] = 0
+    if 'ec_launchers' in BNDL_in.keys() and not is_ec_on(BNDL_in['ec_launchers'],BNDL_in['ec_launchers'].time):
+        print('  No EC power for this time slice')
+        parameters['ec_wave_solver'] = 0
+
     # ARTIFICIALLY REMOVE WARNINGS
     warning_list = ['distribution_sources','distributions','ec_launchers',\
                     'ic_antennas','nbi','wall']
@@ -19,73 +93,44 @@ def hcd_workflow(BNDL_in,workflow_xml):
             BNDL_in[ids].ids_properties.homogeneous_time = 1
             BNDL_in[ids].time = BNDL_in['core_profiles'].time
 
-    # STEP 0: PREPARATION OF SUB-BUNDLES FOR EACH TYPE OF H&CD CALCULATION
-    # BNDL_OUT WILL HOLD THE FINAL RESULT
-    BNDL_nbi  = bundle_copy(BNDL_in)
-    BNDL_nuc  = bundle_copy(BNDL_in)
-    BNDL_ic   = bundle_copy(BNDL_in)
-    BNDL_ec   = bundle_copy(BNDL_in)
-    BNDL_core = bundle_copy(BNDL_in)
-    BNDL_out  = bundle_copy(BNDL_in)
+    # DEFINE THE SEQUENCE OF CODES TO BE EXECUTED
+    if catdict['ic_wave_fp'][parameters['ic_wave_fp']]['name'] != 'fopla':
+        print('--- Default algorithm ---')
+        input_algorithm = loadlist('algorithm')['default']
+    else:
+        print('--- NBI+IC synergy algorithm ---')
+        input_algorithm = loadlist('algorithm')['nbi_ic_synergy']
+    final_algorithm = clever_algo(input_algorithm,parameters,catdict)
 
-    # IF AN H&CD SOURCE IS CONFIGURED BUT IT HAS NO POWER FOR THIS TIME SLICE, 
-    # DO NOT RUN THE CODE(S) FOR THIS SOURCE
-    if 'nbi' in BNDL_nbi.keys() and not is_nbi_on(BNDL_nbi['nbi'],BNDL_nbi['nbi'].time):
-        print('  No NBI power for this time slice')
-        parameters['nbi_source'] = 0
-        parameters['nbi_fp'] = 0
-    if 'ic_antennas' in BNDL_nbi.keys() and not is_ic_on(BNDL_ic['ic_antennas'],BNDL_ic['ic_antennas'].time):
-        print('  No IC power for this time slice')
-        parameters['iccoup'] = 0
-        parameters['ic_wave_solver'] = 0
-        parameters['ic_wave_fp'] = 0
-    if 'ec_launchers' in BNDL_nbi.keys() and not is_ec_on(BNDL_ec['ec_launchers'],BNDL_ec['ec_launchers'].time):
-        print('  No EC power for this time slice')
-        parameters['ec_wave_solver'] = 0
+    # EXECUTE THE CODES ACCORDING TO THE REQUESTED SEQUENCE
+    BNDL_work     = bundle_copy(BNDL_in)
+    BNDL_out      = {}
+    BNDL_to_merge = {}
+    for steprun in final_algorithm:
+        if not 'merge_' in steprun:
+            output_ids_list = catdict[steprun][parameters[steprun]]['output']
+            output_ids_data = run (steprun, BNDL_work, parameters )
+        else:
+            output_ids_list = [steprun.replace('merge_','')]
+            output_ids_data = run (steprun, [BNDL_work,BNDL_to_merge], parameters)
+            del BNDL_to_merge[output_ids_list[0]]
+        for iids in range(len(output_ids_list)):
+            if len(output_ids_list) == 1:
+                output_ids = output_ids_data
+            else:
+                output_ids = output_ids_data[iids]
+            if output_ids_list[iids] not in BNDL_out.keys() or 'merge_' in steprun:
+                BNDL_out[output_ids_list[iids]]  = output_ids
+                BNDL_work[output_ids_list[iids]] = copy.deepcopy(BNDL_out[output_ids_list[iids]])
+            else:
+                BNDL_to_merge[output_ids_list[iids]] = output_ids
 
-    # STEP 1: SOURCE CODES, ICCOUP (FOR IC COUPLING) AND WAVE SOLVERS
-    print('-- Step 1: Source codes and Wave solvers', file=sys.stdout)
-    BNDL_nbi['distribution_sources'] = actors.run ( 'nbi_source', BNDL_nbi, parameters )
-    BNDL_ic['waves'] = actors.run ( 'ic_coup', BNDL_ic, parameters )
-    BNDL_ic['waves'] = actors.run ( 'ic_wave_solver', BNDL_ic, parameters )
-    BNDL_ec['waves'] = actors.run ( 'ec_wave_solver', BNDL_ec,  parameters )
-    BNDL_nuc['distribution_sources'] = actors.run ( 'nuclear_source', BNDL_nuc, parameters )
-
-    # INTERMEDIATE STEP: SYSTEMATICALLY COPY THE NBI DISTRIBUTION_SOURCES TO 
-    # THE IC BUNDLE IN CASE SYNERGY IS MODELLED
-    BNDL_ic['distribution_sources'] = BNDL_nbi['distribution_sources']
-
-    # STEP 2: FOKKER PLANK SOLVERS
-    print('-- Step 2: Fokker Planck solvers', file=sys.stdout)
-    BNDL_ic['distributions']  = actors.run ( 'ic_wave_fp', BNDL_ic, parameters)
-    BNDL_nbi['distributions'] = actors.run ( 'nbi_fp', BNDL_nbi, parameters)
-    BNDL_nuc['distributions'] = actors.run ( 'nuclear_fp', BNDL_nuc, parameters)
-
-    # STEP 3: MERGING INTO FINAL DISTRIBUTIONS, DISTRIBUTION_SOURCES and WAVES
-    print('-- Step 3: Mergers', file=sys.stdout)
-    distrib_nbi_ic     = actors.merge_distributions(BNDL_nbi['distributions'], \
-                                                    BNDL_ic['distributions'])
-    distrib_fus_nbi_ic = actors.merge_distributions(BNDL_nuc['distributions'],distrib_nbi_ic)
-    waves_ec_ic        = actors.merge_waves(BNDL_ec['waves'],BNDL_ic['waves'])
-    dsources_fus_nbi   = actors.merge_distribution_sources(BNDL_nuc['distribution_sources'], \
-                                                    BNDL_nbi['distribution_sources'])
-
-    # INTERMEDIATE STEP: COPY H&CD RESULTS INTO THE BUNDLES FOR CORE_SOURCES AND CORE_PROFILES
-    BNDL_core['distribution_sources'] = dsources_fus_nbi
-    BNDL_core['distributions']        = distrib_fus_nbi_ic
-    BNDL_core['waves']                = waves_ec_ic 
-
-    # STEP 4: MAKE CORE_SOURCES AND CORE_PROFILES IDS:
-    print('-- Step 4: Make core_sources and/or core_profiles', file=sys.stdout)
-    BNDL_core['core_sources']  = actors.run ( 'fill_core_sources',  BNDL_core, parameters )
-    BNDL_core['core_profiles'] = actors.run ( 'fill_core_profiles', BNDL_core, parameters )
-
-    # FILL THE OUTPUT BUNDLE WITH THE RESULTS OF H&CD CALCUATIONS
-    BNDL_out['distribution_sources'] = BNDL_core ['distribution_sources']
-    BNDL_out['distributions']        = BNDL_core ['distributions']
-    BNDL_out['waves']                = BNDL_core ['waves']
-    BNDL_out['core_sources']         = BNDL_core ['core_sources']
-    BNDL_out['core_profiles']        = BNDL_core ['core_profiles']
+    # COPY ALL OTHER IDSS FROM INPUT TO OUTPUT BUNDLE
+    for iids in BNDL_in.keys():
+        if iids not in BNDL_out.keys():
+            if BNDL_in[iids].ids_properties.homogeneous_time >= 0:
+                print('Copy ',iids)
+                BNDL_out[iids] = copy.deepcopy(BNDL_in[iids])
 
     print('End of time slice', file=sys.stdout)
 
