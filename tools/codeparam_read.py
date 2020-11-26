@@ -1,5 +1,5 @@
 import os
-from utility_functions import update_codeparam_dict
+from utility_functions import update_codeparam_dict_check_xsd
 from hcd_tools import import_actor
 from lxml import etree
 from shutil import copy2
@@ -75,9 +75,10 @@ def populate(frame,current_config_folder,hsys,actor_name,v_scroll,default):
             e.grid(row=rrow, column=ccolumn+1, padx=3, pady=3)
             codeparam_dict[elem.tag] = entrystring.get()
 
-            entrystring.trace('w', lambda name,index,mode,elem=elem.tag,\
-                              entrystring=entrystring,e=e: update_codeparam_dict\
-                              (codeparam_dict,elem,root,entrystring.get(),xmlschema,e))
+            entrystring.trace('w', lambda name,index,mode,elem=elem,\
+                              entrystring=entrystring,entry1=entry1: \
+                              update_codeparam_dict_check_xsd \
+                              (codeparam_dict,elem,root,entrystring.get(),xmlschema,entry1))
 
             rrow += 1
 

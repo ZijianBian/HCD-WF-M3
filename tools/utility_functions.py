@@ -257,8 +257,16 @@ def update_workflow_param(workflow_param,ref,elem,newvalue):
     return workflow_param
 
 ############################################################################################
-def update_codeparam_dict(codeparam_dict,elem,newvalue):
-    codeparam_dict[elem] = newvalue
+def update_codeparam_dict_check_xsd (codeparam_dict,elem,newvalue, \
+                                     root=None,xmlschema=None,entry1=None):
+    import colour_definitions as col
+    codeparam_dict[elem.tag] = newvalue
+    if root is not None: # Check rules of xsd file
+        elem.text = codeparam_dict[elem.tag]
+        if xmlschema.validate(root):
+            entry1.config(bg=col.c1)
+        else:
+            entry1.config(bg='salmon1')
     return codeparam_dict
 
 ############################################################################################

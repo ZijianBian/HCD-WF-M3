@@ -1,7 +1,6 @@
 import os,tkinter,codeparam_properties
 import colour_definitions as col
-from codeparam_xsd_apply import check_xsd_rule
-from utility_functions import update_codeparam_dict
+from utility_functions import update_codeparam_dict_check_xsd
 from lxml import etree
 
 # -----------------------------------------------------------------------------------
@@ -31,15 +30,11 @@ def codeparam_interface(frame,destination_file,codeparam_dict,docum_dict,codepar
             entry1 = tkinter.Entry(frame, textvar=entrystring, bg=col.c1)
             entry1.grid(row=rrow, column=ccolumn+1, padx=3, pady=3)
 
-            # Catch any update of the variable from the interface
-            entrystring.trace('w', lambda name,index,mode,elem=elem.tag,\
-                              entrystring=entrystring,entry1=entry1: \
-                              update_codeparam_dict(codeparam_dict,elem,entrystring.get()))
-
-            # Apply xsd rules
+            # Catch any update of the variable from the interface, and check xsd rules
             entrystring.trace('w', lambda name,index,mode,elem=elem,\
                               entrystring=entrystring,entry1=entry1: \
-                              check_xsd_rule(codeparam_dict,elem,root,xmlschema,entry1))
+                              update_codeparam_dict_check_xsd \
+                              (codeparam_dict,elem,entrystring.get(),root,xmlschema,entry1))
 
             # Update the codeparam dictionary accordingly
             codeparam_dict[elem.tag] = entrystring.get()
@@ -51,7 +46,7 @@ def codeparam_interface(frame,destination_file,codeparam_dict,docum_dict,codepar
             rrow += 1
 
             # Scrollbar
-            if rrow > 20:
+            if rrow > 10:
                 v_scroll.grid(row=1, column=1, sticky='ns')
             else:
                 v_scroll.grid_remove()
