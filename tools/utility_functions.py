@@ -233,6 +233,16 @@ def load(chosen_folder,open_gui):
         print('Load cancelled', file=sys.stderr)
         return
 
+    # Optionally load the most recent folder configuration
+    if chosen_folder == 'latest':
+        import glob
+        list_of_folders = glob.glob(os.path.join(os.getcwd(),'data/*'))
+        if len(list_of_folders) > 0:
+            chosen_folder = max(list_of_folders, key=os.path.getctime)
+        else:
+            print('No folder found --> Nothing loaded.')
+            return
+
     # Check if the chosen folder is a valid configuration folder
     if not os.path.exists(chosen_folder+'/input_workflow.xml'):
         print('The selected folder '+chosen_folder+' does not appear to be a proper', \

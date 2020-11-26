@@ -228,12 +228,16 @@ def open_gui(wf_param_file):
     button_saveas.configure(command=lambda: saved_folder.Save(tkinter.filedialog.\
                             askdirectory(initialdir=os.path.join(os.getcwd(),'data')),init_folder))
 
+    button_loadlconfig = tkinter.Button(fr_wfp, text='Load latest', bg=col.c2)
+    button_loadlconfig.grid(row=51, column=1, padx=5, pady=5, sticky='ew')
+    button_loadlconfig.configure(command=lambda: load('latest',open_gui))
+
     button_saveandrun = tkinter.Button(fr_wfp, text='Run', bg=col.c2, state='normal')
-    button_saveandrun.grid(row=51, column=1, padx=5, pady=5, sticky='ew')
+    button_saveandrun.grid(row=52, column=1, padx=5, pady=5, sticky='ew')
     button_saveandrun.configure(command=lambda: run(saved_folder.Save(None,init_folder)))
 
     button_restore_def = tkinter.Button(fr_wfp, text='Restore Default', bg=col.c2)
-    button_restore_def.grid(row=52, column=1, padx=5, pady=5, sticky='ew')
+    button_restore_def.grid(row=53, column=1, padx=5, pady=5, sticky='ew')
     button_restore_def.configure(command=lambda: open_gui(default_wf_param_file))
 
     button_exit = tkinter.Button(fr_wfp, text='Exit', bg='light grey')
