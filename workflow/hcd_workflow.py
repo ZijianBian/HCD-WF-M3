@@ -1,5 +1,4 @@
 import sys,os,copy
-#import hcd_actors as actors
 from hcd_tools import bundle_copy, create_workflow_param_from_file, \
     is_nbi_on, is_ec_on, is_ic_on, import_actor, loadlist, is_compiled_for_mpi, \
     read_actor_ids, create_workflow_param_from_file, create_maindict, clever_algo
