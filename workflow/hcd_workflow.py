@@ -15,10 +15,9 @@ workflow_xml = hcd_path+'/global_configuration/input_workflow_default.xml'
     create_maindict(workflow_xml,2,0)
 
 # LIST OF EMPTY ACTORS, MERGERS AND OF EXTRA (NON-IDS) ARGUMENTS FOR EACH ACTOR
-empty_actor_list    = loadlist('empty_actor_list')
 merge_actor_list    = loadlist('merge_actor_list')
 extra_argument_list = loadlist('extra_arguments')
-list_of_actors = compiled_actors+empty_actor_list+merge_actor_list
+list_of_actors = compiled_actors+merge_actor_list
 for name in list_of_actors:
     err = import_actor(name,0)
 
@@ -127,9 +126,7 @@ def hcd_workflow(BNDL_in,workflow_xml):
     # COPY ALL OTHER IDSS FROM INPUT TO OUTPUT BUNDLE
     for iids in BNDL_in.keys():
         if iids not in BNDL_out.keys():
-            if BNDL_in[iids].ids_properties.homogeneous_time >= 0:
-                print('Copy ',iids)
-                BNDL_out[iids] = copy.deepcopy(BNDL_in[iids])
+            BNDL_out[iids] = copy.deepcopy(BNDL_in[iids])
 
     print('End of time slice', file=sys.stdout)
 

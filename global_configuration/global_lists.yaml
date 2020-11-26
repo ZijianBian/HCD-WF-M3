@@ -40,13 +40,6 @@ merge_actor_list:
     merge_distribution_sources
     merge_core_sources
 
-empty_actor_list:    
-    empty_distribution_sources 
-    empty_waves 
-    empty_distributions 
-    empty_core_sources 
-    empty_core_profiles
-
 algorithm:
     default:
         [ec_wave_solver,nbi_source,ic_coup,ic_wave_solver,nuclear_source,nbi_fp,ic_wave_fp,nuclear_fp,fill_core_sources,fill_core_profiles]

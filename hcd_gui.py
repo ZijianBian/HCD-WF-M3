@@ -61,12 +61,8 @@ def open_gui(wf_param_file):
 
     # CHECK THAT MANDATORY ACTORS ARE THERE
     merge_actor_list = loadlist('merge_actor_list')
-    empty_actor_list = loadlist('empty_actor_list')
     err_global = 0
     for actor in merge_actor_list:
-        err = import_actor(actor,1)
-        err_global = err_global + err
-    for actor in empty_actor_list:
         err = import_actor(actor,1)
         err_global = err_global + err
     if err_global!=0:

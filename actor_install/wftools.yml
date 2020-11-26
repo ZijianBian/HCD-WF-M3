@@ -15,11 +15,6 @@ BUILDS:
 ACTORS: 
   - DIR: wftools
     XML: 
-      - empty_IDSs/fc2k/empty_core_profiles.xml
-      - empty_IDSs/fc2k/empty_core_sources.xml
-      - empty_IDSs/fc2k/empty_distributions.xml
-      - empty_IDSs/fc2k/empty_distribution_sources.xml
-      - empty_IDSs/fc2k/empty_waves.xml
       - mergers/fc2k/merge_core_sources.xml
       - mergers/fc2k/merge_distribution_sources.xml
       - mergers/fc2k/merge_distributions.xml

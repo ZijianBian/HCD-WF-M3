@@ -38,8 +38,6 @@ def loadlist(listname):
         output_list = data['actor_list'].split(' ')
     elif listname=='merge_actor_list':
         output_list = data['merge_actor_list'].split(' ')
-    elif listname=='empty_actor_list':
-        output_list = data['empty_actor_list'].split(' ')
     elif listname=='algorithm':
         output_list = data['algorithm']
     elif listname=='dependencies':

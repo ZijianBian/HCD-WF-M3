@@ -134,13 +134,8 @@ if [ $local_TOMCAT == 1 ] || [ $all_local == 1 ]; then
     export PYTHONPATH=$ACTOR_FOLDER/tomcat:$PYTHONPATH
 fi
 if [ $local_WFtools == 1 ] || [ $all_local == 1 ]; then
-    echo Warning: empty and mergers modules replaced by actors from ${ACTOR_FOLDER}
+    echo Warning: mergers replaced by actors from ${ACTOR_FOLDER}
     module unload WFtools >& /dev/null
-    export PYTHONPATH=$ACTOR_FOLDER/empty_core_profiles:$PYTHONPATH
-    export PYTHONPATH=$ACTOR_FOLDER/empty_core_sources:$PYTHONPATH
-    export PYTHONPATH=$ACTOR_FOLDER/empty_distributions:$PYTHONPATH
-    export PYTHONPATH=$ACTOR_FOLDER/empty_distribution_sources:$PYTHONPATH
-    export PYTHONPATH=$ACTOR_FOLDER/empty_waves:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/merge_core_sources:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/merge_distributions:$PYTHONPATH
     export PYTHONPATH=$ACTOR_FOLDER/merge_distribution_sources:$PYTHONPATH
