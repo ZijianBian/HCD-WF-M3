@@ -53,6 +53,9 @@ dependencies:
    ic_wave_fp:
        StixReDist:
           ic_wave_solver: any
+       fopla:
+          nbi_source: any
+          nbi_fp: any
    nbi_source: None
    nbi_fp:
        risk:
