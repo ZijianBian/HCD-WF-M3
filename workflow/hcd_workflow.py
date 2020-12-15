@@ -105,6 +105,7 @@ def hcd_workflow(BNDL_in,workflow_xml):
     BNDL_out      = {}
     BNDL_to_merge = {}
     for steprun in final_algorithm:
+        print('STEPRUN --> ',steprun,'=',catdict[steprun][parameters[steprun]]['name'].upper())
         if not 'merge_' in steprun:
             output_ids_list = catdict[steprun][parameters[steprun]]['output']
             output_ids_data = run (steprun, BNDL_work, parameters )
