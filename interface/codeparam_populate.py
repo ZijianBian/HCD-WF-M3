@@ -47,7 +47,7 @@ def codeparam_interface(frame,destination_file,codeparam_dict,docum_dict,codepar
 
             # Scrollbar
             if rrow > 10:
-                v_scroll.grid(row=1, column=1, sticky='ns')
+                v_scroll.grid(row=1, column=1, sticky='n')
             else:
                 v_scroll.grid_remove()
 
