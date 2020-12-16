@@ -200,16 +200,16 @@ def read_actor_ids(name,verbose):
 # their input & output IDSs, their category (ec_wavesolver, nbi_source, ..), 
 # and the H&CD system they belong to (EC, IC, NBI, nuclear)
 #---------------------------------------------------------------------------------
-def create_maindict(workflow_parameters,input_option,verbose):
+def create_maindict(workflow_parameters_path,input_option,verbose):
 
     # MEMO: STRUCTURE OF THE INPUT XML FILE
     # ROOT.ITER() = LOOP OVER ALL ELEMENTS OF THE INPUT XML FILE
-    # ROOT[0] = workflow_parameters
+    # ROOT[0] = workflow_parameters_path
     # ROOT[1] = further_settings
     # ROOT[2] = actor_selection
 
     # READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
-    tree = etree.parse(workflow_parameters)
+    tree = etree.parse(workflow_parameters_path)
     root = tree.getroot()
     actor_selection = root[2]
 
@@ -369,8 +369,8 @@ def check_for_dependencies(workflow_xml):
 # Create the workflow parameter structure from the workflow input xml file
 # ------------------------------------------------------------------------
 
-def create_workflow_param_from_file(filepath,option):
-    tree = etree.parse(filepath)
+def create_workflow_param_from_file(workflow_parameters_path,option):
+    tree = etree.parse(workflow_parameters_path)
     root = tree.getroot()
 
     name0 = root[0].attrib['display']
@@ -409,7 +409,7 @@ def create_workflow_param_from_file(filepath,option):
     workflow_param['fokker_flag'] = 0
 
     # FOLDER WHERE THE INPUT XML FILE IS LOCATED
-    workflow_param['input_path'] = '/'.join(filepath.split('/')[:-1])
+    workflow_param['input_path'] = '/'.join(workflow_parameters_path.split('/')[:-1])
 
     return(workflow_param)
 
