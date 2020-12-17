@@ -23,10 +23,10 @@ def save_workflow_param_to_file(default_wf_param_file,current_wf_param_file,\
 ############################################################################################
 def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_name,default):
 
-    from hcd_tools import import_actor
+    from hcd_tools import import_actor, is_compiled_for_mpi
 
     # NAME OF THE CODEPARAM FILE FOR THIS ACTOR IN THE CURRENT CONFIGURATION FOLDER
-    destination_file = current_config_folder+'/'+hsys+'/input_'+actor_name+'.xml'
+    codeparam_destination_path = current_config_folder+'/'+hsys+'/input_'+actor_name+'.xml'
 
     # INITIALISE INTERFACE STRINGS FOR CODEPARAM XML AND XSD FILES
     codeparam_xml_path = ''
@@ -43,22 +43,22 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
         for iline in pfile:
             if 'xml_location = ' in iline and '_default_xml_location' not in iline:
                 # CHECK IF THE XML FILE EXISTS IN THE DESTINATION FOLDER ALREADY
-                if os.path.exists(destination_file) and default is False:
-                    codeparam_xml_path = destination_file
+                if os.path.exists(codeparam_destination_path) and default is False:
+                    codeparam_xml_path = codeparam_destination_path
                 # IF NOT, COPY IT FROM THE ACTOR LOCATION
                 else:
                     xml_name = iline.split('+')[-1].replace("'","").replace(" ","")\
                                .replace("\n","")
                     if not 'None' in xml_name:
                         codeparam_xml_path = actor_python_folder+xml_name
-                        copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
+                        copy2(codeparam_xml_path, codeparam_destination_path, follow_symlinks=True)
                         # IF DEFAULT IS NOT REQUIRED AND IF CONFIG LOADED FROM A PREVIOUS RUN,
                         # REPLACE THE XML FILE BY THE ONE OF THE PREVIOUS CONFIGURATION
                         if previous_folder is not None and default is False:
                             xml_name = hsys+'/input_'+actor_name+'.xml'
                             codeparam_xml_path = previous_folder+'/'+xml_name
-                            if codeparam_xml_path != destination_file:
-                                copy2(codeparam_xml_path, destination_file, follow_symlinks=True)
+                            if codeparam_xml_path != codeparam_destination_path:
+                                copy2(codeparam_xml_path, codeparam_destination_path, follow_symlinks=True)
                         found_xml = True
 
             if 'xsd_location = ' in iline:
@@ -87,7 +87,7 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
 
     # LOAD THE LIST OF CODE PARAMETERS, CREATE THE LABELS AND ENTRIES
     if found_xml:
-        tree = etree.parse(codeparam_xml_path)
+        tree = etree.parse(codeparam_destination_path)
         root = tree.getroot()
         codeparam_dict = {}
         for elem in root.iter():
@@ -96,21 +96,39 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
     else:
         codeparam_dict = {}
 
-    return destination_file,codeparam_dict,docum_dict,codeparam_xml_path, \
+    # Add element for number of processors (only when found_xml=true, i.e. only the first time)
+    if found_xml:
+        elem.tail = '\n\n  '
+        # IF CODE COMPILED WITH MPI: ADD NUMBER OF PROCESSORS AS EDITABLE PARAMETERS
+        libmpi_path = eval(actor_name+'.location')+'/native_wrapper/lib/lib'+actor_name+'.so'
+        if is_compiled_for_mpi(libmpi_path, 'libmpi'):
+            codeparam_dict['nproc_actor'] = ' 4 '
+            docum_dict['nproc_actor'] = 'Number of processors to run this code'
+            comment = etree.Comment\
+                  (' Number of processors for parallel run (parameter added by HCD wf) ')
+            comment.tail = '\n  '
+            nproc = etree.Element('nproc_actor')
+            nproc.text = codeparam_dict['nproc_actor']
+            nproc.tail = '\n\n  '
+            root.append(comment)
+            root.append(nproc)
+            tree.write(codeparam_destination_path, pretty_print=True)
+
+    return codeparam_destination_path,codeparam_dict,docum_dict,codeparam_xml_path, \
         xmlschema
 
 ############################################################################################
-def update_codeparam_file(destination_file,codeparam_dict,verbose):
+def update_codeparam_file(codeparam_destination_path,codeparam_dict,verbose):
 
-    tree = etree.parse(destination_file)
+    tree = etree.parse(codeparam_destination_path)
     root = tree.getroot()
     for elem in root.iter():
         if elem.tag is not etree.Comment and len(elem) == 0:
             elem.text = codeparam_dict[elem.tag]
-    tree.write(destination_file)
+    tree.write(codeparam_destination_path)
 
     if verbose == 1:
-        print('---> Configuration saved in '+destination_file, file=sys.stdout)
+        print('---> Configuration saved in '+codeparam_destination_path, file=sys.stdout)
 
     return 0
 

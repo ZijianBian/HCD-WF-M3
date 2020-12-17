@@ -52,8 +52,14 @@ def run(cat, bundle, parameters):
     args_np = {}
     if is_compiled_for_mpi(libmpi_path, 'libmpi'):
         if cat == 'nbi_fp':
-            args_np = {'mpi_processes':parameters["nproc_ion_fp"]}
-        inputmpi.append('mpi_local') # FOR NON-FP CODES, DEFAULT IS NPROC=4
+            tree=etree.parse(inputxml[0])
+            root = tree.getroot()
+            for elem in root.iter():
+                if elem.tag=='nproc_actor':
+                    nproc_actor = int(elem.text)
+                    print('nproc_actor',nproc_actor)
+            args_np = {'mpi_processes':nproc_actor}
+        inputmpi.append('mpi_local')
 
     inputs = inputargs + inputxml + inputmpi
     # Call of the chosen code
