@@ -45,6 +45,7 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
                 # CHECK IF THE XML FILE EXISTS IN THE DESTINATION FOLDER ALREADY
                 if os.path.exists(codeparam_destination_path) and default is False:
                     codeparam_xml_path = codeparam_destination_path
+                    found_xml = True
                 # IF NOT, COPY IT FROM THE ACTOR LOCATION
                 else:
                     xml_name = iline.split('+')[-1].replace("'","").replace(" ","")\
@@ -96,14 +97,14 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
     else:
         codeparam_dict = {}
 
-    # Add element for number of processors (only when found_xml=true, i.e. only the first time)
+    # IF CODE COMPILED WITH MPI: ADD NUMBER OF PROCESSORS AS EDITABLE PARAMETERS
+    # (ONLY WHEN FOUND_XML=TRUE, I.E. ONLY THE FIRST TIME)
+    libmpi_path = eval(actor_name+'.location')+'/native_wrapper/lib/lib'+actor_name+'.so'
     if found_xml:
         elem.tail = '\n\n  '
-        # IF CODE COMPILED WITH MPI: ADD NUMBER OF PROCESSORS AS EDITABLE PARAMETERS
-        libmpi_path = eval(actor_name+'.location')+'/native_wrapper/lib/lib'+actor_name+'.so'
-        if is_compiled_for_mpi(libmpi_path, 'libmpi'):
+        if is_compiled_for_mpi(libmpi_path, 'libmpi') \
+           and 'nproc_actor' not in codeparam_dict.keys():
             codeparam_dict['nproc_actor'] = ' 4 '
-            docum_dict['nproc_actor'] = 'Number of processors to run this code'
             comment = etree.Comment\
                   (' Number of processors for parallel run (parameter added by HCD wf) ')
             comment.tail = '\n  '
@@ -113,6 +114,10 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
             root.append(comment)
             root.append(nproc)
             tree.write(codeparam_destination_path, pretty_print=True)
+    if found_xsd:
+        if is_compiled_for_mpi(libmpi_path, 'libmpi') \
+           and 'nproc_actor' not in codeparam_dict.keys():
+            docum_dict['nproc_actor'] = 'Number of processors to run this code'
 
     return codeparam_destination_path,codeparam_dict,docum_dict,codeparam_xml_path, \
         xmlschema
