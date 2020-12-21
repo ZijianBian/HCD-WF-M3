@@ -51,14 +51,13 @@ def run(cat, bundle, parameters):
                   +code+'.so'
     args_np = {}
     if is_compiled_for_mpi(libmpi_path, 'libmpi'):
-        if cat == 'nbi_fp':
-            tree=etree.parse(inputxml[0])
-            root = tree.getroot()
-            for elem in root.iter():
-                if elem.tag=='nproc_actor':
-                    nproc_actor = int(elem.text)
-                    print('nproc_actor',nproc_actor)
-            args_np = {'mpi_processes':nproc_actor}
+        tree=etree.parse(inputxml[0])
+        root = tree.getroot()
+        for elem in root.iter():
+            if elem.tag=='nproc_actor':
+                nproc_actor = int(elem.text)
+                print('MPI code --> nproc_actor = ',nproc_actor)
+        args_np = {'mpi_processes':nproc_actor}
         inputmpi.append('mpi_local')
 
     inputs = inputargs + inputxml + inputmpi
@@ -111,7 +110,7 @@ def hcd_workflow(BNDL_in,workflow_xml):
     BNDL_out      = {}
     BNDL_to_merge = {}
     for steprun in final_algorithm:
-        print('STEPRUN --> ',steprun,'=',catdict[steprun][parameters[steprun]]['name'].upper())
+        print(' STEPRUN --> ',steprun,'=',catdict[steprun][parameters[steprun]]['name'].upper())
         if not 'merge_' in steprun:
             output_ids_list = catdict[steprun][parameters[steprun]]['output']
             output_ids_data = run (steprun, BNDL_work, parameters )

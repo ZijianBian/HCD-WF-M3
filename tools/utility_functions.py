@@ -139,8 +139,6 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
             xmlschema = etree.XMLSchema(xmlschema_doc)
             if xmlschema.validate(root) is False:
                 print(xmlschema.error_log.filter_from_errors()[0])
-                import pdb
-                pdb.set_trace()
 
     return codeparam_destination_path,codeparam_dict,docum_dict,codeparam_xml_path, \
         xmlschema
