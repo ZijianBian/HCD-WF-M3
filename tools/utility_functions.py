@@ -116,8 +116,31 @@ def read_and_save_codeparam(current_config_folder,previous_folder,hsys,actor_nam
             tree.write(codeparam_destination_path, pretty_print=True)
     if found_xsd:
         if is_compiled_for_mpi(libmpi_path, 'libmpi') \
-           and 'nproc_actor' not in codeparam_dict.keys():
+           and 'nproc_actor' not in docum_dict.keys():
             docum_dict['nproc_actor'] = 'Number of processors to run this code'
+            xmltype = '{http://www.w3.org/2001/XMLSchema}'
+            nproc_xsd = etree.Element(xmltype+'element')
+            nproc_xsd.attrib['ref']='nproc_actor'
+            nproc_xsd.attrib['minOccurs']='0'
+            for elem in root_xsd.iter():
+                if elem.tag is not etree.Comment:
+                    if 'all' in elem.tag:
+                        for i in elem.iterancestors():
+                            if 'parameters' in i.values():
+                                elem.append(nproc_xsd)
+            nproc_xsd_description = etree.Element(xmltype+'element')
+            nproc_xsd_description.attrib['name'] = 'nproc_actor'
+            nproc_xsd_description.attrib['type'] = 'xs:integer'
+            nproc_xsd_annotation    = etree.Element(xmltype+'annotation')
+            nproc_xsd_documentation = etree.Element(xmltype+'documentation')
+            nproc_xsd_annotation.append(nproc_xsd_documentation)
+            nproc_xsd_description.append(nproc_xsd_annotation)
+            root_xsd.append(nproc_xsd_description)
+            xmlschema = etree.XMLSchema(xmlschema_doc)
+            if xmlschema.validate(root) is False:
+                print(xmlschema.error_log.filter_from_errors()[0])
+                import pdb
+                pdb.set_trace()
 
     return codeparam_destination_path,codeparam_dict,docum_dict,codeparam_xml_path, \
         xmlschema
