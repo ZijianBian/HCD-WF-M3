@@ -3,6 +3,14 @@ from lxml import etree
 from shutil import copy2
 
 ############################################################################################
+def common_elements(list1,list2):
+    result = []
+    for element in list1:
+        if element in list2:
+            result.append(element)
+    return result
+
+############################################################################################
 def save_workflow_param_to_file(default_wf_param_file,current_wf_param_file,\
     workflow_param,wfp_ref,fur_ref,cod_ref):
 

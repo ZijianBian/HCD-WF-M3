@@ -103,18 +103,19 @@ def hcd_workflow(BNDL_in,workflow_xml):
     else:
         print('--- NBI+IC synergy algorithm ---')
         input_algorithm = loadlist('algorithm')['nbi_ic_synergy']
-    final_algorithm = clever_algo(input_algorithm,parameters,catdict)
+    final_algorithm,waiting_for = clever_algo(input_algorithm,parameters,catdict)
 
     # EXECUTE THE CODES ACCORDING TO THE REQUESTED SEQUENCE
     BNDL_work     = bundle_copy(BNDL_in)
     BNDL_out      = {}
     BNDL_to_merge = {}
     for steprun in final_algorithm:
-        print(' STEPRUN --> ',steprun,'=',catdict[steprun][parameters[steprun]]['name'].upper())
         if not 'merge_' in steprun:
+            print(' STEPRUN --> ',steprun,'=',catdict[steprun][parameters[steprun]]['name'].upper())
             output_ids_list = catdict[steprun][parameters[steprun]]['output']
             output_ids_data = run (steprun, BNDL_work, parameters )
         else:
+            print(' STEPRUN --> ',steprun)
             output_ids_list = [steprun.replace('merge_','')]
             output_ids_data = run (steprun, [BNDL_work,BNDL_to_merge], parameters)
             del BNDL_to_merge[output_ids_list[0]]

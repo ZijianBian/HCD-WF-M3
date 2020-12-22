@@ -74,3 +74,18 @@ extra_arguments:
    iccoup: [ic_wave_nr_toroidal_modes]
    bbnbi:  [nmarkers_bbnbi_ascot]
 
+parallel_dependency:
+   ec_wave_solver:             None
+   ic_coup:                    None
+   ic_wave_solver:             [ic_coup,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_distributions,merge_distribution_sources]
+   ic_wave_fp:                 [ic_wave_solver,merge_waves]
+   nbi_source:                 None
+   nbi_fp:                     [nbi_source,merge_distribution_sources]
+   nuclear_source:             None
+   nuclear_fp:                 [nuclear_source,merge_distribution_sources]
+   fill_core_sources:          [ec_wave_solver,ic_wave_solver,ic_wave_fp,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_waves,merge_distributions,merge_distribution_sources]
+   fill_core_profiles:         [ic_wave_fp,nbi_fp,nuclear_fp,merge_distributions]
+   merge_distributions:        [ic_wave_fp,nbi_fp,nuclear_fp,merge_distributions]
+   merge_waves:                [ec_wave_solver,ic_wave_solver,merge_waves]
+   merge_distribution_sources: [nbi_source,nuclear_source,merge_distribution_sources]
+

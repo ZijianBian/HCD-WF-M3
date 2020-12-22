@@ -44,6 +44,8 @@ def loadlist(listname):
         output_list = data['dependencies']
     elif listname=='extra_arguments':
         output_list = data['extra_arguments']
+    elif listname=='parallel_dependency':
+        output_list = data['parallel_dependency']
     else:
         print('Error: bad listname in loadlist()', file=sys.stderr)
         output_list=[]
@@ -509,6 +511,7 @@ def is_ic_on(ic_antennas,time_slice):
 def clever_algo(algo_input,parameters,catdict):
 
   import collections
+  from utility_functions import common_elements
 
   ## ADD MERGERS TO THE FLOW
   output_list = []
@@ -538,5 +541,19 @@ def clever_algo(algo_input,parameters,catdict):
 
   print('Algorithm =',algo_final)
 
-  return algo_final
+  # DEFINE WHEN TO PUT WAITING POINTS WHEN WORKFLOW ACTORS RUN IN PARALLEL
+  parallel_dependency_list = loadlist('parallel_dependency')
+  previous_occ = dict.fromkeys(algo_final,0)
+  waiting_for  = {}
+  for istep in range(len(algo_final)):
+    steprun = algo_final[istep]
+    index = [i for i, x in enumerate(algo_final) if x == steprun][previous_occ[steprun]]
+    previous_occ[steprun] = previous_occ[steprun] + 1
+    if index>0:
+        waiting_for[str(istep)] = list(set(common_elements(algo_final[0:index],\
+                                  parallel_dependency_list[steprun])))
+    else:
+        waiting_for[str(istep)] = []
+
+  return algo_final,waiting_for
 
