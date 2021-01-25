@@ -46,7 +46,7 @@ algorithm:
     nbi_ic_synergy:
         [ec_wave_solver,nbi_source,nbi_fp,nuclear_source,nuclear_fp,ic_coup,ic_wave_solver,ic_wave_fp,fill_core_sources,fill_core_profiles]
 
-pre_requisites:
+prerequisites:
    ec_wave_solver: None
    ic_coup: None
    ic_wave_solver: None

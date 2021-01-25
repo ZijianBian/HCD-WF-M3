@@ -40,8 +40,8 @@ def loadlist(listname):
         output_list = data['merge_actor_list'].split(' ')
     elif listname=='algorithm':
         output_list = data['algorithm']
-    elif listname=='pre_requisites':
-        output_list = data['pre_requisites']
+    elif listname=='prerequisites':
+        output_list = data['prerequisites']
     elif listname=='extra_arguments':
         output_list = data['extra_arguments']
     elif listname=='parallel_dependency':
@@ -313,19 +313,19 @@ def is_compiled_for_mpi(file_path, grep_str):
 #####################################################################################
 
 # -------------------------------------------------------------------------
-# Check whether the pre-requisites are fulfilled in the actual actor section
+# Check whether the prerequisites are fulfilled in the actual actor section
 # -------------------------------------------------------------------------
 
-def check_for_pre_requisites(workflow_xml):
+def check_for_prerequisites(workflow_xml):
 
-    def check_if_code_fulfills_configuration(pre_requisites, entry, code_selection):
+    def check_if_code_fulfills_configuration(prerequisites, entry, code_selection):
         err = 0
         code = code_selection[entry]
-        if pre_requisites[entry] == 'None':
-          pre_requisites[entry] = None
-        if pre_requisites[entry] is not None and code in pre_requisites[entry]:                 
-          fulfills_all_pre_requisites = [1] * (len(pre_requisites[entry][code]))
-          for dep in [pre_requisites[entry][code]]:
+        if prerequisites[entry] == 'None':
+          prerequisites[entry] = None
+        if prerequisites[entry] is not None and code in prerequisites[entry]:                 
+          fulfills_all_prerequisites = [1] * (len(prerequisites[entry][code]))
+          for dep in [prerequisites[entry][code]]:
             for i in dep.keys():
               if 'any'in str(dep[i]) and code_selection[i] is not None:
                 pass
@@ -348,14 +348,14 @@ def check_for_pre_requisites(workflow_xml):
     # FIND THE ACTUAL ACTOR SELECTION
     (maindict, compiled_actors, uncompiled_actors, code_selection, catdict) = create_maindict(workflow_xml,1,0)
 
-    # LOAD THE LIST OF PRE_REQUISITES BETWEEN THE CODES
-    pre_requisites = loadlist('pre_requisites')
+    # LOAD THE LIST OF PREREQUISITES BETWEEN THE CODES
+    prerequisites = loadlist('prerequisites')
 
     # FOR EACH OF THE SELECTED ACTORS, CHECK THAT DEPENDENCY RULES ARE FULFILLED
     global_error = 0
     for entry in code_selection:
         if code_selection is not None:
-            err = check_if_code_fulfills_configuration(pre_requisites, entry, code_selection)
+            err = check_if_code_fulfills_configuration(prerequisites, entry, code_selection)
             global_error = global_error + err
 
     if global_error == 0:
