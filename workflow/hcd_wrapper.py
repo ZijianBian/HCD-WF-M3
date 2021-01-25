@@ -4,7 +4,7 @@ def hcd_wrapper(par_path):
   import xml.etree.ElementTree as ET
   from hcd_tools import read_actor_ids, \
     bundle_copy, create_dict_from_idslist, create_maindict, \
-    check_for_dependencies, create_workflow_param_from_file
+    check_for_pre_requisites, create_workflow_param_from_file
   from hcd_workflow import hcd_workflow
   import numpy as np
 
@@ -54,8 +54,8 @@ def hcd_wrapper(par_path):
     if not 'core_profiles' in input_ids_list:
         input_ids_list.append('core_profiles')
 
-    # CHECK IF THE CODES ARE COMPATIBLE / DEPENDENCIES ARE FULFILLED
-    err = check_for_dependencies(workflow_xml)
+    # CHECK IF THE CODES ARE COMPATIBLE / PRE-REQUISITES ARE FULFILLED
+    err = check_for_pre_requisites(workflow_xml)
     if err != 0:
       return
 
