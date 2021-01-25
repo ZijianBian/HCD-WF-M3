@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/fopla.git
-    VERSION: feature/further_imas_features
+    VERSION: develop
     DIR: fopla
 
 MODULES: [IMAS, FC2K, INTERPOS, XMLlib]

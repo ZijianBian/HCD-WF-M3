@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/torbeam.git
-    VERSION: feature/imas_relative_folder_adjustment
+    VERSION: develop
     DIR: torbeam
 
 MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
