@@ -552,15 +552,10 @@ def clever_algo(algo_input,parameters,catdict):
     waiting_for[str(istep)] = {}
     waiting_for[str(istep)]['steprun'] = steprun
     if index>0:
-        #print('   ===> steprun                          ',index,steprun)
-        #print('   ===> algo_final[0:index]              ',algo_final[0:index])
-        #print('   ===> parallel_dependency_list[steprun]',parallel_dependency_list[steprun])
         all_possible_dependencies = list(set(common_elements(algo_final[0:index],\
                                   parallel_dependency_list[steprun])))
-        #print('    All_possible_dependencies',all_possible_dependencies)
         reduced_dependencies = copy.deepcopy(all_possible_dependencies)
         for dep in all_possible_dependencies:
-          #print('Dep',dep)
           for keystep in waiting_for.keys():
             if 'dependencies' in waiting_for[keystep] and waiting_for[keystep]['dependencies'] is not None:
               # Remove indirect dependencies
@@ -568,19 +563,12 @@ def clever_algo(algo_input,parameters,catdict):
                  and not 'merge_' in dep \
                  and waiting_for[keystep]['steprun'] in all_possible_dependencies \
                  and dep in reduced_dependencies:
-                #print('Remove ',dep)
-                #if index==7:
-                #  import pdb
-                #  pdb.set_trace()
                 reduced_dependencies.remove(dep)
-        print('   ',index, steprun,reduced_dependencies)
         if len(reduced_dependencies)>0:
           waiting_for[str(istep)]['dependencies'] = reduced_dependencies
         else:
           waiting_for[str(istep)]['dependencies'] = None
     else:
-        print('    -------------------------------------------------------')
-        print('   ',index, steprun,[])
         waiting_for[str(istep)]['dependencies'] = None
 
   # COMPUTE THE LIST OF STEPS OF CODES THAT CAN RUN IN PARALLEL
