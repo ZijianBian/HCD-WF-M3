@@ -40,8 +40,8 @@ def loadlist(listname):
         output_list = data['merge_actor_list'].split(' ')
     elif listname=='algorithm':
         output_list = data['algorithm']
-    elif listname=='dependencies':
-        output_list = data['dependencies']
+    elif listname=='pre_requisites':
+        output_list = data['pre_requisites']
     elif listname=='extra_arguments':
         output_list = data['extra_arguments']
     elif listname=='parallel_dependency':
@@ -313,19 +313,19 @@ def is_compiled_for_mpi(file_path, grep_str):
 #####################################################################################
 
 # -------------------------------------------------------------------------
-# Check whether the dependencies are fulfilled in the actual actor section
+# Check whether the pre-requisites are fulfilled in the actual actor section
 # -------------------------------------------------------------------------
 
-def check_for_dependencies(workflow_xml):
+def check_for_pre_requisites(workflow_xml):
 
-    def check_if_code_fulfills_configuration(dependencies, entry, code_selection):
+    def check_if_code_fulfills_configuration(pre_requisites, entry, code_selection):
         err = 0
         code = code_selection[entry]
-        if dependencies[entry] == 'None':
-          dependencies[entry] = None
-        if dependencies[entry] is not None and code in dependencies[entry]:                 
-          fulfills_all_dependencies = [1] * (len(dependencies[entry][code]))
-          for dep in [dependencies[entry][code]]:
+        if pre_requisites[entry] == 'None':
+          pre_requisites[entry] = None
+        if pre_requisites[entry] is not None and code in pre_requisites[entry]:                 
+          fulfills_all_pre_requisites = [1] * (len(pre_requisites[entry][code]))
+          for dep in [pre_requisites[entry][code]]:
             for i in dep.keys():
               if 'any'in str(dep[i]) and code_selection[i] is not None:
                 pass
@@ -348,14 +348,14 @@ def check_for_dependencies(workflow_xml):
     # FIND THE ACTUAL ACTOR SELECTION
     (maindict, compiled_actors, uncompiled_actors, code_selection, catdict) = create_maindict(workflow_xml,1,0)
 
-    # LOAD THE LIST OF DEPENDENCIES BETWEEN THE CODES
-    dependencies = loadlist('dependencies')
+    # LOAD THE LIST OF PRE_REQUISITES BETWEEN THE CODES
+    pre_requisites = loadlist('pre_requisites')
 
     # FOR EACH OF THE SELECTED ACTORS, CHECK THAT DEPENDENCY RULES ARE FULFILLED
     global_error = 0
     for entry in code_selection:
         if code_selection is not None:
-            err = check_if_code_fulfills_configuration(dependencies, entry, code_selection)
+            err = check_if_code_fulfills_configuration(pre_requisites, entry, code_selection)
             global_error = global_error + err
 
     if global_error == 0:
@@ -549,11 +549,59 @@ def clever_algo(algo_input,parameters,catdict):
     steprun = algo_final[istep]
     index = [i for i, x in enumerate(algo_final) if x == steprun][previous_occ[steprun]]
     previous_occ[steprun] = previous_occ[steprun] + 1
+    waiting_for[str(istep)] = {}
+    waiting_for[str(istep)]['steprun'] = steprun
     if index>0:
-        waiting_for[str(istep)] = list(set(common_elements(algo_final[0:index],\
+        #print('   ===> steprun                          ',index,steprun)
+        #print('   ===> algo_final[0:index]              ',algo_final[0:index])
+        #print('   ===> parallel_dependency_list[steprun]',parallel_dependency_list[steprun])
+        all_possible_dependencies = list(set(common_elements(algo_final[0:index],\
                                   parallel_dependency_list[steprun])))
+        #print('    All_possible_dependencies',all_possible_dependencies)
+        reduced_dependencies = copy.deepcopy(all_possible_dependencies)
+        for dep in all_possible_dependencies:
+          #print('Dep',dep)
+          for keystep in waiting_for.keys():
+            if 'dependencies' in waiting_for[keystep] and waiting_for[keystep]['dependencies'] is not None:
+              # Remove indirect dependencies
+              if dep in waiting_for[keystep]['dependencies'] \
+                 and not 'merge_' in dep \
+                 and waiting_for[keystep]['steprun'] in all_possible_dependencies \
+                 and dep in reduced_dependencies:
+                #print('Remove ',dep)
+                #if index==7:
+                #  import pdb
+                #  pdb.set_trace()
+                reduced_dependencies.remove(dep)
+        print('   ',index, steprun,reduced_dependencies)
+        if len(reduced_dependencies)>0:
+          waiting_for[str(istep)]['dependencies'] = reduced_dependencies
+        else:
+          waiting_for[str(istep)]['dependencies'] = None
     else:
-        waiting_for[str(istep)] = []
+        print('    -------------------------------------------------------')
+        print('   ',index, steprun,[])
+        waiting_for[str(istep)]['dependencies'] = None
 
-  return algo_final,waiting_for
+  # COMPUTE THE LIST OF STEPS OF CODES THAT CAN RUN IN PARALLEL
+  parallel_runs = {}
+  parallel_step = 0
+  for key in waiting_for.keys():
+      if parallel_step not in parallel_runs.keys():
+          parallel_runs[parallel_step] = [waiting_for[key]['steprun']]
+      else:
+          increment = 0
+          if waiting_for[key]['dependencies'] is not None:
+              for dep in waiting_for[key]['dependencies']:
+                  if dep in parallel_runs[parallel_step]:
+                      increment = 1
+              if increment == 1:
+                  parallel_step = parallel_step + increment
+                  parallel_runs[parallel_step] = [waiting_for[key]['steprun']]
+              else:
+                  parallel_runs[parallel_step] = parallel_runs[parallel_step]+[waiting_for[key]['steprun']]
+          else:
+              parallel_runs[parallel_step] = parallel_runs[parallel_step]+[waiting_for[key]['steprun']]
+
+  return algo_final,waiting_for,parallel_runs
 

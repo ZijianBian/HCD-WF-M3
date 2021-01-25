@@ -42,11 +42,11 @@ merge_actor_list:
 
 algorithm:
     default:
-        [ec_wave_solver,nbi_source,ic_coup,ic_wave_solver,nuclear_source,nbi_fp,ic_wave_fp,nuclear_fp,fill_core_sources,fill_core_profiles]
+        [ec_wave_solver,ic_coup,ic_wave_solver,nbi_source,nuclear_source,ic_wave_fp,nbi_fp,nuclear_fp,fill_core_sources,fill_core_profiles]
     nbi_ic_synergy:
         [ec_wave_solver,nbi_source,nbi_fp,nuclear_source,nuclear_fp,ic_coup,ic_wave_solver,ic_wave_fp,fill_core_sources,fill_core_profiles]
 
-dependencies:
+pre_requisites:
    ec_wave_solver: None
    ic_coup: None
    ic_wave_solver: None
@@ -77,7 +77,7 @@ extra_arguments:
 parallel_dependency:
    ec_wave_solver:             None
    ic_coup:                    None
-   ic_wave_solver:             [ic_coup,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_distributions,merge_distribution_sources]
+   ic_wave_solver:             [ic_coup,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_waves,merge_distributions,merge_distribution_sources]
    ic_wave_fp:                 [ic_wave_solver,merge_waves]
    nbi_source:                 None
    nbi_fp:                     [nbi_source,merge_distribution_sources]
@@ -86,6 +86,6 @@ parallel_dependency:
    fill_core_sources:          [ec_wave_solver,ic_wave_solver,ic_wave_fp,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_waves,merge_distributions,merge_distribution_sources]
    fill_core_profiles:         [ic_wave_fp,nbi_fp,nuclear_fp,merge_distributions]
    merge_distributions:        [ic_wave_fp,nbi_fp,nuclear_fp,merge_distributions]
-   merge_waves:                [ec_wave_solver,ic_wave_solver,merge_waves]
+   merge_waves:                [ec_wave_solver,ic_wave_solver,ic_coup,merge_waves]
    merge_distribution_sources: [nbi_source,nuclear_source,merge_distribution_sources]
 
