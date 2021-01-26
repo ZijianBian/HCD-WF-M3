@@ -5,10 +5,12 @@ import argparse
 # Management of input arguments
 parser = argparse.ArgumentParser(description='---- Run the H&CD workflow without the interface')
 parser.add_argument("-c","--config_folder",help="input configuration folder", required=True)
+parser.add_argument("-p","--config_parallel", help="set parallel workflow", required=False)
 
 args = vars(parser.parse_args())
 config_folder  = args["config_folder"]
+f_parallel = int(args["config_parallel"])
 
 from hcd_wrapper import hcd_wrapper
-hcd_wrapper(config_folder)
+hcd_wrapper(config_folder,f_parallel)
 
