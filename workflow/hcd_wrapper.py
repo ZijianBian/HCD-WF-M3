@@ -5,8 +5,7 @@ def hcd_wrapper(par_path,fparallel=0):
   from hcd_tools import read_actor_ids, \
     bundle_copy, create_dict_from_idslist, create_maindict, \
     check_for_prerequisites, create_workflow_param_from_file
-  from hcd_workflow import hcd_workflow
-  from hcd_workflow_parallel import hcd_workflow_parallel
+  from hcd_workflow import hcd_workflow, hcd_workflow_parallel
   import numpy as np
 
   ##################################################################
