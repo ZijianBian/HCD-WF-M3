@@ -12,7 +12,8 @@ my_dir=$(dirname $0)
 . $my_dir/51_python_deps_workflow.sh
 
 mkdir -p ./black
-$BLACK --diff --color $PACKAGE
-$BLACK --diff $PACKAGE > black/diff_report.txt
+PYTHON_FILES=$(find . -name "*.py")
+$BLACK --diff --color $PYTHON_FILES
+$BLACK --diff $PYTHON_FILES > black/diff_report.txt
 
 # Your results will be in the ./black artifact
