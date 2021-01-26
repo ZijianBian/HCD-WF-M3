@@ -587,7 +587,12 @@ def clever_algo(algo_input,parameters,catdict):
                   parallel_step = parallel_step + increment
                   parallel_runs[parallel_step] = [waiting_for[key]['steprun']]
               else:
-                  parallel_runs[parallel_step] = parallel_runs[parallel_step]+[waiting_for[key]['steprun']]
+                  #parallel_runs[parallel_step] = parallel_runs[parallel_step]+[waiting_for[key]['steprun']]
+                  # Optimized parallel runs from the 'algorithm' point of view
+                  for step in parallel_runs.keys():
+                    if dep not in parallel_runs[step]:
+                      parallel_runs[step] = parallel_runs[step]+[waiting_for[key]['steprun']]
+                      break
           else:
               parallel_runs[parallel_step] = parallel_runs[parallel_step]+[waiting_for[key]['steprun']]
 
