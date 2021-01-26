@@ -14,7 +14,6 @@ my_dir=$(dirname $0)
 mkdir -p ./pylint
 echo Running Pylint for $PACKAGE
 #$PYLINT --rcfile=.pylintrc --output-format=text $PACKAGE | tee ./pylint/pylint.log || pylint-exit $?
-PYTHON_FILES=$(find . -name "*.py")
 $PYLINT --rcfile=.pylintrc --output-format=text $PYTHON_FILES | tee ./pylint/pylint.log || pylint-exit $?
 PYLINT_SCORE=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' ./pylint/pylint.log)
 echo "Pylint score is $PYLINT_SCORE"

@@ -13,3 +13,4 @@ export PYLINT="$PYTHON -m pylint"
 export ANYBADGE="$PYTHON -m anybadge"
 export FLAKE8="$PYTHON -m flake8"
 export BLACK="$PYTHON -m black"
+export PYTHON_FILES=$(find -name "*.py" -not -path "*/install/*")

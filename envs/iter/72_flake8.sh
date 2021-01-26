@@ -12,7 +12,6 @@ my_dir=$(dirname $0)
 . $my_dir/51_python_deps_workflow.sh
 
 mkdir -p ./flake8
-PYTHON_FILES=$(find . -name "*.py")
 $FLAKE8 --exit-zero --doctests --statistics --count $PYTHON_FILES | tee flake8.txt
 PEP8_VIOLATIONS=$(tail flake8.txt -n1)
 echo "Flake8 finds $PEP8_VIOLATIONS PEP8 violations"
