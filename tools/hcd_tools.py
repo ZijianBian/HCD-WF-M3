@@ -578,18 +578,18 @@ def clever_algo(algo_input,parameters,catdict):
       if parallel_step not in parallel_runs.keys():
           parallel_runs[parallel_step] = [waiting_for[key]['steprun']]
       else:
-          increment = 0
+          there_is_a_dependency = False
           if waiting_for[key]['dependencies'] is not None:
               for dep in waiting_for[key]['dependencies']:
                   if dep in parallel_runs[parallel_step]:
-                      increment = 1
-              if increment == 1:
-                  parallel_step = parallel_step + increment
+                      there_is_a_dependency = True
+              if there_is_a_dependency:
+                  parallel_step = parallel_step + 1
                   parallel_runs[parallel_step] = [waiting_for[key]['steprun']]
               else:
                   parallel_runs[parallel_step] = parallel_runs[parallel_step]+[waiting_for[key]['steprun']]
           else:
-              parallel_runs[parallel_step] = parallel_runs[parallel_step]+[waiting_for[key]['steprun']]
+              parallel_runs[0] = parallel_runs[0]+[waiting_for[key]['steprun']]
 
   return algo_final,waiting_for,parallel_runs
 
