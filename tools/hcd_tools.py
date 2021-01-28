@@ -46,6 +46,8 @@ def loadlist(listname):
         output_list = data['extra_arguments']
     elif listname=='parallel_dependency':
         output_list = data['parallel_dependency']
+    elif listname=='exec_types':
+        output_list = data['exec_types'].split(' ')
     else:
         print('Error: bad listname in loadlist()', file=sys.stderr)
         output_list=[]

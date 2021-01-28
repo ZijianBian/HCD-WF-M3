@@ -261,11 +261,11 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
     return current_config_folder
     
 ############################################################################################
-def run(current_config_folder,pf=False):
+def run(current_config_folder):
 
     if current_config_folder is not None:
         from hcd_wrapper import hcd_wrapper
-        hcd_wrapper(current_config_folder,pf)
+        hcd_wrapper(current_config_folder)
     else:
         print('Aborted.')
 

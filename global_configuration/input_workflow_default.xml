@@ -7,21 +7,25 @@
     <output_user_or_path>default</output_user_or_path>
     <output_database>default</output_database>
     <run_out>13</run_out>
-    <tbegin>5</tbegin>
+    <tbegin>349.9</tbegin>
     <tend>350.</tend>
-    <dt_required>20</dt_required>
+    <dt_required>0.1</dt_required>
     <!-- <run_simpletrans>False</run_simpletrans> -->
   </workflow_parameters>
 
   <further_settings display="FURTHER SETTINGS">
     <nmarkers_bbnbi_ascot>100</nmarkers_bbnbi_ascot>
+    <ascot4parallel>mpi_local</ascot4parallel><!-- exec_types list in global_lists.yaml 
+    default: 0 ctypes, actors with mpi default: 1 mpi_local, 2 mpi_batch -->
+    <parallel_workflow>0</parallel_workflow> 
   </further_settings>
+
+
 
   <actor_selection display="ACTOR SELECTION"> <!-- 0: none - Higher indices: following code ordering -->
     <systems>
       <ECRH>
 	<ec_wave_solver list="genray gray grayscale torbeam">4</ec_wave_solver>
-
       </ECRH>
 
       <ICRH>

@@ -15,7 +15,7 @@ parser.add_argument("-nuf","--nuclear_fp",help="nuclear_fp=0,1,2,...", type=int,
 
 parser.add_argument("-fs","--fill_core_sources",help="fill_core_sources=0,1", type=int, default=0)
 parser.add_argument("-fp","--fill_core_profiles",help="fill_core_profiles=0,1", type=int, default=0)
-parser.add_argument("-p","--parallel",help="parallel workflow flag",action="store_true")
+parser.add_argument("-p","--parallel",help="parallel workflow flag",type=int,default=0)
 parser.add_argument("-nproc","--nproc_ion_fp",help="nproc of ion FP ",type=int, default=16)
 
 args = vars(parser.parse_args())
@@ -170,6 +170,7 @@ def open_gui(wf_param_file):
     workflow_param['ACTOR SELECTION']['fill_core_sources'] = str(fill_core_sources)
     workflow_param['ACTOR SELECTION']['fill_core_profiles'] = str(fill_core_profiles)
     workflow_param['FURTHER SETTINGS']['nproc_ion_fp'] = str(nproc)
+    workflow_param['FURTHER SETTINGS']['parallel_workflow'] = str(parallel_f)
     if(show_f==1):   
       for icat in cats_actors.keys():
         print('cat ',icat, cats_actors[icat])
@@ -179,7 +180,7 @@ def open_gui(wf_param_file):
 #    if(os.path.isdir(test_folder)):
 #      os.removedirs(test_folder)    
     saved_folder.Save(test_folder, init_folder)
-    run(test_folder,parallel_f)
+    run(test_folder)
 
 #---------------------------------------------------------------------------------------------
 if __name__ == "__main__":

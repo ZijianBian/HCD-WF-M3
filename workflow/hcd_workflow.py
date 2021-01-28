@@ -24,11 +24,8 @@ list_of_actors = compiled_actors+merge_actor_list
 for name in list_of_actors:
     err = import_actor(name,0)
 
-def run(cat, bundle, parameters,stdout_redirect=None):
+def run(cat, bundle, parameters):
 
-    if(stdout_redirect!=None):
-      oldstrout,newstdout=stdout_redirector.redirect_stdout(stdout_redirect)
-    
     # For merge, bundle is a list of 2 bundles and the call is simpler
     if type(bundle) is list:
         ids_to_merge = cat.replace('merge_','')
@@ -38,6 +35,10 @@ def run(cat, bundle, parameters,stdout_redirect=None):
     codeslist = catdict[cat] #next(gen_dict_extract(cat,maindict))
     codeinfo = codeslist[parameters[cat]]
     code = codeinfo['name']
+    if code+'_log' in parameters.keys():
+      stdout_redirect = parameters[code+'_log']
+      oldstrout,newstdout=stdout_redirector.redirect_stdout(stdout_redirect)
+
     inputargs = []
     extra_arg_nr = 0
     inputxml = []
@@ -64,18 +65,24 @@ def run(cat, bundle, parameters,stdout_redirect=None):
                 nproc_actor = int(elem.text)
                 print('MPI code --> nproc_actor = ',nproc_actor)
         args_np = {'mpi_processes':nproc_actor}
-        inputmpi.append('mpi_local')
+        exec_type=None
+        if code in parameters.keys():
+           exec_type= parameters[code]
+        if(exec_type==None):
+          inputmpi.append('mpi_local')
+        else:
+          inputmpi.append(exec_type)
 
     inputs = inputargs + inputxml + inputmpi
     # Call of the chosen code
     results = globals()[code](*inputs, **args_np) 
-    if(stdout_redirect!=None):
+    if code+'_log' in parameters.keys():
       stdout_redirector.stdout_back(oldstrout,newstdout)
     return results
 
 # -------------------------------------------------------------------------------------------------
 
-def hcd_workflow(BNDL_in,workflow_xml,step=0,parallel_f=False):
+def hcd_workflow(BNDL_in,workflow_xml):
 
     print('Execute H&CD workflow for current time slice', file=sys.stdout)
 
@@ -120,17 +127,19 @@ def hcd_workflow(BNDL_in,workflow_xml,step=0,parallel_f=False):
     print(' ')
     print('parallel_runs',parallel_runs)
      
+    parallel_f = parameters['parallel_workflow']
     # EXECUTE THE CODES ACCORDING TO THE REQUESTED SEQUENCE
     BNDL_work     = bundle_copy(BNDL_in)
     BNDL_out      = {}
     BNDL_to_merge = {}
  
-    if not parallel_f:
+    if parallel_f==0:
       for steprun in final_algorithm:
           if not 'merge_' in steprun:
               print(' STEPRUN --> ',steprun,'=',catdict[steprun][parameters[steprun]]['name'].upper())
+              actor_name = catdict[steprun][parameters[steprun]]['name']
               output_ids_list = catdict[steprun][parameters[steprun]]['output']
-              output_ids_data = run (steprun, BNDL_work, parameters )
+              output_ids_data = run (steprun, BNDL_work, parameters)
           else:
               print(' STEPRUN --> ',steprun)
               output_ids_list = [steprun.replace('merge_','')]
@@ -160,15 +169,14 @@ def hcd_workflow(BNDL_in,workflow_xml,step=0,parallel_f=False):
         for i_actor in range(N_actor): 
           steprun = parallel_runs[isection][i_actor] 
           if not 'merge_' in steprun:   
-            actor_name = catdict[steprun][parameters[steprun]]['name'].upper()
+            actor_name = catdict[steprun][parameters[steprun]]['name']
             print('cat = ',steprun,', actor = ',actor_name)
             #logfile = 'Loop_'+str(step)+'_'+'Section_'+str(isection)+'_'+str(i_actor)+'_actor_'+actor_name+'.log' 
             logfile = 'Section_'+str(isection)+'_'+str(i_actor)+'_actor_'+actor_name+'.log' 
-            if(step==0):
-              os.remove(logfile)
+            parameters[actor_name+'_log'] = logfile
             output_ids_list = catdict[steprun][parameters[steprun]]['output']
             output_ids_lists.append(output_ids_list)
-            inputs = (steprun, BNDL_work, parameters,logfile)
+            inputs = (steprun, BNDL_work, parameters)
             output_ids_data = P.apply_async(run, inputs)
             output_ids_data_rs.append(output_ids_data)
           else:
