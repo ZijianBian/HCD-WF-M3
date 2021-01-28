@@ -1,11 +1,11 @@
-def hcd_wrapper(par_path,fparallel=0):
+def hcd_wrapper(par_path,parallel_f=False):
   import os,imas,sys
   from lxml import etree
   import xml.etree.ElementTree as ET
   from hcd_tools import read_actor_ids, \
     bundle_copy, create_dict_from_idslist, create_maindict, \
     check_for_prerequisites, create_workflow_param_from_file
-  from hcd_workflow import hcd_workflow, hcd_workflow_parallel
+  from hcd_workflow import hcd_workflow
   import numpy as np
 
   ##################################################################
@@ -213,11 +213,7 @@ def hcd_wrapper(par_path,fparallel=0):
           list_to_get = [value for value in input_ids_list if (value not in output_ids_list \
                          or value =='core_profiles')] 
           ids_bundle_work.update(bundle_copy(ids_bundle_input,list_to_get))
-        if(fparallel==0):
-          ids_bundle_work = hcd_workflow(ids_bundle_work,workflow_xml)
-        if(fparallel==1):
-          ids_bundle_work = hcd_workflow_parallel(ids_bundle_work,workflow_xml)
-
+        ids_bundle_work = hcd_workflow(ids_bundle_work,workflow_xml,step,parallel_f)
         # OPTIONALLY CALL THE SIMPLE TRANSPORT SOLVER
         if param['run_simpletrans'] == 1:
           try:
