@@ -12,7 +12,7 @@ def common_elements(list1,list2):
 
 ############################################################################################
 def save_workflow_param_to_file(default_wf_param_file,current_wf_param_file,\
-    workflow_param,wfp_ref,fur_ref,cod_ref):
+    workflow_param,wfp_ref,cod_ref):
 
     # Copy the default workflow parameter file into the current one
     copy2(default_wf_param_file,current_wf_param_file,follow_symlinks=True)
@@ -20,8 +20,8 @@ def save_workflow_param_to_file(default_wf_param_file,current_wf_param_file,\
     # Update workflow parameter file if changed from the interface
     tree = etree.parse(current_wf_param_file)
     root = tree.getroot()
-    rl = [wfp_ref, fur_ref, cod_ref]
-    for iroot in range(3):
+    rl = [wfp_ref, cod_ref]
+    for iroot in range(2):
         for elem in root[iroot].iter():
             if elem.tag is not etree.Comment and len(elem) == 0:
                 elem.text = workflow_param[rl[iroot]][elem.tag]
@@ -172,7 +172,7 @@ def save_codeparam_to_file(current_config_folder,previous_folder,maindict,uncomp
 
     from hcd_tools import import_actor
 
-    cod_ref = list(workflow_param.keys())[2]
+    cod_ref = list(workflow_param.keys())[1]
 
     for hsys in maindict:
         for cat in maindict[hsys]:
@@ -198,7 +198,7 @@ def save_codeparam_to_file(current_config_folder,previous_folder,maindict,uncomp
 
 ############################################################################################
 def save(current_config_folder,default_wf_param_file,previous_folder,maindict,uncompiled_actors,\
-         workflow_param,wfp_ref,fur_ref,cod_ref):
+         workflow_param,wfp_ref,cod_ref):
 
     from datetime import datetime
 
@@ -238,16 +238,16 @@ def save(current_config_folder,default_wf_param_file,previous_folder,maindict,un
     # Create the current configuration folder and its sub-folders for each process
     if not os.path.exists(current_config_folder):
         os.makedirs(current_config_folder)
-    for systemname in root[2][1]: # HCD process
+    for systemname in root[1][1]: # HCD process
         if not os.path.exists(current_config_folder+'/'+systemname.tag):
             os.makedirs(current_config_folder+'/'+systemname.tag)
-    for postproc in root[2][2]: # Post-processing
+    for postproc in root[1][2]: # Post-processing
         if not os.path.exists(current_config_folder+'/'+postproc.tag):
             os.makedirs(current_config_folder+'/'+postproc.tag)
 
     # Copy/update the workflow parameter file if changed from the interface
     err = save_workflow_param_to_file(default_wf_param_file,current_wf_param_file,\
-        workflow_param,wfp_ref,fur_ref,cod_ref)
+        workflow_param,wfp_ref,cod_ref)
 
     # Copy/update code parameter files for chosen actors in their respective sub-folders
     err = save_codeparam_to_file(current_config_folder,previous_folder,maindict,\

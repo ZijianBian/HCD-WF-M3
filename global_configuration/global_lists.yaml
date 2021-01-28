@@ -71,8 +71,6 @@ extra_arguments:
    risk:   [dt_required]
    spot:   [dt_required]
    pion:   [tbegin,tend,dt_required]
-   iccoup: [ic_wave_nr_toroidal_modes]
-   bbnbi:  [nmarkers_bbnbi_ascot]
 
 parallel_dependency:
    ec_wave_solver:             None

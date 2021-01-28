@@ -207,13 +207,12 @@ def create_maindict(workflow_parameters_path,input_option,verbose):
     # MEMO: STRUCTURE OF THE INPUT XML FILE
     # ROOT.ITER() = LOOP OVER ALL ELEMENTS OF THE INPUT XML FILE
     # ROOT[0] = workflow_parameters_path
-    # ROOT[1] = further_settings
-    # ROOT[2] = actor_selection
+    # ROOT[1] = actor_selection
 
     # READ THE ACTOR_SELECTION STRUCTURE FROM THE WORKFLOW INPUT XML FILE
     tree = etree.parse(workflow_parameters_path)
     root = tree.getroot()
-    actor_selection = root[2]
+    actor_selection = root[1]
 
     # --------------------------------------------------------------------------------------------
     # MAINDICT CONTAINS 2 MAIN KEYS:
@@ -375,24 +374,16 @@ def create_workflow_param_from_file(workflow_parameters_path,option):
     tree = etree.parse(workflow_parameters_path)
     root = tree.getroot()
 
-    name0 = root[0].attrib['display']
-    name1 = root[1].attrib['display']
-    name2 = root[2].attrib['display']
-
-    # With the 3-tree structure of the input xml file
+    # With the 2-tree structure of the input xml file
     if option == 1:
-        workflow_param = {name0: {}, name1: {}, name2: {}}
-        for elem in root[0].iter():
+        workflow_param = {}
+        for iroot in range(2):
+          workflow_param[root[iroot].attrib['display']] = {}
+          for elem in root[iroot].iter():
             if len(elem) == 0 and elem.tag is not etree.Comment:
-                workflow_param[name0][elem.tag] = elem.text
-        for elem in root[1].iter():
-            if len(elem) == 0 and elem.tag is not etree.Comment:
-                workflow_param[name1][elem.tag] = elem.text     
-        for elem in root[2].iter():
-            if len(elem) == 0 and elem.tag is not etree.Comment:
-                workflow_param[name2][elem.tag] = elem.text
+              workflow_param[root[iroot].attrib['display']][elem.tag] = elem.text
 
-    # Without the 3-tree structure of the input xml file
+    # Without the 2-tree structure of the input xml file
     else:
         workflow_param = {}
         for elem in root.iter():
@@ -407,7 +398,6 @@ def create_workflow_param_from_file(workflow_parameters_path,option):
 
     # HARDCODED UNTIL THESE VARIABLES DISAPPEAR (TO REMOVE THEM FROM THE INTERFACE)
     workflow_param['run_simpletrans'] = 0
-    workflow_param['ic_wave_nr_toroidal_modes'] = 1
     workflow_param['fokker_flag'] = 0
 
     # FOLDER WHERE THE INPUT XML FILE IS LOCATED

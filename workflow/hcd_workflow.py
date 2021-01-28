@@ -105,11 +105,11 @@ def hcd_workflow(BNDL_in,workflow_xml):
         input_algorithm = loadlist('algorithm')['nbi_ic_synergy']
     final_algorithm,waiting_for,parallel_runs = clever_algo(input_algorithm,parameters,catdict)
 
-    #print('final_algo',final_algorithm)
-    #print(' ')
-    #print('waiting_for',waiting_for)
-    #print(' ')
-    #print('parallel_runs',parallel_runs)
+    print('final_algo',final_algorithm)
+    print(' ')
+    print('waiting_for',waiting_for)
+    print(' ')
+    print('parallel_runs',parallel_runs)
 
     # EXECUTE THE CODES ACCORDING TO THE REQUESTED SEQUENCE
     BNDL_work     = bundle_copy(BNDL_in)

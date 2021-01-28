@@ -1,5 +1,5 @@
 # Start from clean environment
-module purge
+module purge >& /dev/null
 
 # Need to remove the stack limit to avoid segmentation fault inside codes
 ulimit -Ss unlimited
@@ -22,7 +22,7 @@ actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
 for actor in ${actor_list[@]}; do
   #echo "load" $actor
   module load $actor >& /dev/null
-  module unload IMAS # To deal with actors compiled with different IMAS versions
+  module unload IMAS >& /dev/null # To deal with actors compiled with different IMAS versions
   export local_${actor}=0
 done
 
