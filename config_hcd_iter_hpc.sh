@@ -16,13 +16,17 @@ mkdir -p $ACTOR_FOLDER
 
 # Force to use exclusively local actors (1) or not (0)
 export all_local=1
-if [ $all_local == 1 ]; then
-    echo Warning: all actors replaced by local versions from ${ACTOR_FOLDER}/
-else
-  # Module for all needed HCD or WF actors are loaded
-  actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
+
+actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
 		  HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist \
 		  WFtools TORBEAM FoPla)
+if [ $all_local == 1 ]; then
+    echo Warning: all actors replaced by local versions from ${ACTOR_FOLDER}/
+    for actor in ${actor_list[@]}; do
+      export local_${actor}=1
+    done
+else
+  # Module for all needed HCD or WF actors are loaded
   for actor in ${actor_list[@]}; do
     #echo "load" $actor
     module load $actor >& /dev/null
@@ -50,7 +54,8 @@ export PYTHONPATH=$HCD_FOLDER/workflow:$PYTHONPATH
 # ---------------------------------------------------------------------------------------
 
 # Optionally replace modules by locally compiled versions for H&CD codes and WF tools
-if [ $local_ASCOT == 1 ] || [ $all_local == 1 ]; then
+#if [ $local_ASCOT == 1 ] || [ $all_local == 1 ]; then
+if  [ $all_local == 1 ] || [ $local_ASCOT == 1 ]; then
     if [ $all_local != 1 ]; then
       echo Warning: BBNBI,ASCOT and AFSI modules replaced by actor from ${ACTOR_FOLDER}
       module unload ASCOT >& /dev/null
