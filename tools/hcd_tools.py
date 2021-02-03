@@ -46,6 +46,8 @@ def loadlist(listname):
         output_list = data['extra_arguments']
     elif listname=='parallel_dependency':
         output_list = data['parallel_dependency']
+    elif listname=='exec_types':
+        output_list = data['exec_types'].split(' ')
     else:
         print('Error: bad listname in loadlist()', file=sys.stderr)
         output_list=[]
@@ -529,7 +531,6 @@ def clever_algo(algo_input,parameters,catdict):
               seen = set();
               output_list = [x for x in output_list if x not in seen and not seen.add(x)]
 
-  print('Algorithm =',algo_final)
 
   # DEFINE WHEN TO PUT WAITING POINTS WHEN WORKFLOW ACTORS RUN IN PARALLEL
   parallel_dependency_list = loadlist('parallel_dependency')

@@ -87,3 +87,10 @@ parallel_dependency:
    merge_waves:                [ec_wave_solver,ic_wave_solver,ic_coup,merge_waves]
    merge_distribution_sources: [nbi_source,nuclear_source,merge_distribution_sources]
 
+
+exec_types:
+   ctypes
+   mpi_local
+   mpi_batch
+
+
