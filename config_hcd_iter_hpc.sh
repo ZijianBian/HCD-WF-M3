@@ -11,7 +11,7 @@ module load sh/1.12.14-intel-2018a-Python-3.6.4
 module load lxml/4.2.0-intel-2018a-Python-3.6.4
 
 # Actor folder (to replace some H&CD modules freshly recompiled)
-export ACTOR_FOLDER=~/public/PYTHON_ACTORS_20210203
+export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
 
 # Force to use exclusively local actors (1) or not (0)
