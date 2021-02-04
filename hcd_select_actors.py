@@ -175,7 +175,7 @@ def open_gui(wf_param_file):
         print('cat ',icat, cats_actors[icat])
     
     test_folder = 'data/test_actors'+str(ec_wave_solver)+str(ic_coup)+str(ic_wave_solver)+str(ic_wave_fp)+str(nbi_source)+str(nbi_fp)+str(nuclear_source)+str(nuclear_fp)+str(fill_core_sources)+str(fill_core_profiles) \
-+'_nproc'+str(nproc)
++'_parallel_worflow_'+str(parallel_f)+'_nproc'+str(nproc)
 #    if(os.path.isdir(test_folder)):
 #      os.removedirs(test_folder)    
     saved_folder.Save(test_folder, init_folder)

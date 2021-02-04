@@ -7,9 +7,9 @@
     <output_user_or_path>default</output_user_or_path>
     <output_database>default</output_database>
     <run_out>13</run_out>
-    <tbegin>349.9</tbegin>
+    <tbegin>349.0</tbegin>
     <tend>350.</tend>
-    <dt_required>0.1</dt_required>
+    <dt_required>1.0</dt_required>
     <parallel_workflow>0</parallel_workflow> 
     <!-- <run_simpletrans>False</run_simpletrans> -->
   </workflow_parameters>
