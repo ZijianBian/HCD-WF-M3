@@ -36,7 +36,7 @@ else
 fi
 
 # Change local_XXX=1 to replace XXX module by the local one in ${ACTOR_FOLDER}
-export local_ASCOT=1
+#export local_ASCOT=1
 #export local_NBISIM=1
 #export local_StixReDist=1
 #export local_CYRANO=1
@@ -54,8 +54,7 @@ export PYTHONPATH=$HCD_FOLDER/workflow:$PYTHONPATH
 # ---------------------------------------------------------------------------------------
 
 # Optionally replace modules by locally compiled versions for H&CD codes and WF tools
-#if [ $local_ASCOT == 1 ] || [ $all_local == 1 ]; then
-if  [ $all_local == 1 ] || [ $local_ASCOT == 1 ]; then
+if [ $local_ASCOT == 1 ] || [ $all_local == 1 ]; then
     if [ $all_local != 1 ]; then
       echo Warning: BBNBI,ASCOT and AFSI modules replaced by actor from ${ACTOR_FOLDER}
       module unload ASCOT >& /dev/null
