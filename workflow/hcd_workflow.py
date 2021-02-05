@@ -5,8 +5,8 @@ from hcd_tools import bundle_copy, create_workflow_param_from_file, \
 from utility_functions import gen_dict_extract
 from lxml import etree
 from multiprocessing import Pool
-import time
-import stdout_redirector
+from stdout_redirector import redirect_stdout,stdout_back
+from time import time
 
 # -------------------------------------------------------------------------------------------------
 
@@ -35,9 +35,11 @@ def run(cat, bundle, parameters):
     codeslist = catdict[cat] #next(gen_dict_extract(cat,maindict))
     codeinfo = codeslist[parameters[cat]]
     code = codeinfo['name']
+
+    # Re-direct the logfile for this specific actor
     if code+'_log' in parameters.keys():
       stdout_redirect = parameters[code+'_log']
-      oldstrout,newstdout=stdout_redirector.redirect_stdout(stdout_redirect)
+      oldstrout,newstdout=redirect_stdout(stdout_redirect)
 
     inputargs = []
     extra_arg_nr = 0
@@ -74,16 +76,20 @@ def run(cat, bundle, parameters):
           inputmpi.append(exec_type)
 
     inputs = inputargs + inputxml + inputmpi
-    # Call of the chosen code
+
     results = globals()[code](*inputs, **args_np) 
+
+    # Re-direct the logfile for this specific actor 
     if code+'_log' in parameters.keys():
-      stdout_redirector.stdout_back(oldstrout,newstdout)
+        stdout_back(oldstrout,newstdout)
+
+    # Call of the chosen code
     return results
 
 # -------------------------------------------------------------------------------------------------
 
 def hcd_workflow(BNDL_in,workflow_xml):
-    t0 = time.time()
+
     print('Execute H&CD workflow for current time slice', file=sys.stdout)
 
     # EXTRACT PARAMETERS FROM INPUT XML FILE
@@ -121,27 +127,26 @@ def hcd_workflow(BNDL_in,workflow_xml):
         input_algorithm = loadlist('algorithm')['nbi_ic_synergy']
     final_algorithm,waiting_for,parallel_runs = clever_algo(input_algorithm,parameters,catdict)
 
-    print('final_algo',final_algorithm)
-    print(' ')
-    print('waiting_for',waiting_for)
-    print(' ')
-    print('parallel_runs',parallel_runs)
-
+    #print('final_algo',final_algorithm)
+    #print(' ')
+    #print('waiting_for',waiting_for)
+    #print(' ')
+    #print('parallel_runs',parallel_runs)
      
-    parallel_f = parameters['parallel_workflow']
     # EXECUTE THE CODES ACCORDING TO THE REQUESTED SEQUENCE
     BNDL_work     = bundle_copy(BNDL_in)
     BNDL_out      = {}
     BNDL_to_merge = {}
- 
+
+    parallel_f = parameters['parallel_workflow'] 
+
+    # SERIAL EXECUTION OF THE WORKFLOW
     if parallel_f==0:
       for steprun in final_algorithm:
-          t1 = time.time()
           if not 'merge_' in steprun:
               print(' STEPRUN --> ',steprun,'=',catdict[steprun][parameters[steprun]]['name'].upper())
-              actor_name = catdict[steprun][parameters[steprun]]['name']
               output_ids_list = catdict[steprun][parameters[steprun]]['output']
-              output_ids_data = run (steprun, BNDL_work, parameters)
+              output_ids_data = run (steprun, BNDL_work, parameters )
           else:
               print(' STEPRUN --> ',steprun)
               output_ids_list = [steprun.replace('merge_','')]
@@ -157,18 +162,17 @@ def hcd_workflow(BNDL_in,workflow_xml):
                   BNDL_work[output_ids_list[iids]] = copy.deepcopy(BNDL_out[output_ids_list[iids]])
               else:
                   BNDL_to_merge[output_ids_list[iids]] = output_ids
-          t2 = time.time()
-          print('step:',steprun,' time:',round(t2-t1,4),'second')  
 
-#parallel run
+    # PARALLEL EXECUTION OF THE WORKFLOW
     else:
+      t0 = time()
       for i in range(len(parallel_runs)):
-        print('section',i,parallel_runs[i])
+        print('Section',i,parallel_runs[i])
       for isection in range(len(parallel_runs)): 
-        t1 = time.time()
+        t1 = time()
         N_actor = len(parallel_runs[isection]) 
         P = Pool(N_actor)
-        print('section =', isection,', No. of actors = ',N_actor) 
+        print('Section =', isection,', No. of actors = ',N_actor) 
         output_ids_lists = [] 
         output_ids_data_rs = [] 
         output_ids_datas = []
@@ -177,7 +181,7 @@ def hcd_workflow(BNDL_in,workflow_xml):
           if not 'merge_' in steprun:   
             actor_name = catdict[steprun][parameters[steprun]]['name']
             print('cat = ',steprun,', actor = ',actor_name)
-            logfile = 'Section_'+str(isection)+'_'+str(i_actor)+'_'+actor_name+'.log' 
+            logfile = 'log/Section_'+str(isection)+'_'+str(i_actor)+'_'+actor_name+'.log' 
             parameters[actor_name+'_log'] = logfile
             output_ids_list = catdict[steprun][parameters[steprun]]['output']
             output_ids_lists.append(output_ids_list)
@@ -207,19 +211,18 @@ def hcd_workflow(BNDL_in,workflow_xml):
              else:
                  BNDL_to_merge[output_ids_lists[i_actor][iids]] = output_ids
         del output_ids_data_rs[:]
-        t2 =time.time()
-        print('section:',i,' time:',round(t2-t1,4),'second') 
+        t2 =time()
+        print('Section:',i,' time:',round(t2-t1,4),'sec') 
+      tend = time()
+      print('CPU time for the workflow time step:',round(tend-t0,4),'sec') 
  
-    #
     # COPY ALL OTHER IDSS FROM INPUT TO OUTPUT BUNDLE
     for iids in BNDL_in.keys():
         if iids not in BNDL_out.keys():
             BNDL_out[iids] = copy.deepcopy(BNDL_in[iids])
 
-
     print('End of time slice', file=sys.stdout)
-    tend = time.time()
-    print('one time step workflow time:',round(tend-t0,4),'second') 
+
     return BNDL_out
 
 
