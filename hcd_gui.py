@@ -103,8 +103,7 @@ def open_gui(wf_param_file):
 
     ## abbreviations for the keys - makes it easier to change them in the xml file
     wfp_ref = list(workflow_param.keys())[0]
-    fur_ref = list(workflow_param.keys())[1]
-    cod_ref = list(workflow_param.keys())[2]
+    cod_ref = list(workflow_param.keys())[1]
 
     hcd_actors_ref = list(maindict.keys())[1]
     make_core_ref  = list(maindict.keys())[2]
@@ -113,35 +112,31 @@ def open_gui(wf_param_file):
     global_dict = dict_merge(maindict[hcd_actors_ref],maindict[make_core_ref])
 
     ## LEFT - CONFIGURING THE WORKFLOW PARAMETERS
-    irow = 0
-    for ref in [wfp_ref, fur_ref]:
+    tkinter.Label(fr_wfp, text=wfp_ref, bg=col.c3, font='15').grid(row=0,
+                                                   column=0,
+                                                   columnspan=3,
+                                                   pady=10,
+                                                   padx=5,
+                                                   sticky='we')
+    irow = 1
+    for elem in workflow_param[wfp_ref]:
 
-        tkinter.Label(fr_wfp, text=ref, bg=col.c3, font='15').grid(row=irow,
-                                                       column=0,
-                                                       columnspan=3,
-                                                       pady=10,
-                                                       padx=5,
-                                                       sticky='we')
+        tkinter.Label(fr_wfp, text=elem, bg=col.c3).grid(row=irow,
+                                             column=0,
+                                             padx=1,
+                                             pady=2,
+                                             sticky='w')
+
+        # Catch any update of the variable from the interface
+        entrystring = tkinter.StringVar()
+        entrystring.set(workflow_param[wfp_ref][elem])
+        entrystring.trace('w', lambda name, index, mode, elem=elem, entrystring=entrystring,\
+           ref=wfp_ref: update_workflow_param(workflow_param,wfp_ref,elem,entrystring.get()))
+        # if an entry is changed, the new values should immediately be changed
+        # in the workflow_param dictionary
+        tkinter.Entry(fr_wfp, textvariable=entrystring, bg=col.c1)\
+               .grid(row=irow,column=1,padx=1,pady=2,sticky='e')
         irow += 1
-
-        for elem in workflow_param[ref]:
-
-            tkinter.Label(fr_wfp, text=elem, bg=col.c3).grid(row=irow,
-                                                 column=0,
-                                                 padx=1,
-                                                 pady=2,
-                                                 sticky='w')
-
-            # Catch any update of the variable from the interface
-            entrystring = tkinter.StringVar()
-            entrystring.set(workflow_param[ref][elem])
-            entrystring.trace('w', lambda name, index, mode, elem=elem, entrystring=entrystring,\
-               ref=ref: update_workflow_param(workflow_param,ref,elem,entrystring.get()))
-            # if an entry is changed, the new values should immediately be changed
-            # in the workflow_param dictionary
-            tkinter.Entry(fr_wfp, textvariable=entrystring, bg=col.c1)\
-                   .grid(row=irow,column=1,padx=1,pady=2,sticky='e')
-            irow += 1
 
 
     ## MIDDLE - SELECTING THE ACTORS
@@ -175,22 +170,22 @@ def open_gui(wf_param_file):
             previous_folder = init_folder
             if chosen_folder == init_folder: # Very first SAVE, or SAVE after a SAVE_AS
                 self.value=save(self.value,default_wf_param_file,previous_folder,\
-                    global_dict,uncompiled_actors,workflow_param,wfp_ref,fur_ref,cod_ref)
+                    global_dict,uncompiled_actors,workflow_param,wfp_ref,cod_ref)
             else:
                 if chosen_folder is None:
                     if self.value is None: # 1st SAVE after a LOAD
                         self.value=save(init_folder,default_wf_param_file,previous_folder,\
                             global_dict,uncompiled_actors,workflow_param, \
-                            wfp_ref,fur_ref,cod_ref)
+                            wfp_ref,cod_ref)
                     else: # Next SAVEs after a LOAD; SAVE after a SAVE AS which is after a LOAD; 
                         self.value=save(self.value,default_wf_param_file,previous_folder, \
                             global_dict,uncompiled_actors,workflow_param, \
-                            wfp_ref,fur_ref,cod_ref)
+                            wfp_ref,cod_ref)
                 else: # SAVE AS
                     if_cancelled = self.value
                     self.value=save(chosen_folder,default_wf_param_file,previous_folder,\
                         global_dict,uncompiled_actors,workflow_param,\
-                        wfp_ref,fur_ref,cod_ref)
+                        wfp_ref,cod_ref)
                     if self.value is None:
                         self.value = if_cancelled
             return self.value

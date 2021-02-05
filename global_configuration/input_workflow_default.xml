@@ -10,18 +10,14 @@
     <tbegin>5</tbegin>
     <tend>350.</tend>
     <dt_required>20</dt_required>
+    <parallel_workflow>0</parallel_workflow> 
     <!-- <run_simpletrans>False</run_simpletrans> -->
   </workflow_parameters>
-
-  <further_settings display="FURTHER SETTINGS">
-    <nmarkers_bbnbi_ascot>100</nmarkers_bbnbi_ascot>
-  </further_settings>
 
   <actor_selection display="ACTOR SELECTION"> <!-- 0: none - Higher indices: following code ordering -->
     <systems>
       <ECRH>
 	<ec_wave_solver list="genray gray grayscale torbeam">4</ec_wave_solver>
-
       </ECRH>
 
       <ICRH>

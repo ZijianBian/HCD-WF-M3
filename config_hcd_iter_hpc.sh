@@ -1,5 +1,5 @@
 # Start from clean environment
-module purge
+module purge >& /dev/null
 
 # Need to remove the stack limit to avoid segmentation fault inside codes
 ulimit -Ss unlimited
@@ -14,17 +14,27 @@ module load lxml/4.2.0-intel-2018a-Python-3.6.4
 export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
 
-# Module for all needed HCD or WF actors are loaded
+# Actor list
 actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
-		  HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist \
-		  WFtools TORBEAM FoPla)
-# StixReDist not available with same IMAS version
-for actor in ${actor_list[@]}; do
-  #echo "load" $actor
-  module load $actor >& /dev/null
-  module unload IMAS # To deal with actors compiled with different IMAS versions
-  export local_${actor}=0
-done
+            HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist \
+	    WFtools TORBEAM FoPla)
+
+# Force to use exclusively local actors (1) or not (0)
+export all_local=1
+if [ $all_local == 1 ]; then
+    echo Warning: all actors replaced by local versions from ${ACTOR_FOLDER}/
+    for actor in ${actor_list[@]}; do
+      export local_${actor}=1
+    done
+else
+  # Module for all needed HCD or WF actors are loaded
+  for actor in ${actor_list[@]}; do
+    #echo "load" $actor
+    module load $actor >& /dev/null
+    module unload IMAS >& /dev/null # To deal with actors compiled with different IMAS versions
+    export local_${actor}=0
+  done
+fi
 
 # Change local_XXX=1 to replace XXX module by the local one in ${ACTOR_FOLDER}
 #export local_ASCOT=1
@@ -32,12 +42,6 @@ done
 #export local_StixReDist=1
 #export local_CYRANO=1
 #export local_GRAY=1
-
-# Force to use exclusively local actors (1) or not (0)
-export all_local=1
-if [ $all_local == 1 ]; then
-    echo Warning: all actors replaced by local versions from ${ACTOR_FOLDER}/
-fi
 
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -69,6 +73,7 @@ if [ $local_SPOT == 1 ] || [ $all_local == 1 ]; then
     module unload SPOT >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/spot:$PYTHONPATH
 fi
+
 if [ $local_CYRANO == 1 ] || [ $all_local == 1 ]; then
     if [ $all_local != 1 ]; then
       echo Warning: CYRANO module replaced by actor from ${ACTOR_FOLDER}
@@ -88,7 +93,6 @@ if [ $local_GENRAY == 1 ] || [ $all_local == 1 ]; then
       echo Warning: GENRAY module replaced by actor from ${ACTOR_FOLDER}
     fi
     module unload GENRAY >& /dev/null
-    module switch netCDF-Fortran
     export PYTHONPATH=$ACTOR_FOLDER/genray:$PYTHONPATH
 fi
 if [ $local_GRAY == 1 ] || [ $all_local == 1 ]; then
@@ -182,7 +186,7 @@ if [ $local_TORBEAM == 1 ] || [ $all_local == 1 ]; then
     if [ $all_local != 1 ]; then
       echo Warning: TORBEAM module replaced by actor from ${ACTOR_FOLDER}
     fi
-    # module unload TORBEAM (to be activated after the 1st release of TORBEAM)
+    module unload TORBEAM >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/torbeam:$PYTHONPATH
 fi
 if [ $local_FoPla == 1 ] || [ $all_local == 1 ]; then
@@ -205,9 +209,16 @@ module load IMAS
 # For local re-compilation of actors
 module load XMLlib
 
-# FC2K to re-compile the actors if necessary
-module load FC2K
+# FC2K, PyAL and INTERPOS to re-compile the actors if necessary
+module load FC2K INTERPOS
 
-# Fix because actors were compile with PyAL/1.3.2 and I don't want to see warnings anymore
+# Fix when actors compiled with different PyAL version
 module unload PyAL >& /dev/null
 module load PyAL
+
+# For GENRAY
+module load netCDF-Fortran/4.4.4-intel-2018a
+
+# For PION
+module load NAG/26-intel-2018a  
+ 

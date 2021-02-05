@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/traj/ascot.git
-    VERSION: feature/no_rfof
+    VERSION: feature/npart_in_codeparam
     DIR:     ascot
 
 MODULES: [IMAS, FC2K, XMLlib]

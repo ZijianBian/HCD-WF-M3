@@ -71,8 +71,6 @@ extra_arguments:
    risk:   [dt_required]
    spot:   [dt_required]
    pion:   [tbegin,tend,dt_required]
-   iccoup: [ic_wave_nr_toroidal_modes]
-   bbnbi:  [nmarkers_bbnbi_ascot]
 
 parallel_dependency:
    ec_wave_solver:             None
@@ -89,3 +87,7 @@ parallel_dependency:
    merge_waves:                [ec_wave_solver,ic_wave_solver,ic_coup,merge_waves]
    merge_distribution_sources: [nbi_source,nuclear_source,merge_distribution_sources]
 
+exec_types:
+   ctypes
+   mpi_local
+   mpi_batch
