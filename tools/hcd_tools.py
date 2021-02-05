@@ -531,6 +531,7 @@ def clever_algo(algo_input,parameters,catdict):
               seen = set();
               output_list = [x for x in output_list if x not in seen and not seen.add(x)]
 
+  print('Algorithm =',algo_final)
 
   # DEFINE WHEN TO PUT WAITING POINTS WHEN WORKFLOW ACTORS RUN IN PARALLEL
   parallel_dependency_list = loadlist('parallel_dependency')
