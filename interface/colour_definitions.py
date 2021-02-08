@@ -1,6 +1,6 @@
-c1 = 'white'
-c2 = 'white smoke'
-c3 = 'azure2'
-c4 = 'ghost white'
-c5 = 'azure4'
-cb = 'LavenderBlush3'
+c1 = "white"
+c2 = "white smoke"
+c3 = "azure2"
+c4 = "ghost white"
+c5 = "azure4"
+cb = "LavenderBlush3"

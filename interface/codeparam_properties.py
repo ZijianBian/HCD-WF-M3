@@ -4,8 +4,8 @@ import tkinter
 # FUNCTION TO DISPLAY/APPLY THE RULES FOR EACH PARAMETER OF H&CD CODES
 # ---------------------------------------------------------------------
 
-class ToolTip(object):
 
+class ToolTip(object):
     def __init__(self, widget):
         self.widget = widget
         self.tipwindow = None
@@ -19,13 +19,19 @@ class ToolTip(object):
             return
         x, y, cx, cy = self.widget.bbox("insert")
         x = x + self.widget.winfo_rootx() + 57
-        y = y + cy + self.widget.winfo_rooty() +27
+        y = y + cy + self.widget.winfo_rooty() + 27
         self.tipwindow = tw = tkinter.Toplevel(self.widget)
         tw.wm_overrideredirect(1)
         tw.wm_geometry("+%d+%d" % (x, y))
-        label = tkinter.Label(tw, text=self.text, justify=tkinter.LEFT,
-                      background="#ffffe0", relief=tkinter.SOLID, borderwidth=1,
-                      font=("tahoma", "8", "normal"))
+        label = tkinter.Label(
+            tw,
+            text=self.text,
+            justify=tkinter.LEFT,
+            background="#ffffe0",
+            relief=tkinter.SOLID,
+            borderwidth=1,
+            font=("tahoma", "8", "normal"),
+        )
         label.pack(ipadx=1)
 
     def hidetip(self):
@@ -34,11 +40,15 @@ class ToolTip(object):
         if tw:
             tw.destroy()
 
+
 def CreateToolTip(widget, text):
     toolTip = ToolTip(widget)
+
     def enter(event):
         toolTip.showtip(text)
+
     def leave(event):
         toolTip.hidetip()
-    widget.bind('<Enter>', enter)
-    widget.bind('<Leave>', leave)
+
+    widget.bind("<Enter>", enter)
+    widget.bind("<Leave>", leave)
