@@ -1,7 +1,8 @@
 from contextlib import contextmanager
 import ctypes
 import io
-import os, sys
+import os
+import sys
 import tempfile
 
 libc = ctypes.CDLL(None)

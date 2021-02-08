@@ -1,4 +1,11 @@
-import sys, os, copy
+import sys
+import os
+import copy
+from utility_functions import gen_dict_extract
+from lxml import etree
+from multiprocessing import Pool
+from time import time
+
 from hcd_tools import (
     bundle_copy,
     create_workflow_param_from_file,
@@ -13,11 +20,7 @@ from hcd_tools import (
     create_maindict,
     clever_algo,
 )
-from utility_functions import gen_dict_extract
-from lxml import etree
-from multiprocessing import Pool
 from stdout_redirector import redirect_stdout, stdout_back
-from time import time
 
 # -------------------------------------------------------------------------------------------------
 

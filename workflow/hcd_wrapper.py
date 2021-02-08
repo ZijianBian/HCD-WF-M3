@@ -1,7 +1,11 @@
 def hcd_wrapper(par_path):
-    import os, imas, sys
-    from lxml import etree
+    import os
+    import sys
     import xml.etree.ElementTree as ET
+
+    import numpy as np
+    from lxml import etree
+
     from hcd_tools import (
         read_actor_ids,
         bundle_copy,
@@ -10,8 +14,9 @@ def hcd_wrapper(par_path):
         check_for_prerequisites,
         create_workflow_param_from_file,
     )
+
     from hcd_workflow import hcd_workflow
-    import numpy as np
+    import imas
 
     ##################################################################
 

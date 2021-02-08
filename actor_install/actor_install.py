@@ -1,8 +1,15 @@
 #!/usr/bin/env python
-import yaml, os, sys, shutil, sh, argparse, subprocess
+import os
+import sys
+import shutil
+import argparse
+import subprocess
 from getpass import getuser
 from datetime import datetime
 from io import open
+
+import yaml
+import sh
 
 
 # adapted from $MODULESHOME/init/python.py

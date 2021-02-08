@@ -1,6 +1,8 @@
-import os, sys
-from lxml import etree
+import os
+import sys
 from shutil import copy2
+
+from lxml import etree
 
 ############################################################################################
 def common_elements(list1, list2):

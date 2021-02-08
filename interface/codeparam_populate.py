@@ -1,7 +1,11 @@
-import os, tkinter, codeparam_properties
+import os
+
+import tkinter
+from lxml import etree
+
+import codeparam_properties
 import colour_definitions as col
 from utility_functions import update_codeparam_dict_check_xsd
-from lxml import etree
 
 # -----------------------------------------------------------------------------------
 # LOAD THE LIST OF CODE PARAMETERS, CREATE THE LABELS AND ENTRIES FOR THE INTERFACE
