@@ -24,7 +24,7 @@ def make_flowchart(removed_by_close_button, window, maindict, workflow_param):
 
     ## abbreviations for the keys - makes it easier to change them in the xml file
     wfp_ref = list(workflow_param.keys())[0]
-    cod_ref = list(workflow_param.keys())[2]
+    cod_ref = list(workflow_param.keys())[1]
 
     base = tkinter.Canvas(window, width=100, height=100, bg=col.c1)
     base.grid(row=0, column=2, sticky="news")
