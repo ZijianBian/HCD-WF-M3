@@ -29,7 +29,7 @@
 
       <NBI>
 	<nbi_source list="nemo bbnbi">0</nbi_source>
-	<nbi_fp list="risk spot ascot4serial ascot4parallel nbisim2">0</nbi_fp>
+	<nbi_fp list="risk spot ascot4serial ascot4parallel nbisim2 nerinet">0</nbi_fp>
       </NBI>
     
 

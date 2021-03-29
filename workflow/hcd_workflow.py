@@ -86,7 +86,7 @@ def run(cat, bundle, parameters):
     inputmpi = []
     libmpi_path = eval(code + ".location") + "/native_wrapper/lib/lib" + code + ".so"
     args_np = {}
-    if is_compiled_for_mpi(libmpi_path, "libmpi"):
+    if os.path.isfile(libmpi_path) is True and is_compiled_for_mpi(libmpi_path, "libmpi"):
         tree = etree.parse(inputxml[0])
         root = tree.getroot()
         for elem in root.iter():

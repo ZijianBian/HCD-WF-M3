@@ -17,7 +17,7 @@ mkdir -p $ACTOR_FOLDER
 # Actor list
 actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
             HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist \
-	    WFtools TORBEAM FoPla)
+	    WFtools TORBEAM FoPla NERINET)
 
 # Force to use exclusively local actors (1) or not (0)
 export all_local=1
@@ -196,6 +196,13 @@ if [ $local_FoPla == 1 ] || [ $all_local == 1 ]; then
     module unload FoPla >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/fopla:$PYTHONPATH
 fi
+if [ $local_NERINET == 1 ] || [ $all_local == 1 ]; then
+    if [ $all_local != 1 ]; then
+      echo Warning: NERINET module replaced by actor from ${ACTOR_FOLDER}
+    fi
+    module unload NERINET >& /dev/null
+    export PYTHONPATH=$ACTOR_FOLDER/nerinet:$PYTHONPATH
+fi
 
 # To find shell scripts in current local folder
 export PATH=$PWD:$PATH
@@ -222,3 +229,4 @@ module load netCDF-Fortran/4.4.4-intel-2018a
 # For PION
 module load NAG/26-intel-2018a  
  
+

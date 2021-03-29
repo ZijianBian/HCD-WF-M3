@@ -139,7 +139,8 @@ def read_and_save_codeparam(
     if found_xml:
         elem.tail = "\n\n  "
         if (
-            is_compiled_for_mpi(libmpi_path, "libmpi")
+            os.path.isfile(libmpi_path) is True
+            and is_compiled_for_mpi(libmpi_path, "libmpi")
             and "nproc_actor" not in codeparam_dict.keys()
         ):
             codeparam_dict["nproc_actor"] = " 4 "
@@ -155,7 +156,8 @@ def read_and_save_codeparam(
             tree.write(codeparam_destination_path, pretty_print=True)
     if found_xsd:
         if (
-            is_compiled_for_mpi(libmpi_path, "libmpi")
+            os.path.isfile(libmpi_path) is True
+            and is_compiled_for_mpi(libmpi_path, "libmpi")
             and "nproc_actor" not in docum_dict.keys()
         ):
             docum_dict["nproc_actor"] = "Number of processors to run this code"

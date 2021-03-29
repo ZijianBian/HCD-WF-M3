@@ -33,6 +33,7 @@ actor_list:
     tomcat 
     torbeam
     fopla
+    nerinet
 
 merge_actor_list:
     merge_waves
