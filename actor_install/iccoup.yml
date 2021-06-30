@@ -9,11 +9,11 @@ SOURCES:
 MODULES: [IMAS, FC2K, XMLlib]
 
 BUILDS: 
-  - DIR: tools
+  - DIR: iccoup/tools
     CMD: ./build_imas.sh
 
 ACTORS: 
-  - DIR: tools
+  - DIR: iccoup/tools
     XML: fc2k/iccoup_imas.xml
 
 #COMMENTS:  
