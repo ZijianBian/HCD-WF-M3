@@ -314,9 +314,9 @@ def create_maindict(workflow_parameters_path, input_option, verbose):
                     list_actor.insert(
                         0,
                         {
-                            "name": "empty_" + output_ids_list[0],
-                            "input": ["core_profiles"],
-                            "output": [output_ids_list[0]],
+                            "name": "empty_dummy",
+                            "input": ["dummy_in"],
+                            "output": ["dummy_out"],
                             "system": system.tag,
                         },
                     )
