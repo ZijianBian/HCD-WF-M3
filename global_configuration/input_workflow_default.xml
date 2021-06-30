@@ -11,6 +11,7 @@
     <tend>350.</tend>
     <dt_required>20</dt_required>
     <parallel_workflow>0</parallel_workflow> 
+    <one_time_slice>0</one_time_slice> 
     <!-- <run_simpletrans>False</run_simpletrans> -->
   </workflow_parameters>
 

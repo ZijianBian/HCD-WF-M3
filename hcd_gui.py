@@ -261,7 +261,7 @@ def open_gui(wf_param_file):
 
     # Left panel
     button_loadconfig = tkinter.Button(fr_wfp, text="Load", bg=col.c2)
-    button_loadconfig.grid(row=51, column=0, padx=5, pady=5, sticky="ew")
+    button_loadconfig.grid(row=52, column=0, padx=5, pady=5, sticky="ew")
     button_loadconfig.configure(
         command=lambda: load(
             tkinter.filedialog.askdirectory(
@@ -272,11 +272,11 @@ def open_gui(wf_param_file):
     )
 
     button_saveconfig = tkinter.Button(fr_wfp, text="Save", bg=col.c2)
-    button_saveconfig.grid(row=52, column=0, padx=5, pady=5, sticky="ew")
+    button_saveconfig.grid(row=53, column=0, padx=5, pady=5, sticky="ew")
     button_saveconfig.configure(command=lambda: saved_folder.Save(None, init_folder))
 
     button_saveas = tkinter.Button(fr_wfp, text="Save as", bg=col.c2)
-    button_saveas.grid(row=53, column=0, padx=5, pady=5, sticky="ew")
+    button_saveas.grid(row=54, column=0, padx=5, pady=5, sticky="ew")
     button_saveas.configure(
         command=lambda: saved_folder.Save(
             tkinter.filedialog.askdirectory(
@@ -287,21 +287,21 @@ def open_gui(wf_param_file):
     )
 
     button_loadlconfig = tkinter.Button(fr_wfp, text="Load latest", bg=col.c2)
-    button_loadlconfig.grid(row=51, column=1, padx=5, pady=5, sticky="ew")
+    button_loadlconfig.grid(row=52, column=1, padx=5, pady=5, sticky="ew")
     button_loadlconfig.configure(command=lambda: load("latest", open_gui))
 
     button_saveandrun = tkinter.Button(fr_wfp, text="Run", bg=col.c2, state="normal")
-    button_saveandrun.grid(row=52, column=1, padx=5, pady=5, sticky="ew")
+    button_saveandrun.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
     button_saveandrun.configure(
         command=lambda: run(saved_folder.Save(None, init_folder))
     )
 
     button_restore_def = tkinter.Button(fr_wfp, text="Restore Default", bg=col.c2)
-    button_restore_def.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
+    button_restore_def.grid(row=54, column=1, padx=5, pady=5, sticky="ew")
     button_restore_def.configure(command=lambda: open_gui(default_wf_param_file))
 
     button_exit = tkinter.Button(fr_wfp, text="Exit", bg="light grey")
-    button_exit.grid(row=55, column=0, padx=5, pady=5, sticky="w")
+    button_exit.grid(row=56, column=0, padx=5, pady=5, sticky="w")
     button_exit.configure(command=lambda: sys.exit())
 
     # Middle panel

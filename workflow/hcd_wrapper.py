@@ -188,55 +188,59 @@ def hcd_wrapper(par_path):
         # PREPARE THE TIME RANGE FOR THE TIME LOOP
         # -----------------------------------------
 
-        # INPUT TIME ARRAY
-        try:
-            time_array = input.partial_get(ids_name="equilibrium", data_path="time")
-        except:
-            print(
-                "  ERROR while reading the core_profiles IDS: is it really present in the input file?",
-                file=sys.stderr,
-            )
-            print("  ----> Aborted.", file=sys.stderr)
-            return
+        if param["one_time_slice"] == 0:
 
-        # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
-        if param["tbegin"] < 0:
-            param["tbegin"] = time_array[0]
-            print(
-                "Initial time tbegin set to core_profiles first time slice. tbegin = ",
-                param["tbegin"],
-                file=sys.stdout,
-            )
+            # INPUT TIME ARRAY
+            try:
+                time_array = input.partial_get(ids_name="equilibrium", data_path="time")
+            except:
+                print(
+                    "  ERROR while reading the core_profiles IDS: is it really present in the input file?",
+                    file=sys.stderr,
+                )
+                print("  ----> Aborted.", file=sys.stderr)
+                return
 
-        if param["tbegin"] > 0 and param["tbegin"] < time_array[0]:
-            print(
-                "ERROR: tbegin out of range: "
-                + str(param["tbegin"])
-                + " s is less than first time in core_profiles =",
-                "{:.2f}".format(time_array[0]),
-                "s",
-                file=sys.stderr,
-            )
-            return
+            # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
+            if param["tbegin"] < 0:
+                param["tbegin"] = time_array[0]
+                print(
+                    "Initial time tbegin set to core_profiles first time slice. tbegin = ",
+                    param["tbegin"],
+                    file=sys.stdout,
+                )
 
-        if param["tend"] < 0:
-            param["tend"] = time_array[-1]
-            print(
-                "Final time tend set to core_profiles final time slice, tend = ",
-                param["tend"],
-                file=sys.stdout,
-            )
+            if param["tbegin"] > 0 and param["tbegin"] < time_array[0]:
+                print(
+                    "ERROR: tbegin out of range: "
+                    + str(param["tbegin"])
+                    + " s is less than first time in core_profiles =",
+                    "{:.2f}".format(time_array[0]),
+                    "s",
+                    file=sys.stderr,
+                )
+                return
 
-        if param["tend"] > 0 and param["tend"] > time_array[-1]:
-            print(
-                "ERROR: tend out of range: "
-                + str(param["tend"])
-                + " s is greater than last time in core_profiles =",
-                "{:.2f}".format(time_array[-1]),
-                "s",
-                file=sys.stderr,
-            )
-            return
+            if param["tend"] < 0:
+                param["tend"] = time_array[-1]
+                print(
+                    "Final time tend set to core_profiles final time slice, tend = ",
+                    param["tend"],
+                    file=sys.stdout,
+                )
+
+            if param["tend"] > 0 and param["tend"] > time_array[-1]:
+                print(
+                    "ERROR: tend out of range: "
+                    + str(param["tend"])
+                    + " s is greater than last time in core_profiles =",
+                    "{:.2f}".format(time_array[-1]),
+                    "s",
+                    file=sys.stderr,
+                )
+                return
+        else:
+            param["tend"]  = param["tbegin"] + param["dt_required"]
 
         ##################################################################
 
