@@ -15,7 +15,8 @@ export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
 
 # Actor list
-actor_list=(ASCOT SPOT CYRANO FPSIM GENRAY GRAY GRAYSCALE HCD2CORE_PROFILES \
+# GENRAY
+actor_list=(ASCOT SPOT CYRANO FPSIM GRAY GRAYSCALE HCD2CORE_PROFILES \
             HCD2CORE_SOURCES LION NBISIM NEMO PION RISK TOMCAT StixReDist \
 	    WFtools TORBEAM FoPla NERINET)
 
@@ -88,13 +89,13 @@ if [ $local_FPSIM == 1 ] || [ $all_local == 1 ]; then
     module unload FPSIM >& /dev/null
     export PYTHONPATH=$ACTOR_FOLDER/iccoup:$PYTHONPATH
 fi
-if [ $local_GENRAY == 1 ] || [ $all_local == 1 ]; then
-    if [ $all_local != 1 ]; then
-      echo Warning: GENRAY module replaced by actor from ${ACTOR_FOLDER}
-    fi
-    module unload GENRAY >& /dev/null
-    export PYTHONPATH=$ACTOR_FOLDER/genray:$PYTHONPATH
-fi
+#if [ $local_GENRAY == 1 ] || [ $all_local == 1 ]; then
+#    if [ $all_local != 1 ]; then
+#      echo Warning: GENRAY module replaced by actor from ${ACTOR_FOLDER}
+#    fi
+#    module unload GENRAY >& /dev/null
+#    export PYTHONPATH=$ACTOR_FOLDER/genray:$PYTHONPATH
+#fi
 if [ $local_GRAY == 1 ] || [ $all_local == 1 ]; then
     if [ $all_local != 1 ]; then
       echo Warning: GRAY module replaced by actor from ${ACTOR_FOLDER}
@@ -224,7 +225,7 @@ module unload PyAL >& /dev/null
 module load PyAL
 
 # For GENRAY
-module load netCDF-Fortran/4.4.4-intel-2018a
+#module load netCDF-Fortran/4.4.4-intel-2018a
 
 # For PION
 module load NAG/26-intel-2018a  
