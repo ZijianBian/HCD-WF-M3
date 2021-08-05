@@ -9,3 +9,4 @@ actor_install/RELEASE.yaml
 fort.*
 Plot_data*
 *.log
+.vscode
