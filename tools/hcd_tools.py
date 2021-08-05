@@ -1,8 +1,6 @@
-# Load necessary modules
 import os
 import sys
 import inspect
-from importlib import import_module
 from inspect import getmodule, stack
 from subprocess import Popen, PIPE
 import copy
@@ -10,8 +8,6 @@ import copy
 import yaml
 import numpy as np
 from lxml import etree
-
-import imas
 
 # Private function to inspect the full path of the function
 def __foo():

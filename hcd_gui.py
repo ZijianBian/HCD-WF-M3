@@ -24,16 +24,16 @@ except:
     sys.exit()
 
 try:
-    import colour_definitions as col
-    from hcd_tools import (
+    import interface.colour_definitions as col
+    from tools.hcd_tools import (
         import_actor,
         create_maindict,
         loadlist,
         create_workflow_param_from_file,
         dict_merge,
     )
-    from codeparam_edit import edit_codeparam
-    from utility_functions import save, run, destr_and_make, update_workflow_param, load
+    from tools.utility_functions import save, run, destr_and_make, update_workflow_param, load
+    from interface.codeparam_edit import edit_codeparam
 except:
     raise
     print("ERROR while loading internal HCD modules", file=sys.stderr)

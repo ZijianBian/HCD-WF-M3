@@ -1,12 +1,12 @@
-import sys
-import os
 import copy
-from utility_functions import gen_dict_extract
-from lxml import etree
 from multiprocessing import Pool
+import os
+import sys
 from time import time
 
-from hcd_tools import (
+from lxml import etree
+
+from tools.hcd_tools import (
     bundle_copy,
     create_workflow_param_from_file,
     is_nbi_on,
@@ -15,12 +15,10 @@ from hcd_tools import (
     import_actor,
     loadlist,
     is_compiled_for_mpi,
-    read_actor_ids,
-    create_workflow_param_from_file,
     create_maindict,
     clever_algo,
 )
-from stdout_redirector import redirect_stdout, stdout_back
+from tools.stdout_redirector import redirect_stdout, stdout_back
 
 # -------------------------------------------------------------------------------------------------
 
@@ -86,7 +84,9 @@ def run(cat, bundle, parameters):
     inputmpi = []
     libmpi_path = eval(code + ".location") + "/native_wrapper/lib/lib" + code + ".so"
     args_np = {}
-    if os.path.isfile(libmpi_path) is True and is_compiled_for_mpi(libmpi_path, "libmpi"):
+    if os.path.isfile(libmpi_path) is True and is_compiled_for_mpi(
+        libmpi_path, "libmpi"
+    ):
         tree = etree.parse(inputxml[0])
         root = tree.getroot()
         for elem in root.iter():

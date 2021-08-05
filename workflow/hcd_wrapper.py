@@ -1,22 +1,21 @@
+import os
+import sys
+
+import imas
+import numpy as np
+
+from hcd_workflow import hcd_workflow
+from tools.hcd_tools import (
+    read_actor_ids,
+    bundle_copy,
+    create_dict_from_idslist,
+    create_maindict,
+    check_for_prerequisites,
+    create_workflow_param_from_file,
+)
+
+
 def hcd_wrapper(par_path):
-    import os
-    import sys
-    import xml.etree.ElementTree as ET
-
-    import numpy as np
-    from lxml import etree
-
-    from hcd_tools import (
-        read_actor_ids,
-        bundle_copy,
-        create_dict_from_idslist,
-        create_maindict,
-        check_for_prerequisites,
-        create_workflow_param_from_file,
-    )
-
-    from hcd_workflow import hcd_workflow
-    import imas
 
     ##################################################################
 
@@ -240,7 +239,7 @@ def hcd_wrapper(par_path):
                 )
                 return
         else:
-            param["tend"]  = param["tbegin"] + param["dt_required"]
+            param["tend"] = param["tbegin"] + param["dt_required"]
 
         ##################################################################
 
