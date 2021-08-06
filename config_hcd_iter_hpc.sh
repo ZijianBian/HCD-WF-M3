@@ -47,9 +47,6 @@ fi
 # Add the folder where the generic scripts for H&CD wf are stored to PYTHONPATH
 export HCD_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export PYTHONPATH=$HCD_FOLDER:$PYTHONPATH
-export PYTHONPATH=$HCD_FOLDER/tools:$PYTHONPATH
-export PYTHONPATH=$HCD_FOLDER/interface:$PYTHONPATH
-export PYTHONPATH=$HCD_FOLDER/workflow:$PYTHONPATH
 
 # ---------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------
