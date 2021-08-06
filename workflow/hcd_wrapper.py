@@ -4,7 +4,7 @@ import sys
 import imas
 import numpy as np
 
-from hcd_workflow import hcd_workflow
+from workflow.hcd_workflow import hcd_workflow
 from tools.hcd_tools import (
     read_actor_ids,
     bundle_copy,

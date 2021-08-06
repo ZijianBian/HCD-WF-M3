@@ -3,8 +3,8 @@ import tkinter
 
 from lxml import etree
 
-import codeparam_properties
-import colour_definitions as col
+import interface.codeparam_properties as codeparam_properties
+import interface.colour_definitions as col
 from tools.utility_functions import update_codeparam_dict_check_xsd
 
 # -----------------------------------------------------------------------------------

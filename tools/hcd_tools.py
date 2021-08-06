@@ -130,6 +130,7 @@ def import_actor(actor_input, verbose):
 
 def create_dict_from_idslist(idslist):
 
+    import imas
     imas_dict = {}
     for ids in idslist:
         imas_dict[ids] = eval("imas." + ids + "()")
@@ -590,7 +591,7 @@ def is_ic_on(ic_antennas, time_slice):
 def clever_algo(algo_input, parameters, catdict):
 
     import collections
-    from utility_functions import common_elements
+    from tools.utility_functions import common_elements
 
     ## ADD MERGERS TO THE FLOW
     output_list = []

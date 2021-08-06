@@ -1,7 +1,7 @@
 import tkinter
 
-import colour_definitions as col
-from codeparam_populate import codeparam_interface
+import interface.colour_definitions as col
+from interface.codeparam_populate import codeparam_interface
 from tools.utility_functions import update_codeparam_file, read_and_save_codeparam
 
 # CREATE THE WINDOW TO EDIT CODE PARAMETERS

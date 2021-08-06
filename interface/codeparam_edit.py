@@ -1,7 +1,7 @@
 import tkinter
 
-import colour_definitions as col
-from codeparam_frame import make_frame
+import interface.colour_definitions as col
+from interface.codeparam_frame import make_frame
 
 # MANAGE XML FILES
 def edit_codeparam(

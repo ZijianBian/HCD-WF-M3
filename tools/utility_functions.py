@@ -38,7 +38,7 @@ def read_and_save_codeparam(
     current_config_folder, previous_folder, hsys, actor_name, default
 ):
 
-    from hcd_tools import import_actor, is_compiled_for_mpi
+    from tools.hcd_tools import import_actor, is_compiled_for_mpi
 
     # NAME OF THE CODEPARAM FILE FOR THIS ACTOR IN THE CURRENT CONFIGURATION FOLDER
     codeparam_destination_path = (
@@ -220,7 +220,7 @@ def save_codeparam_to_file(
     verbose,
 ):
 
-    from hcd_tools import import_actor
+    from tools.hcd_tools import import_actor
 
     cod_ref = list(workflow_param.keys())[1]
 
@@ -355,7 +355,7 @@ def save(
 def run(current_config_folder):
 
     if current_config_folder is not None:
-        from hcd_wrapper import hcd_wrapper
+        from workflow.hcd_wrapper import hcd_wrapper
 
         hcd_wrapper(current_config_folder)
     else:
@@ -365,7 +365,7 @@ def run(current_config_folder):
 ############################################################################################
 def destr_and_make(removed_by_close_button, window, maindict, workflow_param):
 
-    from flowchart_display import make_flowchart
+    from interface.flowchart_display import make_flowchart
 
     base = make_flowchart(removed_by_close_button, window, maindict, workflow_param)
     removed_by_close_button.append(base)
@@ -432,7 +432,7 @@ def update_workflow_param(workflow_param, ref, elem, newvalue):
 def update_codeparam_dict_check_xsd(
     codeparam_dict, elem, newvalue, root=None, xmlschema=None, entry1=None
 ):
-    import colour_definitions as col
+    import interface.colour_definitions as col
 
     codeparam_dict[elem.tag] = newvalue
     if root is not None:  # Check rules of xsd file

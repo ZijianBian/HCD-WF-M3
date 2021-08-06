@@ -1,6 +1,6 @@
 import tkinter
 
-import colour_definitions as col
+import interface.colour_definitions as col
 
 ############################################################################################
 

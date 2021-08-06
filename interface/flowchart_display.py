@@ -1,7 +1,7 @@
 import tkinter
 
-import colour_definitions as col
-from flowchart_functions import (
+import interface.colour_definitions as col
+from interface.flowchart_functions import (
     merge_bottom_lines,
     mergefr_draw_lines,
     hide_display,
