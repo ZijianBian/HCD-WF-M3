@@ -1,6 +1,5 @@
 import os
 import sys
-import inspect
 from inspect import getmodule, stack
 from subprocess import Popen, PIPE
 import copy
