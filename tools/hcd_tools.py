@@ -9,12 +9,6 @@ import yaml
 import numpy as np
 from lxml import etree
 
-# Private function to inspect the full path of the function
-def __foo():
-    pass
-
-
-#####################################################################################
 
 # Function to find the index of a value in a time array, and the closest array value
 def find_nearest(a, a0):
@@ -31,8 +25,8 @@ def find_nearest(a, a0):
 # Create lists from the global configuration yaml file
 def loadlist(listname):
 
-    path_file = os.path.abspath(inspect.getfile(__foo))
-    path = "/".join(path_file.split("/")[:-1])
+    path_file = os.path.abspath(__file__)
+    path = os.path.dirname(path_file)
 
     file = open(path + "/../global_configuration/" + "global_lists.yaml", "r")
     data = yaml.load(file, Loader=yaml.CLoader)
