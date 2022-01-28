@@ -2,11 +2,26 @@ ids_list:
     core_profiles 
     core_sources 
     equilibrium  
-    pulse_schedule  
     nbi  
     ic_antennas  
     ec_launchers 
     wall  
+    distribution_sources  
+    distributions  
+    waves
+
+ids_scenario_list:
+    core_profiles 
+    equilibrium
+
+ids_md_list:
+    nbi  
+    ic_antennas  
+    ec_launchers 
+    wall  
+
+ids_process_list:
+    core_sources 
     distribution_sources  
     distributions  
     waves
@@ -76,12 +91,12 @@ extra_arguments:
 parallel_dependency:
    ec_wave_solver:             None
    ic_coup:                    None
-   ic_wave_solver:             [ic_coup,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_waves,merge_distributions,merge_distribution_sources]
-   ic_wave_fp:                 [ic_wave_solver,merge_waves]
+   ic_wave_solver:             [ic_coup,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_distributions,merge_distribution_sources]
+   ic_wave_fp:                 [ic_wave_solver]
    nbi_source:                 None
-   nbi_fp:                     [nbi_source,merge_distribution_sources]
+   nbi_fp:                     [nbi_source]
    nuclear_source:             None
-   nuclear_fp:                 [nuclear_source,merge_distribution_sources]
+   nuclear_fp:                 [nuclear_source]
    fill_core_sources:          [ec_wave_solver,ic_wave_solver,ic_wave_fp,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_waves,merge_distributions,merge_distribution_sources]
    fill_core_profiles:         [ic_wave_fp,nbi_fp,nuclear_fp,merge_distributions]
    merge_distributions:        [ic_wave_fp,nbi_fp,nuclear_fp,merge_distributions]

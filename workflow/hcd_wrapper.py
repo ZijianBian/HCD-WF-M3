@@ -12,7 +12,9 @@ from tools.hcd_tools import (
     create_maindict,
     check_for_prerequisites,
     create_workflow_param_from_file,
+    loadlist
 )
+from tools.utility_functions import add_ids_entry_to_dict
 
 
 def hcd_wrapper(par_path):
@@ -43,37 +45,49 @@ def hcd_wrapper(par_path):
             catlist,
         ) = create_maindict(workflow_xml, 1, 0)
 
-        # LIST OF SELECTED ACTORS
-        list_of_actors = []
+        # LIST OF ACTIVATED PROCESSES AND SELECTED ACTORS
+        list_of_processes = {}
         for process, code in code_selection.items():
             if code is not None:
-                list_of_actors.append(code)
-        if len(list_of_actors) == 0:
+                list_of_processes[process] = code
+
+        if len(list_of_processes) == 0:
             print(
-                "ERROR: no actor selected --> The H&CD workflow will not be executed",
+                "ERROR: no actor selected --> The Diagnostic workflow will not be executed",
                 file=sys.stderr,
             )
             return
 
+        ids_scenario_list = loadlist('ids_scenario_list')
+        ids_md_list       = loadlist('ids_md_list')
+        ids_process_list  = loadlist('ids_process_list')
+
         # DEFINE THE TOTAL LIST OF INVOLVED INPUT AND OUTPUT IDSS ACCORDING TO THE ACTOR SELECTION
-        input_ids_list = []
-        output_ids_list = []
-        for name in list_of_actors:
+        process_bundle  = {}
+        for process,actor in list_of_processes.items():
             [
                 single_input_ids_list,
                 single_input_arg_list,
                 single_output_ids_list,
                 err,
-            ] = read_actor_ids(name, 0)
-            input_ids_list = input_ids_list + single_input_ids_list
-            output_ids_list = output_ids_list + single_output_ids_list
-        input_ids_list = list(set(input_ids_list))
-        output_ids_list = list(set(output_ids_list))
-        ids_list = list(set(input_ids_list + output_ids_list))
+            ] = read_actor_ids(actor, 0)
 
-        # ALWAYS INCLUDE CORE_PROFILES IDS SINCE IT IS USED AS A REFERENCE
-        if not "core_profiles" in input_ids_list:
-            input_ids_list.append("core_profiles")
+            process_bundle[process] = {}
+            process_bundle[process]['input']  = {}
+            process_bundle[process]['output'] = {}
+            add_ids_entry_to_dict(process_bundle[process]['input'],single_input_ids_list)
+            add_ids_entry_to_dict(process_bundle[process]['output'],single_output_ids_list)
+
+        common_bundle = {}
+        add_ids_entry_to_dict(common_bundle,ids_scenario_list)
+
+        # Temporary version:
+        # common_bundle contains all IDSs to be read via get_slice() from input scenario, defined by ids_scenario_list
+        # process_bundle contains all other input and output IDSs (total list = ids_md_list + ids_process_list)
+        #    - all its inputs from ids_md_list to be read via get()
+        #    - all other inputs from ids_process_list are output of upstream actors 
+        #      to be copied from the output bundle of upstream actors inside the time loop
+        #      according to the parallel_dependency constraints
 
         # CHECK IF THE CODES ARE COMPATIBLE / PREREQUISITES ARE FULFILLED
         err = check_for_prerequisites(workflow_xml)
@@ -168,18 +182,11 @@ def hcd_wrapper(par_path):
 
         ##################################################################
 
-        # ------------------
-        # BUNDLE MANAGEMENT
-        # ------------------
-        # BUNDLING THE IDSS MAKES IT EASIER TO PASS THEM BETWEEN ACTORS
-        # IDS_BUNDLE_INPUT:  IDSS FROM THE INPUT DATABASE
-        # IDS_BUNDLE_WORK:   IDSS OF THE CURRENT TIMESTEP IN THE WORKFLOW
-        # IDS_BUNDLE_OUTPUT: IDSS FOR THE OUTPUT DATABASE
-        # ----------------------------------------------------------------
-
-        # TOTAL LIST OF INPUT AND OUTPUT IDSS FOR H&CD CALCULATIONS
-        ids_bundle_input = create_dict_from_idslist(ids_list)
-        ids_bundle_output = create_dict_from_idslist(ids_list)
+        # READ INPUT MACHINE DESCRIPTION DATA
+        for process in process_bundle.keys():
+            for ids in process_bundle[process]['input'].keys():
+                if ids in ids_md_list:
+                    process_bundle[process]['input'][ids] = input.get(ids)
 
         ##################################################################
 
@@ -260,6 +267,7 @@ def hcd_wrapper(par_path):
             nsteps = nsteps + 1
 
         step = 0
+        previous_time = {}
 
         while timenow < param["tend"]:
 
@@ -270,14 +278,17 @@ def hcd_wrapper(par_path):
             print("Time = %5.2f" % timenow, "s", file=sys.stdout)
             print("dt   = %5.2f" % param["dt_required"], "s", file=sys.stdout)
 
-            # READ ALL INPUT IDSS FOR THE CURRENT TIME SLICE
-            for elem in input_ids_list:
-                print("  Get", elem, file=sys.stdout)
+            # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
+            for ids in ids_scenario_list:
+                print("  Get", ids, file=sys.stdout)
                 try:
-                    ids_bundle_input[elem] = input.get_slice(elem, timenow, 1)
+                    common_bundle[ids] = input.get_slice(ids, timenow, 1)
+                    for process in process_bundle.keys():
+                        if 'merge_' not in process and ids in process_bundle[process]['input'].keys():
+                            process_bundle[process]['input'][ids] = common_bundle[ids]
                 except:
                     print(
-                        "  ERROR while reading the " + elem + " IDS:", file=sys.stderr
+                        "  ERROR while reading the " + ids + " IDS:", file=sys.stderr
                     )
                     print(
                         "  ----> Check the version of the Data Dictionary between the"
@@ -287,64 +298,61 @@ def hcd_wrapper(par_path):
                     print("  ----> Aborted.", file=sys.stderr)
                     return
 
-            # COPY THE INITIAL BUNDLE TO THE WORK BUNDLE
-            # WHEN IT IS NOT THE FIRST TIME SLICE: COPY ONLY IDSS WHICH ARE NO OUTPUT OF H&CD ACTORS
-            # EXCEPTION: CORE_PROFILES TO ALWAYS BE READ EVEN IF IT IS AN OUTPUT OF HCD2CORE_PROFILES
-            if timenow == param["tbegin"]:
-                ids_bundle_work = bundle_copy(ids_bundle_input, input_ids_list)
-            else:
-                list_to_get = [
-                    value
-                    for value in input_ids_list
-                    if (value not in output_ids_list or value == "core_profiles")
-                ]
-                ids_bundle_work.update(bundle_copy(ids_bundle_input, list_to_get))
+            process_bundle = hcd_workflow(process_bundle, workflow_xml)
 
-            ids_bundle_work = hcd_workflow(ids_bundle_work, workflow_xml)
-
-            # OPTIONALLY CALL THE SIMPLE TRANSPORT SOLVER
-            if param["run_simpletrans"] == 1:
-                try:
-                    ids_bundle_work["core_profiles"] = simpletrans(
-                        ids_bundle_work["equilibirum"],
-                        ids_bundle_work["core_profiles"],
-                        ids_bundle_work["waves"],
-                        ids_bundle_work["distributions"],
-                    )
-                except:
-                    print("Failed to load or run SimpleTrans", file=sys.stderr)
-                    print(
-                        "WARNING - Skipping SimpleTrans even though it has been"
-                        + " choosen in the configuration!",
-                        file=sys.stdout,
-                    )
-
-            # COPY WORK BUNDLE TO OUTPUT BUNDLE TO SAVE THE RESULTS TO DISK
-            ids_bundle_output = bundle_copy(ids_bundle_work)
-
-            for elem in ids_bundle_output:
+            for ids in common_bundle.keys():
 
                 # IF THE IDS IS NOT EMPTY (INPUT OR OUTPUT) IT IS GOING TO BE SAVED USING THE TIME OF
                 # THE WORKFLOW (TO AVOID SAVING IDENTICAL TIME VALUES IN CASE THE WORKFLOW TIME
                 # RESOLUTION IS SCARCER THAN THE INPUT ONE)
-                if ids_bundle_output[elem].ids_properties.homogeneous_time >= 0:
-                    ids_bundle_output[elem].time = np.array([timenow])
+                if common_bundle[ids].ids_properties.homogeneous_time >= 0:
+                    common_bundle[ids].time = np.array([timenow])
 
                     # FIRST TIME SLICE: PUT() INSTEAD OF PUT_SLICE() TO SAVE ALSO STATIC DATA
                     if timenow == param["tbegin"]:
-                        output.put(ids_bundle_output[elem])
+                        output.put(common_bundle[ids])
 
                     # OTHER TIME SLICES: SAVE ONLY THE TIME SLICE
                     else:
-                        output.put_slice(ids_bundle_output[elem])
+                        output.put_slice(common_bundle[ids])
 
-            # PREPARE FOR THE NEXT TIME STEP
-            timenow += param["dt_required"]
-            for elem in ids_bundle_work:
-                ids_bundle_work[elem].time = np.array([timenow])
+            # OUTPUT BUNDLE TO SAVE TO DISK
+            process_bundle_out = {}
+            # SAVE THE MERGER OUTPUT IDS IF THERE IS ANY
+            for process in process_bundle.keys():
+                if 'merge_' in process:
+                    key, value = list(process_bundle[process]['output'].items())[0]
+                    process_bundle_out[key] = value
+            # SAVE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
+            for process in process_bundle.keys():
+                    for key, value in process_bundle[process]['output'].items():
+                        if key not in process_bundle_out.keys():
+                            process_bundle_out[key] = value
+            # SAVE TO DISK
+            for ids in process_bundle_out.keys():
 
-            # CLEAN TO SAVE A BIT OF MEMORY
-            del ids_bundle_output
+                # FIRST TIME SLICE: PUT() INSTEAD OF PUT_SLICE() TO SAVE ALSO STATIC DATA
+                if ids not in previous_time:
+                    if process_bundle_out[ids].time[0] > 0 or 'merge' in process_bundle_out[ids].code.name:
+                        output.put(process_bundle_out[ids])
+                        previous_time[ids] = process_bundle_out[ids].time[0]
+                # OTHER TIME SLICES: SAVE ONLY THE TIME SLICE
+                else:
+                    if process_bundle_out[ids] != {}:
+                        if process_bundle_out[ids].time[0] > previous_time[ids] \
+                           or 'merge' in process_bundle_out[ids].code.name:
+                              output.put_slice(process_bundle_out[ids])
+                              previous_time[ids] = process_bundle_out[ids].time[0]
+
+            # PREPARE FOR THE NEXT TIME STEP: COPY OUTPUT IDS IN INPUT OF ACTORS FOR THE NEXT TIME STEP
+            timenow = timenow*1.0 + param["dt_required"]*1.0
+            for process in process_bundle.keys():
+                if 'merge_' not in process:
+                        for ids in process_bundle[process]['output'].keys():
+                            if type(process_bundle[process]['input']) is dict \
+                               and ids in process_bundle[process]['input'].keys():
+                                  print('Copy '+ids+' from output to input for '+process+' for next time slice')
+                                  process_bundle[process]['input'][ids] = process_bundle[process]['output'][ids]
 
         input.close()
         output.close()

@@ -458,3 +458,15 @@ def gen_dict_extract(key, var):
                 for d in v:
                     for result in gen_dict_extract(key, d):
                         yield result
+
+############################################################################################
+def add_ids_entry_to_dict(dict_ids,ids):
+
+    import imas
+    if type(ids) is list:
+        value=[]
+        for each_ids in ids:
+            dict_ids[each_ids] = eval('imas.'+each_ids+'()')
+    else:
+        dict_ids[ids] = eval('imas.'+ids+'()')
+

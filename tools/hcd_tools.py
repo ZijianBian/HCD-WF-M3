@@ -30,25 +30,16 @@ def loadlist(listname):
     file = open(path + "/../global_configuration/" + "global_lists.yaml", "r")
     data = yaml.load(file, Loader=yaml.CLoader)
 
-    if listname == "ids_list":
-        output_list = data["ids_list"].split(" ")
-    elif listname == "actor_list":
-        output_list = data["actor_list"].split(" ")
-    elif listname == "merge_actor_list":
-        output_list = data["merge_actor_list"].split(" ")
-    elif listname == "algorithm":
-        output_list = data["algorithm"]
-    elif listname == "prerequisites":
-        output_list = data["prerequisites"]
-    elif listname == "extra_arguments":
-        output_list = data["extra_arguments"]
-    elif listname == "parallel_dependency":
-        output_list = data["parallel_dependency"]
-    elif listname == "exec_types":
-        output_list = data["exec_types"].split(" ")
-    else:
+    if listname not in data.keys():
         print("Error: bad listname in loadlist()", file=sys.stderr)
         output_list = []
+
+    for key in data.keys():
+        if listname == key:
+            try:
+                output_list = data[key].split(" ")
+            except:
+                output_list = data[key]
 
     return output_list
 
