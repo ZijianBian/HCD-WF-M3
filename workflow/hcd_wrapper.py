@@ -53,7 +53,7 @@ def hcd_wrapper(par_path):
 
         if len(list_of_processes) == 0:
             print(
-                "ERROR: no actor selected --> The Diagnostic workflow will not be executed",
+                "ERROR: no actor selected --> The H&CD workflow will not be executed",
                 file=sys.stderr,
             )
             return

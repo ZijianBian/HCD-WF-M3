@@ -46,8 +46,6 @@ def run(process, bundle, parameters):
 
     # For merge, bundle is a list of 2 bundles and the call is simpler
     if type(bundle) is list:
-        #ids_to_merge = cat.replace("merge_", "")
-        #return globals()[cat](bundle[0][ids_to_merge], bundle[1][ids_to_merge])
         return globals()[process](bundle[0], bundle[1])
 
     # Get list of all codes in that category
