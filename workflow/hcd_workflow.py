@@ -178,9 +178,13 @@ def hcd_workflow(process_bundle, workflow_xml):
                 catdict[process][parameters[process]]["name"].upper(),
             )
             output_ids_list = catdict[process][parameters[process]]["output"]
+            # REMOVE WARNINGS AND HCD2CORE_SOURCE CRASHS (DOES NOT LIKE RECEIVING EMPTY IDSS)
+            for ids in process_bundle[process]['input'].keys(): 
+                if process_bundle[process]['input'][ids].ids_properties.homogeneous_time < 1:
+                    process_bundle[process]['input'][ids].ids_properties.homogeneous_time = 1
+                    process_bundle[process]['input'][ids].time = process_bundle[process]['input']['core_profiles'].time
             output_ids_data = run(process, process_bundle[process]['input'], parameters)
         else:
-
             kmerge = 0
             ids_to_be_merged = process_bundle[process]['input'][0].__name__
             for each_proc in process_bundle.keys(): # merge only if at least one of involved codes is called
@@ -188,8 +192,6 @@ def hcd_workflow(process_bundle, workflow_xml):
                     kmerge = 1                
             if kmerge == 1:
                 print(" PROCESS -->", process)
-                #import pdb
-                #pdb.set_trace()
                 output_ids_data = run(process, process_bundle[process]['input'], parameters)
                 del bundle_out[output_ids_list[0]]
 
