@@ -14,7 +14,6 @@ from tools.hcd_tools import (
     is_ic_on,
     import_actor,
     loadlist,
-    is_compiled_for_mpi,
     create_maindict,
     clever_algo,
 )
@@ -32,17 +31,9 @@ workflow_xml = hcd_path + "/global_configuration/input_workflow_default.xml"
     uncompiled_actors,
     code_selection,
     catdict,
-) = create_maindict(workflow_xml, 2, 0)
+) = create_maindict(workflow_xml, 0)
 
-# LIST OF EMPTY ACTORS, MERGERS AND OF EXTRA (NON-IDS) ARGUMENTS FOR EACH ACTOR
-merge_actor_list = loadlist("merge_actor_list")
-extra_argument_list = loadlist("extra_arguments")
-list_of_actors = compiled_actors + merge_actor_list
-for name in list_of_actors:
-    err = import_actor(name, 0)
-
-
-def run(process, bundle, parameters):
+def run(process, actor, bundle, parameters):
 
     # For merge, bundle is a list of 2 bundles and the call is simpler
     if type(bundle) is list:
@@ -59,51 +50,29 @@ def run(process, bundle, parameters):
         oldstrout, newstdout = redirect_stdout(stdout_redirect)
 
     inputargs = []
-    extra_arg_nr = 0
-    inputxml = []
     for i in codeinfo["input"]:
-        if (
-            i.find("extra_argument_list") is not -1
-            and extra_argument_list.get(code) is not None
-        ):
-            inputargs.append(parameters[extra_argument_list[code][extra_arg_nr]])
-            extra_arg_nr += 1
-        elif i.find("codeparam") is not -1:
-            inputxml.append(
-                parameters["input_path"]
-                + "/"
-                + codeinfo["system"]
-                + "/input_"
-                + code
-                + ".xml"
-            )
-        else:
-            inputargs.append(bundle[i])
+        inputargs.append(bundle[i])
 
-    inputmpi = []
-    libmpi_path = eval(code + ".location") + "/native_wrapper/lib/lib" + code + ".so"
-    args_np = {}
-    if os.path.isfile(libmpi_path) is True and is_compiled_for_mpi(
-        libmpi_path, "libmpi"
-    ):
-        tree = etree.parse(inputxml[0])
-        root = tree.getroot()
-        for elem in root.iter():
-            if elem.tag == "nproc_actor":
-                nproc_actor = int(elem.text)
-                print("MPI code --> nproc_actor = ", nproc_actor)
-        args_np = {"mpi_processes": nproc_actor}
-        exec_type = None
-        if code in parameters.keys():
-            exec_type = parameters[code]
-        if exec_type == None:
-            inputmpi.append("mpi_local")
-        else:
-            inputmpi.append(exec_type)
+    if 0:
+        inputmpi = []
+        args_np = {}
+        if actor.is_mpi_code is True:
+            tree = etree.parse(inputxml[0])
+            root = tree.getroot()
+            for elem in root.iter():
+                if elem.tag == "nproc_actor":
+                    nproc_actor = int(elem.text)
+                    print("MPI code --> nproc_actor = ", nproc_actor)
+            args_np = {"mpi_processes": nproc_actor}
+            exec_type = None
+            if code in parameters.keys():
+                exec_type = parameters[code]
+            if exec_type == None:
+                inputmpi.append("mpi_local")
+            else:
+                inputmpi.append(exec_type)
 
-    inputs = inputargs + inputxml + inputmpi
-
-    results = globals()[code](*inputs, **args_np)
+    results = actor(*inputargs)
 
     # Re-direct the logfile for this specific actor
     if code + "_log" in parameters.keys():
@@ -116,7 +85,7 @@ def run(process, bundle, parameters):
 # -------------------------------------------------------------------------------------------------
 
 
-def hcd_workflow(process_bundle, workflow_xml):
+def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
 
     print("Execute H&CD workflow for current time slice", file=sys.stdout)
 
@@ -170,6 +139,7 @@ def hcd_workflow(process_bundle, workflow_xml):
 
     # EXECUTION OF THE WORKFLOW
     for process in final_algorithm:
+        actor = dictionary_of_actors[catdict[process][parameters[process]]['name']]
         if not "merge_" in process:
             print(
                 " PROCESS --> ",
@@ -183,7 +153,9 @@ def hcd_workflow(process_bundle, workflow_xml):
                 if process_bundle[process]['input'][ids].ids_properties.homogeneous_time < 1:
                     process_bundle[process]['input'][ids].ids_properties.homogeneous_time = 1
                     process_bundle[process]['input'][ids].time = process_bundle[process]['input']['core_profiles'].time
-            output_ids_data = run(process, process_bundle[process]['input'], parameters)
+            #import pdb
+            #pdb.set_trace()
+            output_ids_data = run(process, actor, process_bundle[process]['input'], parameters)
         else:
             kmerge = 0
             ids_to_be_merged = process_bundle[process]['input'][0].__name__
@@ -192,7 +164,7 @@ def hcd_workflow(process_bundle, workflow_xml):
                     kmerge = 1                
             if kmerge == 1:
                 print(" PROCESS -->", process)
-                output_ids_data = run(process, process_bundle[process]['input'], parameters)
+                output_ids_data = run(process, actor, process_bundle[process]['input'], parameters)
                 del bundle_out[output_ids_list[0]]
 
         for iids in range(len(output_ids_list)):

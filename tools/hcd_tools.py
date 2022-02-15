@@ -61,18 +61,21 @@ def __syspath_import_actor(actor_name, verbose):
 
     # Import the actor function
     actor_function = getattr(
-        import_module(actor_name + ".wrapper"), actor_name + "_actor"
-    )
-
-    # Folder where the actor is located
-    actor_function.location = "/".join(
-        getattr(actor_module, "__file__").split("/")[:-1]
-    )
+        import_module(actor_name + ".actor"), actor_name
+    )()
 
     return actor_function, 0
 
 
 #####################################################################################
+def where_am_i():
+    from inspect import stack
+    stk = stack()
+    nstack = len(stk)
+    stackpath = ''
+    for istack in reversed(range(nstack)):
+        stackpath = stackpath+'/'+stk[istack][3]
+    print('Stack = ',stackpath)
 
 # -----------------------------
 # Function to import an actor
@@ -81,9 +84,12 @@ def import_actor(actor_input, verbose):
 
     error = 0
 
+    #if actor_input == 'torbeam':
+    #    where_am_i()
+    
     # Import the actor(s) and put into a dictionary
     dictactor = {}
-    if type(actor_input) is str:
+    if type(actor_input) == str:
         dictactor[actor_input], error = __syspath_import_actor(actor_input, verbose)
     else:
         for actor_name in actor_input:
@@ -170,35 +176,20 @@ def bundle_copy(input_bundle, idslist=None, origin_bundle=None):
 
 def read_actor_ids(name, verbose):
     ids_list = loadlist("ids_list")
-    input_ids_list = []
-    input_arg_list = []
+    input_ids_list  = []
     output_ids_list = []
     err = import_actor(name, verbose)
+    actor = eval(name)
+    
     if err == 0:
-        parstr = eval(name + ".__doc__")
 
-        for elem in parstr.split("\n"):
-
-            for iids in ids_list:
-                if elem.find(":param " + iids) is not -1:
-                    input_ids_list.append(iids)
-                    input_arg_list.append(iids)
-                    break
-                elif elem.find("integ") is not -1:
-                    input_arg_list.append("extra_argument_list")
-                    break
-                elif elem.find("doub") is not -1:
-                    input_arg_list.append("extra_argument_list")
-                    break
-                elif elem.find("codeparam") is not -1:
-                    input_arg_list.append("codeparam")
-                    break
-                elif (
-                    elem.find(":param result: ") is not -1 and elem.find(iids) is not -1
-                ):
-                    output_ids_list.append(iids)
-
-    return (input_ids_list, input_arg_list, output_ids_list, err)
+        for ids in actor.arguments:
+            if ids.intent=='IN':
+                input_ids_list.append(ids.type)
+            elif ids.intent=='OUT':
+                output_ids_list.append(ids.type)
+        
+    return (input_ids_list, output_ids_list, err)
 
 
 #####################################################################################
@@ -208,7 +199,7 @@ def read_actor_ids(name, verbose):
 # their input & output IDSs, their category (ec_wavesolver, nbi_source, ..),
 # and the H&CD system they belong to (EC, IC, NBI, nuclear)
 # ---------------------------------------------------------------------------------
-def create_maindict(workflow_parameters_path, input_option, verbose):
+def create_maindict(workflow_parameters_path,verbose):
 
     # MEMO: STRUCTURE OF THE INPUT XML FILE
     # ROOT.ITER() = LOOP OVER ALL ELEMENTS OF THE INPUT XML FILE
@@ -244,7 +235,7 @@ def create_maindict(workflow_parameters_path, input_option, verbose):
     #        print('  system',system)
     #        for category in system:
     #            print('    category',category)
-    #            if category.tag is not etree.Comment:
+    #            if category.tag != etree.Comment:
     #                for actor_name in category.attrib['list'].split():
     #                    print('     actor_name',actor_name)
 
@@ -255,7 +246,7 @@ def create_maindict(workflow_parameters_path, input_option, verbose):
             for category in system:
                 list_actor = []
                 dict_actor = {}
-                if category.tag is not etree.Comment:
+                if category.tag != etree.Comment:
                     for actor_name in category.attrib["list"].split():
                         if actor_name in not_compiled_list:
                             verbose_eff = 0
@@ -263,7 +254,6 @@ def create_maindict(workflow_parameters_path, input_option, verbose):
                             verbose_eff = verbose
                             (
                                 input_ids_list,
-                                input_arg_list,
                                 output_ids_list,
                                 err,
                             ) = read_actor_ids(actor_name, verbose_eff)
@@ -271,26 +261,15 @@ def create_maindict(workflow_parameters_path, input_option, verbose):
                             compiled_list.append(actor_name)
                         else:
                             not_compiled_list.append(actor_name)
-                        if input_option == 1:
-                            dict_actor[actor_name] = [input_ids_list, output_ids_list]
-                            list_actor.append(
-                                {
-                                    "name": actor_name,
-                                    "input": input_ids_list,
-                                    "output": output_ids_list,
-                                    "system": system.tag,
-                                }
-                            )
-                        else:
-                            dict_actor[actor_name] = [input_arg_list, output_ids_list]
-                            list_actor.append(
-                                {
-                                    "name": actor_name,
-                                    "input": input_arg_list,
-                                    "output": output_ids_list,
-                                    "system": system.tag,
-                                }
-                            )
+                        dict_actor[actor_name] = [input_ids_list, output_ids_list]
+                        list_actor.append(
+                            {
+                                "name": actor_name,
+                                "input": input_ids_list,
+                                "output": output_ids_list,
+                                "system": system.tag,
+                            }
+                        )
                     # Prepend empty_* code
                     list_actor.insert(
                         0,
@@ -301,7 +280,7 @@ def create_maindict(workflow_parameters_path, input_option, verbose):
                             "system": system.tag,
                         },
                     )
-                    if category.text is not "0":
+                    if category.text != "0":
                         code_selection[category.tag] = category.attrib["list"].split(
                             " "
                         )[int(category.text) - 1]
@@ -327,23 +306,12 @@ def create_maindict(workflow_parameters_path, input_option, verbose):
 def __get_result(p):
     stdout = p.communicate()
     for s in stdout:
-        if len(s) is not 0:
+        if len(s) != 0:
             res = True
-        elif len(s) is 0:
+        elif len(s) == 0:
             res = False
         break
     return res
-
-
-def __run_cmd(cmd):
-    p = Popen(cmd, shell=True, stdout=PIPE)
-    p.wait()
-    return __get_result(p)
-
-
-def is_compiled_for_mpi(file_path, grep_str):
-    cmd = "ldd " + file_path + "| grep " + grep_str
-    return __run_cmd(cmd)
 
 
 #####################################################################################
@@ -359,13 +327,13 @@ def check_for_prerequisites(workflow_xml):
         code = code_selection[entry]
         if prerequisites[entry] == "None":
             prerequisites[entry] = None
-        if prerequisites[entry] is not None and code in prerequisites[entry]:
+        if prerequisites[entry] != None and code in prerequisites[entry]:
             fulfills_all_prerequisites = [1] * (len(prerequisites[entry][code]))
             for dep in [prerequisites[entry][code]]:
                 for i in dep.keys():
-                    if "any" in str(dep[i]) and code_selection[i] is not None:
+                    if "any" in str(dep[i]) and code_selection[i] != None:
                         pass
-                    elif str(dep[i]).find(str(code_selection[i])) is not -1:
+                    elif str(dep[i]).find(str(code_selection[i])) != -1:
                         pass
                     else:
                         if str(dep[i]) == "any":
@@ -407,7 +375,7 @@ def check_for_prerequisites(workflow_xml):
         uncompiled_actors,
         code_selection,
         catdict,
-    ) = create_maindict(workflow_xml, 1, 0)
+    ) = create_maindict(workflow_xml, 0)
 
     # LOAD THE LIST OF PREREQUISITES BETWEEN THE CODES
     prerequisites = loadlist("prerequisites")
@@ -415,7 +383,7 @@ def check_for_prerequisites(workflow_xml):
     # FOR EACH OF THE SELECTED ACTORS, CHECK THAT DEPENDENCY RULES ARE FULFILLED
     global_error = 0
     for entry in code_selection:
-        if code_selection is not None:
+        if code_selection != None:
             err = check_if_code_fulfills_configuration(
                 prerequisites, entry, code_selection
             )
@@ -446,14 +414,14 @@ def create_workflow_param_from_file(workflow_parameters_path, option):
         for iroot in range(2):
             workflow_param[root[iroot].attrib["display"]] = {}
             for elem in root[iroot].iter():
-                if len(elem) == 0 and elem.tag is not etree.Comment:
+                if len(elem) == 0 and elem.tag != etree.Comment:
                     workflow_param[root[iroot].attrib["display"]][elem.tag] = elem.text
 
     # Without the 2-tree structure of the input xml file
     else:
         workflow_param = {}
         for elem in root.iter():
-            if len(elem) == 0 and elem.tag is not etree.Comment:
+            if len(elem) == 0 and elem.tag != etree.Comment:
                 try:
                     workflow_param[elem.tag] = int(elem.text)
                 except:
@@ -635,7 +603,7 @@ def clever_algo(algo_input, parameters, catdict):
                 for keystep in waiting_for.keys():
                     if (
                         "dependencies" in waiting_for[keystep]
-                        and waiting_for[keystep]["dependencies"] is not None
+                        and waiting_for[keystep]["dependencies"] != None
                     ):
                         # Remove indirect dependencies
                         if (
@@ -661,7 +629,7 @@ def clever_algo(algo_input, parameters, catdict):
             parallel_runs[parallel_step] = [waiting_for[key]["steprun"]]
         else:
             there_is_a_dependency = False
-            if waiting_for[key]["dependencies"] is not None:
+            if waiting_for[key]["dependencies"] != None:
                 for dep in waiting_for[key]["dependencies"]:
                     if dep in parallel_runs[parallel_step]:
                         there_is_a_dependency = True

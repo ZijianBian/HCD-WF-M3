@@ -23,20 +23,20 @@
 
       <ICRH>
 	<ic_coup list="iccoup">0</ic_coup> 
-	<ic_wave_solver list="Cyrano tomcat pion lion">0</ic_wave_solver>
-	<ic_wave_fp list="StixReDist fopla">0</ic_wave_fp>
+	<ic_wave_solver list="cyrano tomcat pion lion">0</ic_wave_solver>
+	<ic_wave_fp list="stixredist fopla">0</ic_wave_fp>
       </ICRH>
     
 
       <NBI>
-	<nbi_source list="nemo bbnbi">0</nbi_source>
-	<nbi_fp list="risk spot ascot4serial ascot4parallel nbisim2 nerinet">0</nbi_fp>
+	<nbi_source list="nemo bbnbi_serial bbnbi_parallel">0</nbi_source>
+	<nbi_fp list="risk spot ascot_serial ascot_parallel nbisim">0</nbi_fp>
       </NBI>
     
 
       <NUCLEAR>
 	<nuclear_source list="afsi">0</nuclear_source> <!-- 0: none 1: AFSI -->
-	<nuclear_fp list="spot ascot4serial ascot4parallel">0</nuclear_fp>
+	<nuclear_fp list="spot ascot_serial ascot_parallel">0</nuclear_fp>
       </NUCLEAR>
     </systems> 
 

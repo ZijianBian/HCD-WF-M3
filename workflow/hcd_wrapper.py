@@ -6,6 +6,7 @@ import numpy as np
 
 from workflow.hcd_workflow import hcd_workflow
 from tools.hcd_tools import (
+    import_actor,
     read_actor_ids,
     bundle_copy,
     create_dict_from_idslist,
@@ -43,7 +44,7 @@ def hcd_wrapper(par_path):
             uncompiled_actors,
             code_selection,
             catlist,
-        ) = create_maindict(workflow_xml, 1, 0)
+        ) = create_maindict(workflow_xml, 0)
 
         # LIST OF ACTIVATED PROCESSES AND SELECTED ACTORS
         list_of_processes = {}
@@ -67,7 +68,6 @@ def hcd_wrapper(par_path):
         for process,actor in list_of_processes.items():
             [
                 single_input_ids_list,
-                single_input_arg_list,
                 single_output_ids_list,
                 err,
             ] = read_actor_ids(actor, 0)
@@ -78,6 +78,24 @@ def hcd_wrapper(par_path):
             add_ids_entry_to_dict(process_bundle[process]['input'],single_input_ids_list)
             add_ids_entry_to_dict(process_bundle[process]['output'],single_output_ids_list)
 
+        # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
+        dictionary_of_actors = {}
+        for hsys in maindict:
+            for cat in maindict[hsys]:
+                for proc in maindict[hsys][cat]:
+                    for actor_name in maindict[hsys][cat][proc]:
+                        if actor_name in list_of_processes.values():
+                            err = import_actor(actor_name,0)
+                            actor = eval(actor_name)
+                            runtime_settings = actor.get_runtime_settings() # IMAS-4055
+                            runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND # IMAS-4055
+                            code_parameters = actor.get_code_parameters()
+                            code_parameters.parameters_path = par_path+"/"+cat+"/input_"+actor_name+".xml"
+                            actor.initialize(code_parameters=code_parameters,runtime_settings=runtime_settings) # IMAS-4055
+                            dictionary_of_actors[actor_name] = actor
+                            
+        import pdb
+        pdb.set_trace()
         common_bundle = {}
         add_ids_entry_to_dict(common_bundle,ids_scenario_list)
 
@@ -298,53 +316,41 @@ def hcd_wrapper(par_path):
                     print("  ----> Aborted.", file=sys.stderr)
                     return
 
-            process_bundle = hcd_workflow(process_bundle, workflow_xml)
+            process_bundle = hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors)
 
+            # ------------------------------
+            # COMMON BUNDLE TO SAVE TO DISK
+            # ------------------------------
             for ids in common_bundle.keys():
-
-                # IF THE IDS IS NOT EMPTY (INPUT OR OUTPUT) IT IS GOING TO BE SAVED USING THE TIME OF
-                # THE WORKFLOW (TO AVOID SAVING IDENTICAL TIME VALUES IN CASE THE WORKFLOW TIME
-                # RESOLUTION IS SCARCER THAN THE INPUT ONE)
                 if common_bundle[ids].ids_properties.homogeneous_time >= 0:
-                    common_bundle[ids].time = np.array([timenow])
+                    output.put_slice(common_bundle[ids])
 
-                    # FIRST TIME SLICE: PUT() INSTEAD OF PUT_SLICE() TO SAVE ALSO STATIC DATA
-                    if timenow == param["tbegin"]:
-                        output.put(common_bundle[ids])
-
-                    # OTHER TIME SLICES: SAVE ONLY THE TIME SLICE
-                    else:
-                        output.put_slice(common_bundle[ids])
-
+            # ------------------------------
             # OUTPUT BUNDLE TO SAVE TO DISK
+            # ------------------------------
             process_bundle_out = {}
-            # SAVE THE MERGER OUTPUT IDS IF THERE IS ANY
+
+            # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
             for process in process_bundle.keys():
                 if 'merge_' in process:
                     key, value = list(process_bundle[process]['output'].items())[0]
                     process_bundle_out[key] = value
-            # SAVE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
+
+            # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
             for process in process_bundle.keys():
-                    for key, value in process_bundle[process]['output'].items():
-                        if key not in process_bundle_out.keys():
-                            process_bundle_out[key] = value
+                for key, value in process_bundle[process]['output'].items():
+                    if key not in process_bundle_out.keys():
+                        process_bundle_out[key] = value
+
             # SAVE TO DISK
             for ids in process_bundle_out.keys():
+                if process_bundle_out[ids].time[0] > 0 or 'merge' in process_bundle_out[ids].code.name:
+                    output.put_slice(process_bundle_out[ids])
+                    previous_time[ids] = process_bundle_out[ids].time[0]
 
-                # FIRST TIME SLICE: PUT() INSTEAD OF PUT_SLICE() TO SAVE ALSO STATIC DATA
-                if ids not in previous_time:
-                    if process_bundle_out[ids].time[0] > 0 or 'merge' in process_bundle_out[ids].code.name:
-                        output.put(process_bundle_out[ids])
-                        previous_time[ids] = process_bundle_out[ids].time[0]
-                # OTHER TIME SLICES: SAVE ONLY THE TIME SLICE
-                else:
-                    if process_bundle_out[ids] != {}:
-                        if process_bundle_out[ids].time[0] > previous_time[ids] \
-                           or 'merge' in process_bundle_out[ids].code.name:
-                              output.put_slice(process_bundle_out[ids])
-                              previous_time[ids] = process_bundle_out[ids].time[0]
-
+            # ------------------------------------------------------------------------------------------
             # PREPARE FOR THE NEXT TIME STEP: COPY OUTPUT IDS IN INPUT OF ACTORS FOR THE NEXT TIME STEP
+            # ------------------------------------------------------------------------------------------
             timenow = timenow*1.0 + param["dt_required"]*1.0
             for process in process_bundle.keys():
                 if 'merge_' not in process:
@@ -356,6 +362,10 @@ def hcd_wrapper(par_path):
 
         input.close()
         output.close()
+
+        # FINALIZE ALL ACTORS
+        for actor_name,actor in dictionary_of_actors.items():
+            actor.finalize()
 
         print("---------------------------------------------", file=sys.stdout)
         print("End of H&CD workflow.", file=sys.stdout)

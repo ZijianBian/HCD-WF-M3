@@ -38,7 +38,8 @@ def read_and_save_codeparam(
     current_config_folder, previous_folder, hsys, actor_name, default
 ):
 
-    from tools.hcd_tools import import_actor, is_compiled_for_mpi
+    from tools.hcd_tools import import_actor
+    import glob
 
     # NAME OF THE CODEPARAM FILE FOR THIS ACTOR IN THE CURRENT CONFIGURATION FOLDER
     codeparam_destination_path = (
@@ -51,59 +52,48 @@ def read_and_save_codeparam(
 
     # IMPORT THE ACTOR TO KNOW WHERE IT IS LOCATED
     import_actor(actor_name, 0)
-    actor_python_folder = eval(actor_name + ".location")
+    actor = eval(actor_name)
 
     # LOOK FOR ITS XML AND XSD FILES FOR USER-DEFINED PARAMETERS
     found_xml = False
-    found_xsd = False
-    with open(actor_python_folder + "/wrapper.py") as pfile:
-        for iline in pfile:
-            if "xml_location = " in iline and "_default_xml_location" not in iline:
-                # CHECK IF THE XML FILE EXISTS IN THE DESTINATION FOLDER ALREADY
-                if os.path.exists(codeparam_destination_path) and default is False:
-                    codeparam_xml_path = codeparam_destination_path
-                    found_xml = True
-                # IF NOT, COPY IT FROM THE ACTOR LOCATION
-                else:
-                    xml_name = (
-                        iline.split("+")[-1]
-                        .replace("'", "")
-                        .replace(" ", "")
-                        .replace("\n", "")
+    founx_xsd = False
+    
+    # CHECK IF THE XML FILE EXISTS IN THE DESTINATION FOLDER ALREADY
+    if os.path.exists(codeparam_destination_path) and default is False:
+        codeparam_xml_path = codeparam_destination_path
+        found_xml = True
+    # IF NOT, COPY IT FROM THE ACTOR LOCATION
+    else:
+        try:
+            codeparam_xml_path = glob.glob(actor.actor_dir+'/input/*.xml')[0]
+            found_xml = True
+        except:
+            codeparam_xml_path = None
+
+        if codeparam_xml_path is not None:
+            copy2(
+                codeparam_xml_path,
+                codeparam_destination_path,
+                follow_symlinks=True,
+            )
+            # IF DEFAULT IS NOT REQUIRED AND IF CONFIG LOADED FROM A PREVIOUS RUN,
+            # REPLACE THE XML FILE BY THE ONE OF THE PREVIOUS CONFIGURATION
+            if previous_folder is not None and default is False:
+                xml_name = hsys + "/input_" + actor_name + ".xml"
+                codeparam_xml_path = previous_folder + "/" + xml_name
+                if codeparam_xml_path != codeparam_destination_path:
+                    copy2(
+                        codeparam_xml_path,
+                        codeparam_destination_path,
+                        follow_symlinks=True,
                     )
-                    if not "None" in xml_name:
-                        codeparam_xml_path = actor_python_folder + xml_name
-                        copy2(
-                            codeparam_xml_path,
-                            codeparam_destination_path,
-                            follow_symlinks=True,
-                        )
-                        # IF DEFAULT IS NOT REQUIRED AND IF CONFIG LOADED FROM A PREVIOUS RUN,
-                        # REPLACE THE XML FILE BY THE ONE OF THE PREVIOUS CONFIGURATION
-                        if previous_folder is not None and default is False:
-                            xml_name = hsys + "/input_" + actor_name + ".xml"
-                            codeparam_xml_path = previous_folder + "/" + xml_name
-                            if codeparam_xml_path != codeparam_destination_path:
-                                copy2(
-                                    codeparam_xml_path,
-                                    codeparam_destination_path,
-                                    follow_symlinks=True,
-                                )
-                        found_xml = True
+            found_xml = True
 
-            if "xsd_location = " in iline:
-                xsd_name = (
-                    iline.split("+")[-1]
-                    .replace("'", "")
-                    .replace(" ", "")
-                    .replace("\n", "")
-                )
-                if not "None" in xsd_name:
-                    codeparam_xsd_path = actor_python_folder + xsd_name
-                    found_xsd = True
-
-            if found_xml is True and found_xsd is True:
-                break
+    try:
+        codeparam_xsd_path = glob.glob(actor.actor_dir+'/input/*.xsd')[0]
+        found_xsd = True
+    except:
+        codeparam_xsd_path = None
 
     # READ THE ADDITIONAL INFORMATION FROM THE XSD FILE
     if found_xsd:
@@ -133,14 +123,10 @@ def read_and_save_codeparam(
 
     # IF CODE COMPILED WITH MPI: ADD NUMBER OF PROCESSORS AS EDITABLE PARAMETERS
     # (ONLY WHEN FOUND_XML=TRUE, I.E. ONLY THE FIRST TIME)
-    libmpi_path = (
-        eval(actor_name + ".location") + "/native_wrapper/lib/lib" + actor_name + ".so"
-    )
     if found_xml:
         elem.tail = "\n\n  "
         if (
-            os.path.isfile(libmpi_path) is True
-            and is_compiled_for_mpi(libmpi_path, "libmpi")
+            actor.is_mpi_code is True
             and "nproc_actor" not in codeparam_dict.keys()
         ):
             codeparam_dict["nproc_actor"] = " 4 "
@@ -156,8 +142,7 @@ def read_and_save_codeparam(
             tree.write(codeparam_destination_path, pretty_print=True)
     if found_xsd:
         if (
-            os.path.isfile(libmpi_path) is True
-            and is_compiled_for_mpi(libmpi_path, "libmpi")
+            actor.is_mpi_code is True
             and "nproc_actor" not in docum_dict.keys()
         ):
             docum_dict["nproc_actor"] = "Number of processors to run this code"
@@ -226,7 +211,7 @@ def save_codeparam_to_file(
 
     for hsys in maindict:
         for cat in maindict[hsys]:
-            if int(workflow_param[cod_ref][cat]) is not 0:
+            if int(workflow_param[cod_ref][cat]) != 0:
                 actor_name = list(maindict[hsys][cat].keys())[
                     int(workflow_param[cod_ref][cat]) - 1
                 ]
@@ -285,7 +270,7 @@ def save(
         first_save = 0
 
     # When operation is cancelled from the interface
-    if current_config_folder is () or current_config_folder == "":
+    if current_config_folder == () or current_config_folder == "":
         print("Save_as cancelled.", file=sys.stderr)
         return None
 
@@ -374,7 +359,7 @@ def destr_and_make(removed_by_close_button, window, maindict, workflow_param):
 ############################################################################################
 def load(chosen_folder, open_gui):
 
-    if chosen_folder is () or chosen_folder == "":
+    if chosen_folder == () or chosen_folder == "":
         print("Load cancelled", file=sys.stderr)
         return
 

@@ -103,7 +103,7 @@ def open_gui(wf_param_file):
         uncompiled_actors,
         code_selection,
         catlist,
-    ) = create_maindict(wf_param_file, 1, 1)
+    ) = create_maindict(wf_param_file, 1)
     workflow_param = create_workflow_param_from_file(wf_param_file, 1)
 
     ### setup

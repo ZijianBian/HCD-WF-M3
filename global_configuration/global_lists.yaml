@@ -28,10 +28,11 @@ ids_process_list:
 
 actor_list:
     afsi
-    ascot4parallel 
-    ascot4serial 
-    bbnbi 
-    Cyrano 
+    ascot_parallel
+    ascot_serial 
+    bbnbi_parallel
+    bbnbi_serial
+    cyrano
     genray 
     gray
     grayscale
@@ -39,16 +40,15 @@ actor_list:
     hcd2core_profiles  
     iccoup 
     lion
-    nbisim2
+    nbisim
     nemo 
     pion 
     risk 
     spot 
-    StixReDist 
+    stixredist
     tomcat 
     torbeam
     fopla
-    nerinet
 
 merge_actor_list:
     merge_waves
@@ -67,7 +67,7 @@ prerequisites:
    ic_coup: None
    ic_wave_solver: None
    ic_wave_fp:
-       StixReDist:
+       stixredist:
           ic_wave_solver: any
        fopla:
           nbi_source: any
@@ -82,11 +82,6 @@ prerequisites:
    nuclear_fp: None
    fill_core_sources: None
    fill_core_profiles: None
-
-extra_arguments:
-   risk:   [dt_required]
-   spot:   [dt_required]
-   pion:   [tbegin,tend,dt_required]
 
 parallel_dependency:
    ec_wave_solver:             None
