@@ -26,6 +26,16 @@ def codeparam_interface(
     tree = etree.parse(codeparam_xml_path)
     root = tree.getroot()
 
+    # FOR MPI ACTORS, ARTIFICIALLY ADD NPROC_ACTOR TO THE TREE OF THE CODE PARAMETERS XML FILE
+    #nproc_actor = -1
+    #codeparam_xml_nproc_path = codeparam_xml_path.replace('.xml','_nproc.xml')
+    #if os.path.exists(codeparam_xml_nproc_path):
+    #    tree_nproc = etree.parse(codeparam_xml_nproc_path)
+    #    root_nproc = tree_nproc.getroot()
+    #    for elem in root_nproc.iter():
+    #        continue
+    #    root.append(elem)
+
     rrow = 1
     ccolumn = 0
 

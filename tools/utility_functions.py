@@ -24,12 +24,14 @@ def save_workflow_param_to_file(
     # Update workflow parameter file if changed from the interface
     tree = etree.parse(current_wf_param_file)
     root = tree.getroot()
+    root.tail = "\n"
     rl = [wfp_ref, cod_ref]
     for iroot in range(2):
         for elem in root[iroot].iter():
             if elem.tag is not etree.Comment and len(elem) == 0:
                 elem.text = workflow_param[rl[iroot]][elem.tag]
-    tree.write(current_wf_param_file)
+    elem.tail = "\n"
+    tree.write(current_wf_param_file, xml_declaration=True, encoding='UTF-8')
     return 0
 
 
@@ -98,6 +100,7 @@ def read_and_save_codeparam(
     # READ THE ADDITIONAL INFORMATION FROM THE XSD FILE
     if found_xsd:
         xmlschema_doc = etree.parse(codeparam_xsd_path)
+        xmlschema_doc.write(codeparam_destination_path.replace('.xml','.xsd'), pretty_print=True)
         root_xsd = xmlschema_doc.getroot()
         xmlschema = etree.XMLSchema(xmlschema_doc)
         docum_dict = {}
@@ -122,13 +125,14 @@ def read_and_save_codeparam(
         codeparam_dict = {}
 
     # IF CODE COMPILED WITH MPI: ADD NUMBER OF PROCESSORS AS EDITABLE PARAMETERS
+    # TO AN ADDITIONAL XML FILE FOR THIS ACTOR
     # (ONLY WHEN FOUND_XML=TRUE, I.E. ONLY THE FIRST TIME)
     if found_xml:
-        elem.tail = "\n\n  "
         if (
             actor.is_mpi_code is True
             and "nproc_actor" not in codeparam_dict.keys()
         ):
+            print('lelelelelele')
             codeparam_dict["nproc_actor"] = " 4 "
             comment = etree.Comment(
                 " Number of processors for parallel run (parameter added by HCD wf) "
@@ -139,7 +143,29 @@ def read_and_save_codeparam(
             nproc.tail = "\n\n  "
             root.append(comment)
             root.append(nproc)
-            tree.write(codeparam_destination_path, pretty_print=True)
+            tree.write(codeparam_destination_path, xml_declaration=True, encoding='UTF-8')
+            #rtp = etree.Element("parallel")
+            #rtp.tail = "\n"
+            #nproc_actor = etree.Element("nproc_actor")
+            #nproc_actor.text = codeparam_dict["nproc_actor"]
+            #nproc_actor.tail = "\n"
+            #comment = etree.Comment(" Number of processors for parallel run (parameter added by HCD wf) ")
+            #comment.tail = "\n"
+            #rtp.append(comment)
+            #rtp.append(nproc_actor)
+            #tree_rtp = etree.ElementTree(rtp)
+            #tree_rtp.write(current_config_folder+"/"+hsys+"/input_"+actor_name+"_nproc.xml",
+            #               xml_declaration=True, encoding='UTF-8')
+    #else:
+    #    if actor.is_mpi_code is True:
+    #        print('lulululululu')
+    #        codeparam_xml_nproc_path = current_config_folder+"/"+hsys+"/input_"+actor_name+"_nproc.xml"
+    #        tree_nproc = etree.parse(codeparam_xml_nproc_path)
+    #        root_nproc = tree_nproc.getroot()
+    #        for elem in root_nproc.iter():
+    #            codeparam_dict["nproc_actor"] = elem.text
+    #    root.append(elem)
+
     if found_xsd:
         if (
             actor.is_mpi_code is True
@@ -167,7 +193,8 @@ def read_and_save_codeparam(
             xmlschema = etree.XMLSchema(xmlschema_doc)
             if xmlschema.validate(root) is False:
                 print(xmlschema.error_log.filter_from_errors()[0])
-
+            xmlschema_doc.write(codeparam_destination_path.replace('.xml','.xsd'), pretty_print=True)
+        
     return (
         codeparam_destination_path,
         codeparam_dict,
@@ -182,10 +209,12 @@ def update_codeparam_file(codeparam_destination_path, codeparam_dict, verbose):
 
     tree = etree.parse(codeparam_destination_path)
     root = tree.getroot()
+    root.tail = "\n"
     for elem in root.iter():
         if elem.tag is not etree.Comment and len(elem) == 0:
             elem.text = codeparam_dict[elem.tag]
-    tree.write(codeparam_destination_path)
+    elem.tail = "\n"
+    tree.write(codeparam_destination_path, xml_declaration=True, encoding='UTF-8')
 
     if verbose == 1:
         print(

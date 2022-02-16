@@ -53,25 +53,6 @@ def run(process, actor, bundle, parameters):
     for i in codeinfo["input"]:
         inputargs.append(bundle[i])
 
-    if 0:
-        inputmpi = []
-        args_np = {}
-        if actor.is_mpi_code is True:
-            tree = etree.parse(inputxml[0])
-            root = tree.getroot()
-            for elem in root.iter():
-                if elem.tag == "nproc_actor":
-                    nproc_actor = int(elem.text)
-                    print("MPI code --> nproc_actor = ", nproc_actor)
-            args_np = {"mpi_processes": nproc_actor}
-            exec_type = None
-            if code in parameters.keys():
-                exec_type = parameters[code]
-            if exec_type == None:
-                inputmpi.append("mpi_local")
-            else:
-                inputmpi.append(exec_type)
-
     results = actor(*inputargs)
 
     # Re-direct the logfile for this specific actor

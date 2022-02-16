@@ -192,7 +192,7 @@ def make_flowchart(removed_by_close_button, window, maindict, workflow_param):
 
         if (
             sum([int(workflow_param[cod_ref][i]) for i in maindict[actors_ref][hsys]])
-            is not 0
+            != 0
         ):
             isys += 1
             oldlabel = hcdla
@@ -202,7 +202,7 @@ def make_flowchart(removed_by_close_button, window, maindict, workflow_param):
 
             for cat in maindict[actors_ref][hsys]:
                 icat = 0
-                if int(workflow_param[cod_ref][cat]) is not 0:
+                if int(workflow_param[cod_ref][cat]) != 0:
                     curval = list(maindict[actors_ref][hsys][cat])[
                         int(workflow_param[cod_ref][cat]) - 1
                     ]
@@ -289,7 +289,7 @@ def make_flowchart(removed_by_close_button, window, maindict, workflow_param):
     for hsys in maindict[actors_ref]:
         if (
             sum([int(workflow_param[cod_ref][i]) for i in maindict[actors_ref][hsys]])
-            is not 0
+            != 0
         ):
             isys += 1
             if ccol > 1:
@@ -310,14 +310,14 @@ def make_flowchart(removed_by_close_button, window, maindict, workflow_param):
                 int(workflow_param[cod_ref][cat]) - 1
             ]
 
-            if (int(workflow_param[cod_ref][cat]) is not 0) and (
-                curval.find("iccoup") is -1
+            if (int(workflow_param[cod_ref][cat]) != 0) and (
+                curval.find("iccoup") == -1
             ):
                 if (
                     "".join(maindict[actors_ref][hsys][cat][curval][1]).find(
                         "distributions"
                     )
-                    is not -1
+                    != -1
                 ):
                     merge_distributions += 1
 
@@ -325,13 +325,13 @@ def make_flowchart(removed_by_close_button, window, maindict, workflow_param):
                     "".join(maindict[actors_ref][hsys][cat][curval][1]).find(
                         "distribution_sources"
                     )
-                    is not -1
+                    != -1
                 ):
                     merge_distribution_sources += 1
 
                 if (
                     "".join(maindict[actors_ref][hsys][cat][curval][1]).find("waves")
-                    is not -1
+                    != -1
                 ):
                     merge_waves += 1
 
@@ -363,13 +363,13 @@ def make_flowchart(removed_by_close_button, window, maindict, workflow_param):
         )
         mdist.grid(row=1, column=2)
 
-        if int(workflow_param[cod_ref]["nbi_fp"]) is not 0:
+        if int(workflow_param[cod_ref]["nbi_fp"]) != 0:
             conn_list_merge.append([inv["NBI"], mdist, mergec[0]])
 
-        if int(workflow_param[cod_ref]["nuclear_fp"]) is not 0:
+        if int(workflow_param[cod_ref]["nuclear_fp"]) != 0:
             conn_list_merge.append([inv["NUCLEAR"], mdist, mergec[0]])
 
-        if int(workflow_param[cod_ref]["ic_wave_fp"]) is not 0:
+        if int(workflow_param[cod_ref]["ic_wave_fp"]) != 0:
             conn_list_merge.append([inv["ICRH"], mdist, mergec[0]])
 
         conn_list_merge_bottom.append([mdist, inv_bot])
@@ -450,12 +450,12 @@ def make_flowchart(removed_by_close_button, window, maindict, workflow_param):
         rrow = 1
         if (
             sum([int(workflow_param[cod_ref][i]) for i in workflow_param[cod_ref]])
-            is not 0
+            != 0
         ):
 
             oldlabel = l0
             for cat in maindict[make_core_ids_ref][hsys]:
-                if int(workflow_param[cod_ref][cat]) is not 0:
+                if int(workflow_param[cod_ref][cat]) != 0:
                     curval = list(maindict[make_core_ids_ref][hsys][cat])[
                         int(workflow_param[cod_ref][cat]) - 1
                     ]

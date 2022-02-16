@@ -9,6 +9,7 @@ ids_list:
     distribution_sources  
     distributions  
     waves
+    workflow
 
 ids_scenario_list:
     core_profiles 

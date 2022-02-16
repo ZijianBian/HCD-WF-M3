@@ -1,9 +1,10 @@
 import os
 import sys
 
-import imas
+import imas,copy
 import numpy as np
 
+from lxml import etree
 from workflow.hcd_workflow import hcd_workflow
 from tools.hcd_tools import (
     import_actor,
@@ -80,22 +81,32 @@ def hcd_wrapper(par_path):
 
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
         dictionary_of_actors = {}
+        process_actor = {}
         for hsys in maindict:
             for cat in maindict[hsys]:
                 for proc in maindict[hsys][cat]:
                     for actor_name in maindict[hsys][cat][proc]:
                         if actor_name in list_of_processes.values():
+                            process_actor[proc] = actor_name
                             err = import_actor(actor_name,0)
                             actor = eval(actor_name)
-                            runtime_settings = actor.get_runtime_settings() # IMAS-4055
+                            runtime_settings = actor.get_runtime_settings()
                             runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND # IMAS-4055
                             code_parameters = actor.get_code_parameters()
                             code_parameters.parameters_path = par_path+"/"+cat+"/input_"+actor_name+".xml"
-                            actor.initialize(code_parameters=code_parameters,runtime_settings=runtime_settings) # IMAS-4055
+                            if actor.is_mpi_code is True:
+                                if actor.is_mpi_code is True:
+                                    tree = etree.parse(par_path+"/"+cat+"/input_"+actor_name+".xml")
+                                    root = tree.getroot()
+                                    for elem in root.iter():
+                                        if elem.tag == "nproc_actor":
+                                            nproc_actor = int(elem.text)
+                                runtime_settings.mpi.mpi_nodes = nproc_actor
+                                code_parameters.__init__(default_parameters_path=par_path+"/"+cat+"/input_"+actor_name+".xml",
+                                                         schema_path=par_path+"/"+cat+"/input_"+actor_name+".xsd")
+                            actor.initialize(code_parameters=code_parameters,runtime_settings=runtime_settings)
                             dictionary_of_actors[actor_name] = actor
                             
-        import pdb
-        pdb.set_trace()
         common_bundle = {}
         add_ids_entry_to_dict(common_bundle,ids_scenario_list)
 
@@ -208,6 +219,20 @@ def hcd_wrapper(par_path):
 
         ##################################################################
 
+        # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS
+        workflow = imas.workflow()
+        workflow.ids_properties.homogeneous_time = 1
+        workflow.time.resize(1)
+        workflow.time_loop.component.resize(1)
+        workflow.time_loop.workflow_cycle.resize(1)
+        workflow.time_loop.workflow_cycle[0].component.resize(1)
+        workflow.time_loop.workflow_cycle[0].component[0].time_interval = param["dt_required"]
+
+        for process in process_bundle.keys():
+            if 'workflow' in process_bundle[process]['input'].keys():
+                workflow.time_loop.component[0].name = process_actor[process].upper()
+                process_bundle[process]['input']['workflow'] = copy.deepcopy(workflow)
+        
         # -----------------------------------------
         # PREPARE THE TIME RANGE FOR THE TIME LOOP
         # -----------------------------------------
