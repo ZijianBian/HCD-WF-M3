@@ -132,7 +132,6 @@ def read_and_save_codeparam(
             actor.is_mpi_code is True
             and "nproc_actor" not in codeparam_dict.keys()
         ):
-            print('lelelelelele')
             codeparam_dict["nproc_actor"] = " 4 "
             comment = etree.Comment(
                 " Number of processors for parallel run (parameter added by HCD wf) "
