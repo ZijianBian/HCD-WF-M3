@@ -84,9 +84,6 @@ def import_actor(actor_input, verbose):
 
     error = 0
 
-    #if actor_input == 'torbeam':
-    #    where_am_i()
-    
     # Import the actor(s) and put into a dictionary
     dictactor = {}
     if type(actor_input) == str:
