@@ -144,27 +144,6 @@ def read_and_save_codeparam(
             root.append(comment)
             root.append(nproc)
             tree.write(codeparam_destination_path, xml_declaration=True, encoding='UTF-8')
-            #rtp = etree.Element("parallel")
-            #rtp.tail = "\n"
-            #nproc_actor = etree.Element("nproc_actor")
-            #nproc_actor.text = codeparam_dict["nproc_actor"]
-            #nproc_actor.tail = "\n"
-            #comment = etree.Comment(" Number of processors for parallel run (parameter added by HCD wf) ")
-            #comment.tail = "\n"
-            #rtp.append(comment)
-            #rtp.append(nproc_actor)
-            #tree_rtp = etree.ElementTree(rtp)
-            #tree_rtp.write(current_config_folder+"/"+hsys+"/input_"+actor_name+"_nproc.xml",
-            #               xml_declaration=True, encoding='UTF-8')
-    #else:
-    #    if actor.is_mpi_code is True:
-    #        print('lulululululu')
-    #        codeparam_xml_nproc_path = current_config_folder+"/"+hsys+"/input_"+actor_name+"_nproc.xml"
-    #        tree_nproc = etree.parse(codeparam_xml_nproc_path)
-    #        root_nproc = tree_nproc.getroot()
-    #        for elem in root_nproc.iter():
-    #            codeparam_dict["nproc_actor"] = elem.text
-    #    root.append(elem)
 
     if found_xsd:
         if (
