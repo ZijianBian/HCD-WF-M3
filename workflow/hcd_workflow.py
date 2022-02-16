@@ -134,8 +134,6 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
                 if process_bundle[process]['input'][ids].ids_properties.homogeneous_time < 1:
                     process_bundle[process]['input'][ids].ids_properties.homogeneous_time = 1
                     process_bundle[process]['input'][ids].time = process_bundle[process]['input']['core_profiles'].time
-            #import pdb
-            #pdb.set_trace()
             output_ids_data = run(process, actor, process_bundle[process]['input'], parameters)
         else:
             kmerge = 0
