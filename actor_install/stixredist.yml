@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/stixredist.git
-    VERSION: develop
+    VERSION: feature/iwrap_reloaded
     DIR: stixredist
 
-MODULES: [IMAS, FC2K]
+MODULES: [IMAS, iWrap]
 
 BUILDS:
   - DIR: stixredist 
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: stixredist
-    XML: fc2k/stix_redist_imas.xml
+    XML: stixredist.yaml
 
 #COMMENTS:  
 ...

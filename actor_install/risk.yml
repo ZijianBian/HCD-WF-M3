@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/risk.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR:     risk
 
-MODULES: [IMAS, FC2K, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
+MODULES: [IMAS, iWrap, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: risk
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: risk
-    XML: fc2k/risk_ids.xml
+    XML: iwrap/risk.yaml
 
 #COMMENTS:  
 ...

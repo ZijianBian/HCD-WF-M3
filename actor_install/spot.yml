@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/spot.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR:     spot
 
-MODULES: [IMAS, FC2K, FRUIT, FRUIT_processor, INTERPOS, PSPLINE, XMLlib]
+MODULES: [IMAS, iWrap, FRUIT, FRUIT_processor, INTERPOS, PSPLINE, XMLlib]
 
 BUILDS: 
   - DIR: spot
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: spot
-    XML: fc2k/spot_ids.xml
+    XML: iwrap/spot.yaml
 
 #COMMENTS:  
 ...

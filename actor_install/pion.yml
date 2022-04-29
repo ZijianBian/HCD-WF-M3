@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/pion.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR: pion
 
-MODULES: [IMAS, FC2K, INTERPOS, NAG, XMLlib]
+MODULES: [IMAS, iWrap, INTERPOS, NAG/26-intel-2020b, XMLlib]
 
 BUILDS: 
   - DIR: pion
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: pion
-    XML: fc2k/pimascal_1.0.xml
+    XML: pion.yaml
 
 #COMMENTS:  
 ...

@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/lion.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR:     lion
 
-MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
+MODULES: [IMAS, iWrap, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: lion
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: lion
-    XML: fc2k/lion_imas.xml
+    XML: lion.yaml
 
 #COMMENTS:  
 ...

@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/nemo.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR:     nemo
 
-MODULES: [IMAS, FC2K, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
+MODULES: [IMAS, iWrap, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: nemo
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: nemo
-    XML: fc2k/nemo_ids.xml
+    XML: iwrap/nemo.yaml
 
 #COMMENTS:  
 ...

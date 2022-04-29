@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/grayscale.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR: grayscale
 
-MODULES: [IMAS, FC2K, XMLlib]
+MODULES: [IMAS, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: grayscale
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: grayscale
-    XML: fc2k/grayscale-ids.xml
+    XML: grayscale.yaml
 
 #COMMENTS:  
 ...

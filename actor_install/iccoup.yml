@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/fpsim.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR: iccoup
 
-MODULES: [IMAS, FC2K, XMLlib]
+MODULES: [IMAS, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: iccoup/tools
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: iccoup/tools
-    XML: fc2k/iccoup_imas.xml
+    XML: iccoup.yaml
 
 #COMMENTS:  
 ...

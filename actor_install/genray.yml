@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR: genray
 
-MODULES: [IMAS, FC2K, INTERPOS, XMLlib, netCDF-Fortran/4.4.4-intel-2018a]
+MODULES: [IMAS, iWrap, INTERPOS, XMLlib, netCDF-Fortran/4.5.3-iimpi-2020b]
 
 BUILDS: 
   - DIR: genray
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: genray
-    XML: fc2k_genray.xml
+    XML: genray.yaml
 
 #COMMENTS:  
 ...

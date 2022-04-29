@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/hcd2core-profiles.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR:     hcd2core-profiles
 
-MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
+MODULES: [IMAS, iWrap, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: hcd2core-profiles
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: hcd2core-profiles
-    XML: fc2k/hcd2core_profiles.xml
+    XML: hcd2core_profiles.yaml
 
 #COMMENTS:  
 ...

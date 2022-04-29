@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR:     wftools
 
-MODULES: [IMAS, FC2K]
+MODULES: [IMAS, iWrap]
 
 BUILDS: 
   - DIR: wftools
@@ -15,10 +15,10 @@ BUILDS:
 ACTORS: 
   - DIR: wftools
     XML: 
-      - mergers/fc2k/merge_core_sources.xml
-      - mergers/fc2k/merge_distribution_sources.xml
-      - mergers/fc2k/merge_distributions.xml
-      - mergers/fc2k/merge_waves.xml
+      - mergers/merge_core_sources.yaml
+      - mergers/merge_distribution_sources.yaml
+      - mergers/merge_distributions.yaml
+      - mergers/merge_waves.yaml
 
 #COMMENTS: |
 ...

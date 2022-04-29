@@ -171,9 +171,9 @@ def install_actors(desc, args):
             for x in xml:
                 subprocess.call(
                     [
-                        "fc2k "
+                        "iwrap -f "
                         + x
-                        + " -nokepler -pyworkspace "
+                        + " -i "
                         + os.getenv("ACTOR_FOLDER")
                     ],
                     shell=True,
@@ -181,9 +181,9 @@ def install_actors(desc, args):
         else:
             subprocess.call(
                 [
-                    "fc2k "
+                    "iwrap -f "
                     + xml
-                    + " -nokepler -pyworkspace "
+                    + " -i "
                     + os.getenv("ACTOR_FOLDER")
                 ],
                 shell=True,
@@ -197,7 +197,7 @@ def install_actors(desc, args):
 # main
 argp = argparse.ArgumentParser(
     prog="actor_install.py",
-    description="This program installs IMAS actors in Kepler given a release description from the code developers",
+    description="This program installs IMAS actors in Python given a release description from the code developers",
 )
 argp.add_argument(
     "yml",

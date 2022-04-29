@@ -14,7 +14,7 @@ module load lxml/4.6.2-GCCcore-10.2.0
 export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
 
-# EXTEND PYTHON PATH AND AVOID DOUBLONS
+# Extend python path and avoid doublons
 export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
 
@@ -25,22 +25,22 @@ export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/
 # To find shell scripts in current local folder
 export PATH=$PWD:$PATH
 
-# Avoid doublons in PYTHONPATH
-export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
-
 # Load the default IMAS version, no matter what was loaded through the HCD modules themselves
 module load IMAS
 
 # For local re-compilation of actors
+module load iWrap
 module load XMLlib
-
-# IWRAP and INTERPOS to re-compile the actors if necessary
-module load iWrap INTERPOS
-
-# For GENRAY
-module load netCDF-Fortran/4.5.3-iimpi-2020b
-
-# For PION
+module load FRUIT
+module load FRUIT_processor
+module load INTERPOS
+module load PSPLINE
+module load AMNS/1.3.5-intel-2020b-DD-3.35.0
 module load NAG/26-intel-2020b
- 
+module load netCDF-Fortran/4.5.3-iimpi-2020b
+module load CMake/3.18.4-GCCcore-10.2.0
+
+# Avoid doublons in PYTHONPATH
+export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
+
 

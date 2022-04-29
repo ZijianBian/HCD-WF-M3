@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/tomcat.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR:     tomcat
 
-MODULES: [IMAS, FC2K, XMLlib]
+MODULES: [IMAS, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: tomcat
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: tomcat
-    XML: fc2k/tomcat_ifort.xml
+    XML: tomcat.yaml
 
 #COMMENTS:  
 ...

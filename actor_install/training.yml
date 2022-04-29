@@ -1,0 +1,20 @@
+#example
+---
+SOURCES:
+  - VCS:  git
+    REPO: ssh://git@git.iter.org/imas/training.git
+    VERSION: feature/huge_modif
+    DIR: training
+
+MODULES: [IMAS, iWrap, XMLlib]
+
+BUILDS: 
+  - DIR: training/level2/fortran
+    CMD: make
+
+ACTORS: 
+  - DIR: training/level2/fortran
+    XML: physics_model_level2.yaml
+
+#COMMENTS:  
+...

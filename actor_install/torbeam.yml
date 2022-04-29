@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/torbeam.git
-    VERSION: develop
+    VERSION: feature/training
     DIR: torbeam
 
-MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
+MODULES: [IMAS, iWrap, INTERPOS, XMLlib, CMake/3.18.4-GCCcore-10.2.0]
 
 BUILDS: 
   - DIR: torbeam/tests/test_imas/build
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: torbeam/tests/test_imas/build
-    XML: fc2k/torbeam.xml
+    XML: torbeam.yaml
 
 #COMMENTS:  
 ...

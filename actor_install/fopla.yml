@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/fopla.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR: fopla
 
-MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
+MODULES: [IMAS, iWrap, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: fopla
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: fopla
-    XML: fc2k/fopla_ids.xml
+    XML: fopla.yaml
 
 #COMMENTS:  
 ...

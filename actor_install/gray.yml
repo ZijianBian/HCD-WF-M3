@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/gray.git
-    VERSION: develop
+    VERSION: feature/iwrap
     DIR: gray
 
-MODULES: [IMAS, FC2K, XMLlib]
+MODULES: [IMAS, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: gray
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: gray
-    XML: fc2k/gray-ids.xml
+    XML: gray.yaml
 
 #COMMENTS:  
 ...

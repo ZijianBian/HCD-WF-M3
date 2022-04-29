@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR:     hcd2core-sources
 
-MODULES: [IMAS, FC2K, INTERPOS, XMLlib]
+MODULES: [IMAS, iWrap, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: hcd2core-sources
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: hcd2core-sources
-    XML: fc2k/hcd2core_sources.xml
+    XML: hcd2core_sources.yaml
 
 #COMMENTS:  
 ...
