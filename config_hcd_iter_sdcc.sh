@@ -35,10 +35,11 @@ module load FRUIT
 module load FRUIT_processor
 module load INTERPOS
 module load PSPLINE
-module load AMNS/1.3.5-intel-2020b-DD-3.35.0
 module load NAG/26-intel-2020b
 module load netCDF-Fortran/4.5.3-iimpi-2020b
 module load CMake/3.18.4-GCCcore-10.2.0
+module load Fundamental-Constants
+module load `module avail AMNS/*-intel-* -t |tail -n 1`
 
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"

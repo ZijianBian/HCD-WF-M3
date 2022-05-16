@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/spot.git
-    VERSION: feature/iwrap
+    VERSION: feature/imas_identifiers
     DIR:     spot
 
 MODULES: [IMAS, iWrap, FRUIT, FRUIT_processor, INTERPOS, PSPLINE, XMLlib]

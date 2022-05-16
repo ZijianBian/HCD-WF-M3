@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/stixredist.git
-    VERSION: feature/iwrap_reloaded
+    VERSION: develop
     DIR: stixredist
 
 MODULES: [IMAS, iWrap]

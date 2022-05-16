@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/grayscale.git
-    VERSION: feature/iwrap
+    VERSION: develop
     DIR: grayscale
 
 MODULES: [IMAS, iWrap, XMLlib]
