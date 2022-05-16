@@ -18,6 +18,9 @@ from tools.hcd_tools import (
 )
 from tools.utility_functions import add_ids_entry_to_dict
 
+import logging
+log = logging.getLogger()
+log.setLevel(logging.ERROR)
 
 def hcd_wrapper(par_path):
 
@@ -86,7 +89,7 @@ def hcd_wrapper(par_path):
             for cat in maindict[hsys]:
                 for proc in maindict[hsys][cat]:
                     for actor_name in maindict[hsys][cat][proc]:
-                        if actor_name in list_of_processes.values():
+                        if code_selection[proc] is not None and actor_name in code_selection[proc]:
                             process_actor[proc] = actor_name
                             err = import_actor(actor_name,0)
                             actor = eval(actor_name)
