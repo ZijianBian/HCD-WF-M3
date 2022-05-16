@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/torbeam.git
-    VERSION: feature/training
+    VERSION: master
     DIR: torbeam
 
 MODULES: [IMAS, iWrap, INTERPOS, XMLlib, CMake/3.18.4-GCCcore-10.2.0]

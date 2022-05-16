@@ -65,6 +65,9 @@ def setup_env(desc, args):
         os.environ["KEPLER"] = args.setKEPLER
         print("Using " + args.setKEPLER + " as destination for actors!")
 
+    err = module("list")
+    print(err)
+    
     return 0
 
 
