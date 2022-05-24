@@ -27,7 +27,7 @@ def edit_codeparam(
         for hsys in maindict[ref]:
             la_sys = tkinter.Label(fr_ab, text=hsys, bg=col.c4)
             for cat in maindict[ref][hsys]:
-                if int(workflow_param[cod_ref][cat]) is not 0:
+                if int(workflow_param[cod_ref][cat]) != 0:
                     la_sys.grid(padx=5, pady=5, sticky="ew")
 
                     curval = list(maindict[ref][hsys][cat].keys())[
