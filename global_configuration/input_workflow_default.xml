@@ -1,7 +1,7 @@
 <root>
   <workflow_parameters display="WORKFLOW PARAMETERS (STANDALONE)">
     <input_user_or_path>public</input_user_or_path>
-    <input_database>iter</input_database>
+    <input_database>ITER</input_database>
     <shot_nr>130011</shot_nr>
     <run_in>4</run_in>
     <output_user_or_path>default</output_user_or_path>
