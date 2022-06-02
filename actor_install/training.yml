@@ -6,7 +6,7 @@ SOURCES:
     VERSION: feature/huge_modif
     DIR: training
 
-MODULES: [IMAS/3.35.0-4.10.0-2020b, iWrap, XMLlib]
+MODULES: [IMAS, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: training/level2/fortran
