@@ -79,14 +79,14 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
 
         if 'nbi' in process_bundle[process]['input'] \
            and not is_nbi_on(process_bundle[process]['input']['nbi'], \
-                             process_bundle[process]['input']['nbi'].time):
+                             process_bundle[process]['input']['core_profiles'].time):
             print("  No NBI power for this time slice")
             parameters["nbi_source"] = 0
             parameters["nbi_fp"] = 0
 
         if 'ic_antennas' in process_bundle[process]['input'] \
            and not is_ic_on(process_bundle[process]['input']['ic_antennas'], \
-                            process_bundle[process]['input']['ic_antennas'].time):
+                            process_bundle[process]['input']['core_profiles'].time):
             print("  No IC power for this time slice")
             parameters["iccoup"] = 0
             parameters["ic_wave_solver"] = 0
@@ -94,7 +94,7 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
 
         if 'ec_launchers' in process_bundle[process]['input'] \
           and not is_ec_on(process_bundle[process]['input']['ec_launchers'], \
-                           process_bundle[process]['input']['ec_launchers'].time):
+                           process_bundle[process]['input']['core_profiles'].time):
            print("  No EC power for this time slice")
            parameters["ec_wave_solver"] = 0
 
