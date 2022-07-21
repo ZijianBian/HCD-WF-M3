@@ -4,9 +4,7 @@ import interface.colour_definitions as col
 from interface.codeparam_frame import make_frame
 
 # MANAGE XML FILES
-def edit_codeparam(
-    maindict, actors_ref, workflow_param, cod_ref, current_config_folder
-):
+def edit_codeparam(maindict, workflow_param, current_config_folder):
 
     cp_top = tkinter.Toplevel()
     cp_top.title("Edit Code Parameters")
@@ -23,22 +21,22 @@ def edit_codeparam(
     fr_top = tkinter.Frame(cp_top, width=500, height=50, bg=col.c2)
     fr_top.grid(row=0, column=1, sticky="ew", columnspan=2)
 
-    for ref in actors_ref:
-        for hsys in maindict[ref]:
-            la_sys = tkinter.Label(fr_ab, text=hsys, bg=col.c4)
-            for cat in maindict[ref][hsys]:
-                if int(workflow_param[cod_ref][cat]) != 0:
+    for main_key in maindict:
+        for category in maindict[main_key]:
+            la_sys = tkinter.Label(fr_ab, text=category, bg=col.c4)
+            for process in maindict[main_key][category]:
+                if int(workflow_param['actor_selection'][0][main_key][0][category][0][process][0]) != 0:
                     la_sys.grid(padx=5, pady=5, sticky="ew")
-
-                    curval = list(maindict[ref][hsys][cat].keys())[
-                        int(workflow_param[cod_ref][cat]) - 1
-                    ]
+                    curval = list(maindict[main_key][category][process].keys())\
+                        [int(workflow_param['actor_selection'][0][main_key][0]\
+                             [category][0][process][0])-1]
                     tkinter.Button(
                         fr_ab,
                         text=curval,
                         bg=col.c2,
-                        command=lambda actor_name=curval, hsys=hsys: make_frame(
-                            hsys,
+                        command=lambda actor_name=curval, category=category, process=process: make_frame(
+                            category,
+                            process,
                             fr_top,
                             actor_name,
                             prev_frame,

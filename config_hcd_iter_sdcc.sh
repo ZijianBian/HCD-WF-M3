@@ -41,6 +41,9 @@ module load CMake/3.18.4-GCCcore-10.2.0
 module load Fundamental-Constants
 module load `module avail AMNS/*-intel-* -t |tail -n 1`
 
+# Workflow tools
+export PYTHONPATH=/home/ITER/schneim/public/git/wftools/scripts:$PYTHONPATH
+
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
 

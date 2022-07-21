@@ -5,7 +5,7 @@ from lxml import etree
 
 import interface.codeparam_properties as codeparam_properties
 import interface.colour_definitions as col
-from tools.utility_functions import update_codeparam_dict_check_xsd
+from wf_tools import update_codeparam_dict_check_xsd
 
 # -----------------------------------------------------------------------------------
 # LOAD THE LIST OF CODE PARAMETERS, CREATE THE LABELS AND ENTRIES FOR THE INTERFACE

@@ -2,11 +2,11 @@ import tkinter
 
 import interface.colour_definitions as col
 from interface.codeparam_populate import codeparam_interface
-from tools.utility_functions import update_codeparam_file, read_and_save_codeparam
+from wf_tools import update_codeparam_file, read_and_save_codeparam
 
 # CREATE THE WINDOW TO EDIT CODE PARAMETERS
 def make_frame(
-    hsys, fr_top, actor_name, previous_frame, cp_top, current_config_folder, default
+        category, process, fr_top, actor_name, previous_frame, cp_top, current_config_folder, default
 ):
 
     # WINDOW CONFIGURATION
@@ -26,7 +26,7 @@ def make_frame(
         docum_dict,
         codeparam_xml_path,
         xmlschema,
-    ) = read_and_save_codeparam(current_config_folder, None, hsys, actor_name, default)
+    ) = read_and_save_codeparam(current_config_folder, None, category, process, actor_name, default)
 
     # CREATE/UPDATE THE INTERFACE FOR ALL PARAMETERS, RETURN THEIR UPDATED LIST
     updated_codeparam_dict = codeparam_interface(
@@ -56,7 +56,7 @@ def make_frame(
         text="Restore default",
         bg=col.c2,
         command=lambda: make_frame(
-            hsys, fr_top, actor_name, frame, cp_top, current_config_folder, True
+            category, process, fr_top, actor_name, frame, cp_top, current_config_folder, True
         ),
     ).grid(row=0, column=2, padx=5, pady=5)
 

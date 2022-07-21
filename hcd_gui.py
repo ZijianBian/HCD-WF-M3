@@ -1,10 +1,10 @@
-import os
-import sys
+import os,sys,copy
 
 try:
     import tkinter
     import tkinter.ttk
     import tkinter.filedialog
+    import tkinter.font as font
 except:
     print("ERROR: tkinter not found", file=sys.stderr)
     print(
@@ -25,14 +25,19 @@ except:
 
 try:
     import interface.colour_definitions as col
-    from tools.hcd_tools import (
+    from wf_tools import (
         import_actor,
-        create_maindict,
-        loadlist,
         create_workflow_param_from_file,
         dict_merge,
-    )
-    from tools.utility_functions import save, run, destr_and_make, update_workflow_param, load
+        save,
+        run,
+        destr_and_make,
+        update_workflow_param,
+        loadlist,
+        load,
+        create_maindict,
+        saved_folder_name,
+)
     from interface.codeparam_edit import edit_codeparam
 except:
     raise
@@ -42,15 +47,6 @@ except:
         file=sys.stderr,
     )
     sys.exit()
-
-# ---------------------------------------------------------------------------------------------
-# Folder from which to find the compiled HCD actors
-
-# if os.getenv('ACTOR_FOLDER') is None:
-#    print('ERROR: the environment variable ACTOR_FOLDER has not been set up', file=sys.stderr)
-#    sys.exit()
-# else:
-#    ACTOR_FOLDER = os.getenv('ACTOR_FOLDER')
 
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
@@ -62,8 +58,8 @@ default_wf_param_file = hcd_path + "/global_configuration/input_workflow_default
 # Create the main window (define font, title and background colour)
 window = tkinter.Tk()
 fontsize = int(window.winfo_screenheight() / 100) + 3  # Adjusted with screen size
-if fontsize > 14:
-    fontsize = 14
+if fontsize > 10:
+    fontsize = 10
 if fontsize < 5:
     fontsize = 5
 window.option_add("*font", "courier " + str(fontsize))
@@ -74,7 +70,10 @@ window.configure(bg=col.c1)
 def open_gui(wf_param_file):
 
     # CHECK THAT MANDATORY ACTORS ARE THERE
-    merge_actor_list = loadlist("merge_actor_list")
+    file = os.path.dirname(os.path.abspath(__file__))\
+                + "/global_configuration/" + "global_lists.yaml"
+    merge_actor_list = loadlist(file,"merge_actor_list")
+    process_list = loadlist(file,"process_list")
     err_global = 0
     for actor in merge_actor_list:
         err = import_actor(actor, 1)
@@ -104,9 +103,10 @@ def open_gui(wf_param_file):
         code_selection,
         catlist,
     ) = create_maindict(wf_param_file, 1)
-    workflow_param = create_workflow_param_from_file(wf_param_file, 1)
 
-    ### setup
+    workflow_param = create_workflow_param_from_file(wf_param_file)
+
+    # Setup
 
     fr_wfp = tkinter.Frame(window, width=300, height=500, background=col.c3)
     fr_wfp.grid(row=0, column=0, rowspan=2, sticky="nwes", padx=3, pady=3)
@@ -120,34 +120,27 @@ def open_gui(wf_param_file):
     removed_by_close_button = [fr_fc]
     fr_fc.grid_remove()
 
-    ## abbreviations for the keys - makes it easier to change them in the xml file
-    wfp_ref = list(workflow_param.keys())[0]
-    cod_ref = list(workflow_param.keys())[1]
-
-    hcd_actors_ref = list(maindict.keys())[1]
-    make_core_ref = list(maindict.keys())[2]
-    all_actors_ref = [hcd_actors_ref, make_core_ref]
-
-    global_dict = dict_merge(maindict[hcd_actors_ref], maindict[make_core_ref])
-
     ## LEFT - CONFIGURING THE WORKFLOW PARAMETERS
-    tkinter.Label(fr_wfp, text=wfp_ref, bg=col.c3, font="15").grid(
+    tkinter.Label(fr_wfp, text=workflow_param['workflow_parameters'][1], bg=col.c3, font=('Courier',fontsize,'bold')).grid(
         row=0, column=0, columnspan=3, pady=10, padx=5, sticky="we"
     )
     irow = 1
-    for elem in workflow_param[wfp_ref]:
+    for elem in workflow_param['workflow_parameters'][0]:
 
-        tkinter.Label(fr_wfp, text=elem, bg=col.c3).grid(
+        elem_name = workflow_param['workflow_parameters'][0][elem][1]
+
+        label = tkinter.Label(fr_wfp, text=elem_name, bg=col.c3).grid(
             row=irow, column=0, padx=1, pady=2, sticky="w"
         )
 
         # Catch any update of the variable from the interface
         entrystring = tkinter.StringVar()
-        entrystring.set(workflow_param[wfp_ref][elem])
+        entrystring.set(workflow_param['workflow_parameters'][0][elem][0])
         entrystring.trace(
             "w",
-            lambda name, index, mode, elem=elem, entrystring=entrystring, ref=wfp_ref: update_workflow_param(
-                workflow_param, wfp_ref, elem, entrystring.get()
+            lambda name, index, mode, elem=elem, entrystring=entrystring,
+            ref='workflow_parameters': update_workflow_param(
+                workflow_param, 'workflow_parameters', '', '', elem, entrystring.get()
             ),
         )
         # if an entry is changed, the new values should immediately be changed
@@ -159,93 +152,44 @@ def open_gui(wf_param_file):
 
     ## MIDDLE - SELECTING THE ACTORS
     rrow = 0
-    for ref in all_actors_ref:
-        for hsys in maindict[ref]:
-            tkinter.Label(fr_as, text=hsys, bg=col.c1, font="15").grid(
-                row=rrow, column=0, columnspan=2, sticky="ew"
+    complex_button = {}
+    for main_key in maindict.keys():
+        for category in maindict[main_key]:
+            tkinter.Label(fr_as, text=workflow_param['actor_selection'][0][main_key][0][category][1], \
+                          bg=col.c1, font=('Courier',fontsize,'bold'),fg='darkcyan').grid(
+                row=rrow, column=0, columnspan=2, sticky="w"
             )
             rrow += 1
-            for cat in maindict[ref][hsys]:
+
+            for process in maindict[main_key][category]:
+                process_name = workflow_param['actor_selection'][0][main_key][0][category][0][process][1]
+                proc_dict = copy.deepcopy(maindict[main_key][category][process])
                 tkinter.Label(
-                    fr_as, text=cat, bg=col.c1, anchor=tkinter.W, justify=tkinter.LEFT
+                    fr_as, text=' - '+process_name, bg=col.c1, anchor=tkinter.W, justify=tkinter.LEFT
                 ).grid(row=rrow, column=0, sticky=tkinter.W)
                 cb = tkinter.ttk.Combobox(
-                    fr_as, value=[""] + list(maindict[ref][hsys][cat])
+                    fr_as, value=[""] + list(proc_dict)
                 )
                 cb.grid(row=rrow, column=1, padx=20, pady=5, sticky="ew")
-                cb.current(workflow_param[cod_ref][cat])
+                cb.current(workflow_param['actor_selection'][0][main_key][0][category][0][process][0])
                 cb.bind(
                     "<<ComboboxSelected>>",
-                    lambda event, cat=cat, cb=cb: update_workflow_param(
-                        workflow_param, cod_ref, cat, str(cb.current())
+                    lambda event, main_key=main_key, process=process, cb=cb, category=category: update_workflow_param(
+                        workflow_param, 'actor_selection', main_key, category, process, str(cb.current())
                     ),
                 )
+                complex_button[process] = tkinter.Button(master=fr_as,text="Time Base",bg=col.c2)
+                complex_button[process]['font'] = font.Font(size=8)
+                complex_button[process].config(activebackground=col.c4)
+                complex_button[process].grid(row=rrow, column=2, padx=0, pady=0, sticky="w")
+                complex_button[process].configure(command=lambda process=process: cm.complex_mode(fr_as,process,workflow_param))
+                font.Font(size=fontsize)
                 rrow += 1
 
     # -------------------------------------------------------------------------------------
 
-    # Class to not re-generate a new folder name between two 'save' statements
-    class saved_folder_name(object):
-        def __init__(self):
-            self.value = None
-
-        def NoAction(self):
-            self.value = self.value
-
-        def Save(self, chosen_folder, init_folder):
-            previous_folder = init_folder
-            if chosen_folder == init_folder:  # Very first SAVE, or SAVE after a SAVE_AS
-                self.value = save(
-                    self.value,
-                    default_wf_param_file,
-                    previous_folder,
-                    global_dict,
-                    uncompiled_actors,
-                    workflow_param,
-                    wfp_ref,
-                    cod_ref,
-                )
-            else:
-                if chosen_folder is None:
-                    if self.value is None:  # 1st SAVE after a LOAD
-                        self.value = save(
-                            init_folder,
-                            default_wf_param_file,
-                            previous_folder,
-                            global_dict,
-                            uncompiled_actors,
-                            workflow_param,
-                            wfp_ref,
-                            cod_ref,
-                        )
-                    else:  # Next SAVEs after a LOAD; SAVE after a SAVE AS which is after a LOAD;
-                        self.value = save(
-                            self.value,
-                            default_wf_param_file,
-                            previous_folder,
-                            global_dict,
-                            uncompiled_actors,
-                            workflow_param,
-                            wfp_ref,
-                            cod_ref,
-                        )
-                else:  # SAVE AS
-                    if_cancelled = self.value
-                    self.value = save(
-                        chosen_folder,
-                        default_wf_param_file,
-                        previous_folder,
-                        global_dict,
-                        uncompiled_actors,
-                        workflow_param,
-                        wfp_ref,
-                        cod_ref,
-                    )
-                    if self.value is None:
-                        self.value = if_cancelled
-            return self.value
-
-    saved_folder = saved_folder_name()
+    saved_folder = saved_folder_name(default_wf_param_file,maindict,
+                 uncompiled_actors,workflow_param,'workflow_parameters','actor_selection',process_list)
 
     # -------------------------------------------------------------------------------------
 
@@ -268,6 +212,7 @@ def open_gui(wf_param_file):
                 initialdir=os.path.join(os.getcwd(), "data")
             ),
             open_gui,
+            process_list,
         )
     )
 
@@ -288,7 +233,7 @@ def open_gui(wf_param_file):
 
     button_loadlconfig = tkinter.Button(fr_wfp, text="Load latest", bg=col.c2)
     button_loadlconfig.grid(row=52, column=1, padx=5, pady=5, sticky="ew")
-    button_loadlconfig.configure(command=lambda: load("latest", open_gui))
+    button_loadlconfig.configure(command=lambda: load("latest", open_gui, process_list))
 
     button_saveandrun = tkinter.Button(fr_wfp, text="Run", bg=col.c2, state="normal")
     button_saveandrun.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
@@ -312,9 +257,7 @@ def open_gui(wf_param_file):
     button_edit_codeparameters.configure(
         command=lambda: edit_codeparam(
             maindict,
-            all_actors_ref,
             workflow_param,
-            cod_ref,
             saved_folder.Save(None, init_folder),
         )
     )

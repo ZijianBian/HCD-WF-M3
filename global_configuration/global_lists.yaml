@@ -27,6 +27,14 @@ ids_process_list:
     distributions  
     waves
 
+process_list:
+    ECRH
+    ICRH
+    NBI
+    NUCLEAR
+    profiles
+    source
+
 actor_list:
     afsi
     ascot_parallel

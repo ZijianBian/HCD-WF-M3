@@ -1,38 +1,35 @@
-import os
-import sys
-
-import imas,copy
+import os, sys, copy, imas
 import numpy as np
 
 from lxml import etree
 from workflow.hcd_workflow import hcd_workflow
-from tools.hcd_tools import (
+from wf_tools import (
+    add_ids_entry_to_dict,
     import_actor,
     read_actor_ids,
     bundle_copy,
     create_dict_from_idslist,
-    create_maindict,
-    check_for_prerequisites,
+    check_if_code_fulfills_configuration,
     create_workflow_param_from_file,
-    loadlist
+    loadlist,
+    create_maindict,
 )
-from tools.utility_functions import add_ids_entry_to_dict
 
 import logging
 log = logging.getLogger()
 log.setLevel(logging.ERROR)
 
-def hcd_wrapper(par_path):
+def wf_wrapper(par_path):
 
     ##################################################################
 
     try:
 
-        # --------------------------------------------------------------
-        # READ PARAMETERS FROM INPUT PARAMETER XML FILE OF THE WORKFLOW
-        # --------------------------------------------------------------
+        # ---------------------------------------------
+        # READ WORKFLOW PARAMETERS FROM INPUT XML FILE
+        # ---------------------------------------------
         workflow_xml = par_path + "/input_workflow.xml"
-        param = create_workflow_param_from_file(workflow_xml, 2)
+        parameters = create_workflow_param_from_file(workflow_xml)['workflow_parameters'][0]
 
         ##################################################################
 
@@ -63,9 +60,13 @@ def hcd_wrapper(par_path):
             )
             return
 
-        ids_scenario_list = loadlist('ids_scenario_list')
-        ids_md_list       = loadlist('ids_md_list')
-        ids_process_list  = loadlist('ids_process_list')
+        # YAML FILE CONTAINING ALL USEFUL LISTS
+        file = os.path.dirname(os.path.abspath(__file__))\
+                    + "/../global_configuration/" + "global_lists.yaml"
+
+        ids_scenario_list = loadlist(file,'ids_scenario_list')
+        ids_md_list       = loadlist(file,'ids_md_list')
+        ids_process_list  = loadlist(file,'ids_process_list')
 
         # DEFINE THE TOTAL LIST OF INVOLVED INPUT AND OUTPUT IDSS ACCORDING TO THE ACTOR SELECTION
         process_bundle  = {}
@@ -85,28 +86,28 @@ def hcd_wrapper(par_path):
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
         dictionary_of_actors = {}
         process_actor = {}
-        for hsys in maindict:
-            for cat in maindict[hsys]:
-                for proc in maindict[hsys][cat]:
-                    for actor_name in maindict[hsys][cat][proc]:
-                        if code_selection[proc] is not None and actor_name in code_selection[proc]:
-                            process_actor[proc] = actor_name
+        for main_key in maindict:
+            for category in maindict[main_key]:
+                for process in maindict[main_key][category]:
+                    for actor_name in maindict[main_key][category][process]:
+                        if code_selection[process] is not None and actor_name in code_selection[process]:
+                            process_actor[process] = actor_name
                             err = import_actor(actor_name,0)
                             actor = eval(actor_name)
                             runtime_settings = actor.get_runtime_settings()
                             runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND # IMAS-4055
                             code_parameters = actor.get_code_parameters()
-                            code_parameters.parameters_path = par_path+"/"+cat+"/input_"+actor_name+".xml"
+                            code_parameters.parameters_path = par_path+"/"+category+"/"+process+"/input_"+actor_name+".xml"
                             if actor.is_mpi_code is True:
                                 if actor.is_mpi_code is True:
-                                    tree = etree.parse(par_path+"/"+cat+"/input_"+actor_name+".xml")
+                                    tree = etree.parse(par_path+"/"+category+"/"+process+"/input_"+actor_name+".xml")
                                     root = tree.getroot()
                                     for elem in root.iter():
                                         if elem.tag == "nproc_actor":
                                             nproc_actor = int(elem.text)
                                 runtime_settings.mpi.mpi_nodes = nproc_actor
-                                code_parameters.__init__(default_parameters_path=par_path+"/"+cat+"/input_"+actor_name+".xml",
-                                                         schema_path=par_path+"/"+cat+"/input_"+actor_name+".xsd")
+                                code_parameters.__init__(default_parameters_path=par_path+"/"+category+"/"+process+"/input_"+actor_name+".xml",
+                                                         schema_path=par_path+"/"+category+"/"+process+"/input_"+actor_name+".xsd")
                             actor.initialize(code_parameters=code_parameters,runtime_settings=runtime_settings)
                             dictionary_of_actors[actor_name] = actor
                             
@@ -122,8 +123,12 @@ def hcd_wrapper(par_path):
         #      according to the parallel_dependency constraints
 
         # CHECK IF THE CODES ARE COMPATIBLE / PREREQUISITES ARE FULFILLED
-        err = check_for_prerequisites(workflow_xml)
-        if err != 0:
+        prerequisites = loadlist(file,"prerequisites")
+        err = check_if_code_fulfills_configuration(prerequisites, code_selection)
+        if err == 0:
+            print("Selection fulfills all actor selection rules", file=sys.stdout)
+        else:
+            print("Please change the actor selection and try again.", file=sys.stderr)
             return
 
         ##################################################################
@@ -136,10 +141,17 @@ def hcd_wrapper(par_path):
         version = os.getenv("IMAS_VERSION")[0]
 
         # INPUT AND OUTPUT DB ENVIRONMENT
-        input_user_or_path = param["input_user_or_path"]
-        input_database = param["input_database"]
-        output_user_or_path = param["output_user_or_path"]
-        output_database = param["output_database"]
+        input_user_or_path  = parameters["input_user_or_path"][0]
+        input_database      = parameters["input_database"][0]
+        output_user_or_path = parameters["output_user_or_path"][0]
+        output_database     = parameters["output_database"][0]
+        shot_nr             = parameters["shot_nr"][0]
+        run_in              = parameters["run_in"][0]
+        run_out             = parameters["run_out"][0]
+        dt_required         = parameters["dt_required"][0]
+        one_time_slice      = parameters["one_time_slice"][0]
+        tbegin              = parameters["tbegin"][0]
+        tend                = parameters["tend"][0]
 
         # DEFAULT OUTPUT USER_OR_PATH IS $USER
         if output_user_or_path == "default":
@@ -168,17 +180,17 @@ def hcd_wrapper(par_path):
         input = imas.DBEntry(
             imas.imasdef.MDSPLUS_BACKEND,
             input_database,
-            param["shot_nr"],
-            param["run_in"],
+            shot_nr,
+            run_in,
             input_user_or_path,
         )
         retstatus, idx_in = input.open()
         if retstatus != 0:
             print(
                 "   ERROR while reading the input shot="
-                + str(param["shot_nr"])
+                + str(shot_nr)
                 + " and run="
-                + str(param["run_in"])
+                + str(run_in)
                 + "\n   for user_or_path = "
                 + input_user_or_path
                 + " and database = "
@@ -192,17 +204,17 @@ def hcd_wrapper(par_path):
         output = imas.DBEntry(
             imas.imasdef.MDSPLUS_BACKEND,
             output_database,
-            param["shot_nr"],
-            param["run_out"],
+            shot_nr,
+            run_out,
             output_user_or_path,
         )
         retstatus, idx_out = output.create()
         if retstatus != 0:
             print(
                 "   ERROR while creating the output shot="
-                + str(param["shot_nr"])
+                + str(shot_nr)
                 + " and run="
-                + str(param["run_out"])
+                + str(run_out)
                 + "\n   for user_or_path = "
                 + output_user_or_path
                 + " and database = "
@@ -229,7 +241,7 @@ def hcd_wrapper(par_path):
         workflow.time_loop.component.resize(1)
         workflow.time_loop.workflow_cycle.resize(1)
         workflow.time_loop.workflow_cycle[0].component.resize(1)
-        workflow.time_loop.workflow_cycle[0].component[0].time_interval = param["dt_required"]
+        workflow.time_loop.workflow_cycle[0].component[0].time_interval = dt_required
 
         for process in process_bundle.keys():
             if 'workflow' in process_bundle[process]['input'].keys():
@@ -240,7 +252,7 @@ def hcd_wrapper(par_path):
         # PREPARE THE TIME RANGE FOR THE TIME LOOP
         # -----------------------------------------
 
-        if param["one_time_slice"] == 0:
+        if one_time_slice == 0:
 
             # INPUT TIME ARRAY
             try:
@@ -254,18 +266,18 @@ def hcd_wrapper(par_path):
                 return
 
             # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
-            if param["tbegin"] < 0:
-                param["tbegin"] = time_array[0]
+            if tbegin < 0:
+                tbegin = time_array[0]
                 print(
                     "Initial time tbegin set to core_profiles first time slice. tbegin = ",
-                    param["tbegin"],
+                    tbegin,
                     file=sys.stdout,
                 )
 
-            if param["tbegin"] > 0 and param["tbegin"] < time_array[0]:
+            if tbegin > 0 and tbegin < time_array[0]:
                 print(
                     "ERROR: tbegin out of range: "
-                    + str(param["tbegin"])
+                    + str(tbegin)
                     + " s is less than first time in core_profiles =",
                     "{:.2f}".format(time_array[0]),
                     "s",
@@ -273,18 +285,18 @@ def hcd_wrapper(par_path):
                 )
                 return
 
-            if param["tend"] < 0:
-                param["tend"] = time_array[-1]
+            if tend < 0:
+                tend = time_array[-1]
                 print(
                     "Final time tend set to core_profiles final time slice, tend = ",
-                    param["tend"],
+                    tend,
                     file=sys.stdout,
                 )
 
-            if param["tend"] > 0 and param["tend"] > time_array[-1]:
+            if tend > 0 and tend > time_array[-1]:
                 print(
                     "ERROR: tend out of range: "
-                    + str(param["tend"])
+                    + str(tend)
                     + " s is greater than last time in core_profiles =",
                     "{:.2f}".format(time_array[-1]),
                     "s",
@@ -292,7 +304,7 @@ def hcd_wrapper(par_path):
                 )
                 return
         else:
-            param["tend"] = param["tbegin"] + param["dt_required"]
+            tend = tbegin + dt_required
 
         ##################################################################
 
@@ -303,26 +315,26 @@ def hcd_wrapper(par_path):
         print("---------------------------------------------", file=sys.stdout)
         print("---- Enter time loop of the H&CD wrapper ----", file=sys.stdout)
 
-        timenow = param["tbegin"]
+        timenow = tbegin
 
-        nsteps = int((param["tend"] - param["tbegin"]) / param["dt_required"])
+        nsteps = int((tend - tbegin) / dt_required)
         if (
-            param["dt_required"] * nsteps
-            < int((param["tend"] - param["tbegin"]) * 10 ** 5) / 10 ** 5
+            dt_required * nsteps
+            < int((tend - tbegin) * 10 ** 5) / 10 ** 5
         ):
             nsteps = nsteps + 1
 
         step = 0
         previous_time = {}
 
-        while timenow < param["tend"]:
+        while timenow < tend:
 
             step += 1
 
             print("---------------------------------------------", file=sys.stdout)
             print("Step = " + str(step) + "/" + str(nsteps), file=sys.stdout)
             print("Time = %5.2f" % timenow, "s", file=sys.stdout)
-            print("dt   = %5.2f" % param["dt_required"], "s", file=sys.stdout)
+            print("dt   = %5.2f" % dt_required, "s", file=sys.stdout)
 
             # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
             for ids in ids_scenario_list:
@@ -372,14 +384,15 @@ def hcd_wrapper(par_path):
 
             # SAVE TO DISK
             for ids in process_bundle_out.keys():
-                if process_bundle_out[ids].time[0] > 0 or 'merge' in process_bundle_out[ids].code.name:
-                    output.put_slice(process_bundle_out[ids])
-                    previous_time[ids] = process_bundle_out[ids].time[0]
+                if len(process_bundle_out[ids].time) > 0: # Empty if process deactivated by an is_xx_on function
+                    if process_bundle_out[ids].time[0] > 0 or 'merge' in process_bundle_out[ids].code.name:
+                        output.put_slice(process_bundle_out[ids])
+                        previous_time[ids] = process_bundle_out[ids].time[0]
 
             # ------------------------------------------------------------------------------------------
             # PREPARE FOR THE NEXT TIME STEP: COPY OUTPUT IDS IN INPUT OF ACTORS FOR THE NEXT TIME STEP
             # ------------------------------------------------------------------------------------------
-            timenow = timenow*1.0 + param["dt_required"]*1.0
+            timenow = timenow*1.0 + dt_required*1.0
             for process in process_bundle.keys():
                 if 'merge_' not in process:
                         for ids in process_bundle[process]['output'].keys():
@@ -400,10 +413,10 @@ def hcd_wrapper(par_path):
         print("---------------------", file=sys.stdout)
 
     except (KeyboardInterrupt, SystemExit):
-        print(" hcd_wrapper.py aborted by the user", file=sys.stderr)
+        print(" wf_wrapper.py aborted by the user", file=sys.stderr)
         input.close()
         output.close()
 
     except:
-        print("ERROR in hcd_wrapper.py", file=sys.stderr)
+        print("ERROR in wf_wrapper.py", file=sys.stderr)
         raise
