@@ -58,12 +58,12 @@ def is_ec_on(ec_launchers, time_slice):
         else:
             return False
         [tc, it] = find_nearest(time_array, time_slice)
-        nlauncher = len(ec_launchers.launcher)
+        nlauncher = len(ec_launchers.beam)
         power = 0.0
         if nlauncher > 0:
             for ilauncher in range(nlauncher):
-                if ec_launchers.launcher[ilauncher].power_launched.data[it] > 0:
-                    power = power + ec_launchers.launcher[ilauncher].power_launched.data[it]
+                if ec_launchers.beam[ilauncher].power_launched.data[it] > 0:
+                    power = power + ec_launchers.beam[ilauncher].power_launched.data[it]
             if power == 0:
                 return False
             else:
@@ -71,15 +71,15 @@ def is_ec_on(ec_launchers, time_slice):
         else:
             return False
     else:
-        nlauncher = len(ec_launchers.launcher)
+        nlauncher = len(ec_launchers.beam)
         power = 0.0
         if nlauncher > 0:
             for ilauncher in range(nlauncher):
-                if len(ec_launchers.launcher[ilauncher].power_launched.time) > 0:
-                    time_array = ec_launchers.launcher[ilauncher].power_launched.time
+                if len(ec_launchers.beam[ilauncher].power_launched.time) > 0:
+                    time_array = ec_launchers.beam[ilauncher].power_launched.time
                     [tc, it] = find_nearest(time_array, time_slice)
-                    if ec_launchers.launcher[ilauncher].power_launched.data[it] > 0:
-                        power = power + ec_launchers.launcher[ilauncher].power_launched.data[it]
+                    if ec_launchers.beam[ilauncher].power_launched.data[it] > 0:
+                        power = power + ec_launchers.beam[ilauncher].power_launched.data[it]
             if power == 0:
                 return False
             else:

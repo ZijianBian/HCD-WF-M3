@@ -24,7 +24,7 @@ except:
     sys.exit()
 
 try:
-    import interface.colour_definitions as col
+    import colour_definitions.bluish as col
     from wf_tools import (
         import_actor,
         create_workflow_param_from_file,
@@ -38,7 +38,7 @@ try:
         create_maindict,
         saved_folder_name,
 )
-    from interface.codeparam_edit import edit_codeparam
+    from gui_tools import edit_codeparam, edit_waveforms
 except:
     raise
     print("ERROR while loading internal HCD modules", file=sys.stderr)
@@ -93,6 +93,11 @@ def open_gui(wf_param_file):
         window.geometry("+%d+%d" % (wx, wy))
     except:
         pass
+
+    # LIST OF PRE-CONFIGURED WAVEFORMS
+    waveform_folder = os.getenv('EBROOTWAVEFORMMINCOOKER')+'/ITER_PRESETS/'
+    #waveform_folder = '/home/ITER/schneim/public/git/waveform-cooker/ITER_PRESETS/'
+    waveform_presets = loadlist(file,'waveform_presets')
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
@@ -262,13 +267,11 @@ def open_gui(wf_param_file):
         )
     )
 
-    button_create_flowchart = tkinter.Button(fr_as, text="Show Flowchart", bg=col.c2)
-    button_create_flowchart.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
-    button_create_flowchart.configure(
-        command=lambda: destr_and_make(
-            removed_by_close_button, window, maindict, workflow_param
-        )
-    )
+    button_edit_waveforms = tkinter.Button(fr_as, text="Edit H&CD waveforms", bg=col.c2)
+    button_edit_waveforms.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
+    button_edit_waveforms.configure(
+        command=lambda: edit_waveforms(\
+            waveform_presets,waveform_folder,saved_folder.Save(None, init_folder)))
 
     window.mainloop()
 

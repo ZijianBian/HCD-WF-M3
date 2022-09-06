@@ -232,6 +232,10 @@ def wf_wrapper(par_path):
                 if ids in ids_md_list:
                     process_bundle[process]['input'][ids] = input.get(ids)
 
+
+        #import pdb
+        #pdb.set_trace()
+
         ##################################################################
 
         # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS

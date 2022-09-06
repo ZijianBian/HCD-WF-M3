@@ -10,6 +10,12 @@ module load sh
 # Library to process xml with Python
 module load lxml/4.6.2-GCCcore-10.2.0
 
+# Waveform cooker
+module load Waveform-Cooker
+
+# For YAML formatted edition
+module load ruamel.yaml/0.16.12-GCCcore-10.2.0
+
 # Actor folder (to replace some H&CD modules freshly recompiled)
 export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
