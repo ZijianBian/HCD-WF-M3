@@ -29,7 +29,7 @@ def wf_wrapper(par_path):
         # READ WORKFLOW PARAMETERS FROM INPUT XML FILE
         # ---------------------------------------------
         workflow_xml = par_path + "/input_workflow.xml"
-        parameters = create_workflow_param_from_file(workflow_xml)['workflow_parameters'][0]
+        wf_parameters = create_workflow_param_from_file(workflow_xml)['workflow_parameters'][0]
 
         ##################################################################
 
@@ -141,17 +141,17 @@ def wf_wrapper(par_path):
         version = os.getenv("IMAS_VERSION")[0]
 
         # INPUT AND OUTPUT DB ENVIRONMENT
-        input_user_or_path  = parameters["input_user_or_path"][0]
-        input_database      = parameters["input_database"][0]
-        output_user_or_path = parameters["output_user_or_path"][0]
-        output_database     = parameters["output_database"][0]
-        shot_nr             = parameters["shot_nr"][0]
-        run_in              = parameters["run_in"][0]
-        run_out             = parameters["run_out"][0]
-        dt_required         = parameters["dt_required"][0]
-        one_time_slice      = parameters["one_time_slice"][0]
-        tbegin              = parameters["tbegin"][0]
-        tend                = parameters["tend"][0]
+        input_user_or_path  = wf_parameters["input_user_or_path"][0]
+        input_database      = wf_parameters["input_database"][0]
+        output_user_or_path = wf_parameters["output_user_or_path"][0]
+        output_database     = wf_parameters["output_database"][0]
+        shot_nr             = wf_parameters["shot_nr"][0]
+        run_in              = wf_parameters["run_in"][0]
+        run_out             = wf_parameters["run_out"][0]
+        dt_required         = wf_parameters["dt_required"][0]
+        one_time_slice      = wf_parameters["one_time_slice"][0]
+        tbegin              = wf_parameters["tbegin"][0]
+        tend                = wf_parameters["tend"][0]
 
         # DEFAULT OUTPUT USER_OR_PATH IS $USER
         if output_user_or_path == "default":
@@ -233,6 +233,8 @@ def wf_wrapper(par_path):
                     process_bundle[process]['input'][ids] = input.get(ids)
 
 
+        # process_bundle['ec_wave_solver']['input']['ec_launchers'].ids_properties.homogeneous_time
+        #actor_parameters = create_workflow_param_from_file(workflow_xml)['actor_selection'][0]
         #import pdb
         #pdb.set_trace()
 
@@ -360,7 +362,10 @@ def wf_wrapper(par_path):
                     print("  ----> Aborted.", file=sys.stderr)
                     return
 
-            process_bundle = hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors)
+            process_bundle,err = hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors)
+            if err<1:
+                print('  Error in H&CD workflow.',file=sys.stderr)
+                return
 
             # ------------------------------
             # COMMON BUNDLE TO SAVE TO DISK

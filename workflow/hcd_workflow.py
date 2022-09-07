@@ -77,46 +77,67 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
         + '/../global_configuration/' + 'global_lists.yaml'
     
     # EXTRACT ACTOR SELECTION PARAMETERS FROM INPUT XML FILE
-    parameters = create_workflow_param_from_file(workflow_xml)['actor_selection'][0]
+    actor_parameters = create_workflow_param_from_file(workflow_xml)['actor_selection'][0]
 
     # CREATE PARAMETERS DICTIONARY WITH DIRECTLY EACH PROCESS AS KEY
     param_process = {}
-    for main_key in parameters:
-        for category in parameters[main_key][0]:
-            for process in parameters[main_key][0][category][0]:
-                param_process[process] = parameters[main_key][0][category][0][process][0]
+    for main_key in actor_parameters:
+        for category in actor_parameters[main_key][0]:
+            for process in actor_parameters[main_key][0][category][0]:
+                param_process[process] = actor_parameters[main_key][0][category][0][process][0]
 
     # IF AN H&CD SOURCE IS CONFIGURED BUT IT HAS NO POWER FOR THIS TIME SLICE,
     # DO NOT RUN THE CODE(S) FOR THIS SOURCE
     for process in  process_bundle.keys():
 
         if 'nbi' in process_bundle[process]['input'] \
+           and process_bundle[process]['input']['nbi'].ids_properties.homogeneous_time < 0:
+            print('  NBI required but no waveform!!!',file=sys.stderr)
+            print('  --> Edit H&CD waveforms before executing the workflow.',file=sys.stderr)
+            print('  --> Abort.',file=sys.stderr)
+            return process_bundle,-1
+        
+        if 'nbi' in process_bundle[process]['input'] \
            and not is_nbi_on(process_bundle[process]['input']['nbi'], \
                              process_bundle[process]['input']['core_profiles'].time):
-            print('  No NBI power for this time slice')
+            print('  No NBI power for this time slice',file=sys.stdout)
             param_process['nbi_source'] = 0
             param_process['nbi_fp'] = 0
 
         if 'ic_antennas' in process_bundle[process]['input'] \
+           and process_bundle[process]['input']['ic_antennas'].ids_properties.homogeneous_time < 0:
+            print('  ICRH required but no waveform!!!',file=sys.stderr)
+            print('  --> Edit H&CD waveforms before executing the workflow.',file=sys.stderr)
+            print('  --> Abort.',file=sys.stderr)
+            return process_bundle,-1
+        
+        if 'ic_antennas' in process_bundle[process]['input'] \
            and not is_ic_on(process_bundle[process]['input']['ic_antennas'], \
                             process_bundle[process]['input']['core_profiles'].time):
-            print('  No IC power for this time slice')
+            print('  No IC power for this time slice',file=sys.stdout)
             param_process['ic_coup'] = 0
             param_process['ic_wave_solver'] = 0
             param_process['ic_wave_fp'] = 0
 
         if 'ec_launchers' in process_bundle[process]['input'] \
+           and process_bundle[process]['input']['ec_launchers'].ids_properties.homogeneous_time < 0:
+            print('  ECRH required but no waveform!!!',file=sys.stderr)
+            print('  --> Edit H&CD waveforms before executing the workflow.',file=sys.stderr)
+            print('  --> Abort.',file=sys.stderr)
+            return process_bundle,-1
+        
+        if 'ec_launchers' in process_bundle[process]['input'] \
           and not is_ec_on(process_bundle[process]['input']['ec_launchers'], \
                            process_bundle[process]['input']['core_profiles'].time):
-           print('  No EC power for this time slice')
+           print('  No EC power for this time slice',file=sys.stdout)
            param_process['ec_wave_solver'] = 0
 
     # DEFINE THE SEQUENCE OF CODES TO BE EXECUTED
     if catdict['ic_wave_fp'][param_process['ic_wave_solver']]['name'] != 'fopla':
-        print('--- Default algorithm ---')
+        print('--- Default algorithm ---',file=sys.stdout)
         input_algorithm = loadlist(file,'algorithm')['default']
     else:
-        print('--- NBI+IC synergy algorithm ---')
+        print('--- NBI+IC synergy algorithm ---',file=sys.stdout)
         input_algorithm = loadlist(file,'algorithm')['nbi_ic_synergy']
 
     final_algorithm, waiting_for, parallel_runs = clever_algo(
@@ -141,6 +162,7 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
                 process,
                 '=',
                 catdict[process][param_process[process]]['name'].upper(),
+                file=sys.stdout,
             )
             output_ids_list = catdict[process][param_process[process]]['output']
             # REMOVE WARNINGS AND HCD2CORE_SOURCE CRASHS (DOES NOT LIKE RECEIVING EMPTY IDSS)
@@ -156,7 +178,7 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
                 if ids_to_be_merged in process_bundle[each_proc]['input']:
                     kmerge = 1                
             if kmerge == 1:
-                print(' PROCESS -->', process)
+                print(' PROCESS -->', process,file=sys.stdout)
                 output_ids_data = run(process, actor, process_bundle[process]['input'], param_process)
                 del bundle_out[output_ids_list[0]]
 
@@ -190,4 +212,4 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
 
     print('End of time slice', file=sys.stdout)
 
-    return process_bundle
+    return process_bundle,0
