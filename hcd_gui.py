@@ -99,7 +99,6 @@ def open_gui(wf_param_file):
 
     # LIST OF PRE-CONFIGURED WAVEFORMS
     waveform_folder = os.getenv('EBROOTWAVEFORMMINCOOKER')+'/ITER_PRESETS/'
-    #waveform_folder = '/home/ITER/schneim/public/git/waveform-cooker/ITER_PRESETS/'
     waveform_presets = loadlist(file,'waveform_presets')
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS

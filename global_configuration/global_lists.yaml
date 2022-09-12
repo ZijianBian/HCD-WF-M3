@@ -112,17 +112,6 @@ exec_types:
    mpi_local
    mpi_batch
 
-#wf_presets:
-#  ec:
-#     file: ['ec_launchers_standard_Omode.yaml','ec_launchers_standard_Xmode.yaml']
-#     name: ['O-mode','X-mode']
-#  ic:
-#     file: ['ic_53MHz_default.yaml']
-#     name: ['53 MHz']
-#  nbi:
-#     file: ['nbi_D_1MeV_off_off.yaml','nbi_D_1MeV_off_on.yaml','nbi_D_1MeV_on_on.yaml','nbi_H_870keV_off_off.yaml','nbi_H_870keV_off_on.yaml','nbi_H_870keV_on_on.yaml']
-#     name: ['D 1MeV off-off','D 1MeV off-on','D 1MeV on-on','H 870keV off-off','H 870keV off-on','H 870keV on-on']
-
 waveform_presets:
   ec:
      custom:  ['ec_waveforms.yaml','Custom']

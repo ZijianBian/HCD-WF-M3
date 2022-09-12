@@ -13,9 +13,6 @@ module load lxml/4.6.2-GCCcore-10.2.0
 # Waveform cooker
 module load Waveform-Cooker
 
-# For YAML formatted edition
-module load ruamel.yaml/0.16.12-GCCcore-10.2.0
-
 # Actor folder (to replace some H&CD modules freshly recompiled)
 export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
@@ -47,8 +44,8 @@ module load CMake/3.18.4-GCCcore-10.2.0
 module load Fundamental-Constants
 module load `module avail AMNS/*-intel-* -t |tail -n 1`
 
-# Workflow tools
-export PYTHONPATH=/home/ITER/schneim/public/git/wftools/scripts:$PYTHONPATH
+# Workflow tools (local version)
+#export PYTHONPATH=/home/ITER/schneim/public/git/wftools/scripts:$PYTHONPATH
 
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
