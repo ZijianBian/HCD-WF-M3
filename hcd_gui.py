@@ -38,7 +38,9 @@ try:
         create_maindict,
         saved_folder_name,
 )
-    from gui_tools import edit_codeparam, edit_waveforms
+    from gui_tools import edit_codeparam
+    from waveform_edition import edit_waveforms
+    import complex_mode as cm
 except:
     raise
     print("ERROR while loading internal HCD modules", file=sys.stderr)
@@ -48,7 +50,6 @@ except:
     )
     sys.exit()
 
-import complex_mode as cm
     
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file

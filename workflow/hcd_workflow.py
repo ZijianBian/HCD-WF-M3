@@ -1,7 +1,6 @@
-import copy
+import copy, os, sys
+import imas
 from multiprocessing import Pool
-import os
-import sys
 from time import time
 
 from lxml import etree
@@ -157,25 +156,52 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
     for process in final_algorithm:
         actor = dictionary_of_actors[catdict[process][param_process[process]]['name']]
         if not 'merge_' in process:
-            print(
-                ' PROCESS --> ',
-                process,
-                '=',
-                catdict[process][param_process[process]]['name'].upper(),
-                file=sys.stdout,
-            )
+            if process_bundle[process]['status'] == 1:
+                print(
+                    ' PROCESS --> ',
+                    process,
+                    '=',
+                    catdict[process][param_process[process]]['name'].upper(),
+                    file=sys.stdout,
+                )
+            else:
+                print(
+                    ' PROCESS',
+                    process,
+                    '=',
+                    catdict[process][param_process[process]]['name'].upper(),
+                    ' not called for this time slice',
+                    file=sys.stdout,
+                )
             output_ids_list = catdict[process][param_process[process]]['output']
-            # REMOVE WARNINGS AND HCD2CORE_SOURCE CRASHS (DOES NOT LIKE RECEIVING EMPTY IDSS)
+            # REMOVE WARNINGS AND HCD2CORE_SOURCES CRASHS (DOES NOT LIKE RECEIVING EMPTY IDSS)
             for ids in process_bundle[process]['input'].keys(): 
                 if process_bundle[process]['input'][ids].ids_properties.homogeneous_time < 1:
                     process_bundle[process]['input'][ids].ids_properties.homogeneous_time = 1
-                    process_bundle[process]['input'][ids].time = process_bundle[process]['input']['core_profiles'].time
-            output_ids_data = run(process, actor, process_bundle[process]['input'], param_process)
+                    process_bundle[process]['input'][ids].time = \
+                            process_bundle[process]['input']['core_profiles'].time
+            if process_bundle[process]['status'] == 1:
+                output_ids_data = run(process, actor, process_bundle[process]['input'], param_process)
+            else:
+                output_ids_data = []
+                for ids in process_bundle[process]['output']:
+                    if len(process_bundle[process]['output']) == 1:
+                        if ids in process_bundle[process]['input']:
+                            output_ids_data = process_bundle[process]['input'][ids]
+                        else:
+                            output_ids_data = eval('imas.'+ids+'()')
+                    else:
+                        if ids in process_bundle[process]['input']:
+                            output_ids_data.append(process_bundle[process]['input'][ids])
+                        else:
+                            import imas
+                            output_ids_data.append(eval('imas.'+ids+'()'))
         else:
             kmerge = 0
             ids_to_be_merged = process_bundle[process]['input'][0].__name__
             for each_proc in process_bundle.keys(): # merge only if at least one of involved codes is called
-                if ids_to_be_merged in process_bundle[each_proc]['input']:
+                if ids_to_be_merged in process_bundle[each_proc]['input']\
+                   and process_bundle[each_proc]['status'] == 1:
                     kmerge = 1                
             if kmerge == 1:
                 print(' PROCESS -->', process,file=sys.stdout)

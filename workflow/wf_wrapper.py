@@ -13,8 +13,9 @@ from wf_tools import (
     create_workflow_param_from_file,
     loadlist,
     create_maindict,
+    find_nearest,
 )
-
+from waveform_cooker import add_dynamic
 import logging
 log = logging.getLogger()
 log.setLevel(logging.ERROR)
@@ -67,6 +68,7 @@ def wf_wrapper(par_path):
         ids_scenario_list = loadlist(file,'ids_scenario_list')
         ids_md_list       = loadlist(file,'ids_md_list')
         ids_process_list  = loadlist(file,'ids_process_list')
+        waveform_presets  = loadlist(file,'waveform_presets')
 
         # DEFINE THE TOTAL LIST OF INVOLVED INPUT AND OUTPUT IDSS ACCORDING TO THE ACTOR SELECTION
         process_bundle  = {}
@@ -227,11 +229,18 @@ def wf_wrapper(par_path):
         ##################################################################
 
         # READ INPUT MACHINE DESCRIPTION DATA
+        md = imas.DBEntry(imas.imasdef.MEMORY_BACKEND,output_database,0,run_out,output_user_or_path)
+        md.create()
         for process in process_bundle.keys():
             for ids in process_bundle[process]['input'].keys():
                 if ids in ids_md_list:
                     process_bundle[process]['input'][ids] = input.get(ids)
-
+                    # Overwrite with configured waveform if it exists
+                    waveform_file = par_path\
+                        +'/'+waveform_presets[process.split('_')[0]]['custom'][0]
+                    if os.path.exists(waveform_file):
+                        process_bundle[process]['input'][ids] = add_dynamic(waveform_file)
+                    md.put(process_bundle[process]['input'][ids])
 
         # process_bundle['ec_wave_solver']['input']['ec_launchers'].ids_properties.homogeneous_time
         #actor_parameters = create_workflow_param_from_file(workflow_xml)['actor_selection'][0]
@@ -346,7 +355,10 @@ def wf_wrapper(par_path):
             for ids in ids_scenario_list:
                 print("  Get", ids, file=sys.stdout)
                 try:
-                    common_bundle[ids] = input.get_slice(ids, timenow, 1)
+                    if ids not in ids_md_list: # Scenario IDSs
+                        common_bundle[ids] = input.get_slice(ids, timenow, 1)
+                    else: # Machine Description IDSs
+                        common_bundle[ids] = md.get_slice(ids, timenow, 1)
                     for process in process_bundle.keys():
                         if 'merge_' not in process and ids in process_bundle[process]['input'].keys():
                             process_bundle[process]['input'][ids] = common_bundle[ids]
@@ -362,8 +374,28 @@ def wf_wrapper(par_path):
                     print("  ----> Aborted.", file=sys.stderr)
                     return
 
+            # ---------------------------------------------------------------------
+            # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
+            # ---------------------------------------------------------------------
+            try:
+                time_base=create_workflow_param_from_file(workflow_xml)['time_base']
+            except:
+                time_base = None
+
+            for process in process_bundle.keys():
+                if time_base is not None:
+                    if process in time_base[0]:
+                        [tc,it]=find_nearest(np.array(time_base[0][process][0]\
+                                                      ['wf_interval'][0]['time_array'][0]),timenow)
+                        process_bundle[process]['status'] = time_base[0][process][0]\
+                            ['wf_interval'][0]['status'][0][it]
+                    else:
+                        process_bundle[process]['status'] = 1
+                else:
+                    process_bundle[process]['status'] = 1
+
             process_bundle,err = hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors)
-            if err<1:
+            if err<0:
                 print('  Error in H&CD workflow.',file=sys.stderr)
                 return
 
@@ -394,7 +426,8 @@ def wf_wrapper(par_path):
             # SAVE TO DISK
             for ids in process_bundle_out.keys():
                 if len(process_bundle_out[ids].time) > 0: # Empty if process deactivated by an is_xx_on function
-                    if process_bundle_out[ids].time[0] > 0 or 'merge' in process_bundle_out[ids].code.name:
+                    if process_bundle_out[ids].time[0] > 0 \
+                       or 'merge' in process_bundle_out[ids].code.name:
                         output.put_slice(process_bundle_out[ids])
                         previous_time[ids] = process_bundle_out[ids].time[0]
 
@@ -407,11 +440,14 @@ def wf_wrapper(par_path):
                         for ids in process_bundle[process]['output'].keys():
                             if type(process_bundle[process]['input']) is dict \
                                and ids in process_bundle[process]['input'].keys():
-                                  print('Copy '+ids+' from output to input for '+process+' for next time slice')
-                                  process_bundle[process]['input'][ids] = process_bundle[process]['output'][ids]
+                                  print('Copy '+ids+' from output to input for '\
+                                        +process+' for next time slice')
+                                  process_bundle[process]['input'][ids] = \
+                                      process_bundle[process]['output'][ids]
 
         input.close()
         output.close()
+        md.close()
 
         # FINALIZE ALL ACTORS
         for actor_name,actor in dictionary_of_actors.items():
