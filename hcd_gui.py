@@ -48,6 +48,8 @@ except:
     )
     sys.exit()
 
+import complex_mode as cm
+    
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
 
@@ -187,14 +189,16 @@ def open_gui(wf_param_file):
                 complex_button[process]['font'] = font.Font(size=8)
                 complex_button[process].config(activebackground=col.c4)
                 complex_button[process].grid(row=rrow, column=2, padx=0, pady=0, sticky="w")
-                complex_button[process].configure(command=lambda process=process: cm.complex_mode(fr_as,process,workflow_param))
+                complex_button[process].configure(command=lambda process=process: \
+                                                  cm.complex_mode(fr_as,process,workflow_param))
                 font.Font(size=fontsize)
                 rrow += 1
 
     # -------------------------------------------------------------------------------------
 
     saved_folder = saved_folder_name(default_wf_param_file,maindict,
-                 uncompiled_actors,workflow_param,'workflow_parameters','actor_selection',process_list)
+                uncompiled_actors,workflow_param,\
+                'workflow_parameters','actor_selection',process_list)
 
     # -------------------------------------------------------------------------------------
 
