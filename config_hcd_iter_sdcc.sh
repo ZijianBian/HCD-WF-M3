@@ -45,7 +45,7 @@ module load Fundamental-Constants
 module load `module avail AMNS/*-intel-* -t |tail -n 1`
 
 # Workflow tools (local version)
-#export PYTHONPATH=/home/ITER/schneim/public/git/wftools/scripts:$PYTHONPATH
+#export PYTHONPATH=/home/ITER/schneim/public/git/wftools/:$PYTHONPATH
 
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"

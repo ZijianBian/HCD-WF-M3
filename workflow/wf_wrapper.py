@@ -119,7 +119,7 @@ def wf_wrapper(par_path):
         # Temporary version:
         # common_bundle contains all IDSs to be read via get_slice() from input scenario, defined by ids_scenario_list
         # process_bundle contains all other input and output IDSs (total list = ids_md_list + ids_process_list)
-        #    - all its inputs from ids_md_list to be read via get()
+        #    - all its inputs from ids_md_list to be read via get() or get_slice()
         #    - all other inputs from ids_process_list are output of upstream actors 
         #      to be copied from the output bundle of upstream actors inside the time loop
         #      according to the parallel_dependency constraints
@@ -231,6 +231,7 @@ def wf_wrapper(par_path):
         # READ INPUT MACHINE DESCRIPTION DATA
         md = imas.DBEntry(imas.imasdef.MEMORY_BACKEND,output_database,0,run_out,output_user_or_path)
         md.create()
+        reduced_md_list = []
         for process in process_bundle.keys():
             for ids in process_bundle[process]['input'].keys():
                 if ids in ids_md_list:
@@ -241,11 +242,8 @@ def wf_wrapper(par_path):
                     if os.path.exists(waveform_file):
                         process_bundle[process]['input'][ids] = add_dynamic(waveform_file)
                     md.put(process_bundle[process]['input'][ids])
-
-        # process_bundle['ec_wave_solver']['input']['ec_launchers'].ids_properties.homogeneous_time
-        #actor_parameters = create_workflow_param_from_file(workflow_xml)['actor_selection'][0]
-        #import pdb
-        #pdb.set_trace()
+                    if ids not in reduced_md_list:
+                        reduced_md_list.append(ids)
 
         ##################################################################
 
@@ -355,13 +353,29 @@ def wf_wrapper(par_path):
             for ids in ids_scenario_list:
                 print("  Get", ids, file=sys.stdout)
                 try:
-                    if ids not in ids_md_list: # Scenario IDSs
-                        common_bundle[ids] = input.get_slice(ids, timenow, 1)
-                    else: # Machine Description IDSs
-                        common_bundle[ids] = md.get_slice(ids, timenow, 1)
+                    common_bundle[ids] = input.get_slice(ids, timenow, 1)
                     for process in process_bundle.keys():
                         if 'merge_' not in process and ids in process_bundle[process]['input'].keys():
                             process_bundle[process]['input'][ids] = common_bundle[ids]
+                except:
+                    print(
+                        "  ERROR while reading the " + ids + " IDS:", file=sys.stderr
+                    )
+                    print(
+                        "  ----> Check the version of the Data Dictionary between the"
+                        + " input and the loaded IMAS version.",
+                        file=sys.stderr,
+                    )
+                    print("  ----> Aborted.", file=sys.stderr)
+                    return
+                
+            # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
+            for ids in reduced_md_list:
+                print("  Get", ids, file=sys.stdout)
+                try:
+                    for process in process_bundle.keys():
+                        if ids in process_bundle[process]['input'].keys():
+                            process_bundle[process]['input'][ids] = md.get_slice(ids, timenow, 1)
                 except:
                     print(
                         "  ERROR while reading the " + ids + " IDS:", file=sys.stderr

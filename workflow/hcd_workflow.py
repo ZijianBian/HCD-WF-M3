@@ -181,7 +181,8 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
                     process_bundle[process]['input'][ids].time = \
                             process_bundle[process]['input']['core_profiles'].time
             if process_bundle[process]['status'] == 1:
-                output_ids_data = run(process, actor, process_bundle[process]['input'], param_process)
+                output_ids_data = run(process, actor, process_bundle[process]['input'],\
+                                      param_process)
             else:
                 output_ids_data = []
                 for ids in process_bundle[process]['output']:

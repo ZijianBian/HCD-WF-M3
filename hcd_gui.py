@@ -40,7 +40,7 @@ try:
 )
     from gui_tools import edit_codeparam
     from waveform_edition import edit_waveforms
-    import complex_mode as cm
+    import time_base_edition as tbe
 except:
     raise
     print("ERROR while loading internal HCD modules", file=sys.stderr)
@@ -190,7 +190,7 @@ def open_gui(wf_param_file):
                 complex_button[process].config(activebackground=col.c4)
                 complex_button[process].grid(row=rrow, column=2, padx=0, pady=0, sticky="w")
                 complex_button[process].configure(command=lambda process=process: \
-                                                  cm.complex_mode(fr_as,process,workflow_param))
+                                tbe.time_base_edition(fr_as,process,workflow_param))
                 font.Font(size=fontsize)
                 rrow += 1
 
