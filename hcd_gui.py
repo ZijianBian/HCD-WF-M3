@@ -38,7 +38,7 @@ try:
         create_maindict,
         saved_folder_name,
 )
-    from gui_tools import edit_codeparam
+    from gui_tools import edit_codeparam, CreateToolTip
     from waveform_edition import edit_waveforms
     import time_base_edition as tbe
 except:
@@ -191,6 +191,8 @@ def open_gui(wf_param_file):
                 complex_button[process].grid(row=rrow, column=2, padx=0, pady=0, sticky="w")
                 complex_button[process].configure(command=lambda process=process: \
                                 tbe.time_base_edition(fr_as,process,workflow_param))
+                CreateToolTip(complex_button[process],\
+                    'Edit the time base to select the time slices for which the model is called')
                 font.Font(size=fontsize)
                 rrow += 1
 
@@ -224,10 +226,12 @@ def open_gui(wf_param_file):
             process_list,
         )
     )
+    CreateToolTip(button_loadconfig,'Load another configuration folder')
 
     button_saveconfig = tkinter.Button(fr_wfp, text="Save", bg=col.c2)
     button_saveconfig.grid(row=53, column=0, padx=5, pady=5, sticky="ew")
     button_saveconfig.configure(command=lambda: saved_folder.Save(None, init_folder))
+    CreateToolTip(button_saveconfig,'Save the current configuration folder')
 
     button_saveas = tkinter.Button(fr_wfp, text="Save as", bg=col.c2)
     button_saveas.grid(row=54, column=0, padx=5, pady=5, sticky="ew")
@@ -239,24 +243,29 @@ def open_gui(wf_param_file):
             init_folder,
         )
     )
+    CreateToolTip(button_saveas,'Save as another configuration folder name')
 
     button_loadlconfig = tkinter.Button(fr_wfp, text="Load latest", bg=col.c2)
     button_loadlconfig.grid(row=52, column=1, padx=5, pady=5, sticky="ew")
     button_loadlconfig.configure(command=lambda: load("latest", open_gui, process_list))
+    CreateToolTip(button_loadlconfig,'Load the latest created configuration folder')
 
     button_saveandrun = tkinter.Button(fr_wfp, text="Run", bg=col.c2, state="normal")
     button_saveandrun.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
     button_saveandrun.configure(
         command=lambda: run(saved_folder.Save(None, init_folder))
     )
+    CreateToolTip(button_saveandrun,'Run the H&CD workflow with the current configuration')
 
     button_restore_def = tkinter.Button(fr_wfp, text="Restore Default", bg=col.c2)
     button_restore_def.grid(row=54, column=1, padx=5, pady=5, sticky="ew")
     button_restore_def.configure(command=lambda: open_gui(default_wf_param_file))
+    CreateToolTip(button_restore_def,'Restore the default parameters of the H&CD workflow')
 
     button_exit = tkinter.Button(fr_wfp, text="Exit", bg="light grey")
     button_exit.grid(row=56, column=0, padx=5, pady=5, sticky="w")
     button_exit.configure(command=lambda: sys.exit())
+    CreateToolTip(button_exit,'Exit the interface')
 
     # Middle panel
     button_edit_codeparameters = tkinter.Button(
@@ -270,12 +279,15 @@ def open_gui(wf_param_file):
             saved_folder.Save(None, init_folder),
         )
     )
+    CreateToolTip(button_edit_codeparameters,'Edit the code parameters for the selected models')
 
     button_edit_waveforms = tkinter.Button(fr_as, text="Edit H&CD waveforms", bg=col.c2)
     button_edit_waveforms.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
     button_edit_waveforms.configure(
         command=lambda: edit_waveforms(\
             waveform_presets,waveform_folder,saved_folder.Save(None, init_folder)))
+    CreateToolTip(button_edit_waveforms,\
+    'Edit the dynamic variables of H&CD sources (power, energy, angles, etc.)')
 
     window.mainloop()
 
