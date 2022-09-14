@@ -1,0 +1,193 @@
+# ----------------------------------------------------------------
+# THIS FILE IS AIMED AT CONFIGURING THE DYNAMIC DATA OF AN IDS
+# PREVIOUSLY READ FROM THE MACHINE DESCRIPTION DATABASE... OR NOT
+# ----------------------------------------------------------------
+ 
+# -------------------------------------------------------------------------------------------------------
+# CONFIGURATION RULES:
+# --------------------
+# - IF SHOT = O, IDS CREATED FROM SCRACTH, OTHERWISE IT IS READ FROM THE MD DATABASE
+# - IF NO TIME ARRAY IS DEFINED FOR A SPECIFIC VARIABLE, IT USES THE GENERAL ONE INSTEAD
+# - THE TIME ARRAY OF A SPECIFIC VARIABLE HAS TO BE DEFINED AFTER THE SPECIFIC VARIABLE
+# --------------------
+# - ADVICE: DO NOT REMOVE VARIABLES (EXCEPT TIME ARRAYS), COMMENT THEM OUT INSTEAD
+# - NOTE:   THE ACCESS LAYER MAY NOT NOTICE A DIMENSION MISTAKE
+# - CAVEAT: MAKE SURE THE DIMENSION OF THE VARIABLE IS THE SAME AS THE ASSOCIATED TIME ARRAY
+#          (EXCEPTION: IF THE VARIABLE HAS JUST ONE VALUE, IT IS DUPLICATED OVER THE GENERAL TIME ARRAY)
+# -------------------------------------------------------------------------------------------------------
+ 
+ids: ec_launchers
+ 
+database:
+   shot: 120000
+   run: 203
+   user: public
+   db: ITER_MD
+ 
+time: [ 0, 80, 520, 750 ]
+ 
+nbeams: 11
+ 
+static_variables:
+ 
+   beam[0].name: EL/TSM
+   beam[1].name: EL/MSM
+   beam[2].name: EL/BSM
+   beam[3].name: UL12/USM
+   beam[4].name: UL12/LSM
+   beam[5].name: UL13/USM
+   beam[6].name: UL13/LSM
+   beam[7].name: UL15/USM
+   beam[8].name: UL15/LSM
+   beam[9].name: UL16/USM
+   beam[10].name: UL16/LSM
+ 
+dynamic_variables:
+ 
+   beam[0].power_launched.data: [0, 4.444e6, 4.444e6, 0]
+   beam[1].power_launched.data: [0, 4.444e6, 4.444e6, 0]
+#   beam[2].power_launched.data: [0, 0, 4.444e6, 4.444e6, 0]
+#   beam[2].power_launched.time: [0, 50, 60, 320, 400] # Independent time array
+   beam[2].power_launched.data: [0, 4.444e6, 4.444e6, 0]
+   beam[3].power_launched.data: [0, 3.333e6, 3.333e6, 0]
+   beam[4].power_launched.data: [0, 3.333e6, 3.333e6, 0]
+   beam[5].power_launched.data: [0.0000]
+   beam[6].power_launched.data: [0.0000]
+   beam[7].power_launched.data: [0.0000]
+   beam[8].power_launched.data: [0.0000]
+   beam[9].power_launched.data: [0.0000]
+   beam[10].power_launched.data: [0.0000]
+ 
+   beam[0].frequency.data: [1.7000e+11]
+   beam[1].frequency.data: [1.7000e+11]
+   beam[2].frequency.data: [1.7000e+11]
+   beam[3].frequency.data: [1.7000e+11]
+   beam[4].frequency.data: [1.7000e+11]
+   beam[5].frequency.data: [1.7000e+11]
+   beam[6].frequency.data: [1.7000e+11]
+   beam[7].frequency.data: [1.7000e+11]
+   beam[8].frequency.data: [1.7000e+11]
+   beam[9].frequency.data: [1.7000e+11]
+   beam[10].frequency.data: [1.7000e+11]
+ 
+   beam[0].mode: 1 # (1) O-mode, (-1) X-mode
+   beam[1].mode: 1
+   beam[2].mode: 1
+   beam[3].mode: 1
+   beam[4].mode: 1
+   beam[5].mode: 1
+   beam[6].mode: 1
+   beam[7].mode: 1
+   beam[8].mode: 1
+   beam[9].mode: 1
+   beam[10].mode: 1
+ 
+   beam[0].steering_angle_pol: [0.1724]
+   beam[1].steering_angle_pol: [0.0911]
+   beam[2].steering_angle_pol: [-0.08831]
+   beam[3].steering_angle_pol: [1.134]
+   beam[4].steering_angle_pol: [0.92]
+   beam[5].steering_angle_pol: [1.134]
+   beam[6].steering_angle_pol: [0.92]
+   beam[7].steering_angle_pol: [1.134]
+   beam[8].steering_angle_pol: [0.92]
+   beam[9].steering_angle_pol: [1.134]
+   beam[10].steering_angle_pol: [0.92]
+ 
+   beam[0].steering_angle_tor: [-0.3262]
+   beam[1].steering_angle_tor: [0.4340]
+   beam[2].steering_angle_tor: [0.4345]
+   beam[3].steering_angle_tor: [0.3319]
+   beam[4].steering_angle_tor: [0.3394]
+   beam[5].steering_angle_tor: [0.3319]
+   beam[6].steering_angle_tor: [0.3394]
+   beam[7].steering_angle_tor: [0.3319]
+   beam[8].steering_angle_tor: [0.3394]
+   beam[9].steering_angle_tor: [0.3319]
+   beam[10].steering_angle_tor: [0.3394]
+ 
+   beam[0].launching_position.r: [9.9907]
+   beam[1].launching_position.r: [9.9331]
+   beam[2].launching_position.r: [9.9632]
+   beam[3].launching_position.r: [7.0058]
+   beam[4].launching_position.r: [7.0622]
+   beam[5].launching_position.r: [7.0058]
+   beam[6].launching_position.r: [7.0622]
+   beam[7].launching_position.r: [7.0058]
+   beam[8].launching_position.r: [7.0622]
+   beam[9].launching_position.r: [7.0058]
+   beam[10].launching_position.r: [7.0622]
+ 
+   beam[0].launching_position.z: [1.2498]
+   beam[1].launching_position.z: [0.7770]
+   beam[2].launching_position.z: [-0.1649]
+   beam[3].launching_position.z: [4.4360]
+   beam[4].launching_position.z: [4.2332]
+   beam[5].launching_position.z: [4.4360]
+   beam[6].launching_position.z: [4.2332]
+   beam[7].launching_position.z: [4.4360]
+   beam[8].launching_position.z: [4.2332]
+   beam[9].launching_position.z: [4.4360]
+   beam[10].launching_position.z: [4.2332]
+ 
+   beam[0].launching_position.phi: [-1.4970]
+   beam[1].launching_position.phi: [-1.6504]
+   beam[2].launching_position.phi: [-1.6529]
+   beam[3].launching_position.phi: [-0.0176]
+   beam[4].launching_position.phi: [-0.0093]
+   beam[5].launching_position.phi: [-0.0176]
+   beam[6].launching_position.phi: [-0.0093]
+   beam[7].launching_position.phi: [-0.0176]
+   beam[8].launching_position.phi: [-0.0093]
+   beam[9].launching_position.phi: [-0.0176]
+   beam[10].launching_position.phi: [-0.0093]
+ 
+   beam[0].spot.size: [[0.0193], [0.0146]]
+   beam[1].spot.size: [[0.0233], [0.0160]]
+   beam[2].spot.size: [[0.0179], [0.0150]]
+   beam[3].spot.size: [[0.0407], [0.0485]]
+   beam[4].spot.size: [[0.0433], [0.0445]]
+   beam[5].spot.size: [[0.0407], [0.0485]]
+   beam[6].spot.size: [[0.0433], [0.0445]]
+   beam[7].spot.size: [[0.0407], [0.0485]]
+   beam[8].spot.size: [[0.0433], [0.0445]]
+   beam[9].spot.size: [[0.0407], [0.0485]]
+   beam[10].spot.size: [[0.0433], [0.0445]]
+ 
+   beam[0].spot.angle: [-1.5685]
+   beam[1].spot.angle: [1.7608]
+   beam[2].spot.angle: [1.3501]
+   beam[3].spot.angle: [-0.0277]
+   beam[4].spot.angle: [-0.0450]
+   beam[5].spot.angle: [-0.0277]
+   beam[6].spot.angle: [-0.0450]
+   beam[7].spot.angle: [-0.0277]
+   beam[8].spot.angle: [-0.0450]
+   beam[9].spot.angle: [-0.0277]
+   beam[10].spot.angle: [-0.0450]
+ 
+   beam[0].phase.curvature: [[-0.0002], [0.0006]]
+   beam[1].phase.curvature: [[-0.0096], [0.0432]]
+   beam[2].phase.curvature: [[-0.0584], [0.1191]]
+   beam[3].phase.curvature: [[-0.6336], [-0.3167]]
+   beam[4].phase.curvature: [[-0.5932], [-0.5467]]
+   beam[5].phase.curvature: [[-0.6336], [-0.3167]]
+   beam[6].phase.curvature: [[-0.5932], [-0.5467]]
+   beam[7].phase.curvature: [[-0.6336], [-0.3167]]
+   beam[8].phase.curvature: [[-0.5932], [-0.5467]]
+   beam[9].phase.curvature: [[-0.6336], [-0.3167]]
+   beam[10].phase.curvature: [[-0.5932], [-0.5467]]
+ 
+   beam[0].phase.angle: [-1.5685]
+   beam[1].phase.angle: [1.7608]
+   beam[2].phase.angle: [1.3501]
+   beam[3].phase.angle: [-0.0277]
+   beam[4].phase.angle: [-0.0450]
+   beam[5].phase.angle: [-0.0277]
+   beam[6].phase.angle: [-0.0450]
+   beam[7].phase.angle: [-0.0277]
+   beam[8].phase.angle: [-0.0450]
+   beam[9].phase.angle: [-0.0277]
+   beam[10].phase.angle: [-0.0450]
+ 
+
