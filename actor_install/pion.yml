@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/pion.git
-    VERSION: feature/iwrap
+    VERSION: develop
     DIR: pion
 
 MODULES: [IMAS, iWrap, INTERPOS, NAG/26-intel-2020b, XMLlib]

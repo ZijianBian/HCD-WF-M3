@@ -2,18 +2,18 @@
 ---
 SOURCES:
   - VCS:     git
-    REPO:    ssh://git@git.iter.org/imas/wftools.git
-    VERSION: develop
-    DIR:     wftools
+    REPO:    ssh://git@git.iter.org/heat/hcd-mergers.git
+    VERSION: master
+    DIR:     hcd_mergers
 
 MODULES: [IMAS, iWrap]
 
 BUILDS: 
-  - DIR: wftools
+  - DIR: hcd_mergers
     CMD: ./build.sh
 
 ACTORS: 
-  - DIR: wftools
+  - DIR: hcd_mergers
     XML: 
       - mergers/merge_core_sources.yaml
       - mergers/merge_distribution_sources.yaml

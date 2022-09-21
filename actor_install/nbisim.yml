@@ -1,7 +1,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/nbisim.git
-    VERSION: master
+    VERSION: develop
     DIR:     nbisim
 
 MODULES: [IMAS, iWrap, INTERPOS, XMLlib]

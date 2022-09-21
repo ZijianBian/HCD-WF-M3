@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/gray.git
-    VERSION: feature/ec_waveforms
+    VERSION: feature/3.37.0_DD_ec_launchers
     DIR: gray
 
 MODULES: [IMAS, iWrap, XMLlib]

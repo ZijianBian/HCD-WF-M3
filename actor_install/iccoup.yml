@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/fpsim.git
-    VERSION: feature/iwrap
+    VERSION: develop
     DIR: iccoup
 
 MODULES: [IMAS, iWrap, XMLlib]

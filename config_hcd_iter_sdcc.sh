@@ -13,12 +13,15 @@ module load lxml/4.6.2-GCCcore-10.2.0
 # Waveform cooker
 module load Waveform-Cooker
 
+# Workflow tools needed mostly for the HCD gui
+module load WFtools/1.1.0-intel-2020b
+
 # Actor folder (to replace some H&CD modules freshly recompiled)
 export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
+export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
 
 # Extend python path and avoid doublons
-export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
 
 # ---------------------------------------------------------------------------------------

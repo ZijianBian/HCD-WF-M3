@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/imas/training.git
-    VERSION: feature/huge_modif
+    VERSION: develop
     DIR: training
 
 MODULES: [IMAS, iWrap, XMLlib]
