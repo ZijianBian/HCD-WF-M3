@@ -10,9 +10,6 @@ module load sh
 # Library to process xml with Python
 module load lxml/4.6.2-GCCcore-10.2.0
 
-# Waveform cooker
-module load Waveform-Cooker
-
 # Workflow tools needed mostly for the HCD gui
 module load WFtools/1.1.0-intel-2020b
 
