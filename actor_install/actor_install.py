@@ -86,8 +86,12 @@ def get_sources(desc, args):
             sh.mv(s.get("DIR"), "." + s.get("DIR") + "_BACKUP")
 
         if s.get("VCS").lower() == "svn":
-            logs = sh.svn.checkout(s.get("REPO"), s.get("DIR"))
-            print(logs)
+            try:
+                logs = sh.svn.checkout(s.get("REPO"), s.get("DIR"))
+                print(logs)
+            except Exception as e:
+                print(e)
+                return 1
             wcrev = sh.svnversion(s.get("DIR"))
             if args.checkRevision:
                 if wcrev != s.get("VERSION"):
@@ -103,10 +107,14 @@ def get_sources(desc, args):
                 print("Checked-out " + s.get("REPO") + " in revision " + str(wcrev))
 
         elif s.get("VCS").lower() == "git":
-            logs = sh.git.clone(
-                "--single-branch", "-b", s.get("VERSION"), s.get("REPO"), s.get("DIR")
-            )
-            print(logs)
+            try:
+                logs = sh.git.clone(
+                    "--single-branch", "-b", s.get("VERSION"), s.get("REPO"), s.get("DIR")
+                )
+                print(logs)
+            except Exception as e:
+                print(e)
+                return 1
             prevdir = os.getcwd()
             os.chdir(s.get("DIR"))
             hhash = sh.git("rev-parse", "--verify", "HEAD")
@@ -253,7 +261,6 @@ argp.add_argument(
     help="Stop the whole script at first detected error",
 )
 args = argp.parse_args()
-
 
 # with open(args.yml, 'r') as stream:
 # desc = yaml.load(stream)
