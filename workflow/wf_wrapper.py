@@ -232,15 +232,17 @@ def wf_wrapper(par_path):
         md = imas.DBEntry(imas.imasdef.MEMORY_BACKEND,output_database,0,run_out,output_user_or_path)
         md.create()
         reduced_md_list = []
+        flag_multiple_md = 0
         for process in process_bundle.keys():
             for ids in process_bundle[process]['input'].keys():
                 if ids in ids_md_list:
                     process_bundle[process]['input'][ids] = input.get(ids)
                     # Overwrite with configured waveform if it exists
                     waveform_file = par_path\
-                        +'/'+waveform_presets[process.split('_')[0]]['custom'][0]
+                        +'/'+waveform_presets[process.split('_')[0]]['custom'][flag_multiple_md]
                     if os.path.exists(waveform_file):
                         process_bundle[process]['input'][ids] = add_dynamic(waveform_file)
+                        flag_multiple_md+=1
                     md.put(process_bundle[process]['input'][ids])
                     if ids not in reduced_md_list:
                         reduced_md_list.append(ids)

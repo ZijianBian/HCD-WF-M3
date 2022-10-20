@@ -132,7 +132,7 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
            param_process['ec_wave_solver'] = 0
 
     # DEFINE THE SEQUENCE OF CODES TO BE EXECUTED
-    if catdict['ic_wave_fp'][param_process['ic_wave_solver']]['name'] != 'fopla':
+    if catdict['ic_wave_fp'][param_process['ic_wave_fp']]['name'] != 'fopla':
         print('--- Default algorithm ---',file=sys.stdout)
         input_algorithm = loadlist(file,'algorithm')['default']
     else:
