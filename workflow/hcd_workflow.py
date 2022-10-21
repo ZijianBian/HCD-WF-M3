@@ -210,13 +210,17 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
                 del bundle_out[output_ids_list[0]]
 
         for iids in range(len(output_ids_list)):
-            if type(output_ids_data) is not list:
+            if not hasattr(output_ids_data,'__len__'):
+                #import pdb
+                #pdb.set_trace()
+                #if hasattr(output_ids_data,'__len__'):
+                #    for iids in range(len(output_ids_data)):                
                 process_bundle[process]['output'][output_ids_data.__name__] = output_ids_data
             else:
                 process_bundle[process]['output'][output_ids_data[iids].__name__] = output_ids_data[iids]
 
             if output_ids_list[iids] not in bundle_out.keys() or 'merge_' in process:
-                if type(output_ids_data) is not list:
+                if not hasattr(output_ids_data,'__len__'):
                     bundle_out[output_ids_list[iids]] = process_bundle[process]['output'][output_ids_data.__name__]
                 else:
                     bundle_out[output_ids_list[iids]] = process_bundle[process]['output'][output_ids_data[iids].__name__]
