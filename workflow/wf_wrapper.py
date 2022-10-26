@@ -107,7 +107,7 @@ def wf_wrapper(par_path):
                                     for elem in root.iter():
                                         if elem.tag == "nproc_actor":
                                             nproc_actor = int(elem.text)
-                                runtime_settings.mpi.mpi_nodes = nproc_actor
+                                runtime_settings.mpi.mpi_processes = nproc_actor
                                 code_parameters.__init__(default_parameters_path=par_path+"/"+category+"/"+process+"/input_"+actor_name+".xml",
                                                          schema_path=par_path+"/"+category+"/"+process+"/input_"+actor_name+".xsd")
                             actor.initialize(code_parameters=code_parameters,runtime_settings=runtime_settings)
