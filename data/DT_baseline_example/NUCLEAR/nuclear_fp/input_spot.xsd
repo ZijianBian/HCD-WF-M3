@@ -1,0 +1,830 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+   <xs:annotation>
+     <xs:documentation>Code parameters for Spot (Fokker-Planck code)</xs:documentation>
+   </xs:annotation>
+ 
+   <xs:simpleType name="integer_minInclusive_1">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minInclusive_2">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_12">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_04">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="0"/>
+       <xs:maxInclusive value="4"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_01">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="0"/>
+       <xs:maxInclusive value="1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="float_minmaxInclusive_dot0001_dot01">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="1.e-4"/>
+       <xs:maxInclusive value="0.1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="float_minmax_orbit">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="-1.0"/>
+       <xs:maxInclusive value="1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="float_minmax_timestep">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="-1.0"/>
+       <xs:maxInclusive value="1.0001e-7"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="float_minmax_eth">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="-1.0"/>
+       <xs:maxInclusive value="500"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="float_minmaxInclusive_mendeleiv">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="1.0"/>
+       <xs:maxInclusive value="300.0"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <!-- document element -->
+   <xs:element name="parameters">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="nperstep" minOccurs="1"/>
+         <xs:element ref="nout1d" minOccurs="1"/>
+         <xs:element ref="nout2dr" minOccurs="1"/>
+         <xs:element ref="nout2dz" minOccurs="1"/>
+         <xs:element ref="ksolver" minOccurs="1"/>
+         <xs:element ref="bigwidth" minOccurs="1"/>
+         <xs:element ref="icrh_heating" minOccurs="1"/>
+         <xs:element ref="source_flag" minOccurs="1"/>
+         <xs:element ref="icrh_ion_mass" minOccurs="1"/>
+         <xs:element ref="icrh_ion_charge" minOccurs="1"/>
+         <xs:element ref="kforce_xml" minOccurs="1"/>
+         <xs:element ref="dt_forced" minOccurs="1"/>
+         <xs:element ref="korbdisp" minOccurs="1"/>
+	 <xs:element ref="force_instant_source" minOccurs="1"/>
+         <xs:element ref="zdelvpara_acc" minOccurs="1"/>
+         <xs:element ref="forced_timestep" minOccurs="1"/>
+         <xs:element ref="engy_threshold" minOccurs="1"/>
+         <xs:element ref="up2wall" minOccurs="1"/>
+       <xs:element ref="rfof_parameters" minOccurs="0" maxOccurs="1"/><xs:element ref="nproc_actor" minOccurs="0"/></xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <!-- Number of markers to be created every big time step -->
+   <xs:element name="nperstep" type="integer_minInclusive_1">
+      <xs:annotation>
+          <xs:documentation>Number of markers to be created every big time step</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Resolution of output 1D-profiles -->
+   <xs:element name="nout1d" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>Resolution of output 1D-profiles</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- R-Resolution of output 2D-profiles -->
+   <xs:element name="nout2dr" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>R-Resolution of output 2D-profiles</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Z-Resolution of output 2D-profiles -->
+   <xs:element name="nout2dz" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>Z-Resolution of output 2D-profiles</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Flag for internal solver: 1 = (R,Z) coordinates, 2 = (PSI,THETA) Boozer coordinates -->
+   <xs:element name="ksolver" type="integer_minmaxInclusive_12">
+      <xs:annotation>
+          <xs:documentation>Flag for internal solver: 1 = (R,Z) coordinates, 2 = (PSI,THETA) Boozer coordinates</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Duration of a big time step (sec) for source update, RFOF E-field normalisation, etc -->
+   <xs:element name="bigwidth" type="float_minmaxInclusive_dot0001_dot01">
+      <xs:annotation>
+          <xs:documentation>Duration of a big time step (sec) for source update, RFOF E-field normalisation, etc</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Flag for ICRH heating (0 = NO, 1 = YES) -->
+   <xs:element name="icrh_heating" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Flag for ICRH heating (0 = NO, 1 = YES)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Flag for source option (0=Spot-generated-alphas, 2=Spot-generated-thermals-for-ICRH, 3=Spot-generated-NBI, 4=marker-source) -->
+   <xs:element name="source_flag" type="integer_minmaxInclusive_04">
+      <xs:annotation>
+          <xs:documentation>Flag for source option (0=Spot-generated-alphas, 2=Spot-generated-thermals-for-ICRH, 3=Spot-generated-NBI, 4=marker-source)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Mass of followed ICRH-accelerated ion (if any) -->
+   <xs:element name="icrh_ion_mass" type="float_minmaxInclusive_mendeleiv">
+      <xs:annotation>
+          <xs:documentation>Mass of followed ICRH-accelerated ion (if any)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Charge of followed ICRH-accelerated ion (if any) -->
+   <xs:element name="icrh_ion_charge" type="float_minmaxInclusive_mendeleiv">
+      <xs:annotation>
+          <xs:documentation>Charge of followed ICRH-accelerated ion (if any)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Flag to force the use of XML input file for ICRF heating (when = 1) -->
+   <xs:element name="kforce_xml" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Flag to force the use of XML input file for ICRF heating (when = 1)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Forced simulation time (sec); if lower or equal to 0: use the IDS input instead -->
+   <xs:element name="dt_forced" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Forced simulation time (sec); if lower or equal to 0: use the IDS input instead</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Follow just one particle (1) or not (0) -->
+   <xs:element name="korbdisp" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Follow just one particle (1) or not (0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Force unique instantaneous source at the beginning of the simulation (1) or not (0) -->
+   <xs:element name="force_instant_source" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Force unique instantaneous source at the beginning of the simulation (1) or not (0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Quality criteria (allowed error on vpara) for orbit integration, from 0.0001 [accurate] to 1 [bad but fast] (-1 = automatic) -->
+   <xs:element name="zdelvpara_acc" type="float_minmax_orbit">
+      <xs:annotation>
+          <xs:documentation>Quality criteria (allowed error on vpara) for orbit integration, from 0.0001 [accurate] to 1 [bad but fast] (-1 = automatic)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Forced time step [s] or not (if equal to -1) -->
+   <xs:element name="forced_timestep" type="float_minmax_timestep">
+      <xs:annotation>
+          <xs:documentation>Forced time step [s] or not (if equal to -1)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Forced thermal energy threshold [keV] or not (if equal to -1) -->
+   <xs:element name="engy_threshold" type="float_minmax_eth">
+      <xs:annotation>
+          <xs:documentation>Forced thermal energy threshold [keV] or not (if equal to -1)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Follow the particles up to the LCFS (0) or up to the wall (1) -->
+   <xs:element name="up2wall" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Follow the particles up to the LCFS (0) or up to the wall (1)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+
+<!--
+    ==========================================================
+                 START: RFOF input parameters   
+    ==========================================================
+-->
+  <xs:simpleType name="RFOF_FloatPositive">
+    <xs:restriction base="xs:float">
+      <xs:minExclusive value="0.0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+   <!-- Definitions -->
+   <xs:simpleType name="RFOF_FloatList">
+      <xs:list itemType="xs:float"/>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="RFOF_IntegerList">
+      <xs:list itemType="xs:integer"/>
+   </xs:simpleType>
+ 
+  <xs:element name="rfof_parameters">
+    <xs:annotation>
+      <xs:documentation>RFOF code parameters</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+	
+	<!-- Use this element to couple to the RFOF -->
+	<xs:element ref="rfof_core_param"/>
+	
+	<!-- Use this element to couple to the RFOF -->
+	<xs:element ref="rfof_plasma_param"/>
+	
+	<!-- Use this element to couple to the RFOF -->
+	<xs:element ref="rfof_wave_param"/>
+	
+	<!-- Use this element to couple to the RFOF -->
+	<xs:element ref="rfof_wrapper_param"/>
+	
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <!--
+      ===============================================================
+      PRVATE RFOF OBJECTS:
+      author Thomas Johnson
+      ===============================================================
+  -->
+  
+  <xs:element name="rfof_core_param">
+    <xs:annotation>
+      <xs:documentation>Contains all fields needed when coupling to RFOF</xs:documentation>
+    </xs:annotation>
+      <xs:complexType>
+	<xs:sequence>
+	  <xs:element ref="assumptions"/>
+	  <xs:element ref="bounding_box"/>
+	  <xs:element ref="resonance_memory"/>
+	  <xs:element ref="IO_control"/>
+	  <xs:element ref="quasilinear" minOccurs="0"/>
+	</xs:sequence>
+      </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="assumptions">
+    <xs:annotation>
+      <xs:documentation>List of optional physics assumptions.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="assume_static_resonance_position_during_RF_kick"/>
+	<xs:element ref="use_drift_velocity_in_doppler_shift"/>
+	<xs:element ref="use_parallel_velocity_in_doppler_shift"/>
+	<xs:element ref="assume_zero_larmor_radius_in_KPERPxRHO"/>
+	<xs:element ref="assume_kpar_is_nphi_over_R"/>
+	<xs:element ref="assume_zero_order_FLR_for_Pphi"/>
+	<xs:element ref="width_of_rf_resonance_layer"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="assume_static_resonance_position_during_RF_kick" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation> If true then the RF intraction induces no spatial motion of the 
+orbit during the wave-particle interaction (however the new drift orbit may have a 
+different spatial extent)</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="use_drift_velocity_in_doppler_shift" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If true then the Doppler shift due to the drift velocity is 
+included in the resonance condition</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="use_parallel_velocity_in_doppler_shift" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If true then the Doppler shift due to the parallel velocity 
+is included in the resonance condition</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="assume_zero_larmor_radius_in_KPERPxRHO" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If "true", then the finite larmor radius effects in the wave 
+particle interaction are neglected</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="assume_kpar_is_nphi_over_R" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If "true" then the parallel wave number of is nphi/R, 
+otherwise the exact value is used</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="assume_zero_order_FLR_for_Pphi" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>Neglect finite larmor radius (FLR) corrections 
+to P_phi</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="width_of_rf_resonance_layer" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Width of the resonance layer as a fraction of the momentary 
+major radius</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <xs:element name="bounding_box">
+    <xs:annotation>
+      <xs:documentation>Bounding box in the poloidal cross section.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="Rmin"/>
+	<xs:element ref="Rmax"/>
+	<xs:element ref="Zmin"/>
+	<xs:element ref="Zmax"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Rmin" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Minimum major radius of the bounding box [m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Rmax" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Maximum major radius of the bounding box [m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Zmin" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Minimum vertical coordinate of the bounding box [m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Zmax" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Maximum vertical coordinate of the bounding box [m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <xs:element name="resonance_memory">
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="nStoreTimes"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nStoreTimes" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>The number of time points to be stored in the resonance memory. 
+These are used to extrapolate the orbit to the next upcoming resonance.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <xs:element name="IO_control">
+    <xs:annotation>
+      <xs:documentation>Controlling the output written to file</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="start_time_event_output"/>
+	<xs:element ref="output__2D_RZ_out"/>
+	<xs:element ref="NRedges_2DgridRZ"/>
+	<xs:element ref="NZedges_2DgridRZ"/>
+	<xs:element ref="output__Orbit"/>
+	<xs:element ref="MAX_number_of_points_stored_in_the_Orbit"/>
+	<xs:element ref="output__rf_kicks"/>
+	<xs:element ref="MAX_number_of_points_stored_in_rf_kick"/>
+	<xs:element ref="output__resonace_predictions"/>
+	<xs:element ref="MAX_number_of_points_stored_in_resonance_memory"/>
+	<xs:element ref="output__efield_normalization"/>
+	<xs:element ref="MAX_number_of_points_stored_in_the_efield_normalization"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="start_time_event_output" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Time at which to start generating event-output files</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="output__2D_RZ_out" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If true, then 2D output in (R,Z) will be generated for the density 
+of abosorbed power and torque</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="NRedges_2DgridRZ" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Number of horizontal grid points in the 2D (R,z) grid</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="NZedges_2DgridRZ" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Number of vertical grid points in the 2D (R,z) grid</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="output__Orbit" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If true, then output of the full orbits wil be generated and stored 
+to file</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="MAX_number_of_points_stored_in_the_Orbit" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Maximum number of orbit points written to file</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="output__rf_kicks" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If true, then a list of rf-kicks will be generated containing 
+the location and strength of the kick</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="MAX_number_of_points_stored_in_rf_kick" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Maximum number of rf-kick points written to file</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="output__resonace_predictions" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If true, then a list of rf-resonance preditions will be generated 
+containing the present location and predicted location of the next resonance</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="MAX_number_of_points_stored_in_resonance_memory" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Maximum number of rf-resonance prediction points written to file</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="output__efield_normalization" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If true, then a list of electric field normalization factors to file</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="MAX_number_of_points_stored_in_the_efield_normalization" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Maximum number of electric field normalizations (time-vector) written 
+to output file</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- Parameters describing the quasilinear model -->
+  <xs:element name="quasilinear">
+    <xs:annotation>
+      <xs:documentation>Parameters describing the quasilinear model</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+	<xs:element ref="MAX_relative_energy_kick" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MAX_relative_energy_kick" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>The I-perp kicks cannot be larger than this fraction of 
+the input I-perp</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- Representation of plasma -->
+  <xs:element name="rfof_plasma_param">
+    <xs:complexType>
+      <xs:sequence>
+	<xs:element ref="composition"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Representation of plasma composition -->
+  <xs:element name="composition">
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="n_species"/>
+	<xs:element ref="amn"/>
+	<xs:element ref="zn"/>
+	<xs:element ref="zion"/>
+	<xs:element ref="densities"/>
+	<xs:element ref="ion_temperature"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="n_species" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Number of plasma ion species</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="amn" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Atomic mass number</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="zn" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Nuclear charge in atomic units</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="zion" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Ionic charge in atomic units</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="densities" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Densities of each ion species</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="ion_temperature" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Temperatures of the ions</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+
+  <!-- Contains all fields of the RFOF wrapper -->   
+  <xs:element name="rfof_wave_param">
+    <xs:complexType>
+      <xs:sequence>
+	<xs:element ref="select_wave_from"/>
+	<xs:element ref="parametric_wave"/>
+	<xs:element ref="ascii_itm_wave"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="select_wave_from" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Select where the wave field should be taken from. 
+      0 : wave generated from the data in parametric_wave
+      1 : wave read from ascii version of ITM cpos, written using write_cpo in the write_structures module. 
+Filename is specified in ascii_itm_wave/filename_ascii_itm_wave.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <xs:element name="parametric_wave">
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="nfreq"/>
+	<xs:element ref="nnphi"/>
+	<xs:element ref="RFpower"/>
+	<xs:element ref="EfieldNormalisation"/>
+	<xs:element ref="ratioEPlusOverEMinus"/>
+	<xs:element ref="freq"/>
+	<xs:element ref="nphi"/>
+	<xs:element ref="kperp" minOccurs="0"/>
+	<xs:element ref="verticalCentre"/>
+	<xs:element ref="verticalWidth"/>
+	<xs:element ref="nGridHorisontal" minOccurs="0"/>
+	<xs:element ref="nGridVertical" minOccurs="0"/>
+	<xs:element ref="dielectric_response_model"/>
+	<xs:element ref="filename_lion_fields"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nfreq" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Number of RF frequencies</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="nnphi" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Number of toroidal modes per frequency</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="RFpower" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Power provided by the RF wave field</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="EfieldNormalisation" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Normalisation factor for the strength of the RF wave field</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="ratioEPlusOverEMinus" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Ratio between the left- and right-hand polarized electric wave 
+field components</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="freq" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>RF wave frequency [Hz]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="nphi" type="RFOF_IntegerList">
+    <xs:annotation>
+      <xs:documentation>Toroidal mode number</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="kperp" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Perpendicular wave number [1/m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="verticalCentre" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Vertical centre of the Gaussian RF wave field [m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="verticalWidth" type="RFOF_FloatList">
+    <xs:annotation>
+      <xs:documentation>Vertical width of the Gaussian RF wave field [m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="nGridHorisontal" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Number of grid points in the horisontal direction</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="nGridVertical" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Number of grid points in the vertical direction</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:element name="dielectric_response_model" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Determines what value of k-perp and Eplus/Eminus is used in RFOFWAVES. There are three options:
+      (a) "warm" = use fast wave dispersion relation with warm parallel dielectric response;
+      (b) "cold" = use fast wave dispersion relation with cold plasma dielecrtric response;
+      (c) "parametric" = The the values of kperp and ratioEPlusOverEMinus from xml-input.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+
+  <xs:element name="filename_lion_fields" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Filename for lion corfields-file</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <xs:element name="ascii_itm_wave">
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="filename_ascii_itm_wave"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="filename_ascii_itm_wave" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Name of input file containing the ITM cpo waves in ascii format written 
+using write_cpo in the write_structures module</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <!-- Contains all fields of the RFOF wrapper -->   
+  <xs:element name="rfof_wrapper_param">
+    <xs:complexType>
+      <xs:sequence>
+	<xs:element ref="time_stepping"/>
+	<xs:element ref="magnetic_field"/>
+	<xs:element ref="markers"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element> 
+  
+  <xs:element name="time_stepping">
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="NtimeSteps"/>
+	<xs:element ref="dt"/>
+	<xs:element ref="nStoreOutTimes"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NtimeSteps" type="xs:nonNegativeInteger">
+    <xs:annotation>
+      <xs:documentation>Number of time steps (of standalone RFOF orbit tracer).</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="dt" type="RFOF_FloatPositive">
+    <xs:annotation>
+      <xs:documentation>Length of each time step [s].</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="nStoreOutTimes" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Number of time steps between which the output is accumulated 
+before being written to file.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <xs:element name="magnetic_field">
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="R0"/>
+	<xs:element ref="aminor"/>
+	<xs:element ref="B0"/>
+	<xs:element ref="q"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="R0" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Major radius of the plasma torus [m].</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="aminor" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Minor radius of the plasma torus [m].</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="B0" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Magnetic field strength  att the magnetic axis [T].</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="q" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Safety factor of the magnetic field.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  
+  <xs:element name="markers">
+    <xs:annotation>
+      <xs:documentation>Defining the initial conditions for the markers in 
+the RFOF wrapper</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+	<xs:element ref="species_index"/>
+	<xs:element ref="weight"/>
+	<xs:element ref="R"/>
+	<xs:element ref="z"/>
+	<xs:element ref="phi"/>
+	<xs:element ref="charge"/>
+	<xs:element ref="mass"/>
+	<xs:element ref="E"/>
+	<xs:element ref="xi"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="species_index" type="xs:integer">
+    <xs:annotation>
+      <xs:documentation>Species index within the vector of particle species in 
+the rfof_plasma_param/composition/*(), where * is amn, zn and zion. species_index 
+has be in the range [1,rfof_plasma_param/composition/n_species]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="weight" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Marker weight</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <xs:element name="R" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Initial major radius position of the marker [m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="z" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Initial veritical position of the marker [m]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="phi" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Initial toroidal angle of the marker [rad]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="charge" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Charge of the marker [au]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="mass" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Mass of the marker [au]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="E" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Energy of the marker [eV]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="xi" type="xs:float">
+    <xs:annotation>
+      <xs:documentation>Pitch-angle of the marker [-]</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+<xs:element name="nproc_actor" type="xs:integer"><xs:annotation><xs:documentation/></xs:annotation></xs:element></xs:schema>

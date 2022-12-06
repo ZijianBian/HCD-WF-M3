@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<parameters>
+
+    <!-- Number of markers to be created every big time step -->
+    <nperstep> 5 </nperstep>
+
+    <!-- Resolution of output 1D-profiles -->
+    <nout1d> 21 </nout1d>
+
+    <!-- R-Resolution of output 2D-profiles -->
+    <nout2dr> 41 </nout2dr>
+
+    <!-- Z-Resolution of output 2D-profiles -->
+    <nout2dz> 41 </nout2dz>
+
+    <!-- Flag for internal solver: 1 = (R,Z) coordinates, 2 = (PSI,THETA) Boozer coordinates -->
+    <ksolver> 1 </ksolver>
+
+    <!-- Duration of a big time step (sec) for source update, RFOF E-field normalisation, etc -->
+    <bigwidth> 1.e-3 </bigwidth>
+
+    <!-- Flag for ICRH heating (0 = NO, 1 = YES) -->
+    <icrh_heating> 0 </icrh_heating>
+
+   <!-- Flag for source option (0=Spot-generated-alphas, 2=Spot-generated-thermals-for-ICRH, 3=Spot-generated-NBI, 4=marker-source) -->
+    <source_flag> 4 </source_flag>
+
+   <!-- Mass of followed ICRH-accelerated ion (if any) -->
+    <icrh_ion_mass> 2 </icrh_ion_mass>
+
+   <!-- Charge of followed ICRH-accelerated ion (if any) -->
+    <icrh_ion_charge> 1 </icrh_ion_charge>
+
+   <!-- Flag to force the use of XML input file for ICRF heating (when = 1) -->
+    <kforce_xml> 0 </kforce_xml>
+
+   <!-- Forced simulation time (sec); if lower or equal to 0: use the IDS input instead -->
+   <dt_forced> -1.0 </dt_forced>
+
+   <!-- Follow just one particle (1) or not (0) -->
+   <korbdisp> 0 </korbdisp>
+
+
+<!--
+    ==========================================================
+                 START: RFOF input parameters   
+    ==========================================================
+-->
+<rfof_parameters>
+  
+  <!-- Contains all fields needed when coupling to RFOF -->   
+    <rfof_core_param>
+      <assumptions>
+	<!--
+	    assume_static_resonance_position_during_RF_kick:  If true then the RF intraction induces no spatial motion of the orbit during the wave-particle interaction (however the new drift orbit may have a different spatial extent)
+	    use_drift_velocity_in_doppler_shift:     If true then all term in the resonance condition involving the drift velocity are neglected
+	    use_parallel_velocity_in_doppler_shift:  If true then all term in the resonance condition involving the parallel velocity are neglected
+	    assume_assume_zero_larmor_radius_in_KPERPxRHO:    If "true", then the finite larmor radius effects in the wave particle interaction are neglected
+	    assume_kpar_is_nphi_over_R:                       If "true" then the parallel wave number of is nphi/R, otherwise the exact value is used
+	    assume_zero_order_FLR_for_Pphi:               Neglect finite larmor radius (FLR) corrections to P_phi
+	    width_of_rf_resonance_layer:                         Width of the resonance layer as a fraction of the momentary major radius
+	-->
+	<assume_static_resonance_position_during_RF_kick>  true  </assume_static_resonance_position_during_RF_kick>
+	<use_drift_velocity_in_doppler_shift>              true  </use_drift_velocity_in_doppler_shift>
+	<use_parallel_velocity_in_doppler_shift>           true  </use_parallel_velocity_in_doppler_shift>
+	<assume_zero_larmor_radius_in_KPERPxRHO>           true  </assume_zero_larmor_radius_in_KPERPxRHO>
+	<assume_kpar_is_nphi_over_R>                       true  </assume_kpar_is_nphi_over_R>
+	<assume_zero_order_FLR_for_Pphi>                   true  </assume_zero_order_FLR_for_Pphi>
+	<width_of_rf_resonance_layer>                      0.005 </width_of_rf_resonance_layer>
+      </assumptions>
+      <bounding_box>
+	<Rmin>  0.10  </Rmin>  <!-- Minimum major radius of bounding box [m] -->
+	<Rmax>  20.0  </Rmax>  <!-- Maximum major radius of bounding box [m] -->
+	<Zmin> -20.0  </Zmin>  <!-- Minimum vertical coordinate of bounding box [m] -->
+	<Zmax>  20.0  </Zmax>  <!-- Maximum vertical coordinate of bounding box [m] -->
+      </bounding_box>
+      <resonance_memory>
+	<!-- Number of time point from which to extrapolate the next upcoming resonance position -->
+	<nStoreTimes>  3  </nStoreTimes>
+      </resonance_memory>
+      <IO_control>
+	<!-- 
+	     start_time_event_output:                    Time at which to start generating event-output files
+	     output__2D_RZ_out:                          If true, then 2D output in (R,Z) will be generated for the density of abosorbed power and torque
+	     output__Orbit:                              If true, then output of the full orbits will be generated and stored to file
+	     MAX_number_of_points_stored_in_the_Orbit:   Maximum number of orbit points written to file 
+	     output__rf_kicks:                           If true, then a list of rf-kicks will be generated containing the location and strength of the kick
+	     MAX_number_of_points_stored_in_rf_kick:     Maximum number of rf-kick points written to file
+	     output__resonace_predictions:               If true, then a list of rf-resonance preditions will be generated containing the present location and predicted location of the next resonance
+	     MAX_number_points_stored_in_resonance_memory: Maximum number of rf-resonance prediction points written to file
+	-->
+	<start_time_event_output>                         0.0   </start_time_event_output>
+	<output__2D_RZ_out>                               false </output__2D_RZ_out>
+	<NRedges_2DgridRZ>                                35    </NRedges_2DgridRZ>
+	<NZedges_2DgridRZ>                                21    </NZedges_2DgridRZ>
+	<output__Orbit>                                   false </output__Orbit>
+	<MAX_number_of_points_stored_in_the_Orbit>        10000 </MAX_number_of_points_stored_in_the_Orbit>
+	<output__rf_kicks>                                true  </output__rf_kicks>
+	<MAX_number_of_points_stored_in_rf_kick>          10000 </MAX_number_of_points_stored_in_rf_kick>
+	<output__resonace_predictions>                    true  </output__resonace_predictions>
+	<MAX_number_of_points_stored_in_resonance_memory> 10000 </MAX_number_of_points_stored_in_resonance_memory>
+	<output__efield_normalization>                    true  </output__efield_normalization>
+	<MAX_number_of_points_stored_in_the_efield_normalization> 100000 </MAX_number_of_points_stored_in_the_efield_normalization>
+
+
+      </IO_control>
+
+      <quasilinear>
+	<!-- MAX_relative_energy_kick: The I-perp kicks cannot be larger than this fraction of the input I-perp -->
+	<MAX_relative_energy_kick> 12.0 </MAX_relative_energy_kick>
+      </quasilinear>
+
+    </rfof_core_param>
+
+
+    <!-- Representation of plasma -->
+    <rfof_plasma_param>
+      <composition>
+	<n_species> 3        </n_species>
+	<amn>       2. 3. 4. </amn>  <!-- Mass -->
+	<zn>        1. 1. 2. </zn>   <!-- Nuclear charge -->
+	<zion>      1. 1. 2. </zion> <!-- Ionic charge -->
+	<densities> 8e17 5e19 4e17 </densities>
+	<ion_temperature> 5e3 </ion_temperature>
+      </composition>
+    </rfof_plasma_param>
+
+
+    <!-- Contains fields needed to generate a wave field -->
+    <rfof_wave_param>
+      <!--  Select where the wave field should be taken from. 
+	   0 : wave generated from the data in parametric_wave
+	   1 : wave read from ascii version of ITM cpos, written using write_cpo in the write_structures module. Filename is specified in ascii_itm_wave/filename_ascii_itm_wave.
+      -->
+      <select_wave_from>  0  </select_wave_from>
+      <parametric_wave>
+	<nfreq>               1         </nfreq>
+	<nnphi>               2         </nnphi>
+	<RFpower>             3.0e6 1e6    </RFpower>
+	<EfieldNormalisation> 1e2 1e2    </EfieldNormalisation>
+	<ratioEPlusOverEMinus>0.2 0.2      </ratioEPlusOverEMinus>
+	<freq>                48.3e6 48.3e6    </freq>
+	<nphi>                25 -25        </nphi>
+	<kperp>               40.0 39.0      </kperp>
+	<verticalCentre>      0.0 0.0      </verticalCentre>
+	<verticalWidth>       0.3e0 0.25e0      </verticalWidth>
+	<nGridHorisontal>     30             </nGridHorisontal>
+	<nGridVertical>       50             </nGridVertical>
+	<dielectric_response_model>parametric</dielectric_response_model>
+	<filename_lion_fields>dummy_file</filename_lion_fields>
+      </parametric_wave>
+      <ascii_itm_wave>
+	<filename_ascii_itm_wave>itm_waves.ascii</filename_ascii_itm_wave>
+      </ascii_itm_wave>
+    </rfof_wave_param>
+
+  
+    <!-- Contains all fields of the RFOF wrapper -->   
+    <rfof_wrapper_param>
+      <time_stepping>
+	<NtimeSteps>  11434  </NtimeSteps>
+	<dt>          1e-9    </dt>
+	<nStoreOutTimes> 1000 </nStoreOutTimes>
+      </time_stepping>
+      <magnetic_field>
+	<R0>          6.0     </R0>
+	<aminor>      0.95    </aminor>
+	<B0>          4.4     </B0>
+	<q>           1.4     </q>
+      </magnetic_field>
+      <markers>
+	<species_index> 1      </species_index>
+	<weight>        1.0e18 </weight>
+	<R>             3.6    </R>
+	<z>             0.00   </z>
+	<phi>           0.1    </phi>
+	<charge>        1.0    </charge>
+	<mass>          1.0    </mass>
+	<E>             2.0e2    </E>
+	<xi>            0.80    </xi>
+      </markers>
+    </rfof_wrapper_param>
+</rfof_parameters>
+<!-- Number of processors for parallel run (parameter added by HCD wf) -->
+  <nproc_actor> 4 </nproc_actor>
+</parameters>
