@@ -10,9 +10,6 @@ module load sh
 # Library to process xml with Python
 module load lxml/4.6.2-GCCcore-10.2.0
 
-# Workflow tools needed mostly for the HCD gui
-module load WFtools/1.1.0-intel-2020b
-
 # Actor folder (to replace some H&CD modules freshly recompiled)
 export ACTOR_FOLDER=~/public/PYTHON_ACTORS
 mkdir -p $ACTOR_FOLDER
@@ -30,6 +27,9 @@ export PATH=$PWD:$PATH
 
 # Load the default IMAS version, no matter what was loaded through the HCD modules themselves
 module load IMAS
+
+# Workflow tools needed mostly for the HCD gui
+module load WFtools/1.1.0-intel-2020b
 
 # For local re-compilation of actors
 module load iWrap
