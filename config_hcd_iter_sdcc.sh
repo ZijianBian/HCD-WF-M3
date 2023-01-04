@@ -42,7 +42,7 @@ module load NAG/26-intel-2020b
 module load netCDF-Fortran/4.5.3-iimpi-2020b
 module load CMake/3.18.4-GCCcore-10.2.0
 module load Fundamental-Constants
-module load `module avail AMNS/*-intel-* -t |tail -n 1`
+module load `module avail AMNS/*-intel-2020b* -t |tail -n 1`
 
 # Workflow tools (local version)
 #export PYTHONPATH=/home/ITER/schneim/public/git/wftools/:$PYTHONPATH
