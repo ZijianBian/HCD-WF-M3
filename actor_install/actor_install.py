@@ -143,7 +143,7 @@ def build_libs(desc, verb):
     print("***** BUILD LIBRARIES *****")
     if args.verbose:
         print(desc)
-        cmd = os.popen("/usr/bin/modulecmd python list")
+        cmd = "os.popen('/usr/bin/modulecmd python list')"
         exec(cmd)
 
     prevdir = os.getcwd()
