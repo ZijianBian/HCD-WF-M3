@@ -4,7 +4,8 @@ ids_list:
     equilibrium  
     nbi  
     ic_antennas  
-    ec_launchers 
+    ec_launchers
+    lh_antennas
     wall  
     distribution_sources  
     distributions  
@@ -18,7 +19,8 @@ ids_scenario_list:
 ids_md_list:
     nbi  
     ic_antennas  
-    ec_launchers 
+    ec_launchers
+    lh_antennas
     wall  
 
 ids_process_list:
@@ -29,6 +31,7 @@ ids_process_list:
 
 process_list:
     ECRH
+    LHCD
     ICRH
     NBI
     NUCLEAR
@@ -58,6 +61,7 @@ actor_list:
     tomcat 
     torbeam
     fopla
+    lhcd_metis
 
 merge_actor_list:
     merge_waves
@@ -67,12 +71,13 @@ merge_actor_list:
 
 algorithm:
     default:
-        [ec_wave_solver,ic_coup,ic_wave_solver,nbi_source,nuclear_source,ic_wave_fp,nbi_fp,nuclear_fp,fill_core_sources,fill_core_profiles]
+        [ec_wave_solver,lh_wave_solver,ic_coup,ic_wave_solver,nbi_source,nuclear_source,ic_wave_fp,nbi_fp,nuclear_fp,fill_core_sources,fill_core_profiles]
     nbi_ic_synergy:
-        [ec_wave_solver,nbi_source,nbi_fp,nuclear_source,nuclear_fp,ic_coup,ic_wave_solver,ic_wave_fp,fill_core_sources,fill_core_profiles]
+        [ec_wave_solver,lh_wave_solver,nbi_source,nbi_fp,nuclear_source,nuclear_fp,ic_coup,ic_wave_solver,ic_wave_fp,fill_core_sources,fill_core_profiles]
 
 prerequisites:
    ec_wave_solver: None
+   lh_wave_solver: None
    ic_coup: None
    ic_wave_solver: None
    ic_wave_fp:
@@ -94,6 +99,7 @@ prerequisites:
 
 parallel_dependency:
    ec_wave_solver:             None
+   lh_wave_solver:             None
    ic_coup:                    None
    ic_wave_solver:             [ic_coup,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_distributions,merge_distribution_sources]
    ic_wave_fp:                 [ic_wave_solver]
@@ -101,10 +107,10 @@ parallel_dependency:
    nbi_fp:                     [nbi_source]
    nuclear_source:             None
    nuclear_fp:                 [nuclear_source]
-   fill_core_sources:          [ec_wave_solver,ic_wave_solver,ic_wave_fp,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_waves,merge_distributions,merge_distribution_sources]
+   fill_core_sources:          [ec_wave_solver,lh_wave_solver,ic_wave_solver,ic_wave_fp,nbi_source,nbi_fp,nuclear_source,nuclear_fp,merge_waves,merge_distributions,merge_distribution_sources]
    fill_core_profiles:         [ic_wave_fp,nbi_fp,nuclear_fp,merge_distributions]
    merge_distributions:        [ic_wave_fp,nbi_fp,nuclear_fp,merge_distributions]
-   merge_waves:                [ec_wave_solver,ic_wave_solver,ic_coup,merge_waves]
+   merge_waves:                [ec_wave_solver,lh_wave_solver,ic_wave_solver,ic_coup,merge_waves]
    merge_distribution_sources: [nbi_source,nuclear_source,merge_distribution_sources]
 
 exec_types:
@@ -117,6 +123,9 @@ waveform_presets:
      custom:  ['ec_waveforms.yaml','Custom']
      preset1: ['ec_launchers_standard_Omode.yaml','O-mode']
      preset2: ['ec_launchers_standard_Xmode.yaml','X-mode']
+  lh:
+     custom:  ['lh_waveforms.yaml','Custom']
+     preset1: ['lh_default.yaml','Default']
   ic:
      custom:  ['ic_waveforms.yaml','nbi_waveforms.yaml','Custom']
      preset1: ['ic_53MHz_default.yaml','53 MHz']

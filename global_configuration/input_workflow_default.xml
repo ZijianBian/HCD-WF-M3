@@ -21,6 +21,10 @@
 	<ec_wave_solver     display="Wave solver" list="genray gray grayscale torbeam">4</ec_wave_solver>
       </ECRH>
 
+      <LHCD                 display="LHCD">
+	<lh_wave_solver     display="Wave solver" list="lhcd_metis">0</lh_wave_solver>
+      </LHCD>
+
       <ICRH                 display="ICRH">
 	<ic_coup            display="Coupling" list="iccoup">0</ic_coup> 
 	<ic_wave_solver     display="Wave solver" list="cyrano tomcat pion lion">0</ic_wave_solver>

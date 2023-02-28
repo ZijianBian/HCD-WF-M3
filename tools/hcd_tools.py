@@ -132,3 +132,46 @@ def is_ic_on(ic_antennas, time_slice):
     
 #####################################################################################
 
+# ------------------------------------------------------
+# IS THE LH SYSTEM ON?
+# --> CHECK THE POWER ON ALL LAUNCHERS FOR THIS TIME SLICE
+# ------------------------------------------------------
+
+def is_lh_on(lh_antennas, time_slice):
+    if lh_antennas.ids_properties.homogeneous_time==1:
+        if len(lh_antennas.time) > 0:
+            time_array = lh_antennas.time
+        else:
+            return False
+        [tc, it] = find_nearest(time_array, time_slice)
+        nantenna = len(lh_antennas.antenna)
+        power = 0.0
+        if nantenna > 0:
+            for iantenna in range(nantenna):
+                if lh_antennas.antenna[iantenna].power_launched.data[it] > 0:
+                    power = power + lh_antennas.antenna[iantenna].power_launched.data[it]
+            if power == 0:
+                return False
+            else:
+                return True
+        else:
+            return False
+    else:
+        nantenna = len(lh_antennas.antenna)
+        power = 0.0
+        if nantenna > 0:
+            for iantenna in range(nantenna):
+                if len(lh_antennas.antenna[iantenna].power_launched.time) > 0:
+                    time_array = lh_antennas.antenna[iantenna].power_launched.time
+                    [tc, it] = find_nearest(time_array, time_slice)
+                    if lh_antennas.antenna[iantenna].power_launched.data[it] > 0:
+                        power = power + lh_antennas.antenna[iantenna].power_launched.data[it]
+            if power == 0:
+                return False
+            else:
+                return True
+        else:
+            return False
+        
+#####################################################################################
+

@@ -42,10 +42,13 @@ module load NAG/26-intel-2020b
 module load netCDF-Fortran/4.5.3-iimpi-2020b
 module load CMake/3.18.4-GCCcore-10.2.0
 module load Fundamental-Constants
-module load `module avail AMNS/*-intel-2020b* -t |tail -n 1`
+module load `module avail AMNS/*-intel-2020b* -t |tail -n 1 | sed -e 's/[(]default[)]//g'` 
 
 # Workflow tools (local version)
 #export PYTHONPATH=/home/ITER/schneim/public/git/wftools/:$PYTHONPATH
+
+# Waveform cooker (local version)
+#export PYTHONPATH=/home/ITER/schneim/public/git/waveform-cooker/:$PYTHONPATH
 
 # Avoid doublons in PYTHONPATH
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"

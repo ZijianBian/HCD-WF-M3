@@ -9,6 +9,7 @@ from tools.hcd_tools import (
     is_nbi_on,
     is_ec_on,
     is_ic_on,
+    is_lh_on,
 )
 from wf_tools import (
     bundle_copy,
@@ -131,6 +132,12 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
            print('  No EC power for this time slice',file=sys.stdout)
            param_process['ec_wave_solver'] = 0
 
+        if 'lh_antennas' in process_bundle[process]['input'] \
+          and not is_lh_on(process_bundle[process]['input']['lh_antennas'], \
+                           process_bundle[process]['input']['core_profiles'].time):
+           print('  No LH power for this time slice',file=sys.stdout)
+           param_process['lh_wave_solver'] = 0
+
     # DEFINE THE SEQUENCE OF CODES TO BE EXECUTED
     if catdict['ic_wave_fp'][param_process['ic_wave_fp']]['name'] != 'fopla':
         print('--- Default algorithm ---',file=sys.stdout)
@@ -211,10 +218,8 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
 
         for iids in range(len(output_ids_list)):
             if not hasattr(output_ids_data,'__len__'):
-                #import pdb
-                #pdb.set_trace()
                 #if hasattr(output_ids_data,'__len__'):
-                #    for iids in range(len(output_ids_data)):                
+                #    for iids in range(len(output_ids_data)):
                 process_bundle[process]['output'][output_ids_data.__name__] = output_ids_data
             else:
                 process_bundle[process]['output'][output_ids_data[iids].__name__] = output_ids_data[iids]

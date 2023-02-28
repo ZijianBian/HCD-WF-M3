@@ -332,7 +332,10 @@ def wf_wrapper(par_path):
 
         timenow = tbegin
 
-        nsteps = int((tend - tbegin) / dt_required)
+        if one_time_slice == 0:
+            nsteps = int((tend - tbegin) / dt_required)
+        else:
+            nsteps = 1
         if (
             dt_required * nsteps
             < int((tend - tbegin) * 10 ** 5) / 10 ** 5
