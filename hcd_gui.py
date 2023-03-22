@@ -24,8 +24,8 @@ except:
     sys.exit()
 
 try:
-    import colour_definitions.bluish as col
-    from wf_tools import (
+    import wftools.colour_definitions.bluish as col
+    from wftools.wf_tools import (
         import_actor,
         create_workflow_param_from_file,
         dict_merge,
@@ -38,9 +38,9 @@ try:
         create_maindict,
         saved_folder_name,
 )
-    from gui_tools import edit_codeparam, CreateToolTip
-    from waveform_edition import edit_waveforms
-    import time_base_edition as tbe
+    from wftools.gui_tools import edit_codeparam, CreateToolTip
+    from wftools.waveform_edition import edit_waveforms
+    import wftools.time_base_edition as tbe
 except:
     raise
     print("ERROR while loading internal HCD modules", file=sys.stderr)
