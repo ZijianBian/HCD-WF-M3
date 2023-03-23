@@ -1,5 +1,7 @@
 import os,sys,copy
 
+import waveform_cooker
+
 try:
     import tkinter
     import tkinter.ttk
@@ -98,7 +100,7 @@ def open_gui(wf_param_file):
         pass
 
     # LIST OF PRE-CONFIGURED WAVEFORMS
-    waveform_folder = os.getenv('EBROOTWAVEFORMMINCOOKER')+'/presets/ITER/'
+    waveform_folder = os.path.join(os.path.dirname(os.path.abspath(waveform_cooker.__file__)), "presets", "iter")
     waveform_presets = loadlist(file,'waveform_presets')
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
