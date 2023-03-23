@@ -92,7 +92,7 @@ def wf_wrapper(par_path):
             for category in maindict[main_key]:
                 for process in maindict[main_key][category]:
                     for actor_name in maindict[main_key][category][process]:
-                        if code_selection[process] is not None and actor_name in code_selection[process]:
+                        if code_selection[process] is not None and actor_name == code_selection[process]:
                             process_actor[process] = actor_name
                             err = import_actor(actor_name,0)
                             actor = eval(actor_name)
