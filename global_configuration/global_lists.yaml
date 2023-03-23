@@ -121,8 +121,8 @@ exec_types:
 waveform_presets:
   ec:
      custom:  ['ec_waveforms.yaml','Custom']
-     preset1: ['ec_launchers_standard_Omode.yaml','O-mode']
-     preset2: ['ec_launchers_standard_Xmode.yaml','X-mode']
+     preset1: ['ec_launchers_standard_Omode_mirrors.yaml','O-mode']
+     preset2: ['ec_launchers_standard_Xmode_mirrors.yaml','X-mode']
   lh:
      custom:  ['lh_waveforms.yaml','Custom']
      preset1: ['lh_default.yaml','Default']
