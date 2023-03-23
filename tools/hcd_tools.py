@@ -1,4 +1,4 @@
-from wf_tools import find_nearest
+from wftools.wf_tools import find_nearest
 
 #####################################################################################
 

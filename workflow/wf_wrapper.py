@@ -3,7 +3,7 @@ import numpy as np
 
 from lxml import etree
 from workflow.hcd_workflow import hcd_workflow
-from wf_tools import (
+from wftools.wf_tools import (
     add_ids_entry_to_dict,
     import_actor,
     read_actor_ids,

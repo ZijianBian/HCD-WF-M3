@@ -11,7 +11,7 @@ from tools.hcd_tools import (
     is_ic_on,
     is_lh_on,
 )
-from wf_tools import (
+from wftools.wf_tools import (
     bundle_copy,
     create_workflow_param_from_file,
     import_actor,
