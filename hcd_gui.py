@@ -98,7 +98,7 @@ def open_gui(wf_param_file):
         pass
 
     # LIST OF PRE-CONFIGURED WAVEFORMS
-    waveform_folder = os.getenv('EBROOTWAVEFORMMINCOOKER')+'/ITER_PRESETS/'
+    waveform_folder = os.getenv('EBROOTWAVEFORMMINCOOKER')+'/presets/ITER/'
     waveform_presets = loadlist(file,'waveform_presets')
 
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
