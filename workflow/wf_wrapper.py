@@ -359,6 +359,23 @@ def wf_wrapper(par_path):
                 print("  Get", ids, file=sys.stdout)
                 try:
                     common_bundle[ids] = input.get_slice(ids, timenow, 1)
+                    #if common_bundle[ids] == 'equilibrium': # when equilibrium misses phi(r,z)
+                    #  if len(common_bundle[ids].time_slice[0].profiles_2d[0].phi)==0:
+                    #    print('   --- Interpolate missing phi(R,Z) ---')
+                    #    r1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim1
+                    #    z1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim2
+                    #    rho1d_eq = common_bundle[ids].time_slice[0].profiles_1d.rho_tor_norm
+                    #    psi1d_eq = common_bundle[ids].time_slice[0].profiles_1d.psi
+                    #    psi2d_eq = common_bundle[ids].time_slice[0].profiles_2d[0].psi
+                    #    rho_from_psi = interpolate.interp1d(psi1d_eq,rho1d_eq,kind='linear')
+                    #    phi2d_eq = np.zeros(np.shape(psi2d_eq))
+                    #    for ir in range(len(r1d_eq)):
+                    #      for iz in range(len(z1d_eq)):
+                    #        try: # Inside LCFS
+                    #          phi2d_eq[ir,iz] = rho_from_psi(psi2d_eq[ir,iz])
+                    #        except: # Outside LCFS
+                    #          phi2d_eq[ir,iz] = 1.
+                    #    common_bundle[ids].time_slice[0].profiles_2d[0].phi = phi2d_eq
                     for process in process_bundle.keys():
                         if 'merge_' not in process and ids in process_bundle[process]['input'].keys():
                             process_bundle[process]['input'][ids] = common_bundle[ids]

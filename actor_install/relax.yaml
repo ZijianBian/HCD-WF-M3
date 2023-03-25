@@ -1,0 +1,21 @@
+#example
+---
+SOURCES:
+  - VCS:  git
+    REPO: ssh://git@git.iter.org/heat/relax.git
+    VERSION: feature/iwrap
+    DIR: relax
+
+MODULES: [IMAS, iWrap, XMLlib]
+
+BUILDS: 
+  - DIR: relax
+    CMD: ./build.sh
+
+ACTORS: 
+  - DIR: relax
+    XML: relax.yaml
+
+#COMMENTS:  
+...
+  

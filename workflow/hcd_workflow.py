@@ -131,6 +131,7 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
                            process_bundle[process]['input']['core_profiles'].time):
            print('  No EC power for this time slice',file=sys.stdout)
            param_process['ec_wave_solver'] = 0
+           param_process['ec_wave_fp'] = 0
 
         if 'lh_antennas' in process_bundle[process]['input'] \
           and not is_lh_on(process_bundle[process]['input']['lh_antennas'], \

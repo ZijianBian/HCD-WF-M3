@@ -18,7 +18,8 @@
     <main_process           display="Main processes">
       
       <ECRH                 display="ECH">
-	<ec_wave_solver     display="Wave solver" list="genray gray grayscale torbeam">4</ec_wave_solver>
+	<ec_wave_solver     display="Wave solver" list="genray gray grayscale torbeam toray">4</ec_wave_solver>
+	<ec_wave_fp         display="Electron Fokker-Planck" list="relax">0</ec_wave_fp>
       </ECRH>
 
       <LHCD                 display="LHCD">

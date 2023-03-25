@@ -1,0 +1,21 @@
+#example
+---
+SOURCES:
+  - VCS:  git
+    REPO: ssh://git@git.iter.org/heat/toray.git
+    VERSION: feature/iwrap
+    DIR: toray
+
+MODULES: [IMAS, iWrap, XMLlib]
+
+BUILDS: 
+  - DIR: toray
+    CMD: ./build.sh
+
+ACTORS: 
+  - DIR: toray
+    XML: toray.yaml
+
+#COMMENTS:  
+...
+  
