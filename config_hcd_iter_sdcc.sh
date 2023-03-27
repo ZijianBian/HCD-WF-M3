@@ -29,7 +29,7 @@ export PATH=$PWD:$PATH
 module load IMAS
 
 # Workflow tools needed mostly for the HCD gui
-#module load WFtools/1.1.1-intel-2020b
+module load WFtools/1.1.1-intel-2020b
 module load Waveform-Cooker/1.3.1-GCCcore-10.2.0
 
 # For local re-compilation of actors
@@ -46,7 +46,7 @@ module load Fundamental-Constants
 module load `module avail AMNS/*-intel-2020b* -t |tail -n 1 | sed -e 's/[(]default[)]//g'` 
 
 # Workflow tools (local version)
-export PYTHONPATH=/home/ITER/schneim/public/git/wftools/:$PYTHONPATH
+#export PYTHONPATH=/home/ITER/schneim/public/git/wftools/:$PYTHONPATH
 
 # Waveform cooker (local version)
 #export PYTHONPATH=/home/ITER/schneim/public/git/waveform-cooker/:$PYTHONPATH
