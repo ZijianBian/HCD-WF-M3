@@ -1,4 +1,5 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <parameters>
 
   <!-- Power absorption on(1)/off(0) -->
@@ -36,7 +37,10 @@
   <!-- Integration step in vacuum [cm] -->
   <xstep> 2.0 </xstep>
   <!-- Max. value of rho on exit -->
-  <rhostop> 0.96 </rhostop>
+  <rhostop> 1.2 </rhostop>
   <!-- Vert. position for search of magn. axis (def. 0) -->
   <xzsrch> 0. </xzsrch>
+  <!-- Write Torbeam input/output ascii files (1) or not (0) -->
+  <ascii_export> 1 </ascii_export>
+
 </parameters>
