@@ -234,7 +234,8 @@ def wf_wrapper(par_path):
         reduced_md_list = []
         flag_multiple_md = 0
         for process in process_bundle.keys():
-            for ids in process_bundle[process]['input'].keys():
+            if not 'nuclear' in process: # No waveform for nuclear reactions
+              for ids in process_bundle[process]['input'].keys():
                 if ids in ids_md_list:
                     process_bundle[process]['input'][ids] = input.get(ids)
                     # Overwrite with configured waveform if it exists
