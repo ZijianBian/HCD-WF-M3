@@ -55,7 +55,7 @@ python actor_install.py --skipModules ascot.yml
 
 # Further instructions
 
-For usage instructions, see [this confluence page](https://confluence.iter.org/display/IMP/How+to+run+the+Python+HCD+workflow).
+For usage instructions, see [this confluence page](https://confluence.iter.org/display/IMP/How+to+install+and+run+the+Python+HCD+workflow).
 
 At the moment we don't have a central installation of hcd.
  
