@@ -99,10 +99,6 @@ def open_gui(wf_param_file):
     except:
         pass
 
-    # LIST OF PRE-CONFIGURED WAVEFORMS
-    waveform_folder = os.path.join(os.path.dirname(os.path.abspath(waveform_cooker.__file__)), "presets", "iter")
-    waveform_presets = loadlist(file,'waveform_presets')
-
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
     (
@@ -114,6 +110,11 @@ def open_gui(wf_param_file):
     ) = create_maindict(wf_param_file, 1)
 
     workflow_param = create_workflow_param_from_file(wf_param_file)
+
+    # LIST OF PRE-CONFIGURED WAVEFORMS
+    device = loadlist(file,'device')[0]
+    waveform_folder = os.path.join(os.path.dirname(os.path.abspath(waveform_cooker.__file__))+"/../../../../", "presets", device)
+    waveform_presets = loadlist(file,'waveform_presets')
 
     # Setup
 
