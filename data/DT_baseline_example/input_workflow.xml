@@ -8,19 +8,24 @@
     <output_user_or_path display="Output user or path">default</output_user_or_path>
     <output_database display="Output database">HCD</output_database>
     <run_out display="Output run">107</run_out>
-    <tbegin display="Start Time [s]">5.0</tbegin>
-    <tend display="End Time   [s]">790.0</tend>
-    <dt_required display="Time Step  [s]">5.0</dt_required>
+    <tbegin display="Start Time [s]">400.0</tbegin>
+    <tend display="End Time   [s]">400.0</tend>
+    <dt_required display="Time Step  [s]">0.1</dt_required>
     <parallel_workflow display="Parallel workflow [0-1]">0</parallel_workflow> 
-    <one_time_slice display="Single time slice [0-1]">0</one_time_slice> 
+    <one_time_slice display="Single time slice [0-1]">1</one_time_slice> 
   </workflow_parameters>
 
   <actor_selection display="Actor selection"> <!-- 0 = None; >0 follows code ordering -->
     <main_process display="Main processes">
       
       <ECRH display="ECH">
-	<ec_wave_solver display="Wave solver" list="genray gray grayscale torbeam">4</ec_wave_solver>
+	<ec_wave_solver display="Wave solver" list="genray gray grayscale torbeam toray">0</ec_wave_solver>
+	<ec_wave_fp display="Electron Fokker-Planck" list="relax">0</ec_wave_fp>
       </ECRH>
+
+      <LHCD display="LHCD">
+	<lh_wave_solver display="Wave solver" list="lhcd_metis">0</lh_wave_solver>
+      </LHCD>
 
       <ICRH display="ICRH">
 	<ic_coup display="Coupling" list="iccoup">0</ic_coup> 
@@ -29,8 +34,8 @@
       </ICRH>
     
       <NBI display="NBI">
-	<nbi_source display="Beam deposition" list="nemo bbnbi_serial bbnbi_parallel">0</nbi_source>
-	<nbi_fp display="Ion Fokker-Planck" list="risk spot ascot_serial ascot_parallel nbisim">0</nbi_fp>
+	<nbi_source display="Beam deposition" list="nemo bbnbi_serial bbnbi_parallel">3</nbi_source>
+	<nbi_fp display="Ion Fokker-Planck" list="risk spot ascot_serial ascot_parallel nbisim">4</nbi_fp>
       </NBI>
     
       <NUCLEAR display="Nuclear reactions">
