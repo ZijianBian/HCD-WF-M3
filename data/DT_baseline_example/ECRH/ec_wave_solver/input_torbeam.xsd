@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
- <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	   elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
    <xs:annotation>
      <xs:documentation>Code parameters for TORBEAM</xs:documentation>
    </xs:annotation>
@@ -51,7 +48,7 @@
    <!-- Curba, 1 => Lin-Liu, 2 => Lin-Liu+mom. conserv. -->
    <xs:element name="ncdroutine" type="xs:integer">
       <xs:annotation>
-          <xs:documentation>Curba, 1 => Lin-Liu, 2 => Lin-Liu+mom. conserv.</xs:documentation>
+          <xs:documentation>Curba, 1 =&gt; Lin-Liu, 2 =&gt; Lin-Liu+mom. conserv.</xs:documentation>
       </xs:annotation>
    </xs:element>
 
@@ -128,7 +125,7 @@
    <!-- 1 => rel. mass correction for reflectometry -->
    <xs:element name="nrel" type="xs:integer">
       <xs:annotation>
-          <xs:documentation>1 => rel. mass correction for reflectometry</xs:documentation>
+          <xs:documentation>1 =&gt; rel. mass correction for reflectometry</xs:documentation>
       </xs:annotation>
    </xs:element>
 
@@ -175,4 +172,3 @@
    </xs:element>
      
 </xs:schema>
- 
