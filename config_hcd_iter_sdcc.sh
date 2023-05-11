@@ -29,7 +29,7 @@ export PATH=$PWD:$PATH
 module load IMAS
 
 # Workflow tools needed mostly for the HCD gui
-module load WFtools/1.1.1-intel-2020b
+module load WFtools/1.1.2-intel-2020b
 module load Waveform-Cooker/1.3.1-GCCcore-10.2.0
 
 # For local re-compilation of actors
