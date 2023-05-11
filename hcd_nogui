@@ -10,5 +10,8 @@ parser.add_argument("-c","--config_folder",help="input configuration folder", re
 args = vars(parser.parse_args())
 config_folder  = args["config_folder"]
 
-wf_wrapper(os.getcwd()+'/'+config_folder)
+#wf_wrapper(config_folder)
+#wf_wrapper(os.getcwd()+'/'+config_folder)
+wf_wrapper(os.path.abspath(config_folder))
+
 
