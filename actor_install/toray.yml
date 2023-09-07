@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/toray.git
-    VERSION: feature/iwrap
+    VERSION: feature/dd_compliant
     DIR: toray
 
 MODULES: [IMAS, iWrap, XMLlib]

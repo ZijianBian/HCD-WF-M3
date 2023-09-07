@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/imas/training.git
-    VERSION: develop
+    VERSION: feature/dd_compliant
     DIR: training
 
 MODULES: [IMAS, iWrap, XMLlib]

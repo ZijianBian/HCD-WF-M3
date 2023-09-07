@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/genray.git
-    VERSION: develop
+    VERSION: feature/dd_compliant
     DIR: genray
 
 MODULES: [IMAS, iWrap, INTERPOS, XMLlib, netCDF-Fortran/4.5.3-iimpi-2020b]

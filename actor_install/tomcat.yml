@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/tomcat.git
-    VERSION: feature/iwrap
+    VERSION: feature/dd_compliant
     DIR:     tomcat
 
 MODULES: [IMAS, iWrap, XMLlib]

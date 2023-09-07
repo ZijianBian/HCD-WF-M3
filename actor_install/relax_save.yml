@@ -2,19 +2,19 @@
 ---
 SOURCES:
   - VCS:  git
-    REPO: ssh://git@git.iter.org/heat/gray.git
+    REPO: ssh://git@git.iter.org/heat/relax.git
     VERSION: feature/dd_compliant
-    DIR: gray
+    DIR: relax
 
 MODULES: [IMAS, iWrap, XMLlib]
 
 BUILDS: 
-  - DIR: gray
+  - DIR: relax
     CMD: ./build.sh
 
 ACTORS: 
-  - DIR: gray
-    XML: gray.yaml
+  - DIR: relax
+    XML: relax.yaml
 
 #COMMENTS:  
 ...

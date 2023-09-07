@@ -17,6 +17,7 @@ export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
 
 # Extend python path and avoid doublons
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
+export FC=ifort # for hcd2core-sources
 
 # ---------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------
@@ -29,8 +30,8 @@ export PATH=$PWD:$PATH
 module load IMAS
 
 # Workflow tools needed mostly for the HCD gui
-module load WFtools/1.1.2-intel-2020b
-module load Waveform-Cooker/1.3.1-GCCcore-10.2.0
+module load WFtools
+module load Waveform-Cooker/1.3.3-GCCcore-10.2.0
 
 # For local re-compilation of actors
 module load iWrap
@@ -42,8 +43,13 @@ module load PSPLINE
 module load NAG/26-intel-2020b
 module load netCDF-Fortran/4.5.3-iimpi-2020b
 module load CMake/3.18.4-GCCcore-10.2.0
+module load AMNS/1.4.0-GCC-10.2.0-DD-3.39.0
 module load Fundamental-Constants
-module load `module avail AMNS/*-intel-2020b* -t |tail -n 1 | sed -e 's/[(]default[)]//g'` 
+module load netCDF-Fortran/4.5.3-iimpi-2020b
+module load FFTW/3.3.8-intel-2020b
+
+# FOR PRE-COMPILER
+export IMASFORPION=DIMAS_LATEST
 
 # Workflow tools (local version)
 #export PYTHONPATH=/home/ITER/schneim/public/git/wftools/:$PYTHONPATH

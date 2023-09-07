@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/lion.git
-    VERSION: feature/iwrap
+    VERSION: feature/dd_compliant
     DIR:     lion
 
 MODULES: [IMAS, iWrap, INTERPOS, XMLlib]
