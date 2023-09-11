@@ -179,34 +179,9 @@ class HCDWorkflow(WorkflowBase):
         self.tend = self.wf_parameters["tend"][0]
 
         ##################################################################
-
-        # READ INPUT MACHINE DESCRIPTION DATA
-        self.reduced_md_list = []
-        flag_multiple_md = 0
-
-        for process in self.process_bundle.keys():
-            if not "nuclear" in process:  # No waveform for nuclear reactions
-                for ids in self.process_bundle[process]["input"].keys():
-                    if ids in ids_md_list:
-                        self.process_bundle[process]["input"][ids] = self.inputDb.get(
-                            ids
-                        )
-                        # Overwrite with configured waveform if it exists
-                        waveform_file = (
-                            self.workflowConfigPath
-                            + "/"
-                            + waveform_presets[process.split("_")[0]]["custom"][
-                                flag_multiple_md
-                            ]
-                        )
-                        if os.path.exists(waveform_file):
-                            self.process_bundle[process]["input"][ids] = add_dynamic(
-                                waveform_file
-                            )
-                            flag_multiple_md += 1
-                        self.md.put(self.process_bundle[process]["input"][ids])
-                        if ids not in self.reduced_md_list:
-                            self.reduced_md_list.append(ids)
+        self.reduced_md_list = self.getMachineDescriptionData(
+            ids_md_list, waveform_presets, self.process_bundle
+        )
         ##################################################################
 
         # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS
@@ -227,6 +202,33 @@ class HCDWorkflow(WorkflowBase):
                     workflow
                 )
         print("initialized")
+
+    def getMachineDescriptionData(self, ids_md_list, waveform_presets, process_bundle):
+        # READ INPUT MACHINE DESCRIPTION DATA
+        reduced_md_list = []
+        flag_multiple_md = 0
+        for process in process_bundle.keys():
+            if not "nuclear" in process:  # No waveform for nuclear reactions
+                for ids in process_bundle[process]["input"].keys():
+                    if ids in ids_md_list:
+                        process_bundle[process]["input"][ids] = self.inputDb.get(ids)
+                        # Overwrite with configured waveform if it exists
+                        waveform_file = (
+                            self.workflowConfigPath
+                            + "/"
+                            + waveform_presets[process.split("_")[0]]["custom"][
+                                flag_multiple_md
+                            ]
+                        )
+                        if os.path.exists(waveform_file):
+                            process_bundle[process]["input"][ids] = add_dynamic(
+                                waveform_file
+                            )
+                            flag_multiple_md += 1
+                        self.md.put(process_bundle[process]["input"][ids])
+                        if ids not in reduced_md_list:
+                            reduced_md_list.append(ids)
+        return reduced_md_list
 
     def __call__(self, *args):
         return self.run(*args)
@@ -355,92 +357,14 @@ class HCDWorkflow(WorkflowBase):
             print("dt   = %5.2f" % self.dt_required, "s", file=sys.stdout)
 
             # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
-            for ids in self.ids_scenario_list:
-                print("  Get", ids, file=sys.stdout)
-                try:
-                    self.common_bundle[ids] = self.inputDb.get_slice(ids, timenow, 1)
-                    # if common_bundle[ids] == 'equilibrium': # when equilibrium misses phi(r,z)
-                    #  if len(common_bundle[ids].time_slice[0].profiles_2d[0].phi)==0:
-                    #    print('   --- Interpolate missing phi(R,Z) ---')
-                    #    r1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim1
-                    #    z1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim2
-                    #    rho1d_eq = common_bundle[ids].time_slice[0].profiles_1d.rho_tor_norm
-                    #    psi1d_eq = common_bundle[ids].time_slice[0].profiles_1d.psi
-                    #    psi2d_eq = common_bundle[ids].time_slice[0].profiles_2d[0].psi
-                    #    rho_from_psi = interpolate.interp1d(psi1d_eq,rho1d_eq,kind='linear')
-                    #    phi2d_eq = np.zeros(np.shape(psi2d_eq))
-                    #    for ir in range(len(r1d_eq)):
-                    #      for iz in range(len(z1d_eq)):
-                    #        try: # Inside LCFS
-                    #          phi2d_eq[ir,iz] = rho_from_psi(psi2d_eq[ir,iz])
-                    #        except: # Outside LCFS
-                    #          phi2d_eq[ir,iz] = 1.
-                    #    common_bundle[ids].time_slice[0].profiles_2d[0].phi = phi2d_eq
-                    for process in self.process_bundle.keys():
-                        if (
-                            "merge_" not in process
-                            and ids in self.process_bundle[process]["input"].keys()
-                        ):
-                            self.process_bundle[process]["input"][
-                                ids
-                            ] = self.common_bundle[ids]
-                except:
-                    print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
-                    print(
-                        "  ----> Check the version of the Data Dictionary between the"
-                        + " input and the loaded IMAS version.",
-                        file=sys.stderr,
-                    )
-                    print("  ----> Aborted.", file=sys.stderr)
-                    return
-
-            # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
-            for ids in self.reduced_md_list:
-                print("  Get", ids, file=sys.stdout)
-                try:
-                    for process in self.process_bundle.keys():
-                        if ids in self.process_bundle[process]["input"].keys():
-                            self.process_bundle[process]["input"][ids] = md.get_slice(
-                                ids, timenow, 1
-                            )
-                except:
-                    print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
-                    print(
-                        "  ----> Check the version of the Data Dictionary between the"
-                        + " input and the loaded IMAS version.",
-                        file=sys.stderr,
-                    )
-                    print("  ----> Aborted.", file=sys.stderr)
-                    return
-
-            # ---------------------------------------------------------------------
-            # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
-            # ---------------------------------------------------------------------
-            try:
-                time_base = create_workflow_param_from_file(self.workflow_xml)[
-                    "time_base"
-                ]
-            except:
-                time_base = None
-
-            for process in self.process_bundle.keys():
-                if time_base is not None:
-                    if process in time_base[0]:
-                        [tc, it] = find_nearest(
-                            np.array(
-                                time_base[0][process][0]["wf_interval"][0][
-                                    "time_array"
-                                ][0]
-                            ),
-                            timenow,
-                        )
-                        self.process_bundle[process]["status"] = time_base[0][process][
-                            0
-                        ]["wf_interval"][0]["status"][0][it]
-                    else:
-                        self.process_bundle[process]["status"] = 1
-                else:
-                    self.process_bundle[process]["status"] = 1
+            self.initializeProcessBundle(
+                timenow,
+                self.ids_scenario_list,
+                self.inputDb,
+                self.common_bundle,
+                self.process_bundle,
+                self.reduced_md_list,
+            )
 
             self.process_bundle, err = self.hcd_workflow(
                 self.process_bundle, self.workflow_xml, self.dictionary_of_actors
@@ -507,11 +431,110 @@ class HCDWorkflow(WorkflowBase):
                                 ids
                             ] = self.process_bundle[process]["output"][ids]
 
+    def initializeProcessBundle(
+        self,
+        timenow,
+        ids_scenario_list,
+        inputDb,
+        common_bundle,
+        process_bundle,
+        reduced_md_list,
+    ):
+        for ids in ids_scenario_list:
+            print("  Get", ids, file=sys.stdout)
+            # try:
+            common_bundle[ids] = inputDb.get_slice(ids, timenow, 1)
+            # if common_bundle[ids] == 'equilibrium': # when equilibrium misses phi(r,z)
+            #  if len(common_bundle[ids].time_slice[0].profiles_2d[0].phi)==0:
+            #    print('   --- Interpolate missing phi(R,Z) ---')
+            #    r1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim1
+            #    z1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim2
+            #    rho1d_eq = common_bundle[ids].time_slice[0].profiles_1d.rho_tor_norm
+            #    psi1d_eq = common_bundle[ids].time_slice[0].profiles_1d.psi
+            #    psi2d_eq = common_bundle[ids].time_slice[0].profiles_2d[0].psi
+            #    rho_from_psi = interpolate.interp1d(psi1d_eq,rho1d_eq,kind='linear')
+            #    phi2d_eq = np.zeros(np.shape(psi2d_eq))
+            #    for ir in range(len(r1d_eq)):
+            #      for iz in range(len(z1d_eq)):
+            #        try: # Inside LCFS
+            #          phi2d_eq[ir,iz] = rho_from_psi(psi2d_eq[ir,iz])
+            #        except: # Outside LCFS
+            #          phi2d_eq[ir,iz] = 1.
+            #    common_bundle[ids].time_slice[0].profiles_2d[0].phi = phi2d_eq
+            for process in process_bundle.keys():
+                if (
+                    "merge_" not in process
+                    and ids in process_bundle[process]["input"].keys()
+                ):
+                    process_bundle[process]["input"][ids] = common_bundle[ids]
+            # except:
+            #     print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+            #     print(
+            #         "  ----> Check the version of the Data Dictionary between the"
+            #         + " input and the loaded IMAS version.",
+            #         file=sys.stderr,
+            #     )
+            #     print("  ----> Aborted.", file=sys.stderr)
+            #     return
+
+            # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
+            for ids in reduced_md_list:
+                print("  Get", ids, file=sys.stdout)
+                try:
+                    for process in process_bundle.keys():
+                        if ids in process_bundle[process]["input"].keys():
+                            process_bundle[process]["input"][ids] = md.get_slice(
+                                ids, timenow, 1
+                            )
+                except:
+                    print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+                    print(
+                        "  ----> Check the version of the Data Dictionary between the"
+                        + " input and the loaded IMAS version.",
+                        file=sys.stderr,
+                    )
+                    print("  ----> Aborted.", file=sys.stderr)
+                    return
+
+            # ---------------------------------------------------------------------
+            # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
+            # ---------------------------------------------------------------------
+            try:
+                time_base = create_workflow_param_from_file(self.workflow_xml)[
+                    "time_base"
+                ]
+            except:
+                time_base = None
+
+            for process in process_bundle.keys():
+                if time_base is not None:
+                    if process in time_base[0]:
+                        [tc, it] = find_nearest(
+                            np.array(
+                                time_base[0][process][0]["wf_interval"][0][
+                                    "time_array"
+                                ][0]
+                            ),
+                            timenow,
+                        )
+                        process_bundle[process]["status"] = time_base[0][process][0][
+                            "wf_interval"
+                        ][0]["status"][0][it]
+                    else:
+                        process_bundle[process]["status"] = 1
+                else:
+                    process_bundle[process]["status"] = 1
+
     def run_internal(self, process, actor, bundle, parameters):
-        process
-        actor
-        bundle
-        parameters
+        print("--------------------run_internal-----------------------")
+        print("--------------------process-----------------------")
+        print(process)
+        print("--------------------actor-----------------------")
+        print(actor)
+        print("--------------------bundle-----------------------")
+        print(bundle)
+        print("--------------------parameters-----------------------")
+        print(parameters)
         # For merge, bundle is a list of 2 bundles and the call is simpler
         if type(bundle) is list:
             return globals()[process](bundle[0], bundle[1])

@@ -32,3 +32,6 @@ class GlobalListReader:
     def getIdsMdList(self):
         return self.getList("ids_md_list")
     
+    def getWaveformPresetsList(self):
+        return self.getList("waveform_presets")
+    
