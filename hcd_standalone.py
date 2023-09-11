@@ -22,10 +22,11 @@ config_folder = args["config_folder"]
 
 config_folder_path = os.path.abspath(config_folder)
 rootPath = os.path.dirname(os.path.abspath(__file__))
-
+# -----------------------------------------------------------------------------------------
 globalListPath = os.path.join(rootPath, r"global_configuration/global_lists.yaml")
 inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
 
+# create input and output database
 wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
     "workflow_parameters"
 ][0]
@@ -51,7 +52,9 @@ inputDb = dbhelper.getInputDatabase()
 outputDb = dbhelper.getOutputDatabase()
 machineDb = dbhelper.getMachineDatabase()
 
+
 hcdWorkflowSeparate = HCDWorkflow(config_folder_path)
+# initialize dictionary_of_actors
 dictionary_of_actors = {}
 dictionary_of_actors["grayscale"] = hcdWorkflowSeparate.initializeActor(
     "grayscale",
@@ -61,9 +64,10 @@ dictionary_of_actors["grayscale"] = hcdWorkflowSeparate.initializeActor(
 # print("------------dictionary_of_actors-----------------")
 # print(dictionary_of_actors)
 
-
+# read ids of actor
 single_input_ids_list, single_output_ids_list, err = read_actor_ids("grayscale", 0)
 
+# initialize process bundle
 process_bundle = {}
 process_bundle["ec_wave_solver"] = {}
 process_bundle["ec_wave_solver"]["input"] = {}
@@ -78,19 +82,25 @@ process_bundle["ec_wave_solver"]["status"] = 1
 
 
 globallistReader = GlobalListReader(globalListPath)
-inputIds = globallistReader.getIdsScenarioList()
+
+hcdWorkflowSeparate.readWorkflowConfig(inputworkflow_xml)
+
+# get Machine description database
 ids_md_list = globallistReader.getIdsMdList()
 waveform_presets = globallistReader.getWaveformPresetsList()
-
-common_bundle = {}
-add_ids_entry_to_dict(common_bundle, inputIds)
-hcdWorkflowSeparate.getMachineDescriptionData(
+reduced_md_list = hcdWorkflowSeparate.getMachineDescriptionData(
     ids_md_list, waveform_presets, process_bundle
 )
-hcdWorkflowSeparate.readWorkflowConfig(inputworkflow_xml)
-hcdWorkflowSeparate.initializeProcessBundle(
-    70.00, inputIds, inputDb, common_bundle, process_bundle
+
+# initialize process bundle at specific time slice at 70.00
+inputIds = globallistReader.getIdsScenarioList()
+common_bundle = {}
+add_ids_entry_to_dict(common_bundle, inputIds)
+hcdWorkflowSeparate.initializeIDSSlices(
+    70.00, inputIds, inputDb, common_bundle, process_bundle, reduced_md_list
 )
+
+# Run hcd workflow
 hcdWorkflowSeparate.hcd_workflow(
     process_bundle, inputworkflow_xml, dictionary_of_actors
 )

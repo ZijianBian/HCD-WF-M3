@@ -357,7 +357,7 @@ class HCDWorkflow(WorkflowBase):
             print("dt   = %5.2f" % self.dt_required, "s", file=sys.stdout)
 
             # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
-            self.initializeProcessBundle(
+            self.initializeIDSSlices(
                 timenow,
                 self.ids_scenario_list,
                 self.inputDb,
@@ -373,31 +373,8 @@ class HCDWorkflow(WorkflowBase):
                 print("  Error in H&CD workflow.", file=sys.stderr)
                 return
 
-            # ------------------------------
-            # COMMON BUNDLE TO SAVE TO DISK
-            # ------------------------------
-            for ids in self.common_bundle.keys():
-                if self.common_bundle[ids].ids_properties.homogeneous_time >= 0:
-                    self.outputDb.put_slice(self.common_bundle[ids])
+            process_bundle_out = self.storeIDSOutput()
 
-            # ------------------------------
-            # OUTPUT BUNDLE TO SAVE TO DISK
-            # ------------------------------
-            process_bundle_out = {}
-
-            # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
-            for process in self.process_bundle.keys():
-                if "merge_" in process:
-                    key, value = list(self.process_bundle[process]["output"].items())[0]
-                    process_bundle_out[key] = value
-
-            # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
-            for process in self.process_bundle.keys():
-                for key, value in self.process_bundle[process]["output"].items():
-                    if key not in process_bundle_out.keys():
-                        process_bundle_out[key] = value
-
-            # SAVE TO DISK
             for ids in process_bundle_out.keys():
                 if (
                     len(process_bundle_out[ids].time) > 0
@@ -406,9 +383,7 @@ class HCDWorkflow(WorkflowBase):
                         process_bundle_out[ids].time[0] > 0
                         or "merge" in process_bundle_out[ids].code.name
                     ):
-                        self.outputDb.put_slice(process_bundle_out[ids])
                         previous_time[ids] = process_bundle_out[ids].time[0]
-
             # ------------------------------------------------------------------------------------------
             # PREPARE FOR THE NEXT TIME STEP: COPY OUTPUT IDS IN INPUT OF ACTORS FOR THE NEXT TIME STEP
             # ------------------------------------------------------------------------------------------
@@ -431,7 +406,7 @@ class HCDWorkflow(WorkflowBase):
                                 ids
                             ] = self.process_bundle[process]["output"][ids]
 
-    def initializeProcessBundle(
+    def initializeIDSSlices(
         self,
         timenow,
         ids_scenario_list,
@@ -480,21 +455,21 @@ class HCDWorkflow(WorkflowBase):
             # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
             for ids in reduced_md_list:
                 print("  Get", ids, file=sys.stdout)
-                try:
-                    for process in process_bundle.keys():
-                        if ids in process_bundle[process]["input"].keys():
-                            process_bundle[process]["input"][ids] = md.get_slice(
-                                ids, timenow, 1
-                            )
-                except:
-                    print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
-                    print(
-                        "  ----> Check the version of the Data Dictionary between the"
-                        + " input and the loaded IMAS version.",
-                        file=sys.stderr,
-                    )
-                    print("  ----> Aborted.", file=sys.stderr)
-                    return
+                # try:
+                for process in process_bundle.keys():
+                    if ids in process_bundle[process]["input"].keys():
+                        process_bundle[process]["input"][ids] = md.get_slice(
+                            ids, timenow, 1
+                        )
+                # except:
+                #     print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+                #     print(
+                #         "  ----> Check the version of the Data Dictionary between the"
+                #         + " input and the loaded IMAS version.",
+                #         file=sys.stderr,
+                #     )
+                #     print("  ----> Aborted.", file=sys.stderr)
+                #     return
 
             # ---------------------------------------------------------------------
             # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
@@ -525,25 +500,65 @@ class HCDWorkflow(WorkflowBase):
                 else:
                     process_bundle[process]["status"] = 1
 
+    def storeIDSOutput(self):
+        # ------------------------------
+        # COMMON BUNDLE TO SAVE TO DISK
+        # ------------------------------
+        for ids in self.common_bundle.keys():
+            if self.common_bundle[ids].ids_properties.homogeneous_time >= 0:
+                self.outputDb.put_slice(self.common_bundle[ids])
+
+        # ------------------------------
+        # OUTPUT BUNDLE TO SAVE TO DISK
+        # ------------------------------
+        process_bundle_out = {}
+
+        # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
+        for process in self.process_bundle.keys():
+            if "merge_" in process:
+                key, value = list(self.process_bundle[process]["output"].items())[0]
+                process_bundle_out[key] = value
+
+        # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
+        for process in self.process_bundle.keys():
+            for key, value in self.process_bundle[process]["output"].items():
+                if key not in process_bundle_out.keys():
+                    process_bundle_out[key] = value
+
+        # SAVE TO DISK
+        for ids in process_bundle_out.keys():
+            if (
+                len(process_bundle_out[ids].time) > 0
+            ):  # Empty if process deactivated by an is_xx_on function
+                if (
+                    process_bundle_out[ids].time[0] > 0
+                    or "merge" in process_bundle_out[ids].code.name
+                ):
+                    self.outputDb.put_slice(process_bundle_out[ids])
+
+        return process_bundle_out
+
     def run_internal(self, process, actor, bundle, parameters):
-        print("--------------------run_internal-----------------------")
-        print("--------------------process-----------------------")
-        print(process)
-        print("--------------------actor-----------------------")
-        print(actor)
-        print("--------------------bundle-----------------------")
-        print(bundle)
-        print("--------------------parameters-----------------------")
-        print(parameters)
+        # print("--------------------run_internal-----------------------")
+        # print("--------------------process-----------------------")
+        # print(process)
+        # print("--------------------actor-----------------------")
+        # print(actor)
+        # print("--------------------bundle-----------------------")
+        # print(bundle)
+        # print("--------------------parameters-----------------------")
+        # print(parameters)
         # For merge, bundle is a list of 2 bundles and the call is simpler
         if type(bundle) is list:
             return globals()[process](bundle[0], bundle[1])
+
         # Get list of all codes in that category
         codeslist = self.catlist[process]  # next(gen_dict_extract(process,maindict))
         codeinfo = codeslist[parameters[process]]
         code = codeinfo["name"]
 
         # Re-direct the logfile for this specific actor
+
         if code + "_log" in parameters.keys():
             stdout_redirect = parameters[code + "_log"]
             oldstrout, newstdout = redirect_stdout(stdout_redirect)
