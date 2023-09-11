@@ -56,6 +56,15 @@ class HCDWorkflow(WorkflowBase):
             "workflow_parameters"
         ][0]
 
+    def readWorkflowConfig(self, workflowConfig: str):
+        (
+            self.maindict,
+            self.compiled_actors,
+            self.uncompiled_actors,
+            self.code_selection,
+            self.catlist,
+        ) = create_maindict(workflowConfig, 0)
+
     def initialize(self, inputdb, outputdb, machineDb, inputIds, inputMds):
         # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
         # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
@@ -65,13 +74,6 @@ class HCDWorkflow(WorkflowBase):
         self.md = machineDb
         self.ids_scenario_list = inputIds
         ids_md_list = inputMds
-        (
-            self.maindict,
-            self.compiled_actors,
-            self.uncompiled_actors,
-            self.code_selection,
-            self.catlist,
-        ) = create_maindict(self.workflow_xml, 0)
 
         # LIST OF ACTIVATED PROCESSES AND SELECTED ACTORS
         self.list_of_processes = {}
@@ -108,7 +110,6 @@ class HCDWorkflow(WorkflowBase):
                 self.process_bundle[process]["output"], single_output_ids_list
             )
 
-        # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
         self.dictionary_of_actors = {}
         process_actor = {}
         for main_key in self.maindict:
@@ -120,14 +121,7 @@ class HCDWorkflow(WorkflowBase):
                             and actor_name == self.code_selection[process]
                         ):
                             process_actor[process] = actor_name
-                            err = import_actor(actor_name, 0)
-                            actor = eval(actor_name)
-                            runtime_settings = actor.get_runtime_settings()
-                            runtime_settings.ids_storage.backend = (
-                                imas.imasdef.MDSPLUS_BACKEND
-                            )  # IMAS-4055
-                            code_parameters = actor.get_code_parameters()
-                            code_parameters.parameters_path = (
+                            xmlPath = (
                                 self.workflowConfigPath
                                 + "/"
                                 + category
@@ -137,45 +131,17 @@ class HCDWorkflow(WorkflowBase):
                                 + actor_name
                                 + ".xml"
                             )
-                            if actor.is_mpi_code is True:
-                                if actor.is_mpi_code is True:
-                                    tree = etree.parse(
-                                        self.workflowConfigPath
-                                        + "/"
-                                        + category
-                                        + "/"
-                                        + process
-                                        + "/input_"
-                                        + actor_name
-                                        + ".xml"
-                                    )
-                                    root = tree.getroot()
-                                    for elem in root.iter():
-                                        if elem.tag == "nproc_actor":
-                                            nproc_actor = int(elem.text)
-                                runtime_settings.mpi.mpi_processes = nproc_actor
-                                code_parameters.__init__(
-                                    default_parameters_path=self.workflowConfigPath
-                                    + "/"
-                                    + category
-                                    + "/"
-                                    + process
-                                    + "/input_"
-                                    + actor_name
-                                    + ".xml",
-                                    schema_path=self.workflowConfigPath
-                                    + "/"
-                                    + category
-                                    + "/"
-                                    + process
-                                    + "/input_"
-                                    + actor_name
-                                    + ".xsd",
-                                )
-                            actor.initialize(
-                                code_parameters=code_parameters,
-                                runtime_settings=runtime_settings,
+                            xsdPath = (
+                                self.workflowConfigPath
+                                + "/"
+                                + category
+                                + "/"
+                                + process
+                                + "/input_"
+                                + actor_name
+                                + ".xsd"
                             )
+                            actor = self.initializeActor(actor_name, xmlPath, xsdPath)
                             self.dictionary_of_actors[actor_name] = actor
 
         self.common_bundle = {}
@@ -269,6 +235,32 @@ class HCDWorkflow(WorkflowBase):
         if not self.__initialized:
             message = "Workflow is not initialized. Initialize workflow by calling workflow.initialize() method"
             raise RuntimeError(message)
+
+    def initializeActor(self, actor_name: str, xmlPath: str, xsdPath: str):
+        # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
+        err = import_actor(actor_name, 0)
+        actor = eval(actor_name)
+        runtime_settings = actor.get_runtime_settings()
+        runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND  # IMAS-4055
+        code_parameters = actor.get_code_parameters()
+        code_parameters.parameters_path = ()
+        if actor.is_mpi_code is True:
+            if actor.is_mpi_code is True:
+                tree = etree.parse(xmlPath)
+                root = tree.getroot()
+                for elem in root.iter():
+                    if elem.tag == "nproc_actor":
+                        nproc_actor = int(elem.text)
+            runtime_settings.mpi.mpi_processes = nproc_actor
+            code_parameters.__init__(
+                default_parameters_path=xmlPath,
+                schema_path=xsdPath,
+            )
+        actor.initialize(
+            code_parameters=code_parameters,
+            runtime_settings=runtime_settings,
+        )
+        return actor
 
     def run(self, *args):
         # -----------------------------------------
@@ -516,6 +508,10 @@ class HCDWorkflow(WorkflowBase):
                             ] = self.process_bundle[process]["output"][ids]
 
     def run_internal(self, process, actor, bundle, parameters):
+        process
+        actor
+        bundle
+        parameters
         # For merge, bundle is a list of 2 bundles and the call is simpler
         if type(bundle) is list:
             return globals()[process](bundle[0], bundle[1])
@@ -543,6 +539,12 @@ class HCDWorkflow(WorkflowBase):
         return results
 
     def hcd_workflow(self, process_bundle, workflow_xml, dictionary_of_actors):
+        # print("process_bundle-------------------------")
+        # print(process_bundle)
+        # print("workflow_xml-----------------------")
+        # print(workflow_xml)
+        # print("dictionary_of_actors---------------------")
+        # print(dictionary_of_actors)
         # YAML FILE CONTAINING ALL USEFUL LISTS
         file = (
             os.path.dirname(os.path.abspath(__file__))
@@ -800,8 +802,6 @@ class HCDWorkflow(WorkflowBase):
         return process_bundle, 0
 
     def finalize(self):
-        self.md.close()
-
         # FINALIZE ALL ACTORS
         for actor_name, actor in self.dictionary_of_actors.items():
             actor.finalize()
