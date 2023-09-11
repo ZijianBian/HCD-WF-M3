@@ -104,3 +104,4 @@ hcdWorkflowSeparate.initializeIDSSlices(
 hcdWorkflowSeparate.hcd_workflow(
     process_bundle, inputworkflow_xml, dictionary_of_actors
 )
+hcdWorkflowSeparate.storeIDSOutput(common_bundle, process_bundle, outputDb)

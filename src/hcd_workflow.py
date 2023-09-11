@@ -373,7 +373,9 @@ class HCDWorkflow(WorkflowBase):
                 print("  Error in H&CD workflow.", file=sys.stderr)
                 return
 
-            process_bundle_out = self.storeIDSOutput()
+            process_bundle_out = self.storeIDSOutput(
+                self.common_bundle, self.process_bundle, self.outputDb
+            )
 
             for ids in process_bundle_out.keys():
                 if (
@@ -500,13 +502,13 @@ class HCDWorkflow(WorkflowBase):
                 else:
                     process_bundle[process]["status"] = 1
 
-    def storeIDSOutput(self):
+    def storeIDSOutput(self, common_bundle, process_bundle, outputDb):
         # ------------------------------
         # COMMON BUNDLE TO SAVE TO DISK
         # ------------------------------
-        for ids in self.common_bundle.keys():
-            if self.common_bundle[ids].ids_properties.homogeneous_time >= 0:
-                self.outputDb.put_slice(self.common_bundle[ids])
+        for ids in common_bundle.keys():
+            if common_bundle[ids].ids_properties.homogeneous_time >= 0:
+                outputDb.put_slice(common_bundle[ids])
 
         # ------------------------------
         # OUTPUT BUNDLE TO SAVE TO DISK
@@ -514,14 +516,14 @@ class HCDWorkflow(WorkflowBase):
         process_bundle_out = {}
 
         # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
-        for process in self.process_bundle.keys():
+        for process in process_bundle.keys():
             if "merge_" in process:
-                key, value = list(self.process_bundle[process]["output"].items())[0]
+                key, value = list(process_bundle[process]["output"].items())[0]
                 process_bundle_out[key] = value
 
         # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
-        for process in self.process_bundle.keys():
-            for key, value in self.process_bundle[process]["output"].items():
+        for process in process_bundle.keys():
+            for key, value in process_bundle[process]["output"].items():
                 if key not in process_bundle_out.keys():
                     process_bundle_out[key] = value
 
@@ -534,7 +536,7 @@ class HCDWorkflow(WorkflowBase):
                     process_bundle_out[ids].time[0] > 0
                     or "merge" in process_bundle_out[ids].code.name
                 ):
-                    self.outputDb.put_slice(process_bundle_out[ids])
+                    outputDb.put_slice(process_bundle_out[ids])
 
         return process_bundle_out
 
