@@ -62,7 +62,7 @@ class HCDWorkflow(WorkflowBase):
             self.compiled_actors,
             self.uncompiled_actors,
             self.code_selection,
-            self.catlist,
+            self.catdict,
         ) = create_maindict(workflowConfig, 0)
 
     def initialize(self, inputdb, outputdb, machineDb, inputIds, inputMds):
@@ -182,6 +182,7 @@ class HCDWorkflow(WorkflowBase):
         self.reduced_md_list = self.getMachineDescriptionData(
             ids_md_list, waveform_presets, self.process_bundle
         )
+
         ##################################################################
 
         # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS
@@ -245,7 +246,7 @@ class HCDWorkflow(WorkflowBase):
         runtime_settings = actor.get_runtime_settings()
         runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND  # IMAS-4055
         code_parameters = actor.get_code_parameters()
-        code_parameters.parameters_path = ()
+        code_parameters.parameters_path = xmlPath
         if actor.is_mpi_code is True:
             if actor.is_mpi_code is True:
                 tree = etree.parse(xmlPath)
@@ -364,6 +365,7 @@ class HCDWorkflow(WorkflowBase):
                 self.common_bundle,
                 self.process_bundle,
                 self.reduced_md_list,
+                self.md,
             )
 
             self.process_bundle, err = self.hcd_workflow(
@@ -416,91 +418,88 @@ class HCDWorkflow(WorkflowBase):
         common_bundle,
         process_bundle,
         reduced_md_list,
+        machineDb,
     ):
         for ids in ids_scenario_list:
             print("  Get", ids, file=sys.stdout)
-            # try:
-            common_bundle[ids] = inputDb.get_slice(ids, timenow, 1)
-            # if common_bundle[ids] == 'equilibrium': # when equilibrium misses phi(r,z)
-            #  if len(common_bundle[ids].time_slice[0].profiles_2d[0].phi)==0:
-            #    print('   --- Interpolate missing phi(R,Z) ---')
-            #    r1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim1
-            #    z1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim2
-            #    rho1d_eq = common_bundle[ids].time_slice[0].profiles_1d.rho_tor_norm
-            #    psi1d_eq = common_bundle[ids].time_slice[0].profiles_1d.psi
-            #    psi2d_eq = common_bundle[ids].time_slice[0].profiles_2d[0].psi
-            #    rho_from_psi = interpolate.interp1d(psi1d_eq,rho1d_eq,kind='linear')
-            #    phi2d_eq = np.zeros(np.shape(psi2d_eq))
-            #    for ir in range(len(r1d_eq)):
-            #      for iz in range(len(z1d_eq)):
-            #        try: # Inside LCFS
-            #          phi2d_eq[ir,iz] = rho_from_psi(psi2d_eq[ir,iz])
-            #        except: # Outside LCFS
-            #          phi2d_eq[ir,iz] = 1.
-            #    common_bundle[ids].time_slice[0].profiles_2d[0].phi = phi2d_eq
-            for process in process_bundle.keys():
-                if (
-                    "merge_" not in process
-                    and ids in process_bundle[process]["input"].keys()
-                ):
-                    process_bundle[process]["input"][ids] = common_bundle[ids]
-            # except:
-            #     print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
-            #     print(
-            #         "  ----> Check the version of the Data Dictionary between the"
-            #         + " input and the loaded IMAS version.",
-            #         file=sys.stderr,
-            #     )
-            #     print("  ----> Aborted.", file=sys.stderr)
-            #     return
+            try:
+                common_bundle[ids] = inputDb.get_slice(ids, timenow, 1)
+                # if common_bundle[ids] == 'equilibrium': # when equilibrium misses phi(r,z)
+                #  if len(common_bundle[ids].time_slice[0].profiles_2d[0].phi)==0:
+                #    print('   --- Interpolate missing phi(R,Z) ---')
+                #    r1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim1
+                #    z1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim2
+                #    rho1d_eq = common_bundle[ids].time_slice[0].profiles_1d.rho_tor_norm
+                #    psi1d_eq = common_bundle[ids].time_slice[0].profiles_1d.psi
+                #    psi2d_eq = common_bundle[ids].time_slice[0].profiles_2d[0].psi
+                #    rho_from_psi = interpolate.interp1d(psi1d_eq,rho1d_eq,kind='linear')
+                #    phi2d_eq = np.zeros(np.shape(psi2d_eq))
+                #    for ir in range(len(r1d_eq)):
+                #      for iz in range(len(z1d_eq)):
+                #        try: # Inside LCFS
+                #          phi2d_eq[ir,iz] = rho_from_psi(psi2d_eq[ir,iz])
+                #        except: # Outside LCFS
+                #          phi2d_eq[ir,iz] = 1.
+                #    common_bundle[ids].time_slice[0].profiles_2d[0].phi = phi2d_eq
+                for process in process_bundle.keys():
+                    if (
+                        "merge_" not in process
+                        and ids in process_bundle[process]["input"].keys()
+                    ):
+                        process_bundle[process]["input"][ids] = common_bundle[ids]
+            except:
+                print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+                print(
+                    "  ----> Check the version of the Data Dictionary between the"
+                    + " input and the loaded IMAS version.",
+                    file=sys.stderr,
+                )
+                print("  ----> Aborted.", file=sys.stderr)
+                return
 
-            # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
-            for ids in reduced_md_list:
-                print("  Get", ids, file=sys.stdout)
-                # try:
+        # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
+        for ids in reduced_md_list:
+            print("  Get", ids, file=sys.stdout)
+            try:
                 for process in process_bundle.keys():
                     if ids in process_bundle[process]["input"].keys():
-                        process_bundle[process]["input"][ids] = md.get_slice(
+                        process_bundle[process]["input"][ids] = machineDb.get_slice(
                             ids, timenow, 1
                         )
-                # except:
-                #     print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
-                #     print(
-                #         "  ----> Check the version of the Data Dictionary between the"
-                #         + " input and the loaded IMAS version.",
-                #         file=sys.stderr,
-                #     )
-                #     print("  ----> Aborted.", file=sys.stderr)
-                #     return
-
-            # ---------------------------------------------------------------------
-            # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
-            # ---------------------------------------------------------------------
-            try:
-                time_base = create_workflow_param_from_file(self.workflow_xml)[
-                    "time_base"
-                ]
             except:
-                time_base = None
+                print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+                print(
+                    "  ----> Check the version of the Data Dictionary between the"
+                    + " input and the loaded IMAS version.",
+                    file=sys.stderr,
+                )
+                print("  ----> Aborted.", file=sys.stderr)
+                return
 
-            for process in process_bundle.keys():
-                if time_base is not None:
-                    if process in time_base[0]:
-                        [tc, it] = find_nearest(
-                            np.array(
-                                time_base[0][process][0]["wf_interval"][0][
-                                    "time_array"
-                                ][0]
-                            ),
-                            timenow,
-                        )
-                        process_bundle[process]["status"] = time_base[0][process][0][
-                            "wf_interval"
-                        ][0]["status"][0][it]
-                    else:
-                        process_bundle[process]["status"] = 1
+        # ---------------------------------------------------------------------
+        # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
+        # ---------------------------------------------------------------------
+        try:
+            time_base = create_workflow_param_from_file(self.workflow_xml)["time_base"]
+        except:
+            time_base = None
+
+        for process in process_bundle.keys():
+            if time_base is not None:
+                if process in time_base[0]:
+                    [tc, it] = find_nearest(
+                        np.array(
+                            time_base[0][process][0]["wf_interval"][0]["time_array"][0]
+                        ),
+                        timenow,
+                    )
+                    process_bundle[process]["status"] = time_base[0][process][0][
+                        "wf_interval"
+                    ][0]["status"][0][it]
                 else:
                     process_bundle[process]["status"] = 1
+            else:
+                process_bundle[process]["status"] = 1
 
     def storeIDSOutput(self, common_bundle, process_bundle, outputDb):
         # ------------------------------
@@ -555,7 +554,7 @@ class HCDWorkflow(WorkflowBase):
             return globals()[process](bundle[0], bundle[1])
 
         # Get list of all codes in that category
-        codeslist = self.catlist[process]  # next(gen_dict_extract(process,maindict))
+        codeslist = self.catdict[process]  # next(gen_dict_extract(process,maindict))
         codeinfo = codeslist[parameters[process]]
         code = codeinfo["name"]
 
@@ -586,6 +585,8 @@ class HCDWorkflow(WorkflowBase):
         # print("dictionary_of_actors---------------------")
         # print(dictionary_of_actors)
         # YAML FILE CONTAINING ALL USEFUL LISTS
+        print("Execute H&CD workflow for current time slice", file=sys.stdout)
+
         file = (
             os.path.dirname(os.path.abspath(__file__))
             + "/../global_configuration/"
@@ -687,7 +688,7 @@ class HCDWorkflow(WorkflowBase):
                 param_process["lh_wave_solver"] = 0
 
         # DEFINE THE SEQUENCE OF CODES TO BE EXECUTED
-        if self.catlist["ic_wave_fp"][param_process["ic_wave_fp"]]["name"] != "fopla":
+        if self.catdict["ic_wave_fp"][param_process["ic_wave_fp"]]["name"] != "fopla":
             print("--- Default algorithm ---", file=sys.stdout)
             input_algorithm = loadlist(file, "algorithm")["default"]
         else:
@@ -695,7 +696,7 @@ class HCDWorkflow(WorkflowBase):
             input_algorithm = loadlist(file, "algorithm")["nbi_ic_synergy"]
 
         final_algorithm, waiting_for, parallel_runs = clever_algo(
-            input_algorithm, param_process, self.catlist, file
+            input_algorithm, param_process, self.catdict, file
         )
 
         # print('final_algo',final_algorithm)
@@ -710,7 +711,7 @@ class HCDWorkflow(WorkflowBase):
         # EXECUTION OF THE WORKFLOW
         for process in final_algorithm:
             actor = dictionary_of_actors[
-                self.catlist[process][param_process[process]]["name"]
+                self.catdict[process][param_process[process]]["name"]
             ]
             if not "merge_" in process:
                 if process_bundle[process]["status"] == 1:
@@ -718,7 +719,7 @@ class HCDWorkflow(WorkflowBase):
                         " PROCESS --> ",
                         process,
                         "=",
-                        self.catlist[process][param_process[process]]["name"].upper(),
+                        self.catdict[process][param_process[process]]["name"].upper(),
                         file=sys.stdout,
                     )
                 else:
@@ -726,11 +727,11 @@ class HCDWorkflow(WorkflowBase):
                         " PROCESS",
                         process,
                         "=",
-                        self.catlist[process][param_process[process]]["name"].upper(),
+                        self.catdict[process][param_process[process]]["name"].upper(),
                         " not called for this time slice",
                         file=sys.stdout,
                     )
-                output_ids_list = self.catlist[process][param_process[process]][
+                output_ids_list = self.catdict[process][param_process[process]][
                     "output"
                 ]
                 # REMOVE WARNINGS AND HCD2CORE_SOURCES CRASHS (DOES NOT LIKE RECEIVING EMPTY IDSS)
