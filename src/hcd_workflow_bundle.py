@@ -41,8 +41,6 @@ root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class HCDWorkflow(WorkflowBase):
     def __init__(self, workflowConfigPath: str):
         # READ WORKFLOW PARAMETERS FROM INPUT XML FILE
-        self.workflowConfigPath = workflowConfigPath
-
         # YAML FILE CONTAINING ALL USEFUL LISTS
         self.global_lists = (
             os.path.dirname(os.path.abspath(__file__))
@@ -64,11 +62,14 @@ class HCDWorkflow(WorkflowBase):
         self.dictionary_of_actors = self.workflowConfig.getAllActors()
         self.code_selection = self.workflowConfig.getAllProcesses()
         self.workflowParameters = self.workflowConfig.getWorkflowParameters()
-
-        self.md = self.getMachineDatabase()
         self.process_bundle = self.workflowConfig.getProcessBundle()
 
-    def getMachineDatabase(self):
+        self.dt_required = self.workflowParameters["dt_required"]
+        self.one_time_slice = self.workflowParameters["one_time_slice"]
+        self.tbegin = self.workflowParameters["tbegin"]
+        self.tend = self.workflowParameters["tend"]
+
+    def createMachineDatabase(self):
         machineDb = imas.DBEntry(
             imas.imasdef.MEMORY_BACKEND,
             self.workflowParameters["output_database"],
@@ -79,21 +80,18 @@ class HCDWorkflow(WorkflowBase):
         machineDb.create()
         return machineDb
 
-    def getMachineDescriptionData(self, inputMdsDict):
-        # READ INPUT MACHINE DESCRIPTION DATA
-        reduced_md_list = []
-        # TODO What is the use of flag_multiple_md variable
+    def createMachineDescriptionIDSes(self, inputMdsDict):
         mdCounter = 0
         waveform_presets = self.globalListReader.getWaveformPresetsList()
+        allMachineDescriptionIDSes = []
         for process in self.process_bundle.keys():
-            if not "nuclear" in process:  # No waveform for nuclear reactions
+            if "nuclear" not in process:  # No waveform for nuclear reactions
                 for ids in self.process_bundle[process]["input"].keys():
                     if ids in inputMdsDict.keys():
                         self.process_bundle[process]["input"][ids] = inputMdsDict[ids]
                         # Overwrite with configured waveform if it exists
                         waveform_file = (
-                            self.workflowConfig.workflowDirectory
-                            + "/"
+                            f"{self.workflowConfig.workflowDirectory}/"
                             + waveform_presets[process.split("_")[0]]["custom"][
                                 mdCounter
                             ]
@@ -104,74 +102,11 @@ class HCDWorkflow(WorkflowBase):
                             )
                             mdCounter += 1
                         self.md.put(self.process_bundle[process]["input"][ids])
-                        if ids not in reduced_md_list:
-                            reduced_md_list.append(ids)
-        return reduced_md_list
+                        if ids not in allMachineDescriptionIDSes:
+                            allMachineDescriptionIDSes.append(ids)
+        return allMachineDescriptionIDSes
 
-    def initialize(self, inputdb, outputdb, inputIds, inputMdsDict):
-        # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
-        # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
-        # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-        self.inputDb = inputdb
-        self.outputDb = outputdb
-        self.md = self.getMachineDatabase()
-        self.ids_scenario_list = inputIds
-
-        # LIST OF ACTIVATED PROCESSES AND SELECTED ACTORS
-        # self.list_of_processes = {}
-        # for process, code in self.dictionary_of_actors.items():
-        #     if code is not None:
-        #         self.list_of_processes[process] = code
-
-        ids_process_list = loadlist(self.global_lists, "ids_process_list")
-        # waveform_presets = loadlist(self.global_lists, "waveform_presets")
-
-        # DEFINE THE TOTAL LIST OF INVOLVED INPUT AND OUTPUT IDSS ACCORDING TO THE ACTOR SELECTION
-        # REPLACED PRASAD
-
-        self.common_bundle = {}
-        add_ids_entry_to_dict(self.common_bundle, self.ids_scenario_list)
-
-        # Temporary version:
-        # common_bundle contains all IDSs to be read via get_slice() from input scenario, defined by ids_scenario_list
-        # process_bundle contains all other input and output IDSs (total list = ids_md_list + ids_process_list)
-        #    - all its inputs from ids_md_list to be read via get() or get_slice()
-        #    - all other inputs from ids_process_list are output of upstream actors
-        #      to be copied from the output bundle of upstream actors inside the time loop
-        #      according to the parallel_dependency constraints
-
-        # CHECK IF THE CODES ARE COMPATIBLE / PREREQUISITES ARE FULFILLED
-        prerequisites = loadlist(self.global_lists, "prerequisites")
-        err = self.check_if_code_fulfills_configuration(
-            prerequisites, self.code_selection
-        )
-        if err == 0:
-            print("Selection fulfills all actor selection rules", file=sys.stdout)
-        else:
-            print("Please change the actor selection and try again.", file=sys.stderr)
-            return
-
-        ##################################################################
-
-        # -------------------------------------
-        # INPUT AND OUTPUT DATABASE MANAGEMENT
-        # -------------------------------------
-
-        # IMAS DB VERSION
-        version = os.getenv("IMAS_VERSION")[0]
-
-        self.dt_required = self.workflowParameters["dt_required"]
-        self.one_time_slice = self.workflowParameters["one_time_slice"]
-        self.tbegin = self.workflowParameters["tbegin"]
-        self.tend = self.workflowParameters["tend"]
-
-        ##################################################################
-        self.reduced_md_list = self.getMachineDescriptionData(
-            inputMdsDict,
-        )
-
-        ##################################################################
-
+    def createWorkflowIDS(self, dt_required):
         # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS
         workflow = imas.workflow()
         workflow.ids_properties.homogeneous_time = 1
@@ -179,9 +114,7 @@ class HCDWorkflow(WorkflowBase):
         workflow.time_loop.component.resize(1)
         workflow.time_loop.workflow_cycle.resize(1)
         workflow.time_loop.workflow_cycle[0].component.resize(1)
-        workflow.time_loop.workflow_cycle[0].component[
-            0
-        ].time_interval = self.dt_required
+        workflow.time_loop.workflow_cycle[0].component[0].time_interval = dt_required
 
         for process in self.process_bundle.keys():
             if "workflow" in self.process_bundle[process]["input"].keys():
@@ -191,13 +124,11 @@ class HCDWorkflow(WorkflowBase):
                 self.process_bundle[process]["input"]["workflow"] = copy.deepcopy(
                     workflow
                 )
-        print("initialized")
 
-    def check_if_code_fulfills_configuration(self, prerequisites, code_selection):
+    # TODO Refactor this
+    def validatePrerquisitesOfCodes(self, prerequisites, code_selection):
         global_error = 0
-        print(code_selection)
         for entry, _ in code_selection.items():
-            print(entry)
             if code_selection != None:
                 err = 0
                 code = code_selection[entry]
@@ -246,6 +177,31 @@ class HCDWorkflow(WorkflowBase):
                                 err = 1
                 global_error = global_error + err
         return global_error
+
+    def initialize(self, inputdb, outputdb, inputIds, inputMdsDict):
+        prerequisites = self.globalListReader.getPrerequisites()
+        err = self.validatePrerquisitesOfCodes(prerequisites, self.code_selection)
+        if err == 0:
+            print("Selection fulfills all actor selection rules", file=sys.stdout)
+        else:
+            print("Please change the actor selection and try again.", file=sys.stderr)
+            return
+        self.md = self.createMachineDatabase()
+        self.machineDescriptionIDSes = self.createMachineDescriptionIDSes(inputMdsDict)
+        self.createWorkflowIDS(self.dt_required)
+
+        # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
+        # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
+        # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
+        self.inputDb = inputdb
+        self.outputDb = outputdb
+        self.ids_scenario_list = inputIds
+
+        self.common_bundle = {}
+        add_ids_entry_to_dict(self.common_bundle, self.ids_scenario_list)
+
+        # IMAS DB VERSION
+        version = os.getenv("IMAS_VERSION")[0]
 
     def __call__(self, *args):
         return self.run(*args)
@@ -444,7 +400,7 @@ class HCDWorkflow(WorkflowBase):
                 return
 
         # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
-        for ids in self.reduced_md_list:
+        for ids in self.machineDescriptionIDSes:
             print("  Get", ids, file=sys.stdout)
             try:
                 for process in self.process_bundle.keys():
@@ -856,3 +812,11 @@ class HCDWorkflow(WorkflowBase):
 
     def get_timestamp(self) -> float:
         pass
+
+        # Temporary version:
+        # common_bundle contains all IDSs to be read via get_slice() from input scenario, defined by ids_scenario_list
+        # process_bundle contains all other input and output IDSs (total list = ids_md_list + ids_process_list)
+        #    - all its inputs from ids_md_list to be read via get() or get_slice()
+        #    - all other inputs from ids_process_list are output of upstream actors
+        #      to be copied from the output bundle of upstream actors inside the time loop
+        #      according to the parallel_dependency constraints
