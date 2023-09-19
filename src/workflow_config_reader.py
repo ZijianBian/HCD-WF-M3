@@ -106,6 +106,82 @@ class WorkflowConfigReader(XmlReader):
                     }
         return procesBundle
 
+    def getSelectedCategories(self):
+        if self.workflow is None:
+            return None
+        categoryDict = {}
+        for headProcess, Categories in self.workflow.items():
+            for category, processes in Categories.items():
+                actorList = []
+                for process, actor in processes.items():
+                    actorList.append(
+                        {
+                            "name": actor.name,
+                            "input": actor.inputIDSList,
+                            "output": actor.outputIDSList,
+                            "category": category,
+                        }
+                    )
+                    # Prepend empty_* code
+                    if actor.outputIDSList == []:
+                        actor.outputIDSList.append("core_profiles")
+                    actorList.insert(
+                        0,
+                        {
+                            "name": f"empty_{actor.outputIDSList[0]}",
+                            "input": ["core_profiles"],
+                            "output": [actor.outputIDSList[0]],
+                            "category": category,
+                        },
+                    )
+                categoryDict[process] = actorList
+        return categoryDict
+
+    def getParamProcess(self):
+        actorSelection = self.xmlRoot[1]
+        param_process = {}
+        for mainKey in actorSelection:
+            for category in mainKey:
+                for process in category:
+                    param_process[process.tag] = int(process.text)
+        return param_process
+
+    def getCategories(self):
+        actorSelection = self.xmlRoot[1]
+        categoryDict = {}
+        for mainKey in actorSelection:
+            for category in mainKey:
+                actorList = []
+                for process in category:
+                    actorsList = process.attrib["list"].split()
+                    selectedActor = actorsList[int(process.text) - 1]
+                    result = WfActor.getActorIDS(selectedActor)
+
+                    if result is not None:
+                        inputIDSList, outputIDSList = result
+                        actorList.append(
+                            {
+                                "name": selectedActor,
+                                "input": inputIDSList,
+                                "output": outputIDSList,
+                                "category": category.tag,
+                            }
+                        )
+                        # Prepend empty_* code
+                        if outputIDSList == []:
+                            outputIDSList.append("core_profiles")
+                        actorList.insert(
+                            0,
+                            {
+                                "name": f"empty_{outputIDSList[0]}",
+                                "input": ["core_profiles"],
+                                "output": [outputIDSList[0]],
+                                "category": category.tag,
+                            },
+                        )
+                categoryDict[process.tag] = actorList
+        return categoryDict
+
     # def readXML(self):
     #     actor_selection = self.xmlRoot[1]
     #     for main_key in actor_selection:
@@ -177,11 +253,19 @@ if __name__ == "__main__":
     workflowConfig = WorkflowConfigReader(
         r"/home/ITER/sawantp1/git/hcd/data/DT_baseline_example/input_workflow.xml"
     )
-    workflowConfig.displayConfig()
-    print("getAllProcesses")
-    print(workflowConfig.getAllProcesses())
-    print("getProcessBundle")
-    print(workflowConfig.getProcessBundle())
+    # workflowConfig.displayConfig()
+    # print("getAllProcesses")
+    # print(workflowConfig.getAllProcesses())
+    # print("getProcessBundle")
+    # print(workflowConfig.getProcessBundle())
 
-    print("AreProcessesEmpty")
-    print(workflowConfig.AreProcessesEmpty())
+    # print("AreProcessesEmpty")
+    # print(workflowConfig.AreProcessesEmpty())
+
+    # print("getCategories")
+    import pprint
+
+    pprint.pprint(workflowConfig.getCategories())
+
+    # print("getParamProcess")
+    # pprint.pprint(workflowConfig.getParamProcess())

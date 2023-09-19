@@ -58,13 +58,7 @@ class HCDWorkflow(WorkflowBase):
         ][0]
 
     def readWorkflowConfig(self, workflowConfig: str):
-        (
-            self.maindict1,
-            self.compiled_actors1,
-            self.uncompiled_actors1,
-            self.code_selection1,
-            self.catdict,
-        ) = create_maindict(workflowConfig, 0)
+        _, _, _, _, self.catdict = create_maindict(workflowConfig, 0)
 
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
         self.dictionary_of_actors = self.workflowConfig.getAllActors()
@@ -634,13 +628,15 @@ class HCDWorkflow(WorkflowBase):
         ][0]
 
         # CREATE PARAMETERS DICTIONARY WITH DIRECTLY EACH PROCESS AS KEY
-        param_process = {}
-        for main_key in actor_parameters:
-            for category in actor_parameters[main_key][0]:
-                for process in actor_parameters[main_key][0][category][0]:
-                    param_process[process] = actor_parameters[main_key][0][category][0][
-                        process
-                    ][0]
+        param_process = self.workflowConfig.getParamProcess()
+        # for main_key in actor_parameters:
+        #     for category in actor_parameters[main_key][0]:
+        #         for process in actor_parameters[main_key][0][category][0]:
+        #             param_process[process] = actor_parameters[main_key][0][category][0][
+        #                 process
+        #             ][0]
+        # print(param_process)
+        # exit(0)
         # print("##########################self.catdict##########################")
         # # process and actor is extracted
         # print(self.catdict)
@@ -731,7 +727,11 @@ class HCDWorkflow(WorkflowBase):
                 param_process["lh_wave_solver"] = 0
 
         # DEFINE THE SEQUENCE OF CODES TO BE EXECUTED
-        if self.catdict["ic_wave_fp"][param_process["ic_wave_fp"]]["name"] != "fopla":
+        if (
+            "ic_wave_fp" in self.catdict.keys()
+            and self.catdict["ic_wave_fp"][param_process["ic_wave_fp"]]["name"]
+            != "fopla"
+        ):
             print("--- Default algorithm ---", file=sys.stdout)
             input_algorithm = loadlist(file, "algorithm")["default"]
         else:

@@ -32,20 +32,36 @@ class WfActor:
 
     @classmethod
     def getObject(cls, actorName, xmlDirectory: str):
-        if os.path.exists(xmlDirectory):
-            return WfActor(
-                actorName,
-                os.path.join(
-                    xmlDirectory,
-                    f"input_{actorName}.xml",
-                ),
-                os.path.join(
-                    xmlDirectory,
-                    f"input_{actorName}.xsd",
-                ),
+        if not os.path.exists(xmlDirectory):
+            print(f"Actor configuration not found for actor name : [{actorName}]")
+            return None
+        if not os.path.exists(
+            os.path.join(
+                xmlDirectory,
+                f"input_{actorName}.xml",
             )
-        print(f"Actor configuration not found for actor name : [{actorName}]")
-        return None
+        ):
+            print(f"Actor configuration not found for actor name : [{actorName}]")
+            return None
+        if not os.path.exists(
+            os.path.join(
+                xmlDirectory,
+                f"input_{actorName}.xsd",
+            )
+        ):
+            print(f"Actor configuration not found for actor name : [{actorName}]")
+            return None
+        return WfActor(
+            actorName,
+            os.path.join(
+                xmlDirectory,
+                f"input_{actorName}.xml",
+            ),
+            os.path.join(
+                xmlDirectory,
+                f"input_{actorName}.xsd",
+            ),
+        )
 
     def validate(self):
         if not self.name:
@@ -66,7 +82,8 @@ class WfActor:
 
     def initializeActor(self, actorName: str, xmlPath: str, xsdPath: str):
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
-        self._import(actorName)
+        if WfActor._import(actorName) != 0:
+            return None
 
         actor = eval(actorName)
         runtime_settings = actor.get_runtime_settings()
@@ -125,12 +142,13 @@ class WfActor:
         return idsList
 
     # TODO Look for cleaner way of importing actors
-    def _import(self, actorName: str):
+    @staticmethod
+    def _import(actorName: str):
         error = 0
         try:
             _ = import_module(actorName)
         except Exception:
-            print("ERROR! Actor " + {actorName.upper()} + " not found.")
+            print(f"ERROR! Actor {actorName.upper()} not found.")
             return 1
 
         actor_function = getattr(import_module(f"{actorName}.actor"), actorName)()
@@ -148,6 +166,24 @@ class WfActor:
             getmodule(stack()[1].frame).__dict__.update(actorDictionary)
 
         return 0
+
+    @staticmethod
+    def getActorIDS(actorName: str):
+        err = WfActor._import(actorName)
+        if err == 0:
+            actor = eval(actorName)
+
+            input_ids_list = []
+            output_ids_list = []
+            # IMAS-4679
+            for ilist in actor.code_description["arguments"]:
+                if ilist["intent"] == "IN":
+                    input_ids_list.append(ilist["type"])
+                elif ilist["intent"] == "OUT":
+                    output_ids_list.append(ilist["type"])
+
+            return (input_ids_list, output_ids_list)
+        return None
 
 
 if __name__ == "__main__":
