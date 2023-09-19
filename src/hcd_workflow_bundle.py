@@ -10,6 +10,7 @@ from time import time
 import imas
 import numpy as np
 from lxml import etree
+from src.global_list_reader import GlobalListReader
 from src.workflow_base import WorkflowBase
 from src.workflow_config_reader import WorkflowConfigReader
 from waveform_cooker import add_dynamic
@@ -41,9 +42,6 @@ class HCDWorkflow(WorkflowBase):
     def __init__(self, workflowConfigPath: str):
         # READ WORKFLOW PARAMETERS FROM INPUT XML FILE
         self.workflowConfigPath = workflowConfigPath
-        self.default_workflow_xml = (
-            root_path + "/global_configuration/input_workflow_default.xml"
-        )
 
         # YAML FILE CONTAINING ALL USEFUL LISTS
         self.global_lists = (
@@ -51,28 +49,73 @@ class HCDWorkflow(WorkflowBase):
             + "/../global_configuration/"
             + "global_lists.yaml"
         )
-
-        self.workflow_xml = os.path.join(workflowConfigPath, "input_workflow.xml")
-        self.wf_parameters = create_workflow_param_from_file(self.workflow_xml)[
-            "workflow_parameters"
-        ][0]
+        self.globalListReader = GlobalListReader(self.global_lists)
 
     def readWorkflowConfig(self, workflowConfig: str):
         _, _, _, _, self.catdict = create_maindict(workflowConfig, 0)
 
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
+        if self.workflowConfig.AreProcessesEmpty() is True:
+            print(
+                "ERROR: no actor selected --> The H&CD workflow will not be executed",
+                file=sys.stderr,
+            )
+            return
         self.dictionary_of_actors = self.workflowConfig.getAllActors()
         self.code_selection = self.workflowConfig.getAllProcesses()
+        self.workflowParameters = self.workflowConfig.getWorkflowParameters()
 
-    def initialize(self, inputdb, outputdb, machineDb, inputIds, inputMds):
+        self.md = self.getMachineDatabase()
+        self.process_bundle = self.workflowConfig.getProcessBundle()
+
+    def getMachineDatabase(self):
+        machineDb = imas.DBEntry(
+            imas.imasdef.MEMORY_BACKEND,
+            self.workflowParameters["output_database"],
+            0,
+            self.workflowParameters["run_out"],
+            self.workflowParameters["output_user_or_path"],
+        )
+        machineDb.create()
+        return machineDb
+
+    def getMachineDescriptionData(self, inputMdsDict):
+        # READ INPUT MACHINE DESCRIPTION DATA
+        reduced_md_list = []
+        # TODO What is the use of flag_multiple_md variable
+        mdCounter = 0
+        waveform_presets = self.globalListReader.getWaveformPresetsList()
+        for process in self.process_bundle.keys():
+            if not "nuclear" in process:  # No waveform for nuclear reactions
+                for ids in self.process_bundle[process]["input"].keys():
+                    if ids in inputMdsDict.keys():
+                        self.process_bundle[process]["input"][ids] = inputMdsDict[ids]
+                        # Overwrite with configured waveform if it exists
+                        waveform_file = (
+                            self.workflowConfig.workflowDirectory
+                            + "/"
+                            + waveform_presets[process.split("_")[0]]["custom"][
+                                mdCounter
+                            ]
+                        )
+                        if os.path.exists(waveform_file):
+                            self.process_bundle[process]["input"][ids] = add_dynamic(
+                                waveform_file
+                            )
+                            mdCounter += 1
+                        self.md.put(self.process_bundle[process]["input"][ids])
+                        if ids not in reduced_md_list:
+                            reduced_md_list.append(ids)
+        return reduced_md_list
+
+    def initialize(self, inputdb, outputdb, inputIds, inputMdsDict):
         # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
         # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
         # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
         self.inputDb = inputdb
         self.outputDb = outputdb
-        self.md = machineDb
+        self.md = self.getMachineDatabase()
         self.ids_scenario_list = inputIds
-        ids_md_list = inputMds
 
         # LIST OF ACTIVATED PROCESSES AND SELECTED ACTORS
         # self.list_of_processes = {}
@@ -80,38 +123,11 @@ class HCDWorkflow(WorkflowBase):
         #     if code is not None:
         #         self.list_of_processes[process] = code
 
-        if self.workflowConfig.AreProcessesEmpty() is True:
-            print(
-                "ERROR: no actor selected --> The H&CD workflow will not be executed",
-                file=sys.stderr,
-            )
-            return
-
         ids_process_list = loadlist(self.global_lists, "ids_process_list")
-        waveform_presets = loadlist(self.global_lists, "waveform_presets")
+        # waveform_presets = loadlist(self.global_lists, "waveform_presets")
 
         # DEFINE THE TOTAL LIST OF INVOLVED INPUT AND OUTPUT IDSS ACCORDING TO THE ACTOR SELECTION
         # REPLACED PRASAD
-        self.process_bundle = self.workflowConfig.getProcessBundle()
-        # for process, actor in self.list_of_processes.items():
-        #     [
-        #         single_input_ids_list,
-        #         single_output_ids_list,
-        #         err,
-        #     ] = read_actor_ids(actor, 0)
-
-        #     self.process_bundle[process] = {}
-        #     self.process_bundle[process]["input"] = {}
-        #     self.process_bundle[process]["output"] = {}
-        #     add_ids_entry_to_dict(
-        #         self.process_bundle[process]["input"], single_input_ids_list
-        #     )
-        #     add_ids_entry_to_dict(
-        #         self.process_bundle[process]["output"], single_output_ids_list
-        #     )
-        # print("line 116 ------------------initialize process_bundle")
-        # print(self.process_bundle)
-        # MOVED PRASAD
 
         self.common_bundle = {}
         add_ids_entry_to_dict(self.common_bundle, self.ids_scenario_list)
@@ -144,14 +160,14 @@ class HCDWorkflow(WorkflowBase):
         # IMAS DB VERSION
         version = os.getenv("IMAS_VERSION")[0]
 
-        self.dt_required = self.wf_parameters["dt_required"][0]
-        self.one_time_slice = self.wf_parameters["one_time_slice"][0]
-        self.tbegin = self.wf_parameters["tbegin"][0]
-        self.tend = self.wf_parameters["tend"][0]
+        self.dt_required = self.workflowParameters["dt_required"]
+        self.one_time_slice = self.workflowParameters["one_time_slice"]
+        self.tbegin = self.workflowParameters["tbegin"]
+        self.tend = self.workflowParameters["tend"]
 
         ##################################################################
         self.reduced_md_list = self.getMachineDescriptionData(
-            ids_md_list, waveform_presets, self.process_bundle
+            inputMdsDict,
         )
 
         ##################################################################
@@ -231,33 +247,6 @@ class HCDWorkflow(WorkflowBase):
                 global_error = global_error + err
         return global_error
 
-    def getMachineDescriptionData(self, ids_md_list, waveform_presets, process_bundle):
-        # READ INPUT MACHINE DESCRIPTION DATA
-        reduced_md_list = []
-        flag_multiple_md = 0
-        for process in process_bundle.keys():
-            if not "nuclear" in process:  # No waveform for nuclear reactions
-                for ids in process_bundle[process]["input"].keys():
-                    if ids in ids_md_list:
-                        process_bundle[process]["input"][ids] = self.inputDb.get(ids)
-                        # Overwrite with configured waveform if it exists
-                        waveform_file = (
-                            self.workflowConfigPath
-                            + "/"
-                            + waveform_presets[process.split("_")[0]]["custom"][
-                                flag_multiple_md
-                            ]
-                        )
-                        if os.path.exists(waveform_file):
-                            process_bundle[process]["input"][ids] = add_dynamic(
-                                waveform_file
-                            )
-                            flag_multiple_md += 1
-                        self.md.put(process_bundle[process]["input"][ids])
-                        if ids not in reduced_md_list:
-                            reduced_md_list.append(ids)
-        return reduced_md_list
-
     def __call__(self, *args):
         return self.run(*args)
 
@@ -265,34 +254,6 @@ class HCDWorkflow(WorkflowBase):
         if not self.__initialized:
             message = "Workflow is not initialized. Initialize workflow by calling workflow.initialize() method"
             raise RuntimeError(message)
-
-    # def initializeActor(
-    #     self, actor_name: str, xmlPath: str, xsdPath: str
-    # ):  # Moved PRASAD
-    #     # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
-    #     err = import_actor(actor_name, 0)
-    #     actor = eval(actor_name)
-    #     runtime_settings = actor.get_runtime_settings()
-    #     runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND  # IMAS-4055
-    #     code_parameters = actor.get_code_parameters()
-    #     code_parameters.parameters_path = xmlPath
-    #     if actor.is_mpi_code is True:
-    #         if actor.is_mpi_code is True:
-    #             tree = etree.parse(xmlPath)
-    #             root = tree.getroot()
-    #             for elem in root.iter():
-    #                 if elem.tag == "nproc_actor":
-    #                     nproc_actor = int(elem.text)
-    #         runtime_settings.mpi.mpi_processes = nproc_actor
-    #         code_parameters.__init__(
-    #             default_parameters_path=xmlPath,
-    #             schema_path=xsdPath,
-    #         )
-    #     actor.initialize(
-    #         code_parameters=code_parameters,
-    #         runtime_settings=runtime_settings,
-    #     )
-    #     return actor
 
     def run(self, *args):
         # -----------------------------------------
@@ -393,12 +354,10 @@ class HCDWorkflow(WorkflowBase):
                 self.inputDb,
                 self.common_bundle,
                 self.process_bundle,
-                self.reduced_md_list,
-                self.md,
             )
 
             self.process_bundle, err = self.hcd_workflow(
-                self.process_bundle, self.workflow_xml, self.dictionary_of_actors
+                self.process_bundle, self.dictionary_of_actors
             )
             if err < 0:
                 print("  Error in H&CD workflow.", file=sys.stderr)
@@ -446,8 +405,6 @@ class HCDWorkflow(WorkflowBase):
         inputDb,
         common_bundle,
         process_bundle,
-        reduced_md_list,
-        machineDb,
     ):
         for ids in ids_scenario_list:
             print("  Get", ids, file=sys.stdout)
@@ -487,12 +444,12 @@ class HCDWorkflow(WorkflowBase):
                 return
 
         # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
-        for ids in reduced_md_list:
+        for ids in self.reduced_md_list:
             print("  Get", ids, file=sys.stdout)
             try:
-                for process in process_bundle.keys():
-                    if ids in process_bundle[process]["input"].keys():
-                        process_bundle[process]["input"][ids] = machineDb.get_slice(
+                for process in self.process_bundle.keys():
+                    if ids in self.process_bundle[process]["input"].keys():
+                        self.process_bundle[process]["input"][ids] = self.md.get_slice(
                             ids, timenow, 1
                         )
             except:
@@ -508,21 +465,18 @@ class HCDWorkflow(WorkflowBase):
         # ---------------------------------------------------------------------
         # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
         # ---------------------------------------------------------------------
-        try:
-            time_base = create_workflow_param_from_file(self.workflow_xml)["time_base"]
-        except:
-            time_base = None
+        time_base = self.workflowConfig.getTimeBase()
 
         for process in process_bundle.keys():
             if time_base is not None:
-                if process in time_base[0]:
+                if process in time_base:
                     [tc, it] = find_nearest(
                         np.array(
-                            time_base[0][process][0]["wf_interval"][0]["time_array"][0]
+                            time_base[process][0]["wf_interval"][0]["time_array"][0]
                         ),
                         timenow,
                     )
-                    process_bundle[process]["status"] = time_base[0][process][0][
+                    process_bundle[process]["status"] = time_base[process][0][
                         "wf_interval"
                     ][0]["status"][0][it]
                 else:
@@ -606,7 +560,7 @@ class HCDWorkflow(WorkflowBase):
         # Call of the chosen code
         return results
 
-    def hcd_workflow(self, process_bundle, workflow_xml, dictionary_of_actors):
+    def hcd_workflow(self, process_bundle, dictionary_of_actors):
         # print("process_bundle-------------------------")
         # print(process_bundle)
         # print("workflow_xml-----------------------")
@@ -623,9 +577,9 @@ class HCDWorkflow(WorkflowBase):
         )
 
         # EXTRACT ACTOR SELECTION PARAMETERS FROM INPUT XML FILE
-        actor_parameters = create_workflow_param_from_file(workflow_xml)[
-            "actor_selection"
-        ][0]
+        # actor_parameters = create_workflow_param_from_file(workflow_xml)[
+        #     "actor_selection"
+        # ][0]
 
         # CREATE PARAMETERS DICTIONARY WITH DIRECTLY EACH PROCESS AS KEY
         param_process = self.workflowConfig.getParamProcess()

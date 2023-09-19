@@ -47,19 +47,21 @@ dbhelper = DbHelper(
 )
 inputDb = dbhelper.getInputDatabase()
 outputDb = dbhelper.getOutputDatabase()
-machineDb = dbhelper.getMachineDatabase()
 
 globallistReader = GlobalListReader(globalListPath)
 inputIds = globallistReader.getIdsScenarioList()
 inputMds = globallistReader.getIdsMdList()
 
+inputMdsDict = {}
+for idsName in inputMds:
+    inputMdsDict[idsName] = inputDb.get(idsName)
+
 hcdWorkflow = HCDWorkflow(config_folder_path)
 hcdWorkflow.readWorkflowConfig(inputworkflow_xml)
-hcdWorkflow.initialize(inputDb, outputDb, machineDb, inputIds, inputMds)
+hcdWorkflow.initialize(inputDb, outputDb, inputIds, inputMdsDict)
 
 hcdWorkflow.run()
 hcdWorkflow.finalize()
 
 inputDb.close()
 outputDb.close()
-machineDb.close()

@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import os
 import sys
 import functools
+import numpy as np
 
 root_path = os.path.dirname(__file__)
 sys.path.append(root_path)
@@ -22,6 +23,45 @@ class XmlReader:
             self.xmlRoot = self.xmlTree.getroot()
         except ET.ParseError as e:
             print(f"Error parsing XML: {e}")
+
+    def xml2dict(self, root):
+        children = {}
+        for child in root:
+            if child.tag != ET.Comment:
+                key = child.tag
+                if "display" in child.attrib:
+                    display = child.attrib["display"]
+                else:
+                    display = key
+                if len(child) > 0:
+                    children[key] = [self.xml2dict(child), display]
+                else:
+                    children[key] = [self.string2num(child.text), display]
+
+        return children
+
+    def string2num(self, string):
+        newstring = string.replace(" ", "").replace("[", "").replace("]", "").split(",")
+        if len(newstring) == 1:  # Scalars
+            try:
+                return int(string)  # Integer scalar
+            except Exception:
+                None
+            try:
+                return float(string)  # Float scalar
+            except Exception:
+                None
+        else:  # Arrays
+            try:
+                return np.array([int(i) for i in newstring])  # Integer array
+            except Exception:
+                None
+            try:
+                return np.array([float(i) for i in newstring])  # Float array
+            except Exception:
+                None
+
+        return string  # String scalar
 
 
 class WorkflowConfigReader(XmlReader):
@@ -182,71 +222,26 @@ class WorkflowConfigReader(XmlReader):
                 categoryDict[process.tag] = actorList
         return categoryDict
 
-    # def readXML(self):
-    #     actor_selection = self.xmlRoot[1]
-    #     for main_key in actor_selection:
-    #         dict_category = {}
-    #         for category in main_key:
-    #             if category.tag != etree.Comment:
-    #                 dict_process = {}
-    #                 for process in category:
-    #                     list_actor = []
-    #                     dict_actor = {}
-    #                     if process.tag != etree.Comment:
-    #                         for actor_name in process.attrib["list"].split():
-    #                             if actor_name in not_compiled_list:
-    #                                 verbose_eff = 0
-    #                             else:
-    #                                 verbose_eff = verbose
-    #                                 (
-    #                                     input_ids_list,
-    #                                     output_ids_list,
-    #                                     err,
-    #                                 ) = read_actor_ids(actor_name, verbose_eff)
-    #                             if err == 0:
-    #                                 compiled_list.append(actor_name)
-    #                             else:
-    #                                 not_compiled_list.append(actor_name)
-    #                             dict_actor[actor_name] = [
-    #                                 input_ids_list,
-    #                                 output_ids_list,
-    #                             ]
-    #                             list_actor.append(
-    #                                 {
-    #                                     "name": actor_name,
-    #                                     "input": input_ids_list,
-    #                                     "output": output_ids_list,
-    #                                     "category": category.tag,
-    #                                 }
-    #                             )
-    #                         # Prepend empty_* code
-    #                         if output_ids_list == []:
-    #                             output_ids_list.append("core_profiles")
-    #                         list_actor.insert(
-    #                             0,
-    #                             {
-    #                                 "name": "empty_" + output_ids_list[0],
-    #                                 "input": ["core_profiles"],
-    #                                 "output": [output_ids_list[0]],
-    #                                 "category": category.tag,
-    #                             },
-    #                         )
-    #                         if process.text != "0":
-    #                             code_selection[process.tag] = process.attrib[
-    #                                 "list"
-    #                             ].split(" ")[int(process.text) - 1]
-    #                         else:
-    #                             code_selection[process.tag] = None
-    #                         dict_process[process.tag] = dict_actor
-    #                         catdict[process.tag] = list_actor
-    #                     dict_category[category.tag] = dict_process
-    #                 maindict[main_key.tag] = dict_category
+    def getWorkflowParameters(self):
+        parameters = {}
+        workflowParameters = self.xmlRoot[0]
+        for parameter in workflowParameters:
+            print(parameter.tag)
+            parameterValue = parameter.text
+            if parameterValue.isdigit():
+                parameters[parameter.tag] = int(parameter.text)
+            elif parameterValue.replace(".", "", 1).isdigit():
+                parameters[parameter.tag] = float(parameter.text)
+            else:
+                parameters[parameter.tag] = parameter.text
+        return parameters
 
-    #     # Remove duplicates
-    #     compiled_list = list(dict.fromkeys(compiled_list))
-    #     not_compiled_list = list(dict.fromkeys(not_compiled_list))
-
-    #     return (maindict, compiled_list, not_compiled_list, code_selection, catdict)
+    def getTimeBase(self):
+        try:
+            timeBase = self.xmlRoot[2]
+            return self.xml2dict(timeBase)
+        except Exception:
+            return None
 
 
 if __name__ == "__main__":
@@ -265,7 +260,79 @@ if __name__ == "__main__":
     # print("getCategories")
     import pprint
 
-    pprint.pprint(workflowConfig.getCategories())
+    # pprint.pprint(workflowConfig.getCategories())
 
     # print("getParamProcess")
     # pprint.pprint(workflowConfig.getParamProcess())
+
+    print("workflowParameters")
+    pprint.pprint(workflowConfig.getWorkflowParameters())
+
+    # print("getTimeBase")
+    # pprint.pprint(workflowConfig.getTimeBase())
+
+# def readXML(self):
+#     actor_selection = self.xmlRoot[1]
+#     for main_key in actor_selection:
+#         dict_category = {}
+#         for category in main_key:
+#             if category.tag != etree.Comment:
+#                 dict_process = {}
+#                 for process in category:
+#                     list_actor = []
+#                     dict_actor = {}
+#                     if process.tag != etree.Comment:
+#                         for actor_name in process.attrib["list"].split():
+#                             if actor_name in not_compiled_list:
+#                                 verbose_eff = 0
+#                             else:
+#                                 verbose_eff = verbose
+#                                 (
+#                                     input_ids_list,
+#                                     output_ids_list,
+#                                     err,
+#                                 ) = read_actor_ids(actor_name, verbose_eff)
+#                             if err == 0:
+#                                 compiled_list.append(actor_name)
+#                             else:
+#                                 not_compiled_list.append(actor_name)
+#                             dict_actor[actor_name] = [
+#                                 input_ids_list,
+#                                 output_ids_list,
+#                             ]
+#                             list_actor.append(
+#                                 {
+#                                     "name": actor_name,
+#                                     "input": input_ids_list,
+#                                     "output": output_ids_list,
+#                                     "category": category.tag,
+#                                 }
+#                             )
+#                         # Prepend empty_* code
+#                         if output_ids_list == []:
+#                             output_ids_list.append("core_profiles")
+#                         list_actor.insert(
+#                             0,
+#                             {
+#                                 "name": "empty_" + output_ids_list[0],
+#                                 "input": ["core_profiles"],
+#                                 "output": [output_ids_list[0]],
+#                                 "category": category.tag,
+#                             },
+#                         )
+#                         if process.text != "0":
+#                             code_selection[process.tag] = process.attrib[
+#                                 "list"
+#                             ].split(" ")[int(process.text) - 1]
+#                         else:
+#                             code_selection[process.tag] = None
+#                         dict_process[process.tag] = dict_actor
+#                         catdict[process.tag] = list_actor
+#                     dict_category[category.tag] = dict_process
+#                 maindict[main_key.tag] = dict_category
+
+#     # Remove duplicates
+#     compiled_list = list(dict.fromkeys(compiled_list))
+#     not_compiled_list = list(dict.fromkeys(not_compiled_list))
+
+#     return (maindict, compiled_list, not_compiled_list, code_selection, catdict)
