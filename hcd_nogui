@@ -4,7 +4,7 @@ from src.dbhelper import DbHelper
 from wftools.wf_tools import (
     create_workflow_param_from_file,
 )
-from src.hcd_workflow import HCDWorkflow
+from src.hcd_workflow_bundle import HCDWorkflow
 from src.global_list_reader import GlobalListReader
 
 # Management of input arguments

@@ -59,14 +59,16 @@ class HCDWorkflow(WorkflowBase):
 
     def readWorkflowConfig(self, workflowConfig: str):
         (
-            self.maindict,
-            self.compiled_actors,
-            self.uncompiled_actors,
-            self.code_selection,
+            self.maindict1,
+            self.compiled_actors1,
+            self.uncompiled_actors1,
+            self.code_selection1,
             self.catdict,
         ) = create_maindict(workflowConfig, 0)
 
-        workflowConfig = WorkflowConfigReader(workflowConfig)
+        self.workflowConfig = WorkflowConfigReader(workflowConfig)
+        self.dictionary_of_actors = self.workflowConfig.getAllActors()
+        self.code_selection = self.workflowConfig.getAllProcesses()
 
     def initialize(self, inputdb, outputdb, machineDb, inputIds, inputMds):
         # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
@@ -79,12 +81,12 @@ class HCDWorkflow(WorkflowBase):
         ids_md_list = inputMds
 
         # LIST OF ACTIVATED PROCESSES AND SELECTED ACTORS
-        self.list_of_processes = {}
-        for process, code in self.code_selection.items():
-            if code is not None:
-                self.list_of_processes[process] = code
+        # self.list_of_processes = {}
+        # for process, code in self.dictionary_of_actors.items():
+        #     if code is not None:
+        #         self.list_of_processes[process] = code
 
-        if len(self.list_of_processes) == 0:
+        if self.workflowConfig.AreProcessesEmpty() is True:
             print(
                 "ERROR: no actor selected --> The H&CD workflow will not be executed",
                 file=sys.stderr,
@@ -96,59 +98,26 @@ class HCDWorkflow(WorkflowBase):
 
         # DEFINE THE TOTAL LIST OF INVOLVED INPUT AND OUTPUT IDSS ACCORDING TO THE ACTOR SELECTION
         # REPLACED PRASAD
-        self.process_bundle = {}
-        for process, actor in self.list_of_processes.items():
-            [
-                single_input_ids_list,
-                single_output_ids_list,
-                err,
-            ] = read_actor_ids(actor, 0)
+        self.process_bundle = self.workflowConfig.getProcessBundle()
+        # for process, actor in self.list_of_processes.items():
+        #     [
+        #         single_input_ids_list,
+        #         single_output_ids_list,
+        #         err,
+        #     ] = read_actor_ids(actor, 0)
 
-            self.process_bundle[process] = {}
-            self.process_bundle[process]["input"] = {}
-            self.process_bundle[process]["output"] = {}
-            add_ids_entry_to_dict(
-                self.process_bundle[process]["input"], single_input_ids_list
-            )
-            add_ids_entry_to_dict(
-                self.process_bundle[process]["output"], single_output_ids_list
-            )
-        print("line 116 ------------------initialize process_bundle")
-        print(self.process_bundle)
+        #     self.process_bundle[process] = {}
+        #     self.process_bundle[process]["input"] = {}
+        #     self.process_bundle[process]["output"] = {}
+        #     add_ids_entry_to_dict(
+        #         self.process_bundle[process]["input"], single_input_ids_list
+        #     )
+        #     add_ids_entry_to_dict(
+        #         self.process_bundle[process]["output"], single_output_ids_list
+        #     )
+        # print("line 116 ------------------initialize process_bundle")
+        # print(self.process_bundle)
         # MOVED PRASAD
-        self.dictionary_of_actors = {}
-        process_actor = {}
-        for main_key in self.maindict:
-            for category in self.maindict[main_key]:
-                for process in self.maindict[main_key][category]:
-                    for actor_name in self.maindict[main_key][category][process]:
-                        if (
-                            self.code_selection[process] is not None
-                            and actor_name == self.code_selection[process]
-                        ):
-                            process_actor[process] = actor_name
-                            xmlPath = (
-                                self.workflowConfigPath
-                                + "/"
-                                + category
-                                + "/"
-                                + process
-                                + "/input_"
-                                + actor_name
-                                + ".xml"
-                            )
-                            xsdPath = (
-                                self.workflowConfigPath
-                                + "/"
-                                + category
-                                + "/"
-                                + process
-                                + "/input_"
-                                + actor_name
-                                + ".xsd"
-                            )
-                            actor = self.initializeActor(actor_name, xmlPath, xsdPath)
-                            self.dictionary_of_actors[actor_name] = actor
 
         self.common_bundle = {}
         add_ids_entry_to_dict(self.common_bundle, self.ids_scenario_list)
@@ -163,7 +132,9 @@ class HCDWorkflow(WorkflowBase):
 
         # CHECK IF THE CODES ARE COMPATIBLE / PREREQUISITES ARE FULFILLED
         prerequisites = loadlist(self.global_lists, "prerequisites")
-        err = check_if_code_fulfills_configuration(prerequisites, self.code_selection)
+        err = self.check_if_code_fulfills_configuration(
+            prerequisites, self.code_selection
+        )
         if err == 0:
             print("Selection fulfills all actor selection rules", file=sys.stdout)
         else:
@@ -204,11 +175,67 @@ class HCDWorkflow(WorkflowBase):
 
         for process in self.process_bundle.keys():
             if "workflow" in self.process_bundle[process]["input"].keys():
-                workflow.time_loop.component[0].name = process_actor[process].upper()
+                workflow.time_loop.component[0].name = self.dictionary_of_actors[
+                    process
+                ].upper()
                 self.process_bundle[process]["input"]["workflow"] = copy.deepcopy(
                     workflow
                 )
         print("initialized")
+
+    def check_if_code_fulfills_configuration(self, prerequisites, code_selection):
+        global_error = 0
+        print(code_selection)
+        for entry, _ in code_selection.items():
+            print(entry)
+            if code_selection != None:
+                err = 0
+                code = code_selection[entry]
+                if prerequisites[entry] == "None":
+                    prerequisites[entry] = None
+                if prerequisites[entry] != None and code in prerequisites[entry]:
+                    fulfills_all_prerequisites = [1] * (len(prerequisites[entry][code]))
+                    for dep in [prerequisites[entry][code]]:
+                        for i in dep.keys():
+                            if "any" in str(dep[i]) and code_selection[i] != None:
+                                pass
+                            elif str(dep[i]).find(str(code_selection[i])) != -1:
+                                pass
+                            else:
+                                if str(dep[i]) == "any":
+                                    print(
+                                        "ERROR: "
+                                        + code.upper()
+                                        + " needs any code as "
+                                        + str(i),
+                                        file=sys.stderr,
+                                    )
+                                else:
+                                    if len(dep[i]) < 2:
+                                        print(
+                                            "ERROR: "
+                                            + code.upper()
+                                            + " needs the "
+                                            + str(dep[i][0]).upper()
+                                            + " code as "
+                                            + str(i),
+                                            file=sys.stderr,
+                                        )
+                                    else:
+                                        print(
+                                            "ERROR: "
+                                            + code.upper()
+                                            + " needs the "
+                                            + " or ".join(dep[i])
+                                            .upper()
+                                            .replace("OR", "or")
+                                            + " codes as "
+                                            + str(i),
+                                            file=sys.stderr,
+                                        )
+                                err = 1
+                global_error = global_error + err
+        return global_error
 
     def getMachineDescriptionData(self, ids_md_list, waveform_presets, process_bundle):
         # READ INPUT MACHINE DESCRIPTION DATA
@@ -245,33 +272,33 @@ class HCDWorkflow(WorkflowBase):
             message = "Workflow is not initialized. Initialize workflow by calling workflow.initialize() method"
             raise RuntimeError(message)
 
-    def initializeActor(
-        self, actor_name: str, xmlPath: str, xsdPath: str
-    ):  # Moved PRASAD
-        # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
-        err = import_actor(actor_name, 0)
-        actor = eval(actor_name)
-        runtime_settings = actor.get_runtime_settings()
-        runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND  # IMAS-4055
-        code_parameters = actor.get_code_parameters()
-        code_parameters.parameters_path = xmlPath
-        if actor.is_mpi_code is True:
-            if actor.is_mpi_code is True:
-                tree = etree.parse(xmlPath)
-                root = tree.getroot()
-                for elem in root.iter():
-                    if elem.tag == "nproc_actor":
-                        nproc_actor = int(elem.text)
-            runtime_settings.mpi.mpi_processes = nproc_actor
-            code_parameters.__init__(
-                default_parameters_path=xmlPath,
-                schema_path=xsdPath,
-            )
-        actor.initialize(
-            code_parameters=code_parameters,
-            runtime_settings=runtime_settings,
-        )
-        return actor
+    # def initializeActor(
+    #     self, actor_name: str, xmlPath: str, xsdPath: str
+    # ):  # Moved PRASAD
+    #     # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
+    #     err = import_actor(actor_name, 0)
+    #     actor = eval(actor_name)
+    #     runtime_settings = actor.get_runtime_settings()
+    #     runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND  # IMAS-4055
+    #     code_parameters = actor.get_code_parameters()
+    #     code_parameters.parameters_path = xmlPath
+    #     if actor.is_mpi_code is True:
+    #         if actor.is_mpi_code is True:
+    #             tree = etree.parse(xmlPath)
+    #             root = tree.getroot()
+    #             for elem in root.iter():
+    #                 if elem.tag == "nproc_actor":
+    #                     nproc_actor = int(elem.text)
+    #         runtime_settings.mpi.mpi_processes = nproc_actor
+    #         code_parameters.__init__(
+    #             default_parameters_path=xmlPath,
+    #             schema_path=xsdPath,
+    #         )
+    #     actor.initialize(
+    #         code_parameters=code_parameters,
+    #         runtime_settings=runtime_settings,
+    #     )
+    #     return actor
 
     def run(self, *args):
         # -----------------------------------------

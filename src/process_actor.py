@@ -1,0 +1,256 @@
+import logging
+import os
+from importlib import import_module
+from inspect import getmodule, stack
+
+import imas
+from lxml import etree
+
+logger = logging.getLogger("module")
+
+
+# TODO Make generic process actor using class method which can initialize any actor (iwrap, muscle etc).. keep interface same
+# Current implementation is only iwrap
+class WfActor:
+    def __init__(self, actorName: str, xmlPath: str, xsdPath: str):
+        self.name = actorName
+        self.xmlPath = xmlPath
+        self.xsdPath = xsdPath
+
+        self.validate()
+        self.actor = self.initializeActor(actorName, xmlPath, xsdPath)
+
+        self.inputIDSList = self.getInputIDSList()
+        self.outputIDSList = self.getOutputIDSList()
+
+        self.inputIDSDict = self.getIDSDict(self.inputIDSList)
+        self.outputIDSDict = self.getIDSDict(self.outputIDSList)
+
+    @classmethod
+    def getObject(cls, actorName, xmlPath: str, xsdPath: str):
+        return WfActor(actorName, xmlPath, xsdPath)
+
+    @classmethod
+    def getObject(cls, actorName, xmlDirectory: str):
+        if os.path.exists(xmlDirectory):
+            return WfActor(
+                actorName,
+                os.path.join(
+                    xmlDirectory,
+                    f"input_{actorName}.xml",
+                ),
+                os.path.join(
+                    xmlDirectory,
+                    f"input_{actorName}.xsd",
+                ),
+            )
+        print(f"Actor configuration not found for actor name : [{actorName}]")
+        return None
+
+    def validate(self):
+        if not self.name:
+            logger.critical(
+                f"ERROR! Actor name {self.name } : Actor name is not provided"
+            )
+            return None
+        if not self.xmlPath:
+            logger.critical(
+                f"ERROR! Actor name {self.name } : Actor name is not provided"
+            )
+            return None
+        if not self.xsdPath:
+            logger.critical(
+                f"ERROR! Actor name {self.name } : Actor name is not provided"
+            )
+            return None
+
+    def initializeActor(self, actorName: str, xmlPath: str, xsdPath: str):
+        # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
+        self._import(actorName)
+
+        actor = eval(actorName)
+        runtime_settings = actor.get_runtime_settings()
+        runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND  # IMAS-4055
+        code_parameters = actor.get_code_parameters()
+        code_parameters.parameters_path = xmlPath
+        if actor.is_mpi_code is True:
+            tree = etree.parse(xmlPath)
+            root = tree.getroot()
+            for elem in root.iter():
+                if elem.tag == "nproc_actor":
+                    nproc_actor = int(elem.text)
+            runtime_settings.mpi.mpi_processes = nproc_actor
+            code_parameters.__init__(
+                default_parameters_path=xmlPath,
+                schema_path=xsdPath,
+            )
+        actor.initialize(
+            code_parameters=code_parameters,
+            runtime_settings=runtime_settings,
+        )
+        return actor
+
+    def getActor(self):
+        return self.actor
+
+    def getInputIDSList(self):
+        return self.getIDSList("IN")
+
+    def getOutputIDSList(self):
+        return self.getIDSList("OUT")
+
+    def getInputIDSDict(self):
+        return self.getIDSList("IN")
+
+    def getOutputIDSDict(self):
+        return self.getIDSList("OUT")
+
+    def getIDSDict(self, idsData):
+        idsDict = {}
+        if type(idsData) == list:
+            for idsName in idsData:
+                idsDict[idsName] = eval(f"imas.{idsName}()")
+        else:
+            idsDict[idsData] = eval(f"imas.{idsData}()")
+        return idsDict
+
+    def getIDSList(self, intentType="IN"):
+        idsList = []
+        if self.actor is not None:
+            idsList.extend(
+                ilist["type"]
+                for ilist in self.actor.code_description["arguments"]
+                if ilist["intent"] == intentType
+            )
+        return idsList
+
+    # TODO Look for cleaner way of importing actors
+    def _import(self, actorName: str):
+        error = 0
+        try:
+            _ = import_module(actorName)
+        except Exception:
+            print("ERROR! Actor " + {actorName.upper()} + " not found.")
+            return 1
+
+        actor_function = getattr(import_module(f"{actorName}.actor"), actorName)()
+
+        actorDictionary = {actorName: actor_function}
+
+        # Add this dictionary into the local variables of the calling routine:
+        # 1) from interactive sessions, f_locals from current frame is modified
+        # 2) when called from a script, the dictionary of the calling module is modified
+
+        # For interactive sessions
+        if getmodule(stack()[1].frame) is None:
+            stack()[1].frame.f_locals.update(actorDictionary)
+        else:
+            getmodule(stack()[1].frame).__dict__.update(actorDictionary)
+
+        return 0
+
+
+if __name__ == "__main__":
+    import os
+
+    root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    print(root_path)
+    procesActor = WfActor(
+        "torbeam",
+        os.path.join(
+            root_path, "data/DT_baseline_example/ECRH/ec_wave_solver/input_torbeam.xml"
+        ),
+        os.path.join(
+            root_path, "data/DT_baseline_example/ECRH/ec_wave_solver/input_torbeam.xsd"
+        ),
+    )
+    # procesActor = WfActor(
+    #     "grayscale",
+    #     os.path.join(
+    #         root_path,
+    #         "data/run_230825_18:42:34/ECRH/ec_wave_solver/input_grayscale.xml",
+    #     ),
+    #     os.path.join(
+    #         root_path,
+    #         "data/run_230825_18:42:34/ECRH/ec_wave_solver/input_grayscale.xsd",
+    #     ),
+    # )
+
+    print(procesActor.getInputIDSList())
+    print(procesActor.getOutputIDSList())
+    print(procesActor.getActor())
+    print(type(procesActor.getActor()))
+    # error = 0
+
+    # # Import the actor(s) and put into a dictionary
+    # dictactor = {}
+    # if type(actor_input) == str:
+    #     dictactor[actor_input], error = __syspath_import_actor(actor_input, verbose)
+    # else:
+    #     for actor_name in actor_input:
+    #         dictactor[actor_name], err = __syspath_import_actor(actor_name, verbose)
+    #         if err == 1:
+    #             error = 1
+
+    # # Add this dictionary into the local variables of the calling routine:
+    # # 1) from interactive sessions, f_locals from current frame is modified
+    # # 2) when called from a script, the dictionary of the calling module is modified
+
+    # # For interactive sessions
+    # if getmodule(stack()[1].frame) == None:
+    #     stack()[1].frame.f_locals.update(dictactor)
+    # # When called from a module
+    # else:
+    #     getmodule(stack()[1].frame).__dict__.update(dictactor)
+
+    # return error
+
+    # def __syspath_import_actor(actor_name, verbose):
+    #     from importlib import import_module
+
+    #     # Import the module of the actor
+    #     try:
+    #         actor_module = import_module(actor_name)
+    #     except:
+    #         if verbose == 1:
+    #             print("Actor " + actor_name.upper() + " not found.", file=sys.stderr)
+    #         return [], 1
+
+    #     # Import the actor function
+    #     actor_function = getattr(import_module(actor_name + ".actor"), actor_name)()
+
+    #     return actor_function, 0
+
+    # self.dictionary_of_actors = {}
+    # process_actor = {}
+    # for main_key in self.maindict:
+    #     for category in self.maindict[main_key]:
+    #         for process in self.maindict[main_key][category]:
+    #             for actor_name in self.maindict[main_key][category][process]:
+    #                 if (
+    #                     self.code_selection[process] is not None
+    #                     and actor_name == self.code_selection[process]
+    #                 ):
+    #                     process_actor[process] = actor_name
+    #                     xmlPath = (
+    #                         self.workflowConfigPath
+    #                         + "/"
+    #                         + category
+    #                         + "/"
+    #                         + process
+    #                         + "/input_"
+    #                         + actor_name
+    #                         + ".xml"
+    #                     )
+    #                     xsdPath = (
+    #                         self.workflowConfigPath
+    #                         + "/"
+    #                         + category
+    #                         + "/"
+    #                         + process
+    #                         + "/input_"
+    #                         + actor_name
+    #                         + ".xsd"
+    #                     )
+    #                     actor = self.initializeActor(actor_name, xmlPath, xsdPath)
+    #                     self.dictionary_of_actors[actor_name] = actor
