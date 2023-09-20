@@ -4,6 +4,7 @@ from src.dbhelper import DbHelper
 from wftools.wf_tools import (
     create_workflow_param_from_file,
 )
+from waveform_cooker import add_dynamic
 from src.hcd_workflow_bundle import HCDWorkflow
 from src.global_list_reader import GlobalListReader
 
@@ -47,6 +48,7 @@ dbhelper = DbHelper(
 )
 inputDb = dbhelper.getInputDatabase()
 outputDb = dbhelper.getOutputDatabase()
+machineDb = dbhelper.getMachineDatabase()
 
 globallistReader = GlobalListReader(globalListPath)
 inputIds = globallistReader.getIdsScenarioList()
@@ -56,11 +58,32 @@ inputMdsDict = {}
 for idsName in inputMds:
     inputMdsDict[idsName] = inputDb.get(idsName)
 
+waveform_presets = globallistReader.getWaveformPresetsList()
+for idsObject in inputMdsDict.values():
+    # Overwrite with configured waveform if it exists
+    for filename in os.listdir(config_folder_path):
+        filePath = os.path.join(config_folder_path, filename)
+        if filePath.endswith("waveforms.yaml"):
+            if os.path.exists(filePath):
+                idsObject = add_dynamic(filePath)
+            machineDb.put(idsObject)
+
+timeArray = dbhelper.getTimeArray(inputDb)
+
+timenow = 15.00
+idsslices = {}
+for ids in inputIds:
+    idsslices[ids] = inputDb.get_slice(ids, timenow, 1)
+
+mdidsslices = {}
+for ids in inputMds:
+    mdidsslices[ids] = machineDb.get_slice(ids, timenow, 1)
+
 hcdWorkflow = HCDWorkflow(config_folder_path)
 hcdWorkflow.readWorkflowConfig(inputworkflow_xml)
 hcdWorkflow.initialize(inputDb, outputDb, inputIds, inputMdsDict)
 
-hcdWorkflow.run()
+hcdWorkflow.run(timeArray, idsslices, mdidsslices)
 hcdWorkflow.finalize()
 
 inputDb.close()
