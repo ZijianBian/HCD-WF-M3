@@ -40,3 +40,6 @@ class GlobalListReader:
 
     def getPrerequisites(self):
         return self.getList("prerequisites")
+
+    def getParallelDependency(self):
+        return self.getList("parallel_dependency")
