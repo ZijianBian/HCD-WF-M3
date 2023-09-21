@@ -43,3 +43,9 @@ class GlobalListReader:
 
     def getParallelDependency(self):
         return self.getList("parallel_dependency")
+
+    def getMergeActorList(self):
+        return self.getList("merge_actor_list")
+
+    def getAlgorithms(self):
+        return self.getList("algorithm")

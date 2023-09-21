@@ -11,7 +11,7 @@ import imas
 import numpy as np
 from lxml import etree
 from src.global_list_reader import GlobalListReader
-from src.myhcd_workflow import MyHcdWorkflow
+from src.workflow_executor import WorkflowExecutor
 from src.workflow_base import WorkflowBase
 from src.workflow_config_reader import WorkflowConfigReader
 from waveform_cooker import add_dynamic
@@ -25,7 +25,6 @@ from wftools.wf_tools import (
     create_workflow_param_from_file,
     find_nearest,
     import_actor,
-    loadlist,
     read_actor_ids,
 )
 
@@ -47,8 +46,12 @@ class HCDWorkflow(WorkflowBase):
             + "/../global_configuration/"
             + "global_lists.yaml"
         )
+
         self.globalListReader = GlobalListReader(self.global_lists)
+        self.parallel_dependency_list = self.globalListReader.getParallelDependency()
+        self.merge_actor_list = self.globalListReader.getMergeActorList()
         self.parallel_dependency = self.globalListReader.getParallelDependency()
+        self.algorithms = self.globalListReader.getAlgorithms()
 
     def readWorkflowConfig(self, workflowConfig: str):
         _, _, _, _, self.catdict = create_maindict(workflowConfig, 0)
@@ -304,14 +307,17 @@ class HCDWorkflow(WorkflowBase):
                 self.process_bundle,
             )
             param_process = self.workflowConfig.getParamProcess()
-            hcd_wf = MyHcdWorkflow(
+            hcd_wf = WorkflowExecutor(
                 self.process_bundle,
                 self.dictionary_of_actors,
                 param_process,
                 self.catdict,
-                self.parallel_dependency
+                self.parallel_dependency,
+                self.algorithms,
+                self.parallel_dependency_list,
+                self.merge_actor_list,
             )
-            self.process_bundle, err = hcd_wf.hcd_workflow()
+            err = hcd_wf.execute()
             if err < 0:
                 print("  Error in H&CD workflow.", file=sys.stderr)
                 return
