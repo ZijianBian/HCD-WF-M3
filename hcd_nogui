@@ -4,9 +4,9 @@ from src.dbhelper import DbHelper
 from wftools.wf_tools import (
     create_workflow_param_from_file,
 )
-from waveform_cooker import add_dynamic
 from src.hcd_workflow_bundle import HCDWorkflow
 from src.global_list_reader import GlobalListReader
+from waveform_cooker import add_dynamic
 
 # Management of input arguments
 parser = argparse.ArgumentParser(
@@ -54,6 +54,7 @@ globallistReader = GlobalListReader(globalListPath)
 inputIds = globallistReader.getIdsScenarioList()
 inputMds = globallistReader.getIdsMdList()
 
+
 inputMdsDict = {}
 for idsName in inputMds:
     inputMdsDict[idsName] = inputDb.get(idsName)
@@ -81,7 +82,7 @@ for ids in inputMds:
 
 hcdWorkflow = HCDWorkflow(config_folder_path)
 hcdWorkflow.readWorkflowConfig(inputworkflow_xml)
-hcdWorkflow.initialize(inputDb, outputDb, inputIds, inputMdsDict)
+hcdWorkflow.initialize(inputDb, outputDb, machineDb, inputIds, inputMdsDict)
 
 hcdWorkflow.run(timeArray, idsslices, mdidsslices)
 hcdWorkflow.finalize()

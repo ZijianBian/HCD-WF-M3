@@ -13,7 +13,7 @@ from lxml import etree
 from src.global_list_reader import GlobalListReader
 from src.workflow_base import WorkflowBase
 from src.workflow_config_reader import WorkflowConfigReader
-
+from waveform_cooker import add_dynamic
 from wftools.wf_tools import (
     add_ids_entry_to_dict,
     bundle_copy,
@@ -68,6 +68,32 @@ class HCDWorkflow(WorkflowBase):
         self.one_time_slice = self.workflowParameters["one_time_slice"]
         self.tbegin = self.workflowParameters["tbegin"]
         self.tend = self.workflowParameters["tend"]
+
+    def createMachineDescriptionIDSes(self, inputMdsDict):
+        mdCounter = 0
+        waveform_presets = self.globalListReader.getWaveformPresetsList()
+        allMachineDescriptionIDSes = []
+        for process in self.process_bundle.keys():
+            if "nuclear" not in process:  # No waveform for nuclear reactions
+                for ids in self.process_bundle[process]["input"].keys():
+                    if ids in inputMdsDict.keys():
+                        self.process_bundle[process]["input"][ids] = inputMdsDict[ids]
+                        # Overwrite with configured waveform if it exists
+                        waveform_file = (
+                            f"{self.workflowConfig.workflowDirectory}/"
+                            + waveform_presets[process.split("_")[0]]["custom"][
+                                mdCounter
+                            ]
+                        )
+                        if os.path.exists(waveform_file):
+                            self.process_bundle[process]["input"][ids] = add_dynamic(
+                                waveform_file
+                            )
+                            mdCounter += 1
+                        self.md.put(self.process_bundle[process]["input"][ids])
+                        if ids not in allMachineDescriptionIDSes:
+                            allMachineDescriptionIDSes.append(ids)
+        return allMachineDescriptionIDSes
 
     def createWorkflowIDS(self, dt_required):
         # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS
@@ -141,7 +167,7 @@ class HCDWorkflow(WorkflowBase):
                 global_error = global_error + err
         return global_error
 
-    def initialize(self, inputdb, outputdb, inputIds, inputMdsDict):
+    def initialize(self, inputdb, outputdb, machineDb, inputIds, inputMdsDict):
         prerequisites = self.globalListReader.getPrerequisites()
         err = self.validatePrerquisitesOfCodes(prerequisites, self.code_selection)
         if err == 0:
@@ -149,6 +175,8 @@ class HCDWorkflow(WorkflowBase):
         else:
             print("Please change the actor selection and try again.", file=sys.stderr)
             return
+        self.md = machineDb
+        self.machineDescriptionIDSes = self.createMachineDescriptionIDSes(inputMdsDict)
         self.createWorkflowIDS(self.dt_required)
 
         # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
@@ -176,12 +204,22 @@ class HCDWorkflow(WorkflowBase):
         # -----------------------------------------
         # PREPARE THE TIME RANGE FOR THE TIME LOOP
         # -----------------------------------------
-        time_array = args[0]
+        mytime_array = args[0]
         idsslices = args[1]
         mdidsslices = args[2]
-
         if self.one_time_slice == 0:
             # INPUT TIME ARRAY
+            try:
+                time_array = self.inputDb.partial_get(
+                    ids_name="equilibrium", data_path="time"
+                )
+            except:
+                print(
+                    "  ERROR while reading the core_profiles IDS: is it really present in the input file?",
+                    file=sys.stderr,
+                )
+                print("  ----> Aborted.", file=sys.stderr)
+                return
 
             # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
             if self.tbegin < 0:
@@ -256,8 +294,17 @@ class HCDWorkflow(WorkflowBase):
             print("Time = %5.2f" % timenow, "s", file=sys.stdout)
             print("dt   = %5.2f" % self.dt_required, "s", file=sys.stdout)
 
-            self.process_bundle, err = self.runSingleTimeSlice(
-                idsslices, mdidsslices, timenow
+            # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
+            self.initializeIDSSlices(
+                timenow,
+                self.ids_scenario_list,
+                self.inputDb,
+                self.common_bundle,
+                self.process_bundle,
+            )
+
+            self.process_bundle, err = self.hcd_workflow(
+                self.process_bundle, self.dictionary_of_actors
             )
             if err < 0:
                 print("  Error in H&CD workflow.", file=sys.stderr)
@@ -297,6 +344,92 @@ class HCDWorkflow(WorkflowBase):
                             self.process_bundle[process]["input"][
                                 ids
                             ] = self.process_bundle[process]["output"][ids]
+
+    def initializeIDSSlices(
+        self,
+        timenow,
+        ids_scenario_list,
+        inputDb,
+        common_bundle,
+        process_bundle,
+    ):
+        for ids in ids_scenario_list:
+            print("  Get", ids, file=sys.stdout)
+            try:
+                common_bundle[ids] = inputDb.get_slice(ids, timenow, 1)
+                # if common_bundle[ids] == 'equilibrium': # when equilibrium misses phi(r,z)
+                #  if len(common_bundle[ids].time_slice[0].profiles_2d[0].phi)==0:
+                #    print('   --- Interpolate missing phi(R,Z) ---')
+                #    r1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim1
+                #    z1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim2
+                #    rho1d_eq = common_bundle[ids].time_slice[0].profiles_1d.rho_tor_norm
+                #    psi1d_eq = common_bundle[ids].time_slice[0].profiles_1d.psi
+                #    psi2d_eq = common_bundle[ids].time_slice[0].profiles_2d[0].psi
+                #    rho_from_psi = interpolate.interp1d(psi1d_eq,rho1d_eq,kind='linear')
+                #    phi2d_eq = np.zeros(np.shape(psi2d_eq))
+                #    for ir in range(len(r1d_eq)):
+                #      for iz in range(len(z1d_eq)):
+                #        try: # Inside LCFS
+                #          phi2d_eq[ir,iz] = rho_from_psi(psi2d_eq[ir,iz])
+                #        except: # Outside LCFS
+                #          phi2d_eq[ir,iz] = 1.
+                #    common_bundle[ids].time_slice[0].profiles_2d[0].phi = phi2d_eq
+                for process in process_bundle.keys():
+                    if (
+                        "merge_" not in process
+                        and ids in process_bundle[process]["input"].keys()
+                    ):
+                        process_bundle[process]["input"][ids] = common_bundle[ids]
+            except:
+                print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+                print(
+                    "  ----> Check the version of the Data Dictionary between the"
+                    + " input and the loaded IMAS version.",
+                    file=sys.stderr,
+                )
+                print("  ----> Aborted.", file=sys.stderr)
+                return
+
+        # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
+        for ids in self.machineDescriptionIDSes:
+            print("  Get", ids, file=sys.stdout)
+            try:
+                for process in self.process_bundle.keys():
+                    if ids in self.process_bundle[process]["input"].keys():
+                        self.process_bundle[process]["input"][ids] = self.md.get_slice(
+                            ids, timenow, 1
+                        )
+            except:
+                print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+                print(
+                    "  ----> Check the version of the Data Dictionary between the"
+                    + " input and the loaded IMAS version.",
+                    file=sys.stderr,
+                )
+                print("  ----> Aborted.", file=sys.stderr)
+                return
+
+        # ---------------------------------------------------------------------
+        # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
+        # ---------------------------------------------------------------------
+        time_base = self.workflowConfig.getTimeBase()
+
+        for process in process_bundle.keys():
+            if time_base is not None:
+                if process in time_base:
+                    [tc, it] = find_nearest(
+                        np.array(
+                            time_base[process][0]["wf_interval"][0]["time_array"][0]
+                        ),
+                        timenow,
+                    )
+                    process_bundle[process]["status"] = time_base[process][0][
+                        "wf_interval"
+                    ][0]["status"][0][it]
+                else:
+                    process_bundle[process]["status"] = 1
+            else:
+                process_bundle[process]["status"] = 1
 
     def storeIDSOutput(self, common_bundle, process_bundle, outputDb):
         # ------------------------------
@@ -374,38 +507,39 @@ class HCDWorkflow(WorkflowBase):
         # Call of the chosen code
         return results
 
-    def runSingleTimeSlice(self, idsslices, mdidsslices, timenow):
-        # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
-        for ids in idsslices:
-            for process in self.process_bundle.keys():
-                if (
-                    "merge_" not in process
-                    and ids in self.process_bundle[process]["input"].keys()
-                ):
-                    self.process_bundle[process]["input"][ids] = idsslices[ids]
+    def hcd_workflow(self, process_bundle, dictionary_of_actors):
+        # # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
+        # for ids in idsslices:
+        #     for process in self.process_bundle.keys():
+        #         if (
+        #             "merge_" not in process
+        #             and ids in self.process_bundle[process]["input"].keys()
+        #         ):
+        #             self.process_bundle[process]["input"][ids] = idsslices[ids]
 
-        for ids in mdidsslices:
-            for process in self.process_bundle.keys():
-                if ids in self.process_bundle[process]["input"].keys():
-                    self.process_bundle[process]["input"][ids] = mdidsslices[ids]
+        # for ids in mdidsslices:
+        #     for process in self.process_bundle.keys():
+        #         if ids in self.process_bundle[process]["input"].keys():
+        #             self.process_bundle[process]["input"][ids] = mdidsslices[ids]
 
-        time_base = self.workflowConfig.getTimeBase()
-        for process in self.process_bundle.keys():
-            if time_base is not None:
-                if process in time_base:
-                    [tc, it] = find_nearest(
-                        np.array(
-                            time_base[process][0]["wf_interval"][0]["time_array"][0]
-                        ),
-                        timenow,
-                    )
-                    self.process_bundle[process]["status"] = time_base[process][0][
-                        "wf_interval"
-                    ][0]["status"][0][it]
-                else:
-                    self.process_bundle[process]["status"] = 1
-            else:
-                self.process_bundle[process]["status"] = 1
+        # time_base = self.workflowConfig.getTimeBase()
+        # for process in self.process_bundle.keys():
+        #     if time_base is not None:
+        #         if process in time_base:
+        #             [tc, it] = find_nearest(
+        #                 np.array(
+        #                     time_base[process][0]["wf_interval"][0]["time_array"][0]
+        #                 ),
+        #                 timenow,
+        #             )
+        #             self.process_bundle[process]["status"] = time_base[process][0][
+        #                 "wf_interval"
+        #             ][0]["status"][0][it]
+        #         else:
+        #             self.process_bundle[process]["status"] = 1
+        #     else:
+        #         self.process_bundle[process]["status"] = 1
+
         # print("process_bundle-------------------------")
         # print(process_bundle)
         # print("workflow_xml-----------------------")
@@ -447,10 +581,10 @@ class HCDWorkflow(WorkflowBase):
         # print("####################################################")
         # IF AN H&CD SOURCE IS CONFIGURED BUT IT HAS NO POWER FOR THIS TIME SLICE,
         # DO NOT RUN THE CODE(S) FOR THIS SOURCE
-        for process in self.process_bundle.keys():
+        for process in process_bundle.keys():
             if (
-                "nbi" in self.process_bundle[process]["input"]
-                and self.process_bundle[process]["input"][
+                "nbi" in process_bundle[process]["input"]
+                and process_bundle[process]["input"][
                     "nbi"
                 ].ids_properties.homogeneous_time
                 < 0
@@ -461,19 +595,19 @@ class HCDWorkflow(WorkflowBase):
                     file=sys.stderr,
                 )
                 print("  --> Abort.", file=sys.stderr)
-                return self.process_bundle, -1
+                return process_bundle, -1
 
-            if "nbi" in self.process_bundle[process]["input"] and not is_nbi_on(
-                self.process_bundle[process]["input"]["nbi"],
-                self.process_bundle[process]["input"]["core_profiles"].time,
+            if "nbi" in process_bundle[process]["input"] and not is_nbi_on(
+                process_bundle[process]["input"]["nbi"],
+                process_bundle[process]["input"]["core_profiles"].time,
             ):
                 print("  No NBI power for this time slice", file=sys.stdout)
                 param_process["nbi_source"] = 0
                 param_process["nbi_fp"] = 0
 
             if (
-                "ic_antennas" in self.process_bundle[process]["input"]
-                and self.process_bundle[process]["input"][
+                "ic_antennas" in process_bundle[process]["input"]
+                and process_bundle[process]["input"][
                     "ic_antennas"
                 ].ids_properties.homogeneous_time
                 < 0
@@ -484,11 +618,11 @@ class HCDWorkflow(WorkflowBase):
                     file=sys.stderr,
                 )
                 print("  --> Abort.", file=sys.stderr)
-                return self.process_bundle, -1
+                return process_bundle, -1
 
-            if "ic_antennas" in self.process_bundle[process]["input"] and not is_ic_on(
-                self.process_bundle[process]["input"]["ic_antennas"],
-                self.process_bundle[process]["input"]["core_profiles"].time,
+            if "ic_antennas" in process_bundle[process]["input"] and not is_ic_on(
+                process_bundle[process]["input"]["ic_antennas"],
+                process_bundle[process]["input"]["core_profiles"].time,
             ):
                 print("  No IC power for this time slice", file=sys.stdout)
                 param_process["ic_coup"] = 0
@@ -496,8 +630,8 @@ class HCDWorkflow(WorkflowBase):
                 param_process["ic_wave_fp"] = 0
 
             if (
-                "ec_launchers" in self.process_bundle[process]["input"]
-                and self.process_bundle[process]["input"][
+                "ec_launchers" in process_bundle[process]["input"]
+                and process_bundle[process]["input"][
                     "ec_launchers"
                 ].ids_properties.homogeneous_time
                 < 0
@@ -508,19 +642,19 @@ class HCDWorkflow(WorkflowBase):
                     file=sys.stderr,
                 )
                 print("  --> Abort.", file=sys.stderr)
-                return self.process_bundle, -1
+                return process_bundle, -1
 
-            if "ec_launchers" in self.process_bundle[process]["input"] and not is_ec_on(
-                self.process_bundle[process]["input"]["ec_launchers"],
-                self.process_bundle[process]["input"]["core_profiles"].time,
+            if "ec_launchers" in process_bundle[process]["input"] and not is_ec_on(
+                process_bundle[process]["input"]["ec_launchers"],
+                process_bundle[process]["input"]["core_profiles"].time,
             ):
                 print("  No EC power for this time slice", file=sys.stdout)
                 param_process["ec_wave_solver"] = 0
                 param_process["ec_wave_fp"] = 0
 
-            if "lh_antennas" in self.process_bundle[process]["input"] and not is_lh_on(
-                self.process_bundle[process]["input"]["lh_antennas"],
-                self.process_bundle[process]["input"]["core_profiles"].time,
+            if "lh_antennas" in process_bundle[process]["input"] and not is_lh_on(
+                process_bundle[process]["input"]["lh_antennas"],
+                process_bundle[process]["input"]["core_profiles"].time,
             ):
                 print("  No LH power for this time slice", file=sys.stdout)
                 param_process["lh_wave_solver"] = 0
@@ -552,11 +686,11 @@ class HCDWorkflow(WorkflowBase):
 
         # EXECUTION OF THE WORKFLOW
         for process in final_algorithm:
-            actor = self.dictionary_of_actors[
+            actor = dictionary_of_actors[
                 self.catdict[process][param_process[process]]["name"]
             ]
             if not "merge_" in process:
-                if self.process_bundle[process]["status"] == 1:
+                if process_bundle[process]["status"] == 1:
                     print(
                         " PROCESS --> ",
                         process,
@@ -577,42 +711,35 @@ class HCDWorkflow(WorkflowBase):
                     "output"
                 ]
                 # REMOVE WARNINGS AND HCD2CORE_SOURCES CRASHS (DOES NOT LIKE RECEIVING EMPTY IDSS)
-                for ids in self.process_bundle[process]["input"].keys():
+                for ids in process_bundle[process]["input"].keys():
                     if (
-                        self.process_bundle[process]["input"][
+                        process_bundle[process]["input"][
                             ids
                         ].ids_properties.homogeneous_time
                         < 1
                     ):
-                        self.process_bundle[process]["input"][
+                        process_bundle[process]["input"][
                             ids
                         ].ids_properties.homogeneous_time = 1
-                        self.process_bundle[process]["input"][
-                            ids
-                        ].time = self.process_bundle[process]["input"][
-                            "core_profiles"
-                        ].time
-                if self.process_bundle[process]["status"] == 1:
+                        process_bundle[process]["input"][ids].time = process_bundle[
+                            process
+                        ]["input"]["core_profiles"].time
+                if process_bundle[process]["status"] == 1:
                     output_ids_data = self.run_internal(
-                        process,
-                        actor,
-                        self.process_bundle[process]["input"],
-                        param_process,
+                        process, actor, process_bundle[process]["input"], param_process
                     )
                 else:
                     output_ids_data = []
-                    for ids in self.process_bundle[process]["output"]:
-                        if len(self.process_bundle[process]["output"]) == 1:
-                            if ids in self.process_bundle[process]["input"]:
-                                output_ids_data = self.process_bundle[process]["input"][
-                                    ids
-                                ]
+                    for ids in process_bundle[process]["output"]:
+                        if len(process_bundle[process]["output"]) == 1:
+                            if ids in process_bundle[process]["input"]:
+                                output_ids_data = process_bundle[process]["input"][ids]
                             else:
                                 output_ids_data = eval("imas." + ids + "()")
                         else:
-                            if ids in self.process_bundle[process]["input"]:
+                            if ids in process_bundle[process]["input"]:
                                 output_ids_data.append(
-                                    self.process_bundle[process]["input"][ids]
+                                    process_bundle[process]["input"][ids]
                                 )
                             else:
                                 import imas
@@ -620,24 +747,21 @@ class HCDWorkflow(WorkflowBase):
                                 output_ids_data.append(eval("imas." + ids + "()"))
             else:
                 kmerge = 0
-                ids_to_be_merged = self.process_bundle[process]["input"][0].__name__
+                ids_to_be_merged = process_bundle[process]["input"][0].__name__
                 for (
                     each_proc
                 ) in (
-                    self.process_bundle.keys()
+                    process_bundle.keys()
                 ):  # merge only if at least one of involved codes is called
                     if (
-                        ids_to_be_merged in self.process_bundle[each_proc]["input"]
-                        and self.process_bundle[each_proc]["status"] == 1
+                        ids_to_be_merged in process_bundle[each_proc]["input"]
+                        and process_bundle[each_proc]["status"] == 1
                     ):
                         kmerge = 1
                 if kmerge == 1:
                     print(" PROCESS -->", process, file=sys.stdout)
                     output_ids_data = self.run_internal(
-                        process,
-                        actor,
-                        self.process_bundle[process]["input"],
-                        param_process,
+                        process, actor, process_bundle[process]["input"], param_process
                     )
                     del bundle_out[output_ids_list[0]]
 
@@ -645,11 +769,11 @@ class HCDWorkflow(WorkflowBase):
                 if not hasattr(output_ids_data, "__len__"):
                     # if hasattr(output_ids_data,'__len__'):
                     #    for iids in range(len(output_ids_data)):
-                    self.process_bundle[process]["output"][
+                    process_bundle[process]["output"][
                         output_ids_data.__name__
                     ] = output_ids_data
                 else:
-                    self.process_bundle[process]["output"][
+                    process_bundle[process]["output"][
                         output_ids_data[iids].__name__
                     ] = output_ids_data[iids]
 
@@ -658,21 +782,21 @@ class HCDWorkflow(WorkflowBase):
                     or "merge_" in process
                 ):
                     if not hasattr(output_ids_data, "__len__"):
-                        bundle_out[output_ids_list[iids]] = self.process_bundle[
-                            process
-                        ]["output"][output_ids_data.__name__]
+                        bundle_out[output_ids_list[iids]] = process_bundle[process][
+                            "output"
+                        ][output_ids_data.__name__]
                     else:
-                        bundle_out[output_ids_list[iids]] = self.process_bundle[
-                            process
-                        ]["output"][output_ids_data[iids].__name__]
+                        bundle_out[output_ids_list[iids]] = process_bundle[process][
+                            "output"
+                        ][output_ids_data[iids].__name__]
                 else:
-                    self.process_bundle["merge_" + output_ids_list[iids]] = {}
-                    self.process_bundle["merge_" + output_ids_list[iids]]["input"] = [
+                    process_bundle["merge_" + output_ids_list[iids]] = {}
+                    process_bundle["merge_" + output_ids_list[iids]]["input"] = [
                         bundle_out[output_ids_list[iids]],
                         output_ids_data,
                     ]
-                    self.process_bundle["merge_" + output_ids_list[iids]]["output"] = {}
-                    self.process_bundle["merge_" + output_ids_list[iids]]["output"][
+                    process_bundle["merge_" + output_ids_list[iids]]["output"] = {}
+                    process_bundle["merge_" + output_ids_list[iids]]["output"][
                         output_ids_list[iids]
                     ] = {}
 
@@ -681,18 +805,18 @@ class HCDWorkflow(WorkflowBase):
             parallel_dependency = loadlist(file, "parallel_dependency")
             for stepc in final_algorithm[final_algorithm.index(process) + 1 :]:
                 if process in parallel_dependency[stepc]:
-                    if stepc in self.process_bundle:  # (merger keys may not exist yet)
-                        for idskey, idsvalue in self.process_bundle[process][
+                    if stepc in process_bundle:  # (merger keys may not exist yet)
+                        for idskey, idsvalue in process_bundle[process][
                             "output"
                         ].items():
-                            if type(self.process_bundle[stepc]["input"]) is not list:
-                                self.process_bundle[stepc]["input"][
-                                    idskey
-                                ] = copy.deepcopy(idsvalue)
+                            if type(process_bundle[stepc]["input"]) is not list:
+                                process_bundle[stepc]["input"][idskey] = copy.deepcopy(
+                                    idsvalue
+                                )
 
         print("End of time slice", file=sys.stdout)
 
-        return self.process_bundle, 0
+        return process_bundle, 0
 
     def finalize(self):
         # FINALIZE ALL ACTORS

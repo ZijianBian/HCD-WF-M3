@@ -37,7 +37,6 @@ class GlobalListReader:
 
     def getIdsProcessList(self):
         return self.getList("ids_process_list")
-    
+
     def getPrerequisites(self):
         return self.getList("prerequisites")
-    
