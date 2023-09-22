@@ -81,10 +81,8 @@ for ids in inputMds:
     mdidsslices[ids] = machineDb.get_slice(ids, timenow, 1)
 
 hcdWorkflow = HCDWorkflow(config_folder_path)
-hcdWorkflow.initialize(inputDb, outputDb, machineDb, inputIds, inputMdsDict)
-
-hcdWorkflow.run()
-# hcdWorkflow.runSlice(idsslices, mdidsslices, timenow)
+hcdWorkflow.initializeSlice()
+hcdWorkflow.runSlice(idsslices, mdidsslices, timenow)
 hcdWorkflow.finalize()
 
 inputDb.close()

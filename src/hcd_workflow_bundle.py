@@ -70,6 +70,45 @@ class HCDWorkflow(WorkflowBase):
                             allMachineDescriptionIDSes.append(ids)
         return allMachineDescriptionIDSes
 
+    def initializeSlice(self):
+        self.workflowData = WorkflowData(self.workflowConfigPath)
+
+        # --------------------------------------------------------------------temp
+        self.catdict = self.workflowData.catdict
+        self.dictionary_of_actors = self.workflowData.dictionary_of_actors
+        self.code_selection = self.workflowData.code_selection
+        self.process_bundle = self.workflowData.process_bundle
+        self.workflowParameters = self.workflowData.workflowParameters
+        self.dt_required = self.workflowData.dt_required
+        self.one_time_slice = self.workflowData.one_time_slice
+        self.tbegin = self.workflowData.tbegin
+        self.tend = self.workflowData.tend
+
+        self.prerequisites = self.workflowData.prerequisites
+        self.waveform_presets = self.workflowData.waveform_presets
+        self.parallel_dependency_list = self.workflowData.parallel_dependency_list
+        self.merge_actor_list = self.workflowData.merge_actor_list
+        self.parallel_dependency = self.workflowData.parallel_dependency
+        self.algorithms = self.workflowData.algorithms
+
+        # ----------------------------------------------------------------------
+
+        # self.md = machineDb
+        # self.machineDescriptionIDSes = self.createMachineDescriptionIDSes(inputMdsDict)
+
+        # # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
+        # # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
+        # # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
+        # self.inputDb = inputdb
+        # self.outputDb = outputdb
+        # self.ids_scenario_list = inputIds
+
+        # self.common_bundle = {}
+        # add_ids_entry_to_dict(self.common_bundle, self.ids_scenario_list)
+
+        # # IMAS DB VERSION
+        # version = os.getenv("IMAS_VERSION")[0]
+
     def initialize(self, inputdb, outputdb, machineDb, inputIds, inputMdsDict):
         self.workflowData = WorkflowData(self.workflowConfigPath)
 
@@ -121,9 +160,6 @@ class HCDWorkflow(WorkflowBase):
         # -----------------------------------------
         # PREPARE THE TIME RANGE FOR THE TIME LOOP
         # -----------------------------------------
-        mytime_array = args[0]
-        idsslices = args[1]
-        mdidsslices = args[2]
         if self.one_time_slice == 0:
             # INPUT TIME ARRAY
             try:
@@ -270,6 +306,60 @@ class HCDWorkflow(WorkflowBase):
                                 ids
                             ] = self.process_bundle[process]["output"][ids]
 
+    def runSlice(self, idsslices, mdidsslices, timenow):
+        # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
+        self.initializeExtermalIDSSlices(idsslices, mdidsslices, timenow)
+        param_process = self.workflowData.getParamProcess()
+        hcd_wf = WorkflowExecutor(
+            self.process_bundle,
+            self.dictionary_of_actors,
+            param_process,
+            self.catdict,
+            self.parallel_dependency,
+            self.algorithms,
+            self.parallel_dependency_list,
+            self.merge_actor_list,
+        )
+        err = hcd_wf.execute()
+        if err < 0:
+            print("  Error in H&CD workflow.", file=sys.stderr)
+            return
+
+            # process_bundle_out = self.storeIDSOutput(
+            #     self.common_bundle, self.process_bundle, self.outputDb
+            # )
+
+            # for ids in process_bundle_out.keys():
+            #     if (
+            #         len(process_bundle_out[ids].time) > 0
+            #     ):  # Empty if process deactivated by an is_xx_on function
+            #         if (
+            #             process_bundle_out[ids].time[0] > 0
+            #             or "merge" in process_bundle_out[ids].code.name
+            #         ):
+            #             previous_time[ids] = process_bundle_out[ids].time[0]
+            # # ------------------------------------------------------------------------------------------
+            # # PREPARE FOR THE NEXT TIME STEP: COPY OUTPUT IDS IN INPUT OF ACTORS FOR THE NEXT TIME STEP
+            # # ------------------------------------------------------------------------------------------
+            # timenow = timenow * 1.0 + self.dt_required * 1.0
+            # for process in self.process_bundle.keys():
+            #     if "merge_" not in process:
+            #         for ids in self.process_bundle[process]["output"].keys():
+            #             if (
+            #                 type(self.process_bundle[process]["input"]) is dict
+            #                 and ids in self.process_bundle[process]["input"].keys()
+            #             ):
+            #                 print(
+            #                     "Copy "
+            #                     + ids
+            #                     + " from output to input for "
+            #                     + process
+            #                     + " for next time slice"
+            #                 )
+            #                 self.process_bundle[process]["input"][
+            #                     ids
+            #                 ] = self.process_bundle[process]["output"][ids]
+
     def initializeIDSSlices(
         self,
         timenow,
@@ -355,6 +445,45 @@ class HCDWorkflow(WorkflowBase):
                     process_bundle[process]["status"] = 1
             else:
                 process_bundle[process]["status"] = 1
+
+    def initializeExtermalIDSSlices(self, idsSlices, mdIdsSlices, timenow):
+        for idsName, idsData in idsSlices.items():
+            print("  Loading slice", idsName, file=sys.stdout)
+            for process in self.process_bundle.keys():
+                if (
+                    "merge_" not in process
+                    and idsName in self.process_bundle[process]["input"].keys()
+                ):
+                    self.process_bundle[process]["input"][idsName] = idsData
+
+        # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
+        for idsName, idsData in mdIdsSlices.items():
+            print("  Get", idsName, file=sys.stdout)
+            for process in self.process_bundle.keys():
+                if idsName in self.process_bundle[process]["input"].keys():
+                    self.process_bundle[process]["input"][idsName] = idsData
+
+        # ---------------------------------------------------------------------
+        # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
+        # ---------------------------------------------------------------------
+        time_base = self.workflowData.getTimeBase()
+
+        for process in self.process_bundle.keys():
+            if time_base is not None:
+                if process in time_base:
+                    [tc, it] = find_nearest(
+                        np.array(
+                            time_base[process][0]["wf_interval"][0]["time_array"][0]
+                        ),
+                        timenow,
+                    )
+                    self.process_bundle[process]["status"] = time_base[process][0][
+                        "wf_interval"
+                    ][0]["status"][0][it]
+                else:
+                    self.process_bundle[process]["status"] = 1
+            else:
+                self.process_bundle[process]["status"] = 1
 
     def storeIDSOutput(self, common_bundle, process_bundle, outputDb):
         # ------------------------------
