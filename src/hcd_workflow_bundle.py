@@ -11,6 +11,7 @@ import imas
 import numpy as np
 from lxml import etree
 from src.global_list_reader import GlobalListReader
+from src.workflow_data import WorkflowData
 from src.workflow_executor import WorkflowExecutor
 from src.workflow_base import WorkflowBase
 from src.workflow_config_reader import WorkflowConfigReader
@@ -41,41 +42,11 @@ class HCDWorkflow(WorkflowBase):
     def __init__(self, workflowConfigPath: str):
         # READ WORKFLOW PARAMETERS FROM INPUT XML FILE
         # YAML FILE CONTAINING ALL USEFUL LISTS
-        self.global_lists = (
-            os.path.dirname(os.path.abspath(__file__))
-            + "/../global_configuration/"
-            + "global_lists.yaml"
-        )
-
-        self.globalListReader = GlobalListReader(self.global_lists)
-        self.parallel_dependency_list = self.globalListReader.getParallelDependency()
-        self.merge_actor_list = self.globalListReader.getMergeActorList()
-        self.parallel_dependency = self.globalListReader.getParallelDependency()
-        self.algorithms = self.globalListReader.getAlgorithms()
-
-    def readWorkflowConfig(self, workflowConfig: str):
-        _, _, _, _, self.catdict = create_maindict(workflowConfig, 0)
-
-        self.workflowConfig = WorkflowConfigReader(workflowConfig)
-        if self.workflowConfig.AreProcessesEmpty() is True:
-            print(
-                "ERROR: no actor selected --> The H&CD workflow will not be executed",
-                file=sys.stderr,
-            )
-            return
-        self.dictionary_of_actors = self.workflowConfig.getAllActors()
-        self.code_selection = self.workflowConfig.getAllProcesses()
-        self.workflowParameters = self.workflowConfig.getWorkflowParameters()
-        self.process_bundle = self.workflowConfig.getProcessBundle()
-
-        self.dt_required = self.workflowParameters["dt_required"]
-        self.one_time_slice = self.workflowParameters["one_time_slice"]
-        self.tbegin = self.workflowParameters["tbegin"]
-        self.tend = self.workflowParameters["tend"]
+        self.workflowConfigPath = workflowConfigPath
 
     def createMachineDescriptionIDSes(self, inputMdsDict):
         mdCounter = 0
-        waveform_presets = self.globalListReader.getWaveformPresetsList()
+
         allMachineDescriptionIDSes = []
         for process in self.process_bundle.keys():
             if "nuclear" not in process:  # No waveform for nuclear reactions
@@ -84,8 +55,8 @@ class HCDWorkflow(WorkflowBase):
                         self.process_bundle[process]["input"][ids] = inputMdsDict[ids]
                         # Overwrite with configured waveform if it exists
                         waveform_file = (
-                            f"{self.workflowConfig.workflowDirectory}/"
-                            + waveform_presets[process.split("_")[0]]["custom"][
+                            f"{self.workflowConfigPath}/"
+                            + self.waveform_presets[process.split("_")[0]]["custom"][
                                 mdCounter
                             ]
                         )
@@ -99,89 +70,31 @@ class HCDWorkflow(WorkflowBase):
                             allMachineDescriptionIDSes.append(ids)
         return allMachineDescriptionIDSes
 
-    def createWorkflowIDS(self, dt_required):
-        # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS
-        workflow = imas.workflow()
-        workflow.ids_properties.homogeneous_time = 1
-        workflow.time.resize(1)
-        workflow.time_loop.component.resize(1)
-        workflow.time_loop.workflow_cycle.resize(1)
-        workflow.time_loop.workflow_cycle[0].component.resize(1)
-        workflow.time_loop.workflow_cycle[0].component[0].time_interval = dt_required
-
-        for process in self.process_bundle.keys():
-            if "workflow" in self.process_bundle[process]["input"].keys():
-                workflow.time_loop.component[0].name = self.dictionary_of_actors[
-                    process
-                ].upper()
-                self.process_bundle[process]["input"]["workflow"] = copy.deepcopy(
-                    workflow
-                )
-
-    # TODO Refactor this
-    def validatePrerquisitesOfCodes(self, prerequisites, code_selection):
-        global_error = 0
-        for entry, _ in code_selection.items():
-            if code_selection != None:
-                err = 0
-                code = code_selection[entry]
-                if prerequisites[entry] == "None":
-                    prerequisites[entry] = None
-                if prerequisites[entry] != None and code in prerequisites[entry]:
-                    fulfills_all_prerequisites = [1] * (len(prerequisites[entry][code]))
-                    for dep in [prerequisites[entry][code]]:
-                        for i in dep.keys():
-                            if "any" in str(dep[i]) and code_selection[i] != None:
-                                pass
-                            elif str(dep[i]).find(str(code_selection[i])) != -1:
-                                pass
-                            else:
-                                if str(dep[i]) == "any":
-                                    print(
-                                        "ERROR: "
-                                        + code.upper()
-                                        + " needs any code as "
-                                        + str(i),
-                                        file=sys.stderr,
-                                    )
-                                else:
-                                    if len(dep[i]) < 2:
-                                        print(
-                                            "ERROR: "
-                                            + code.upper()
-                                            + " needs the "
-                                            + str(dep[i][0]).upper()
-                                            + " code as "
-                                            + str(i),
-                                            file=sys.stderr,
-                                        )
-                                    else:
-                                        print(
-                                            "ERROR: "
-                                            + code.upper()
-                                            + " needs the "
-                                            + " or ".join(dep[i])
-                                            .upper()
-                                            .replace("OR", "or")
-                                            + " codes as "
-                                            + str(i),
-                                            file=sys.stderr,
-                                        )
-                                err = 1
-                global_error = global_error + err
-        return global_error
-
     def initialize(self, inputdb, outputdb, machineDb, inputIds, inputMdsDict):
-        prerequisites = self.globalListReader.getPrerequisites()
-        err = self.validatePrerquisitesOfCodes(prerequisites, self.code_selection)
-        if err == 0:
-            print("Selection fulfills all actor selection rules", file=sys.stdout)
-        else:
-            print("Please change the actor selection and try again.", file=sys.stderr)
-            return
+        self.workflowData = WorkflowData(self.workflowConfigPath)
+
+        # --------------------------------------------------------------------temp
+        self.catdict = self.workflowData.catdict
+        self.dictionary_of_actors = self.workflowData.dictionary_of_actors
+        self.code_selection = self.workflowData.code_selection
+        self.process_bundle = self.workflowData.process_bundle
+        self.workflowParameters = self.workflowData.workflowParameters
+        self.dt_required = self.workflowData.dt_required
+        self.one_time_slice = self.workflowData.one_time_slice
+        self.tbegin = self.workflowData.tbegin
+        self.tend = self.workflowData.tend
+
+        self.prerequisites = self.workflowData.prerequisites
+        self.waveform_presets = self.workflowData.waveform_presets
+        self.parallel_dependency_list = self.workflowData.parallel_dependency_list
+        self.merge_actor_list = self.workflowData.merge_actor_list
+        self.parallel_dependency = self.workflowData.parallel_dependency
+        self.algorithms = self.workflowData.algorithms
+
+        # ----------------------------------------------------------------------
+
         self.md = machineDb
         self.machineDescriptionIDSes = self.createMachineDescriptionIDSes(inputMdsDict)
-        self.createWorkflowIDS(self.dt_required)
 
         # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
         # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
@@ -306,7 +219,7 @@ class HCDWorkflow(WorkflowBase):
                 self.common_bundle,
                 self.process_bundle,
             )
-            param_process = self.workflowConfig.getParamProcess()
+            param_process = self.workflowData.getParamProcess()
             hcd_wf = WorkflowExecutor(
                 self.process_bundle,
                 self.dictionary_of_actors,
@@ -424,7 +337,7 @@ class HCDWorkflow(WorkflowBase):
         # ---------------------------------------------------------------------
         # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
         # ---------------------------------------------------------------------
-        time_base = self.workflowConfig.getTimeBase()
+        time_base = self.workflowData.getTimeBase()
 
         for process in process_bundle.keys():
             if time_base is not None:
