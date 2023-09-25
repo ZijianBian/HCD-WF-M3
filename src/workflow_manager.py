@@ -39,50 +39,30 @@ class WorkflowManager():
         mdCounter = 0
 
         allMachineDescriptionIDSes = []
-        for process in self.process_bundle.keys():
+        for process in self.workflowData.process_bundle.keys():
             if "nuclear" not in process:  # No waveform for nuclear reactions
-                for ids in self.process_bundle[process]["input"].keys():
+                for ids in self.workflowData.process_bundle[process]["input"].keys():
                     if ids in inputMdsDict.keys():
-                        self.process_bundle[process]["input"][ids] = inputMdsDict[ids]
+                        self.workflowData.process_bundle[process]["input"][ids] = inputMdsDict[ids]
                         # Overwrite with configured waveform if it exists
                         waveform_file = (
                             f"{self.workflowConfigPath}/"
-                            + self.waveform_presets[process.split("_")[0]]["custom"][
+                            + self.workflowData.waveform_presets[process.split("_")[0]]["custom"][
                                 mdCounter
                             ]
                         )
                         if os.path.exists(waveform_file):
-                            self.process_bundle[process]["input"][ids] = add_dynamic(
+                            self.workflowData.process_bundle[process]["input"][ids] = add_dynamic(
                                 waveform_file
                             )
                             mdCounter += 1
-                        self.md.put(self.process_bundle[process]["input"][ids])
+                        self.md.put(self.workflowData.process_bundle[process]["input"][ids])
                         if ids not in allMachineDescriptionIDSes:
                             allMachineDescriptionIDSes.append(ids)
         return allMachineDescriptionIDSes
 
     def initializeSlice(self):
         self.workflowData = WorkflowData(self.workflowConfigPath)
-
-        # --------------------------------------------------------------------temp
-        self.catdict = self.workflowData.catdict
-        self.dictionary_of_actors = self.workflowData.dictionary_of_actors
-        self.code_selection = self.workflowData.code_selection
-        self.process_bundle = self.workflowData.process_bundle
-        self.workflowParameters = self.workflowData.workflowParameters
-        self.dt_required = self.workflowData.dt_required
-        self.one_time_slice = self.workflowData.one_time_slice
-        self.tbegin = self.workflowData.tbegin
-        self.tend = self.workflowData.tend
-
-        self.prerequisites = self.workflowData.prerequisites
-        self.waveform_presets = self.workflowData.waveform_presets
-        self.parallel_dependency_list = self.workflowData.parallel_dependency_list
-        self.merge_actor_list = self.workflowData.merge_actor_list
-        self.parallel_dependency = self.workflowData.parallel_dependency
-        self.algorithms = self.workflowData.algorithms
-
-        # ----------------------------------------------------------------------
 
         # self.md = machineDb
         # self.machineDescriptionIDSes = self.createMachineDescriptionIDSes(inputMdsDict)
@@ -102,26 +82,6 @@ class WorkflowManager():
 
     def initialize(self, inputdb, outputdb, machineDb, inputIds, inputMdsDict):
         self.workflowData = WorkflowData(self.workflowConfigPath)
-
-        # --------------------------------------------------------------------temp
-        self.catdict = self.workflowData.catdict
-        self.dictionary_of_actors = self.workflowData.dictionary_of_actors
-        self.code_selection = self.workflowData.code_selection
-        self.process_bundle = self.workflowData.process_bundle
-        self.workflowParameters = self.workflowData.workflowParameters
-        self.dt_required = self.workflowData.dt_required
-        self.one_time_slice = self.workflowData.one_time_slice
-        self.tbegin = self.workflowData.tbegin
-        self.tend = self.workflowData.tend
-
-        self.prerequisites = self.workflowData.prerequisites
-        self.waveform_presets = self.workflowData.waveform_presets
-        self.parallel_dependency_list = self.workflowData.parallel_dependency_list
-        self.merge_actor_list = self.workflowData.merge_actor_list
-        self.parallel_dependency = self.workflowData.parallel_dependency
-        self.algorithms = self.workflowData.algorithms
-
-        # ----------------------------------------------------------------------
 
         self.md = machineDb
         self.machineDescriptionIDSes = self.createMachineDescriptionIDSes(inputMdsDict)
@@ -150,8 +110,8 @@ class WorkflowManager():
     def run(self, *args):
         # -----------------------------------------
         # PREPARE THE TIME RANGE FOR THE TIME LOOP
-        # -----------------------------------------
-        if self.one_time_slice == 0:
+        # -----------------------------------------       
+        if self.workflowData.one_time_slice == 0:
             # INPUT TIME ARRAY
             try:
                 time_array = self.inputDb.partial_get(
@@ -166,18 +126,18 @@ class WorkflowManager():
                 return
 
             # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
-            if self.tbegin < 0:
-                self.tbegin = time_array[0]
+            if self.workflowData.tbegin < 0:
+                self.workflowData.tbegin = time_array[0]
                 print(
                     "Initial time tbegin set to core_profiles first time slice. tbegin = ",
-                    self.tbegin,
+                    self.workflowData.tbegin,
                     file=sys.stdout,
                 )
 
-            if self.tbegin > 0 and self.tbegin < time_array[0]:
+            if self.workflowData.tbegin > 0 and self.workflowData.tbegin < time_array[0]:
                 print(
                     "ERROR: tbegin out of range: "
-                    + str(self.tbegin)
+                    + str(self.workflowData.tbegin)
                     + " s is less than first time in core_profiles =",
                     "{:.2f}".format(time_array[0]),
                     "s",
@@ -185,7 +145,7 @@ class WorkflowManager():
                 )
                 return
 
-            if self.tend < 0:
+            if self.workflowData.tend < 0:
                 self.tend = time_array[-1]
                 print(
                     "Final time tend set to core_profiles final time slice, tend = ",
@@ -193,10 +153,10 @@ class WorkflowManager():
                     file=sys.stdout,
                 )
 
-            if self.tend > 0 and self.tend > time_array[-1]:
+            if self.workflowData.tend > 0 and self.workflowData.tend > time_array[-1]:
                 print(
                     "ERROR: tend out of range: "
-                    + str(self.tend)
+                    + str(self.workflowData.tend)
                     + " s is greater than last time in core_profiles =",
                     "{:.2f}".format(time_array[-1]),
                     "s",
@@ -204,7 +164,7 @@ class WorkflowManager():
                 )
                 return
         else:
-            self.tend = self.tbegin + self.dt_required
+            self.workflowData.tend = self.workflowData.tbegin + self.workflowData.dt_required
 
         ##################################################################
 
@@ -215,28 +175,28 @@ class WorkflowManager():
         print("---------------------------------------------", file=sys.stdout)
         print("---- Enter time loop of the H&CD wrapper ----", file=sys.stdout)
 
-        timenow = self.tbegin
+        timenow = self.workflowData.tbegin
 
-        if self.one_time_slice == 0:
-            nsteps = int((self.tend - self.tbegin) / self.dt_required)
+        if self.workflowData.one_time_slice == 0:
+            nsteps = int((self.workflowData.tend - self.workflowData.tbegin) / self.workflowData.dt_required)
         else:
             nsteps = 1
         if (
-            self.dt_required * nsteps
-            < int((self.tend - self.tbegin) * 10**5) / 10**5
+            self.workflowData.dt_required * nsteps
+            < int((self.workflowData.tend - self.workflowData.tbegin) * 10**5) / 10**5
         ):
             nsteps = nsteps + 1
 
         step = 0
         previous_time = {}
 
-        while timenow < self.tend:
+        while timenow < self.workflowData.tend:
             step += 1
 
             print("---------------------------------------------", file=sys.stdout)
             print("Step = " + str(step) + "/" + str(nsteps), file=sys.stdout)
             print("Time = %5.2f" % timenow, "s", file=sys.stdout)
-            print("dt   = %5.2f" % self.dt_required, "s", file=sys.stdout)
+            print("dt   = %5.2f" % self.workflowData.dt_required, "s", file=sys.stdout)
 
             # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
             self.initializeIDSSlices(
@@ -244,18 +204,17 @@ class WorkflowManager():
                 self.ids_scenario_list,
                 self.inputDb,
                 self.common_bundle,
-                self.process_bundle,
             )
             param_process = self.workflowData.getParamProcess()
             hcd_wf = WorkflowExecutor(
-                self.process_bundle,
-                self.dictionary_of_actors,
+                self.workflowData.process_bundle,
+                self.workflowData.dictionary_of_actors,
                 param_process,
-                self.catdict,
-                self.parallel_dependency,
-                self.algorithms,
-                self.parallel_dependency_list,
-                self.merge_actor_list,
+                self.workflowData.catdict,
+                self.workflowData.parallel_dependency,
+                self.workflowData.algorithms,
+                self.workflowData.parallel_dependency_list,
+                self.workflowData.merge_actor_list,
             )
             err = hcd_wf.execute()
             if err < 0:
@@ -263,7 +222,7 @@ class WorkflowManager():
                 return
 
             process_bundle_out = self.storeIDSOutput(
-                self.common_bundle, self.process_bundle, self.outputDb
+                self.common_bundle, self.workflowData.process_bundle, self.outputDb
             )
 
             for ids in process_bundle_out.keys():
@@ -278,13 +237,13 @@ class WorkflowManager():
             # ------------------------------------------------------------------------------------------
             # PREPARE FOR THE NEXT TIME STEP: COPY OUTPUT IDS IN INPUT OF ACTORS FOR THE NEXT TIME STEP
             # ------------------------------------------------------------------------------------------
-            timenow = timenow * 1.0 + self.dt_required * 1.0
-            for process in self.process_bundle.keys():
+            timenow = timenow * 1.0 + self.workflowData.dt_required * 1.0
+            for process in self.workflowData.process_bundle.keys():
                 if "merge_" not in process:
-                    for ids in self.process_bundle[process]["output"].keys():
+                    for ids in self.workflowData.process_bundle[process]["output"].keys():
                         if (
-                            type(self.process_bundle[process]["input"]) is dict
-                            and ids in self.process_bundle[process]["input"].keys()
+                            type(self.workflowData.process_bundle[process]["input"]) is dict
+                            and ids in self.workflowData.process_bundle[process]["input"].keys()
                         ):
                             print(
                                 "Copy "
@@ -293,23 +252,23 @@ class WorkflowManager():
                                 + process
                                 + " for next time slice"
                             )
-                            self.process_bundle[process]["input"][
+                            self.workflowData.process_bundle[process]["input"][
                                 ids
-                            ] = self.process_bundle[process]["output"][ids]
+                            ] = self.workflowData.process_bundle[process]["output"][ids]
 
     def runSlice(self, idsslices, mdidsslices, timenow):
         # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
         self.initializeExtermalIDSSlices(idsslices, mdidsslices, timenow)
         param_process = self.workflowData.getParamProcess()
         hcd_wf = WorkflowExecutor(
-            self.process_bundle,
-            self.dictionary_of_actors,
+            self.workflowData.process_bundle,
+            self.workflowData.dictionary_of_actors,
             param_process,
-            self.catdict,
-            self.parallel_dependency,
-            self.algorithms,
-            self.parallel_dependency_list,
-            self.merge_actor_list,
+            self.workflowData.catdict,
+            self.workflowData.parallel_dependency,
+            self.workflowData.algorithms,
+            self.workflowData.parallel_dependency_list,
+            self.workflowData.merge_actor_list,
         )
         err = hcd_wf.execute()
         if err < 0:
@@ -357,7 +316,6 @@ class WorkflowManager():
         ids_scenario_list,
         inputDb,
         common_bundle,
-        process_bundle,
     ):
         for ids in ids_scenario_list:
             print("  Get", ids, file=sys.stdout)
@@ -380,12 +338,12 @@ class WorkflowManager():
                 #        except: # Outside LCFS
                 #          phi2d_eq[ir,iz] = 1.
                 #    common_bundle[ids].time_slice[0].profiles_2d[0].phi = phi2d_eq
-                for process in process_bundle.keys():
+                for process in self.workflowData.process_bundle.keys():
                     if (
                         "merge_" not in process
-                        and ids in process_bundle[process]["input"].keys()
+                        and ids in self.workflowData.process_bundle[process]["input"].keys()
                     ):
-                        process_bundle[process]["input"][ids] = common_bundle[ids]
+                        self.workflowData.process_bundle[process]["input"][ids] = common_bundle[ids]
             except:
                 print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
                 print(
@@ -400,9 +358,9 @@ class WorkflowManager():
         for ids in self.machineDescriptionIDSes:
             print("  Get", ids, file=sys.stdout)
             try:
-                for process in self.process_bundle.keys():
-                    if ids in self.process_bundle[process]["input"].keys():
-                        self.process_bundle[process]["input"][ids] = self.md.get_slice(
+                for process in self.workflowData.process_bundle.keys():
+                    if ids in self.workflowData.process_bundle[process]["input"].keys():
+                        self.workflowData.process_bundle[process]["input"][ids] = self.md.get_slice(
                             ids, timenow, 1
                         )
             except:
@@ -420,7 +378,7 @@ class WorkflowManager():
         # ---------------------------------------------------------------------
         time_base = self.workflowData.getTimeBase()
 
-        for process in process_bundle.keys():
+        for process in self.workflowData.process_bundle.keys():
             if time_base is not None:
                 if process in time_base:
                     [tc, it] = find_nearest(
@@ -429,37 +387,37 @@ class WorkflowManager():
                         ),
                         timenow,
                     )
-                    process_bundle[process]["status"] = time_base[process][0][
+                    self.workflowData.process_bundle[process]["status"] = time_base[process][0][
                         "wf_interval"
                     ][0]["status"][0][it]
                 else:
-                    process_bundle[process]["status"] = 1
+                    self.workflowData.process_bundle[process]["status"] = 1
             else:
-                process_bundle[process]["status"] = 1
+                self.workflowData.process_bundle[process]["status"] = 1
 
     def initializeExtermalIDSSlices(self, idsSlices, mdIdsSlices, timenow):
         for idsName, idsData in idsSlices.items():
             print("  Loading slice", idsName, file=sys.stdout)
-            for process in self.process_bundle.keys():
+            for process in self.workflowData.process_bundle.keys():
                 if (
                     "merge_" not in process
-                    and idsName in self.process_bundle[process]["input"].keys()
+                    and idsName in self.workflowData.process_bundle[process]["input"].keys()
                 ):
-                    self.process_bundle[process]["input"][idsName] = idsData
+                    self.workflowData.process_bundle[process]["input"][idsName] = idsData
 
         # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
         for idsName, idsData in mdIdsSlices.items():
             print("  Get", idsName, file=sys.stdout)
-            for process in self.process_bundle.keys():
-                if idsName in self.process_bundle[process]["input"].keys():
-                    self.process_bundle[process]["input"][idsName] = idsData
+            for process in self.workflowData.process_bundle.keys():
+                if idsName in self.workflowData.process_bundle[process]["input"].keys():
+                    self.workflowData.process_bundle[process]["input"][idsName] = idsData
 
         # ---------------------------------------------------------------------
         # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
         # ---------------------------------------------------------------------
         time_base = self.workflowData.getTimeBase()
 
-        for process in self.process_bundle.keys():
+        for process in self.workflowData.process_bundle.keys():
             if time_base is not None:
                 if process in time_base:
                     [tc, it] = find_nearest(
@@ -468,13 +426,13 @@ class WorkflowManager():
                         ),
                         timenow,
                     )
-                    self.process_bundle[process]["status"] = time_base[process][0][
+                    self.workflowData.process_bundle[process]["status"] = time_base[process][0][
                         "wf_interval"
                     ][0]["status"][0][it]
                 else:
-                    self.process_bundle[process]["status"] = 1
+                    self.workflowData.process_bundle[process]["status"] = 1
             else:
-                self.process_bundle[process]["status"] = 1
+                self.workflowData.process_bundle[process]["status"] = 1
 
     def storeIDSOutput(self, common_bundle, process_bundle, outputDb):
         # ------------------------------
@@ -516,7 +474,7 @@ class WorkflowManager():
 
     def finalize(self):
         # FINALIZE ALL ACTORS
-        for actor_name, actor in self.dictionary_of_actors.items():
+        for actor_name, actor in self.workflowData.dictionary_of_actors.items():
             actor.finalize()
 
         print("---------------------------------------------", file=sys.stdout)
