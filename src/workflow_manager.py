@@ -2,33 +2,24 @@ import copy
 import logging
 import os
 import sys
-
 from multiprocessing import Pool
 from time import time
-
 
 import imas
 import numpy as np
 from lxml import etree
-from src.workflow_globals_reader import WorkflowGlobalsReader
-from src.workflow_data import WorkflowData
-from src.workflow_executor import WorkflowExecutor
+from waveform_cooker import add_dynamic
+from wftools.wf_tools import (add_ids_entry_to_dict, bundle_copy,
+                              check_if_code_fulfills_configuration,
+                              clever_algo, create_dict_from_idslist,
+                              create_maindict, create_workflow_param_from_file,
+                              find_nearest, import_actor, read_actor_ids)
+
 from src.workflow_base import WorkflowBase
 from src.workflow_config_reader import WorkflowConfigReader
-from waveform_cooker import add_dynamic
-from wftools.wf_tools import (
-    add_ids_entry_to_dict,
-    bundle_copy,
-    check_if_code_fulfills_configuration,
-    clever_algo,
-    create_dict_from_idslist,
-    create_maindict,
-    create_workflow_param_from_file,
-    find_nearest,
-    import_actor,
-    read_actor_ids,
-)
-
+from src.workflow_data import WorkflowData
+from src.workflow_executor import WorkflowExecutor
+from src.workflow_globals_reader import WorkflowGlobalsReader
 
 log = logging.getLogger()
 log.setLevel(logging.ERROR)
@@ -38,7 +29,7 @@ from tools.stdout_redirector import redirect_stdout, stdout_back
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-class HCDWorkflow(WorkflowBase):
+class WorkflowManager():
     def __init__(self, workflowConfigPath: str):
         # READ WORKFLOW PARAMETERS FROM INPUT XML FILE
         # YAML FILE CONTAINING ALL USEFUL LISTS

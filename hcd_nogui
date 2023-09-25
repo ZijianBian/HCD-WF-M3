@@ -1,12 +1,15 @@
 #!/usr/bin/env python
-import argparse, os, sys, imas
-from src.workflow_dbhelper import WorkflowDbHelper
-from wftools.wf_tools import (
-    create_workflow_param_from_file,
-)
-from src.hcd_workflow_bundle import HCDWorkflow
-from src.workflow_globals_reader import WorkflowGlobalsReader
+import argparse
+import os
+import sys
+
+import imas
 from waveform_cooker import add_dynamic
+from wftools.wf_tools import create_workflow_param_from_file
+
+from src.workflow_dbhelper import WorkflowDbHelper
+from src.workflow_globals_reader import WorkflowGlobalsReader
+from src.workflow_manager import WorkflowManager
 
 # Management of input arguments
 parser = argparse.ArgumentParser(
@@ -80,7 +83,7 @@ mdidsslices = {}
 for ids in inputMds:
     mdidsslices[ids] = machineDb.get_slice(ids, timenow, 1)
 
-hcdWorkflow = HCDWorkflow(config_folder_path)
+hcdWorkflow = WorkflowManager(config_folder_path)
 hcdWorkflow.initialize(inputDb, outputDb, machineDb, inputIds, inputMdsDict)
 
 hcdWorkflow.run()
