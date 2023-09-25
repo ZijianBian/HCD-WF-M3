@@ -5,7 +5,7 @@ import sys
 import imas
 from wftools.wf_tools import create_maindict
 
-from src.global_list_reader import GlobalListReader
+from src.workflow_globals_reader import WorkflowGlobalsReader
 from src.workflow_config_reader import WorkflowConfigReader
 
 
@@ -21,7 +21,7 @@ class WorkflowData:
             + "global_lists.yaml"
         )
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
-        self.globalListReader = GlobalListReader(self.globalList)
+        self.globalListReader = WorkflowGlobalsReader(self.globalList)
 
         self.initializeData()
 

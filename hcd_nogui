@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import argparse, os, sys, imas
-from src.dbhelper import DbHelper
+from src.workflow_dbhelper import WorkflowDbHelper
 from wftools.wf_tools import (
     create_workflow_param_from_file,
 )
 from src.hcd_workflow_bundle import HCDWorkflow
-from src.global_list_reader import GlobalListReader
+from src.workflow_globals_reader import WorkflowGlobalsReader
 from waveform_cooker import add_dynamic
 
 # Management of input arguments
@@ -37,7 +37,7 @@ shot_nr = wf_parameters["shot_nr"][0]
 run_in = wf_parameters["run_in"][0]
 run_out = wf_parameters["run_out"][0]
 
-dbhelper = DbHelper(
+dbhelper = WorkflowDbHelper(
     input_user_or_path,
     input_database,
     output_user_or_path,
@@ -50,7 +50,7 @@ inputDb = dbhelper.getInputDatabase()
 outputDb = dbhelper.getOutputDatabase()
 machineDb = dbhelper.getMachineDatabase()
 
-globallistReader = GlobalListReader(globalListPath)
+globallistReader = WorkflowGlobalsReader(globalListPath)
 inputIds = globallistReader.getIdsScenarioList()
 inputMds = globallistReader.getIdsMdList()
 

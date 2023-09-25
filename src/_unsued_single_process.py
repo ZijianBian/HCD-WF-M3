@@ -2,7 +2,7 @@ import logging
 
 import imas
 
-from src.process_actor import ProcessActor
+from src.Workflow_actor import ProcessActor
 
 logger = logging.getLogger("module")
 

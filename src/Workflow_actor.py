@@ -11,7 +11,7 @@ logger = logging.getLogger("module")
 
 # TODO Make generic process actor using class method which can initialize any actor (iwrap, muscle etc).. keep interface same
 # Current implementation is only iwrap
-class WfActor:
+class WorkflowActor:
     def __init__(self, actorName: str, xmlPath: str, xsdPath: str):
         self.name = actorName
         self.xmlPath = xmlPath
@@ -28,7 +28,7 @@ class WfActor:
 
     @classmethod
     def getObject(cls, actorName, xmlPath: str, xsdPath: str):
-        return WfActor(actorName, xmlPath, xsdPath)
+        return WorkflowActor(actorName, xmlPath, xsdPath)
 
     @classmethod
     def getObject(cls, actorName, xmlDirectory: str):
@@ -51,7 +51,7 @@ class WfActor:
         ):
             print(f"Actor configuration not found for actor name : [{actorName}]")
             return None
-        return WfActor(
+        return WorkflowActor(
             actorName,
             os.path.join(
                 xmlDirectory,
@@ -82,7 +82,7 @@ class WfActor:
 
     def initializeActor(self, actorName: str, xmlPath: str, xsdPath: str):
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
-        if WfActor._import(actorName) != 0:
+        if WorkflowActor._import(actorName) != 0:
             return None
 
         actor = eval(actorName)
@@ -169,7 +169,7 @@ class WfActor:
 
     @staticmethod
     def getActorIDS(actorName: str):
-        err = WfActor._import(actorName)
+        err = WorkflowActor._import(actorName)
         if err == 0:
             actor = eval(actorName)
 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     print(root_path)
-    procesActor = WfActor(
+    procesActor = WorkflowActor(
         "torbeam",
         os.path.join(
             root_path, "data/DT_baseline_example/ECRH/ec_wave_solver/input_torbeam.xml"

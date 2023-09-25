@@ -5,9 +5,9 @@ from wftools.wf_tools import (
     add_ids_entry_to_dict,
     create_workflow_param_from_file,
 )
-from src.dbhelper import DbHelper
-from src.hcd_workflow import HCDWorkflow
-from src.global_list_reader import GlobalListReader
+from src.workflow_dbhelper import WorkflowDbHelper
+from src._unused_hcd_workflow import HCDWorkflow
+from src.workflow_globals_reader import WorkflowGlobalsReader
 
 # Management of input arguments
 parser = argparse.ArgumentParser(
@@ -39,7 +39,7 @@ shot_nr = wf_parameters["shot_nr"][0]
 run_in = wf_parameters["run_in"][0]
 run_out = wf_parameters["run_out"][0]
 
-dbhelper = DbHelper(
+dbhelper = WorkflowDbHelper(
     input_user_or_path,
     input_database,
     output_user_or_path,
@@ -81,7 +81,7 @@ process_bundle["ec_wave_solver"]["status"] = 1
 # print(process_bundle)
 
 
-globallistReader = GlobalListReader(globalListPath)
+globallistReader = WorkflowGlobalsReader(globalListPath)
 
 hcdWorkflowSeparate.readWorkflowConfig(inputworkflow_xml)
 

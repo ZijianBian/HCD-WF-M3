@@ -4,7 +4,6 @@ import os
 import sys
 
 import imas
-from wftools.wf_tools import loadlist
 
 from tools.hcd_tools import is_ec_on, is_ic_on, is_lh_on, is_nbi_on
 from tools.stdout_redirector import redirect_stdout, stdout_back
@@ -146,6 +145,7 @@ class WorkflowExecutor:
                 print("  No LH power for this time slice", file=sys.stdout)
                 self.param_process["lh_wave_solver"] = 0
 
+    #TODO Just use set
     def common_elements(self, list1, list2):
         result = []
         for element in list1:

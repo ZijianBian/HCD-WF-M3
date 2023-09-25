@@ -3,7 +3,7 @@ import os
 import sys
 
 
-class DbHelper:
+class WorkflowDbHelper:
     def __init__(
         self,
         input_user_or_path,

@@ -3,7 +3,7 @@ import yaml
 import sys
 
 
-class GlobalListReader:
+class WorkflowGlobalsReader:
     def __init__(self, globalListPath: str) -> None:
         if not os.path.exists(globalListPath):
             raise "Global List Path doesn't exists"

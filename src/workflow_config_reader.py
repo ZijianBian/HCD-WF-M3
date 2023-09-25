@@ -7,7 +7,7 @@ import numpy as np
 root_path = os.path.dirname(__file__)
 sys.path.append(root_path)
 
-from process_actor import WfActor
+from src.Workflow_actor import WorkflowActor
 
 
 class XmlReader:
@@ -85,7 +85,7 @@ class WorkflowConfigReader(XmlReader):
                             actorConfigPath = os.path.join(
                                 self.workflowDirectory, category.tag, process.tag
                             )
-                            processActor = WfActor.getObject(
+                            processActor = WorkflowActor.getObject(
                                 selectedActor, actorConfigPath
                             )
                             if processActor is not None:
@@ -195,7 +195,7 @@ class WorkflowConfigReader(XmlReader):
                 for process in category:
                     actorsList = process.attrib["list"].split()
                     selectedActor = actorsList[int(process.text) - 1]
-                    result = WfActor.getActorIDS(selectedActor)
+                    result = WorkflowActor.getActorIDS(selectedActor)
 
                     if result is not None:
                         inputIDSList, outputIDSList = result

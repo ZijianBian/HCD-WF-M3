@@ -10,7 +10,7 @@ from time import time
 import imas
 import numpy as np
 from lxml import etree
-from src.global_list_reader import GlobalListReader
+from src.workflow_globals_reader import WorkflowGlobalsReader
 from src.workflow_data import WorkflowData
 from src.workflow_executor import WorkflowExecutor
 from src.workflow_base import WorkflowBase
