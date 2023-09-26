@@ -258,7 +258,7 @@ class WorkflowManager():
 
     def runSlice(self, idsslices, mdidsslices, timenow):
         # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
-        self.initializeExtermalIDSSlices(idsslices, mdidsslices, timenow)
+        self.setIDSes(idsslices, mdidsslices, timenow)
         param_process = self.workflowData.getParamProcess()
         hcd_wf = WorkflowExecutor(
             self.workflowData.process_bundle,
@@ -275,6 +275,7 @@ class WorkflowManager():
             print("  Error in H&CD workflow.", file=sys.stderr)
             return
 
+        return self.getIDSes()
             # process_bundle_out = self.storeIDSOutput(
             #     self.common_bundle, self.process_bundle, self.outputDb
             # )
@@ -395,7 +396,7 @@ class WorkflowManager():
             else:
                 self.workflowData.process_bundle[process]["status"] = 1
 
-    def initializeExtermalIDSSlices(self, idsSlices, mdIdsSlices, timenow):
+    def setIDSes(self, idsSlices, mdIdsSlices, timenow):
         for idsName, idsData in idsSlices.items():
             print("  Loading slice", idsName, file=sys.stdout)
             for process in self.workflowData.process_bundle.keys():
@@ -472,6 +473,26 @@ class WorkflowManager():
 
         return process_bundle_out
 
+    def getIDSes(self):
+        # ------------------------------
+        # COMMON BUNDLE TO SAVE TO DISK
+        # ------------------------------
+        idsOut = {}
+
+        # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
+        for process in self.workflowData.process_bundle.keys():
+            if "merge_" in process:
+                key, value = list(self.workflowData.process_bundle[process]["output"].items())[0]
+                idsOut[key] = value
+
+        # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
+        for process in self.workflowData.process_bundle.keys():
+            for key, value in self.workflowData.process_bundle[process]["output"].items():
+                if key not in idsOut.keys():
+                    idsOut[key] = value
+
+        return idsOut
+    
     def finalize(self):
         # FINALIZE ALL ACTORS
         for actor_name, actor in self.workflowData.dictionary_of_actors.items():

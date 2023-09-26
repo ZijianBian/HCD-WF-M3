@@ -54,9 +54,8 @@ outputDb = dbhelper.getOutputDatabase()
 machineDb = dbhelper.getMachineDatabase()
 
 globallistReader = WorkflowGlobalsReader(globalListPath)
-inputIds = globallistReader.getIdsScenarioList()
-inputMds = globallistReader.getIdsMdList()
-
+inputIds = ["core_profiles", "equilibrium"]
+inputMds = ["nbi", "ic_antennas", "ec_launchers", "lh_antennas","wall"]
 
 inputMdsDict = {}
 for idsName in inputMds:
@@ -85,8 +84,19 @@ for ids in inputMds:
 
 hcdWorkflow = WorkflowManager(config_folder_path)
 hcdWorkflow.initializeSlice()
-hcdWorkflow.runSlice(idsslices, mdidsslices, timenow)
+idsData = hcdWorkflow.runSlice(idsslices, mdidsslices, timenow)
+
+print("IDS Slices returned")
+print(idsData.keys())
 hcdWorkflow.finalize()
 
 inputDb.close()
 outputDb.close()
+machineDb.close()
+
+
+# manadatory idses, optional idses (static + dynamic)
+# initialize ids
+# workflow wrapper with gui
+# workflow parameters code parameters -  workflow wrapper
+# 
