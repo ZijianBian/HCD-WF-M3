@@ -9,7 +9,7 @@ from wftools.wf_tools import create_workflow_param_from_file
 
 from src.workflow_dbhelper import WorkflowDbHelper
 from src.workflow_globals_reader import WorkflowGlobalsReader
-from src.workflow_manager import WorkflowManager
+from src.hcd_workflow import HCDWorkflow
 
 # Management of input arguments
 parser = argparse.ArgumentParser(
@@ -54,8 +54,7 @@ outputDb = dbhelper.getOutputDatabase()
 machineDb = dbhelper.getMachineDatabase()
 
 globallistReader = WorkflowGlobalsReader(globalListPath)
-inputIds = ["core_profiles", "equilibrium"]
-inputMds = ["nbi", "ic_antennas", "ec_launchers", "lh_antennas","wall"]
+inputMds = ["nbi", "ic_antennas", "ec_launchers", "lh_antennas", "wall"]
 
 inputMdsDict = {}
 for idsName in inputMds:
@@ -74,17 +73,27 @@ for idsObject in inputMdsDict.values():
 timeArray = dbhelper.getTimeArray(inputDb)
 
 timenow = 320.00
-idsslices = {}
-for ids in inputIds:
-    idsslices[ids] = inputDb.get_slice(ids, timenow, 1)
+equilibrium = inputDb.get_slice("equilibrium", timenow, 1)
+core_profiles = inputDb.get_slice("core_profiles", timenow, 1)
 
-mdidsslices = {}
-for ids in inputMds:
-    mdidsslices[ids] = machineDb.get_slice(ids, timenow, 1)
+nbi = machineDb.get_slice("nbi", timenow, 1)
+ic_antennas = machineDb.get_slice("ic_antennas", timenow, 1)
+ec_launchers = machineDb.get_slice("ec_launchers", timenow, 1)
+lh_antennas = machineDb.get_slice("lh_antennas", timenow, 1)
+wall = machineDb.get_slice("wall", timenow, 1)
 
-hcdWorkflow = WorkflowManager(config_folder_path)
-hcdWorkflow.initializeSlice()
-idsData = hcdWorkflow.runSlice(idsslices, mdidsslices, timenow)
+hcdWorkflow = HCDWorkflow()
+hcdWorkflow.initialize(config_folder_path)
+idsData = hcdWorkflow.run(
+    equilibrium,
+    core_profiles,
+    timenow,
+    nbi=nbi,
+    ic_antennas=ic_antennas,
+    ec_launchers=ec_launchers,
+    lh_antennas=lh_antennas,
+    wall=wall,
+)
 
 print("IDS Slices returned")
 print(idsData.keys())
@@ -99,4 +108,4 @@ machineDb.close()
 # initialize ids
 # workflow wrapper with gui
 # workflow parameters code parameters -  workflow wrapper
-# 
+#

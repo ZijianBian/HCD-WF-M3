@@ -9,7 +9,7 @@ from wftools.wf_tools import create_workflow_param_from_file
 
 from src.workflow_dbhelper import WorkflowDbHelper
 from src.workflow_globals_reader import WorkflowGlobalsReader
-from src.workflow_manager import WorkflowManager
+from src.workflow_wrapper import WorkflowWrapper
 
 # Management of input arguments
 parser = argparse.ArgumentParser(
@@ -83,7 +83,7 @@ mdidsslices = {}
 for ids in inputMds:
     mdidsslices[ids] = machineDb.get_slice(ids, timenow, 1)
 
-hcdWorkflow = WorkflowManager(config_folder_path)
+hcdWorkflow = WorkflowWrapper(config_folder_path)
 hcdWorkflow.initialize(inputDb, outputDb, machineDb, inputIds, inputMdsDict)
 
 hcdWorkflow.run()
