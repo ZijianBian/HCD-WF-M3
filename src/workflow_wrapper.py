@@ -173,13 +173,9 @@ class WorkflowWrapper:
                 equilibrium=idsSlices["equilibrium"],
                 core_profiles=idsSlices["core_profiles"],
                 timenow=timenow,
-                **nonmandatoryIDSes
-                # # nbi=idsSlices["nbi"],
-                # # ic_antennas=idsSlices["ic_antennas"],
-                # ec_launchers=idsSlices["ec_launchers"],
-                # # lh_antennas=idsSlices["lh_antennas"],
-                # # wall=idsSlices["wall"],
+                **nonmandatoryIDSes,
             )
+            # self.workflowObject.finalize()
 
             idsOut = {}
             for idsName, idsData in idsSlices.items():

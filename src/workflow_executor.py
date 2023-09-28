@@ -145,7 +145,7 @@ class WorkflowExecutor:
                 print("  No LH power for this time slice", file=sys.stdout)
                 self.param_process["lh_wave_solver"] = 0
 
-    #TODO Just use set
+    # TODO Just use set
     def common_elements(self, list1, list2):
         result = []
         for element in list1:
@@ -418,6 +418,8 @@ class WorkflowExecutor:
         for i in codeinfo["input"]:
             inputargs.append(bundle[i])
 
+        # TODO assign callbacks for status
+        # TODO initialize finalize methods
         results = actor(*inputargs)
 
         # Re-direct the logfile for this specific actor

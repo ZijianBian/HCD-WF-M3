@@ -124,10 +124,6 @@ class HCDWorkflow(WorkflowBase):
         for actor_name, actor in self.workflowData.dictionary_of_actors.items():
             actor.finalize()
 
-        print("---------------------------------------------", file=sys.stdout)
-        print("End of H&CD workflow.", file=sys.stdout)
-        print("---------------------", file=sys.stdout)
-
     def get_state(self) -> str:
         pass
 
