@@ -56,19 +56,20 @@ machineDb = dbhelper.getMachineDatabase()
 globallistReader = WorkflowGlobalsReader(globalListPath)
 inputMds = ["nbi", "ic_antennas", "ec_launchers", "lh_antennas", "wall"]
 
-inputMdsDict = {}
+# Prepare Memory DB
+# Check if Machine description is exists and write to memory db
 for idsName in inputMds:
-    inputMdsDict[idsName] = inputDb.get(idsName)
+    idsObject = inputDb.get(idsName)
+    machineDb.put(idsObject)
 
+# Overwrite with configured waveform if it exists  to memory db
 waveform_presets = globallistReader.getWaveformPresetsList()
-for idsObject in inputMdsDict.values():
-    # Overwrite with configured waveform if it exists
-    for filename in os.listdir(config_folder_path):
-        filePath = os.path.join(config_folder_path, filename)
-        if filePath.endswith("waveforms.yaml"):
-            if os.path.exists(filePath):
-                idsObject = add_dynamic(filePath)
-            machineDb.put(idsObject)
+for filename in os.listdir(config_folder_path):
+    filePath = os.path.join(config_folder_path, filename)
+    if filePath.endswith("waveforms.yaml"):
+        if os.path.exists(filePath):
+            idsObject = add_dynamic(filePath)
+        machineDb.put(idsObject)
 
 timeArray = dbhelper.getTimeArray(inputDb)
 

@@ -35,13 +35,13 @@ class HCDWorkflow(WorkflowBase):
             raise RuntimeError(message)
 
     def run(self, equilibrium, core_profiles, timenow, **kwargs):
+        self.check_is_initialized()
         # print(kwargs)
         inputIDSes = {
             "equilibrium": equilibrium,
             "core_profiles": core_profiles,
         }
         for key, value in kwargs.items():
-            print(key)
             inputIDSes[key] = value
 
         self._setIDSes(inputIDSes)
@@ -66,7 +66,6 @@ class HCDWorkflow(WorkflowBase):
 
     def _setIDSes(self, idsSlices):
         for idsName, idsData in idsSlices.items():
-            print("  Loading slice", idsName, file=sys.stdout)
             for process in self.workflowData.process_bundle.keys():
                 if (
                     "merge_" not in process

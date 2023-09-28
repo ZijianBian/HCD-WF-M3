@@ -56,39 +56,38 @@ machineDb = dbhelper.getMachineDatabase()
 globallistReader = WorkflowGlobalsReader(globalListPath)
 inputIds = globallistReader.getIdsScenarioList()
 inputMds = globallistReader.getIdsMdList()
+waveform_presets = globallistReader.getWaveformPresetsList()
+
+
+mdCounter = 0
 
 
 inputMdsDict = {}
-for idsName in inputMds:
-    inputMdsDict[idsName] = inputDb.get(idsName)
+
 
 waveform_presets = globallistReader.getWaveformPresetsList()
-for idsObject in inputMdsDict.values():
-    # Overwrite with configured waveform if it exists
-    for filename in os.listdir(config_folder_path):
-        filePath = os.path.join(config_folder_path, filename)
-        if filePath.endswith("waveforms.yaml"):
-            if os.path.exists(filePath):
-                idsObject = add_dynamic(filePath)
-            machineDb.put(idsObject)
+# Prepare Memory DB
+# Check if Machine description is exists and write to memory db
+for idsName in inputMds:
+    idsObject = inputDb.get(idsName)
+    machineDb.put(idsObject)
+
+# Overwrite with configured waveform if it exists
+waveform_presets = globallistReader.getWaveformPresetsList()
+for filename in os.listdir(config_folder_path):
+    filePath = os.path.join(config_folder_path, filename)
+    if filePath.endswith("waveforms.yaml"):
+        if os.path.exists(filePath):
+            idsObject = add_dynamic(filePath)
+        machineDb.put(idsObject)
 
 timeArray = dbhelper.getTimeArray(inputDb)
 
-timenow = 320.00
-idsslices = {}
-for ids in inputIds:
-    idsslices[ids] = inputDb.get_slice(ids, timenow, 1)
+workflowWrapper = WorkflowWrapper(config_folder_path)
+workflowWrapper.initialize(inputDb, outputDb, machineDb, inputIds, inputMds)
 
-mdidsslices = {}
-for ids in inputMds:
-    mdidsslices[ids] = machineDb.get_slice(ids, timenow, 1)
-
-hcdWorkflow = WorkflowWrapper(config_folder_path)
-hcdWorkflow.initialize(inputDb, outputDb, machineDb, inputIds, inputMdsDict)
-
-hcdWorkflow.run()
-# hcdWorkflow.runSlice(idsslices, mdidsslices, timenow)
-hcdWorkflow.finalize()
+workflowWrapper.run()
 
 inputDb.close()
 outputDb.close()
+machineDb.close()
