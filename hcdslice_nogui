@@ -96,8 +96,6 @@ idsData = hcdWorkflow.run(
     wall=wall,
 )
 
-print("IDS Slices returned")
-print(idsData.keys())
 hcdWorkflow.finalize()
 
 inputDb.close()

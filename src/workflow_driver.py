@@ -1,19 +1,8 @@
-import copy
 import logging
 import os
 import sys
-from multiprocessing import Pool
-from time import time
 
-import imas
-import numpy as np
-from lxml import etree
 from src.hcd_workflow import HCDWorkflow
-from waveform_cooker import add_dynamic
-from wftools.wf_tools import (
-    add_ids_entry_to_dict,
-    find_nearest,
-)
 
 
 log = logging.getLogger()
@@ -23,7 +12,7 @@ log.setLevel(logging.ERROR)
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-class WorkflowWrapper:
+class WorkflowDriver:
     def __init__(self, workflowConfigPath: str):
         self.workflowObject = HCDWorkflow()
         self.workflowObject.initialize(workflowConfigPath)

@@ -5,7 +5,7 @@ from wftools.wf_tools import create_workflow_param_from_file
 
 from src.workflow_dbhelper import WorkflowDbHelper
 from src.workflow_globals_reader import WorkflowGlobalsReader
-from src.workflow_wrapper import WorkflowWrapper
+from src.workflow_driver import WorkflowDriver
 
 
 def wf_wrapper(par_path):
@@ -61,7 +61,7 @@ def wf_wrapper(par_path):
                 idsObject = add_dynamic(filePath)
             machineDb.put(idsObject)
 
-    workflowWrapper = WorkflowWrapper(config_folder_path)
+    workflowWrapper = WorkflowDriver(config_folder_path)
     workflowWrapper.initialize(inputDb, outputDb, machineDb, inputIds, inputMds)
 
     workflowWrapper.executeTimeloop()
