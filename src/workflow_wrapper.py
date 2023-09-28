@@ -34,20 +34,11 @@ class WorkflowWrapper:
         self.outputDb = outputdb
         self.md = machineDb
         self.inputMds = inputMds
+        self.inputIds = inputIds
 
-        # DEFINE LIST OF SELECTED ACTORS AND INVOLVED IDSS
-        # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
-        # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
-
-        self.ids_scenario_list = inputIds
-
-        self.common_bundle = {}
-        add_ids_entry_to_dict(self.common_bundle, self.ids_scenario_list)
-
-        # IMAS DB VERSION
-        version = os.getenv("IMAS_VERSION")[0]
-
-    def run(self, one_time_slice=None, tbegin=None, tend=None, dt_required=None):
+    def executeTimeloop(
+        self, one_time_slice=None, tbegin=None, tend=None, dt_required=None
+    ):
         if one_time_slice is not None:
             self.workflowObject.workflowData.one_time_slice = one_time_slice
         if tbegin is not None:
@@ -172,32 +163,30 @@ class WorkflowWrapper:
                 file=sys.stdout,
             )
 
-            # READ ALL INPUT IDSS FROM THE SCENARIO FOR THE CURRENT TIME SLICE
-            # self.initializeIDSSlices(
-            #     timenow,
-            #     self.ids_scenario_list,
-            #     self.inputDb,
-            #     self.common_bundle,
-            # )
-            idsSlices = self.getIDSSlices(
-                timenow, self.ids_scenario_list, self.inputDb, self.common_bundle
-            )
+            idsSlices = self.getIDSSlices(timenow)
+            nonmandatoryIDSes = {
+                k: v
+                for k, v in idsSlices.items()
+                if k not in ["equilibrium", "core_profiles"]
+            }
             idsData = self.workflowObject.run(
                 equilibrium=idsSlices["equilibrium"],
                 core_profiles=idsSlices["core_profiles"],
                 timenow=timenow,
-                # nbi=idsSlices["nbi"],
-                # ic_antennas=idsSlices["ic_antennas"],
-                ec_launchers=idsSlices["ec_launchers"],
-                # lh_antennas=idsSlices["lh_antennas"],
-                # wall=idsSlices["wall"],
+                **nonmandatoryIDSes
+                # # nbi=idsSlices["nbi"],
+                # # ic_antennas=idsSlices["ic_antennas"],
+                # ec_launchers=idsSlices["ec_launchers"],
+                # # lh_antennas=idsSlices["lh_antennas"],
+                # # wall=idsSlices["wall"],
             )
 
-            process_bundle_out = self.storeIDSOutput(
-                self.common_bundle,
-                self.workflowObject.workflowData.process_bundle,
-                self.outputDb,
-            )
+            idsOut = {}
+            for idsName, idsData in idsSlices.items():
+                if idsName not in self.inputMds:
+                    idsOut[idsName] = idsData
+
+            process_bundle_out = self.storeIDSSlices(idsOut)
 
             for ids in process_bundle_out.keys():
                 if (
@@ -246,38 +235,14 @@ class WorkflowWrapper:
                                 ids
                             ]
 
-    def getIDSSlices(
-        self,
-        timenow,
-        ids_scenario_list,
-        inputDb,
-        common_bundle,
-    ):
+    def getIDSSlices(self, timenow):
         idsSlices = {}
-        for ids in ids_scenario_list:
+        for ids in self.inputIds:
             print("  Get", ids, file=sys.stdout)
             try:
-                common_bundle[ids] = inputDb.get_slice(ids, timenow, 1)
-                idsSlices[ids] = inputDb.get_slice(ids, timenow, 1)
-                # if common_bundle[ids] == 'equilibrium': # when equilibrium misses phi(r,z)
-                #  if len(common_bundle[ids].time_slice[0].profiles_2d[0].phi)==0:
-                #    print('   --- Interpolate missing phi(R,Z) ---')
-                #    r1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim1
-                #    z1d_eq   = common_bundle[ids].time_slice[0].profiles_2d[0].grid.dim2
-                #    rho1d_eq = common_bundle[ids].time_slice[0].profiles_1d.rho_tor_norm
-                #    psi1d_eq = common_bundle[ids].time_slice[0].profiles_1d.psi
-                #    psi2d_eq = common_bundle[ids].time_slice[0].profiles_2d[0].psi
-                #    rho_from_psi = interpolate.interp1d(psi1d_eq,rho1d_eq,kind='linear')
-                #    phi2d_eq = np.zeros(np.shape(psi2d_eq))
-                #    for ir in range(len(r1d_eq)):
-                #      for iz in range(len(z1d_eq)):
-                #        try: # Inside LCFS
-                #          phi2d_eq[ir,iz] = rho_from_psi(psi2d_eq[ir,iz])
-                #        except: # Outside LCFS
-                #          phi2d_eq[ir,iz] = 1.
-                #    common_bundle[ids].time_slice[0].profiles_2d[0].phi = phi2d_eq
-            except:
-                print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+                idsSlices[ids] = self.inputDb.get_slice(ids, timenow, 1)
+            except Exception:
+                print(f"  ERROR while reading the {ids} IDS:", file=sys.stderr)
                 print(
                     "  ----> Check the version of the Data Dictionary between the"
                     + " input and the loaded IMAS version.",
@@ -288,11 +253,11 @@ class WorkflowWrapper:
 
         # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
         for ids in self.inputMds:
-            print("  Get", ids, file=sys.stdout)
+            # print("  Get", ids, file=sys.stdout)
             try:
                 idsSlices[ids] = self.md.get_slice(ids, timenow, 1)
-            except:
-                print("  ERROR while reading the " + ids + " IDS:", file=sys.stderr)
+            except Exception:
+                print(f"  ERROR while reading the {ids} IDS:", file=sys.stderr)
                 print(
                     "  ----> Check the version of the Data Dictionary between the"
                     + " input and the loaded IMAS version.",
@@ -301,124 +266,15 @@ class WorkflowWrapper:
                 print("  ----> Aborted.", file=sys.stderr)
                 return
         return idsSlices
-        # ---------------------------------------------------------------------
-        # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
-        # ---------------------------------------------------------------------
-        # time_base = self.workflowData.getTimeBase()
 
-        # for process in self.workflowData.process_bundle.keys():
-        #     if time_base is not None:
-        #         if process in time_base:
-        #             [tc, it] = find_nearest(
-        #                 np.array(
-        #                     time_base[process][0]["wf_interval"][0]["time_array"][0]
-        #                 ),
-        #                 timenow,
-        #             )
-        #             self.workflowData.process_bundle[process]["status"] = time_base[
-        #                 process
-        #             ][0]["wf_interval"][0]["status"][0][it]
-        #         else:
-        #             self.workflowData.process_bundle[process]["status"] = 1
-        #     else:
-        #         self.workflowData.process_bundle[process]["status"] = 1
+    def storeIDSSlices(self, inputSlices):
+        # Store input IDSes to disk
+        for idsName, idsData in inputSlices.items():
+            if idsData.ids_properties.homogeneous_time >= 0:
+                self.outputDb.put_slice(idsData)
 
-    def setIDSes(self, idsSlices, mdIdsSlices, timenow):
-        for idsName, idsData in idsSlices.items():
-            print("  Loading slice", idsName, file=sys.stdout)
-            for process in self.workflowObject.workflowData.process_bundle.keys():
-                if (
-                    "merge_" not in process
-                    and idsName
-                    in self.workflowObject.workflowData.process_bundle[process][
-                        "input"
-                    ].keys()
-                ):
-                    self.workflowObject.workflowData.process_bundle[process]["input"][
-                        idsName
-                    ] = idsData
-
-        # READ ALL MACHINE DESCRITPTION IDSS FOR THE CURRENT TIME SLICE
-        for idsName, idsData in mdIdsSlices.items():
-            print("  Get", idsName, file=sys.stdout)
-            for process in self.workflowObject.workflowData.process_bundle.keys():
-                if (
-                    idsName
-                    in self.workflowObject.workflowData.process_bundle[process][
-                        "input"
-                    ].keys()
-                ):
-                    self.workflowObject.workflowData.process_bundle[process]["input"][
-                        idsName
-                    ] = idsData
-
-        # ---------------------------------------------------------------------
-        # FIND OUT WHETHER EACH PROCESS IS ACTIVATED OR NOT FOR THIS TIME SLICE
-        # ---------------------------------------------------------------------
-        time_base = self.workflowObject.workflowData.getTimeBase()
-
-        for process in self.workflowObject.workflowData.process_bundle.keys():
-            if time_base is not None:
-                if process in time_base:
-                    [tc, it] = find_nearest(
-                        np.array(
-                            time_base[process][0]["wf_interval"][0]["time_array"][0]
-                        ),
-                        timenow,
-                    )
-                    self.workflowObject.workflowData.process_bundle[process][
-                        "status"
-                    ] = time_base[process][0]["wf_interval"][0]["status"][0][it]
-                else:
-                    self.workflowObject.workflowData.process_bundle[process][
-                        "status"
-                    ] = 1
-            else:
-                self.workflowObject.workflowData.process_bundle[process]["status"] = 1
-
-    def storeIDSOutput(self, common_bundle, process_bundle, outputDb):
-        # ------------------------------
-        # COMMON BUNDLE TO SAVE TO DISK
-        # ------------------------------
-        for ids in common_bundle.keys():
-            if common_bundle[ids].ids_properties.homogeneous_time >= 0:
-                outputDb.put_slice(common_bundle[ids])
-
-        # ------------------------------
-        # OUTPUT BUNDLE TO SAVE TO DISK
-        # ------------------------------
+        # Save output IDSes to disk
         process_bundle_out = {}
-
-        # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
-        for process in process_bundle.keys():
-            if "merge_" in process:
-                key, value = list(process_bundle[process]["output"].items())[0]
-                process_bundle_out[key] = value
-
-        # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
-        for process in process_bundle.keys():
-            for key, value in process_bundle[process]["output"].items():
-                if key not in process_bundle_out.keys():
-                    process_bundle_out[key] = value
-
-        # SAVE TO DISK
-        for ids in process_bundle_out.keys():
-            if (
-                len(process_bundle_out[ids].time) > 0
-            ):  # Empty if process deactivated by an is_xx_on function
-                if (
-                    process_bundle_out[ids].time[0] > 0
-                    or "merge" in process_bundle_out[ids].code.name
-                ):
-                    outputDb.put_slice(process_bundle_out[ids])
-
-        return process_bundle_out
-
-    def getIDSes(self):
-        # ------------------------------
-        # COMMON BUNDLE TO SAVE TO DISK
-        # ------------------------------
-        idsOut = {}
 
         # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
         for process in self.workflowObject.workflowData.process_bundle.keys():
@@ -428,14 +284,24 @@ class WorkflowWrapper:
                         "output"
                     ].items()
                 )[0]
-                idsOut[key] = value
+                process_bundle_out[key] = value
 
         # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
         for process in self.workflowObject.workflowData.process_bundle.keys():
             for key, value in self.workflowObject.workflowData.process_bundle[process][
                 "output"
             ].items():
-                if key not in idsOut.keys():
-                    idsOut[key] = value
+                if key not in process_bundle_out.keys():
+                    process_bundle_out[key] = value
 
-        return idsOut
+        # SAVE TO DISK
+        for ids in process_bundle_out:
+            if (
+                len(process_bundle_out[ids].time) > 0
+            ):  # Empty if process deactivated by an is_xx_on function
+                if (
+                    process_bundle_out[ids].time[0] > 0
+                    or "merge" in process_bundle_out[ids].code.name
+                ):
+                    self.outputDb.put_slice(process_bundle_out[ids])
+        return process_bundle_out

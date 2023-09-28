@@ -35,8 +35,7 @@ class HCDWorkflow(WorkflowBase):
             raise RuntimeError(message)
 
     def run(self, equilibrium, core_profiles, timenow, **kwargs):
-        self.check_is_initialized()
-        # print(kwargs)
+        # self.check_is_initialized()
         inputIDSes = {
             "equilibrium": equilibrium,
             "core_profiles": core_profiles,

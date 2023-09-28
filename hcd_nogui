@@ -58,13 +58,6 @@ inputIds = globallistReader.getIdsScenarioList()
 inputMds = globallistReader.getIdsMdList()
 waveform_presets = globallistReader.getWaveformPresetsList()
 
-
-mdCounter = 0
-
-
-inputMdsDict = {}
-
-
 waveform_presets = globallistReader.getWaveformPresetsList()
 # Prepare Memory DB
 # Check if Machine description is exists and write to memory db
@@ -86,7 +79,7 @@ timeArray = dbhelper.getTimeArray(inputDb)
 workflowWrapper = WorkflowWrapper(config_folder_path)
 workflowWrapper.initialize(inputDb, outputDb, machineDb, inputIds, inputMds)
 
-workflowWrapper.run()
+workflowWrapper.executeTimeloop()
 
 inputDb.close()
 outputDb.close()
