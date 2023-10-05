@@ -34,7 +34,7 @@ class HCDWorkflow(WorkflowBase):
             message = "Workflow is not initialized. Initialize workflow by calling workflow.initialize() method"
             raise RuntimeError(message)
 
-    def run(self, equilibrium, core_profiles, timenow, **kwargs):
+    def run(self, equilibrium, core_profiles, **kwargs):
         # self.check_is_initialized()
         inputIDSes = {
             "equilibrium": equilibrium,
@@ -44,7 +44,6 @@ class HCDWorkflow(WorkflowBase):
             inputIDSes[key] = value
 
         self._setIDSes(inputIDSes)
-        self._updateProcesses(timenow)
         param_process = self.workflowData.getParamProcess()
         hcd_wf = WorkflowExecutor(
             self.workflowData.process_bundle,

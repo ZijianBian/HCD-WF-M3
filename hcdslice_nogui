@@ -85,10 +85,11 @@ wall = machineDb.get_slice("wall", timenow, 1)
 
 hcdWorkflow = HCDWorkflow()
 hcdWorkflow.initialize(config_folder_path)
+# TODO Find way to set workflow IDS, It requires time to update
+hcdWorkflow._updateProcesses(timenow)
 idsData = hcdWorkflow.run(
     equilibrium,
     core_profiles,
-    timenow,
     nbi=nbi,
     ic_antennas=ic_antennas,
     ec_launchers=ec_launchers,

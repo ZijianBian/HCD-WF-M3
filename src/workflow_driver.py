@@ -158,10 +158,11 @@ class WorkflowDriver:
                 for k, v in idsSlices.items()
                 if k not in ["equilibrium", "core_profiles"]
             }
+            # TODO Find way to set workflow IDS, It requires time to update
+            self.workflowObject._updateProcesses(timenow)
             idsData = self.workflowObject.run(
                 equilibrium=idsSlices["equilibrium"],
                 core_profiles=idsSlices["core_profiles"],
-                timenow=timenow,
                 **nonmandatoryIDSes,
             )
             # self.workflowObject.finalize()
