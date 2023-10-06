@@ -53,7 +53,9 @@ class WorkflowData:
 
     def initializeData(self):
         self.dictionary_of_actors = self.workflowConfig.getAllActors()
-        self.code_selection = self.workflowConfig.getAllProcesses()
+
+        allProcesses = self.workflowConfig.getAllProcesses()
+        self.code_selection = {k: v.name for (k, v) in allProcesses.items()}
         self.process_bundle = self.workflowConfig.getProcessBundle()
         self.workflowParameters = self.workflowConfig.getWorkflowParameters()
         self.dt_required = self.workflowParameters["dt_required"]
@@ -80,14 +82,12 @@ class WorkflowData:
 
         for process in self.process_bundle.keys():
             if "workflow" in self.process_bundle[process]["input"].keys():
-                print(workflow.time_loop.component[0].name)
-                if process in self.dictionary_of_actors.keys():
-                    workflow.time_loop.component[0].name = self.dictionary_of_actors[
-                        process
-                    ].upper()
-                    self.process_bundle[process]["input"]["workflow"] = copy.deepcopy(
-                        workflow
-                    )
+                workflow.time_loop.component[0].name = self.code_selection[
+                    process
+                ].upper()
+                self.process_bundle[process]["input"]["workflow"] = copy.deepcopy(
+                    workflow
+                )
 
     # TODO Refactor this
     def validatePrerquisitesOfCodes(self):
