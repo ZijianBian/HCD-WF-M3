@@ -3,7 +3,6 @@ import os
 import sys
 
 import imas
-from wftools.wf_tools import create_maindict
 
 from src.workflow_globals_reader import WorkflowGlobalsReader
 from src.workflow_config_reader import WorkflowConfigReader
@@ -12,9 +11,7 @@ from src.workflow_config_reader import WorkflowConfigReader
 # TODO Separate static and runtime part of the data
 class WorkflowData:
     def __init__(self, workflowConfig) -> None:
-        # TODO self.catdict method prepared in the WorkflowConfigReader class has some issues using below method temporarily
         workflowConfig = os.path.join(workflowConfig, "input_workflow.xml")
-        _, _, _, _, self.catdict = create_maindict(workflowConfig, 0)
         self.globalList = (
             os.path.dirname(os.path.abspath(__file__))
             + "/../global_configuration/"
@@ -22,7 +19,7 @@ class WorkflowData:
         )
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
         self.globalListReader = WorkflowGlobalsReader(self.globalList)
-
+        self.catdict = self.workflowConfig.getCategories()
         self.initializeData()
 
         self.validate()

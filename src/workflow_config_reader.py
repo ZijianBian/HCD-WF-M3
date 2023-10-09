@@ -88,6 +88,7 @@ class WorkflowConfigReader(XmlReader):
                             processActor = WorkflowActor.getObject(
                                 selectedActor, actorConfigPath
                             )
+
                             if processActor is not None:
                                 processDict[process.tag] = processActor
                         else:
@@ -150,19 +151,19 @@ class WorkflowConfigReader(XmlReader):
         if self.workflow is None:
             return None
         categoryDict = {}
-        for headProcess, Categories in self.workflow.items():
+        for _, Categories in self.workflow.items():
             for category, processes in Categories.items():
-                actorList = []
                 for process, actor in processes.items():
-                    actorList.append(
+                    actorList = [
                         {
                             "name": actor.name,
                             "input": actor.inputIDSList,
                             "output": actor.outputIDSList,
                             "category": category,
                         }
-                    )
-                    # Prepend empty_* code
+                    ]
+                    # # Prepend empty_* code
+                    # # TODO In original version Why do we need to check last actor output idses always?
                     if actor.outputIDSList == []:
                         actor.outputIDSList.append("core_profiles")
                     actorList.insert(
@@ -174,7 +175,8 @@ class WorkflowConfigReader(XmlReader):
                             "category": category,
                         },
                     )
-                categoryDict[process] = actorList
+                    categoryDict[process] = actorList
+
         return categoryDict
 
     def getParamProcess(self):
@@ -191,35 +193,47 @@ class WorkflowConfigReader(XmlReader):
         categoryDict = {}
         for mainKey in actorSelection:
             for category in mainKey:
-                actorList = []
                 for process in category:
-                    actorsList = process.attrib["list"].split()
-                    selectedActor = actorsList[int(process.text) - 1]
-                    result = WorkflowActor.getActorIDS(selectedActor)
+                    actorList = []
+                    actors = process.attrib["list"].split()
+                    outputIDSList = []
+                    for actor in actors:
+                        # selectedActor = actorsList[int(process.text) - 1]
+                        result = WorkflowActor.getActorIDS(actor)
 
-                    if result is not None:
-                        inputIDSList, outputIDSList = result
-                        actorList.append(
-                            {
-                                "name": selectedActor,
-                                "input": inputIDSList,
-                                "output": outputIDSList,
-                                "category": category.tag,
-                            }
-                        )
-                        # Prepend empty_* code
-                        if outputIDSList == []:
-                            outputIDSList.append("core_profiles")
-                        actorList.insert(
-                            0,
-                            {
-                                "name": f"empty_{outputIDSList[0]}",
-                                "input": ["core_profiles"],
-                                "output": [outputIDSList[0]],
-                                "category": category.tag,
-                            },
-                        )
-                categoryDict[process.tag] = actorList
+                        if result is not None:
+                            inputIDSList, outputIDSList = result
+                            actorList.append(
+                                {
+                                    "name": actor,
+                                    "input": inputIDSList,
+                                    "output": outputIDSList,
+                                    "category": category.tag,
+                                }
+                            )
+                            outputIDSList = outputIDSList
+                        else:
+                            actorList.append(
+                                {
+                                    "name": actor,
+                                    "input": [],
+                                    "output": ["core_profiles"],
+                                    "category": category.tag,
+                                }
+                            )
+                    # Prepend empty_* code
+                    if outputIDSList == []:
+                        outputIDSList.append("core_profiles")
+                    actorList.insert(
+                        0,
+                        {
+                            "name": f"empty_{outputIDSList[0]}",
+                            "input": ["core_profiles"],
+                            "output": [outputIDSList[0]],
+                            "category": category.tag,
+                        },
+                    )
+                    categoryDict[process.tag] = actorList
         return categoryDict
 
     def getWorkflowParameters(self):
