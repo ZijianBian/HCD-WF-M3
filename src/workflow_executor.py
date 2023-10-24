@@ -177,9 +177,9 @@ class WorkflowExecutor:
                         if count > 1
                     ]
                     for merge in self.merge_actor_list:
-                        if merge in ids_to_merge:
-                            algo_final = algo_final + ["merge_" + merge]
-                            code_list = code_list + ["merge_" + merge]
+                        if merge.split("_")[1] in ids_to_merge:
+                            algo_final = algo_final + [merge]
+                            code_list = code_list + [merge]
                     seen = set()
                     output_list = [
                         x for x in output_list if x not in seen and not seen.add(x)
@@ -258,10 +258,11 @@ class WorkflowExecutor:
 
         # EXECUTION OF THE WORKFLOW
         for process in final_algorithm:
-            actor = self.dictionary_of_actors[
-                self.catdict[process][self.param_process[process]]["name"]
-            ]
+            # feature/repair_231017
             if not "merge_" in process:
+                actor = self.dictionary_of_actors[
+                    self.catdict[process][self.param_process[process]]["name"]
+                ]
                 if self.process_bundle[process]["status"] == 1:
                     print(
                         " PROCESS --> ",
@@ -327,6 +328,8 @@ class WorkflowExecutor:
                             else:
                                 output_ids_data.append(eval("imas." + ids + "()"))
             else:
+                # feature/repair_231017
+                actor = self.dictionary_of_actors[process]
                 kmerge = 0
                 ids_to_be_merged = self.process_bundle[process]["input"][0].__name__
                 for (
@@ -374,15 +377,28 @@ class WorkflowExecutor:
                             process
                         ]["output"][output_ids_data[iids].__name__]
                 else:
-                    self.process_bundle["merge_" + output_ids_list[iids]] = {}
-                    self.process_bundle["merge_" + output_ids_list[iids]]["input"] = [
-                        bundle_out[output_ids_list[iids]],
-                        output_ids_data,
-                    ]
-                    self.process_bundle["merge_" + output_ids_list[iids]]["output"] = {}
-                    self.process_bundle["merge_" + output_ids_list[iids]]["output"][
-                        output_ids_list[iids]
-                    ] = {}
+                    # feature/repair_231017
+                    if hasattr(output_ids_data, "__len__"):
+                        tmp_output_ids_data = output_ids_data[iids]
+                    else:
+                        tmp_output_ids_data = output_ids_data
+                    if (
+                        bundle_out[output_ids_list[iids]].__name__
+                        == tmp_output_ids_data.__name__
+                    ):
+                        self.process_bundle["merge_" + output_ids_list[iids]] = {}
+                        self.process_bundle["merge_" + output_ids_list[iids]][
+                            "input"
+                        ] = [
+                            bundle_out[output_ids_list[iids]],
+                            tmp_output_ids_data,
+                        ]
+                        self.process_bundle["merge_" + output_ids_list[iids]][
+                            "output"
+                        ] = {}
+                        self.process_bundle["merge_" + output_ids_list[iids]]["output"][
+                            output_ids_list[iids]
+                        ] = {}
 
             # COPY THE OUTPUT IDS OF THE CURRENT PROCESS TO THE INPUT ONES
             # OF THE DOWNSTREAM DEPENDENT PROCESSES
@@ -401,7 +417,8 @@ class WorkflowExecutor:
     def executeProcess(self, process, actor, bundle, parameters):
         # For merge, bundle is a list of 2 bundles and the call is simpler
         if type(bundle) is list:
-            return globals()[process](bundle[0], bundle[1])
+            # feature/repair_231017
+            return actor(bundle[0], bundle[1])
 
         # Get list of all codes in that category
         codeslist = self.catdict[process]  # next(gen_dict_extract(process,maindict))

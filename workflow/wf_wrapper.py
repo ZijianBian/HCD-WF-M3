@@ -53,6 +53,11 @@ def wf_wrapper(par_path):
         idsObject = inputDb.get(idsName)
         machineDb.put(idsObject)
 
+    # feature/repair_231017
+    # TODO This change is not needed as input slices are separate from process
+    # flag_multiple_md = 0 # has to be in the loop of processes,
+    # otherwise the waveform is not read for all processes which use the same IDS:
+    # e.g. ic_antennas both for ic_wave_solver and ic_wave_fp
     # Overwrite with configured waveform if it exists
     for filename in os.listdir(config_folder_path):
         filePath = os.path.join(config_folder_path, filename)

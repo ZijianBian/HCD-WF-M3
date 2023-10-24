@@ -85,7 +85,7 @@ class WorkflowConfigReader(XmlReader):
                             actorConfigPath = os.path.join(
                                 self.workflowDirectory, category.tag, process.tag
                             )
-                            processActor = WorkflowActor.getObject(
+                            processActor = WorkflowActor.getObjectByXmlDirectory(
                                 selectedActor, actorConfigPath
                             )
 
@@ -117,6 +117,14 @@ class WorkflowConfigReader(XmlReader):
                 for _, actor in processes.items():
                     allActors[actor.name] = actor.actor
         return allActors
+
+    # TODO Think how dictionary of actors can be updated for mergers
+    def getAllMergers(self, mergeActorList: list):
+        mergeActors = {}
+        for actorName in mergeActorList:
+            actor = WorkflowActor.getObject(actorName)
+            mergeActors[actorName] = actor.actor
+        return mergeActors
 
     @functools.lru_cache(maxsize=128)
     def getAllProcesses(self):

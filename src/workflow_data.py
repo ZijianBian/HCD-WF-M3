@@ -67,6 +67,9 @@ class WorkflowData:
         self.parallel_dependency = self.globalListReader.getParallelDependency()
         self.algorithms = self.globalListReader.getAlgorithms()
 
+        merge_actors = self.workflowConfig.getAllMergers(self.merge_actor_list)
+        self.dictionary_of_actors.update(merge_actors)
+
     def createWorkflowIDS(self, dt_required):
         # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS
         workflow = imas.workflow()

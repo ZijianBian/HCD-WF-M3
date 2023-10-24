@@ -120,8 +120,10 @@ class HCDWorkflow(WorkflowBase):
 
     def finalize(self):
         # FINALIZE ALL ACTORS
-        for actor_name, actor in self.workflowData.dictionary_of_actors.items():
-            actor.finalize()
+        pass
+        # feature/repair_231017
+        # for actor_name, actor in self.workflowData.dictionary_of_actors.items():
+        #     actor.finalize()
 
     def get_state(self) -> str:
         pass

@@ -241,6 +241,9 @@ class WorkflowDriver:
         for ids in self.inputMds:
             # print("  Get", ids, file=sys.stdout)
             try:
+                # feature/repair_231017
+                #TODO This change is not needed as input slices are separate from process
+                # if 'merge_' not in process:
                 idsSlices[ids] = self.md.get_slice(ids, timenow, 1)
             except Exception:
                 print(f"  ERROR while reading the {ids} IDS:", file=sys.stderr)
