@@ -76,6 +76,7 @@ timeArray = dbhelper.getTimeArray(inputDb)
 timenow = 320.00
 equilibrium = inputDb.get_slice("equilibrium", timenow, 1)
 core_profiles = inputDb.get_slice("core_profiles", timenow, 1)
+workflow = inputDb.get_slice("workflow", timenow, 1)
 
 nbi = machineDb.get_slice("nbi", timenow, 1)
 ic_antennas = machineDb.get_slice("ic_antennas", timenow, 1)
@@ -90,6 +91,7 @@ hcdWorkflow._updateProcesses(timenow)
 idsData = hcdWorkflow.run(
     equilibrium,
     core_profiles,
+    workflow,
     nbi=nbi,
     ic_antennas=ic_antennas,
     ec_launchers=ec_launchers,

@@ -1,7 +1,7 @@
 import logging
 import os
 import sys
-
+import copy
 from src.hcd_workflow import HCDWorkflow
 
 
@@ -156,13 +156,16 @@ class WorkflowDriver:
             nonmandatoryIDSes = {
                 k: v
                 for k, v in idsSlices.items()
-                if k not in ["equilibrium", "core_profiles"]
+                if k not in ["equilibrium", "core_profiles", "workflow"]
             }
-            # TODO Find way to set workflow IDS, It requires time to update
+            
             self.workflowObject._updateProcesses(timenow)
+
+
             idsData = self.workflowObject.run(
                 equilibrium=idsSlices["equilibrium"],
                 core_profiles=idsSlices["core_profiles"],
+                workflow=idsSlices["workflow"],
                 **nonmandatoryIDSes,
             )
             # self.workflowObject.finalize()

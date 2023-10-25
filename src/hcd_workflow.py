@@ -34,11 +34,12 @@ class HCDWorkflow(WorkflowBase):
             message = "Workflow is not initialized. Initialize workflow by calling workflow.initialize() method"
             raise RuntimeError(message)
 
-    def run(self, equilibrium, core_profiles, **kwargs):
+    def run(self, equilibrium, core_profiles, workflow,**kwargs):
         # self.check_is_initialized()
         inputIDSes = {
             "equilibrium": equilibrium,
             "core_profiles": core_profiles,
+            "workflow": workflow,
         }
         for key, value in kwargs.items():
             inputIDSes[key] = value
@@ -70,9 +71,32 @@ class HCDWorkflow(WorkflowBase):
                     and idsName
                     in self.workflowData.process_bundle[process]["input"].keys()
                 ):
+                    if idsName == "workflow":
+                        # TODO Find way to set workflow IDS, passed from external world
+                        workflow = idsData
+                        workflow.ids_properties.homogeneous_time = 1
+                        workflow.time.resize(1)
+                        workflow.time_loop.component.resize(1)
+                        workflow.time_loop.workflow_cycle.resize(1)
+                        workflow.time_loop.workflow_cycle[0].component.resize(1)
+                        workflow.time_loop.workflow_cycle[0].component[0].time_interval = self.workflowData.dt_required
+                        
+                        workflow.time_loop.component[0].name = self.workflowData.code_selection[process].upper()
+                        self.workflowData.process_bundle[process]["input"]["workflow"] = copy.deepcopy(workflow)
+                        continue
                     self.workflowData.process_bundle[process]["input"][
                         idsName
                     ] = idsData
+        
+
+        for process in self.workflowData.process_bundle:
+            if "workflow" in self.workflowData.process_bundle[process]["input"]:
+                workflow.time_loop.component[0].name = self.workflowData.code_selection[
+                    process
+                ].upper()
+                self.workflowData.process_bundle[process]["input"]["workflow"] = copy.deepcopy(
+                    workflow
+                )
 
     def _updateProcesses(self, timenow):
         time_base = self.workflowData.getTimeBase()

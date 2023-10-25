@@ -45,6 +45,7 @@ def wf_wrapper(par_path):
 
     globallistReader = WorkflowGlobalsReader(globalListPath)
     inputIds = globallistReader.getIdsScenarioList()
+    inputIds.append("workflow")
     inputMds = globallistReader.getIdsMdList()
 
     # TODO load only required by process machine descriptions
