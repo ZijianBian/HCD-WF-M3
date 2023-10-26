@@ -159,7 +159,7 @@ class WorkflowDriver:
                 if k not in ["equilibrium", "core_profiles", "workflow"]
             }
             
-            self.workflowObject._updateProcesses(timenow)
+            self.workflowObject.setProcessStatus(timenow)
 
 
             idsData = self.workflowObject.run(

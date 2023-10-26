@@ -86,8 +86,10 @@ wall = machineDb.get_slice("wall", timenow, 1)
 
 hcdWorkflow = HCDWorkflow()
 hcdWorkflow.initialize(config_folder_path)
-# TODO Find way to set workflow IDS, It requires time to update
-hcdWorkflow._updateProcesses(timenow)
+
+# Set status TRUE for all processes
+hcdWorkflow.setProcessStatus()
+
 idsData = hcdWorkflow.run(
     equilibrium,
     core_profiles,
@@ -98,7 +100,13 @@ idsData = hcdWorkflow.run(
     lh_antennas=lh_antennas,
     wall=wall,
 )
-
+print("<--------------------IDS OUT-------------------->")
+print(type(idsData))
+print("<--------------------IDS OUT-------------------->")
+print(idsData.keys())
+print("<--------------------IDS OUT-------------------->")
+import pprint
+pprint.pprint(idsData["waves"])
 hcdWorkflow.finalize()
 
 inputDb.close()

@@ -98,24 +98,28 @@ class HCDWorkflow(WorkflowBase):
                     workflow
                 )
 
-    def _updateProcesses(self, timenow):
-        time_base = self.workflowData.getTimeBase()
+    def setProcessStatus(self, timenow=None):
+        if timenow is not None:
+            time_base = self.workflowData.getTimeBase()
 
-        for process in self.workflowData.process_bundle.keys():
-            if time_base is not None:
-                if process in time_base:
-                    [tc, it] = find_nearest(
-                        np.array(
-                            time_base[process][0]["wf_interval"][0]["time_array"][0]
-                        ),
-                        timenow,
-                    )
-                    self.workflowData.process_bundle[process]["status"] = time_base[
-                        process
-                    ][0]["wf_interval"][0]["status"][0][it]
+            for process in self.workflowData.process_bundle.keys():
+                if time_base is not None:
+                    if process in time_base:
+                        [tc, it] = find_nearest(
+                            np.array(
+                                time_base[process][0]["wf_interval"][0]["time_array"][0]
+                            ),
+                            timenow,
+                        )
+                        self.workflowData.process_bundle[process]["status"] = time_base[
+                            process
+                        ][0]["wf_interval"][0]["status"][0][it]
+                    else:
+                        self.workflowData.process_bundle[process]["status"] = 1
                 else:
                     self.workflowData.process_bundle[process]["status"] = 1
-            else:
+        else:
+            for process in self.workflowData.process_bundle.keys():
                 self.workflowData.process_bundle[process]["status"] = 1
 
     def _getIDSes(self):
