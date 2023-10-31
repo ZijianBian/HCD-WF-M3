@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/gray.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR: gray
 
 MODULES: [IMAS, iWrap, XMLlib]

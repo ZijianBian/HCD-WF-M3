@@ -6,7 +6,7 @@ SOURCES:
     VERSION: feature/dd_compliant
     DIR: cyrano
 
-MODULES: [IMAS, iWrap, XMLlib/3.3.1-GCC-10.2.0, INTERPOS/9.1.0-GCC-10.2.0]
+MODULES: [IMAS, iWrap, XMLlib/3.3.1-intel-2020b, INTERPOS/9.1.0-intel-2020b]
 
 BUILDS: 
   - DIR: cyrano

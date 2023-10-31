@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/hcd-mergers.git
-    VERSION: feature/iwrap_compliant
+    VERSION: develop
     DIR:     hcd_mergers
 
 MODULES: [IMAS, iWrap]

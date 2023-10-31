@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/hcd2core-sources.git
-    VERSION: feature/dd_compliant
+    VERSION: IMAS-4944-segmentation-fault-in-the-new-version-of-hcd2core_sources
     DIR:     hcd2core-sources
 
 MODULES: [IMAS, iWrap, INTERPOS, XMLlib]

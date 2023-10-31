@@ -3,7 +3,7 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/risk.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR:     risk
 
 MODULES: [IMAS, iWrap, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
