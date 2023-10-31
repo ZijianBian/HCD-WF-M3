@@ -1,0 +1,21 @@
+#example
+---
+SOURCES:
+  - VCS:  git
+    REPO: ssh://git@git.iter.org/heat/toric.git
+    VERSION: feature/September_2023
+    DIR: toric
+
+MODULES: [IMAS, iWrap, XMLlib, netCDF-Fortran/4.5.3-iimpi-2020b, FFTW/3.3.8-intel-2020b]
+
+BUILDS: 
+  - DIR: toric
+    CMD: ./build.sh
+
+ACTORS: 
+  - DIR: toric
+    XML: iwrap/toric.yaml
+
+#COMMENTS:  
+...
+  

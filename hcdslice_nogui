@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+import argparse
+import os
+import sys
+
+import imas
+from waveform_cooker import add_dynamic
+from wftools.wf_tools import create_workflow_param_from_file
+
+from src.workflow_dbhelper import WorkflowDbHelper
+from src.workflow_globals_reader import WorkflowGlobalsReader
+from src.hcd_workflow import HCDWorkflow
+
+# Management of input arguments
+parser = argparse.ArgumentParser(
+    description="---- Run the H&CD workflow without the interface"
+)
+parser.add_argument(
+    "-c", "--config_folder", help="input configuration folder", required=True
+)
+
+args = vars(parser.parse_args())
+config_folder = args["config_folder"]
+
+config_folder_path = os.path.abspath(config_folder)
+
+rootPath = os.path.dirname(os.path.abspath(__file__))
+globalListPath = os.path.join(rootPath, r"global_configuration/global_lists.yaml")
+inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
+
+wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
+    "workflow_parameters"
+][0]
+
+input_user_or_path = wf_parameters["input_user_or_path"][0]
+input_database = wf_parameters["input_database"][0]
+output_user_or_path = wf_parameters["output_user_or_path"][0]
+output_database = wf_parameters["output_database"][0]
+shot_nr = wf_parameters["shot_nr"][0]
+run_in = wf_parameters["run_in"][0]
+run_out = wf_parameters["run_out"][0]
+
+dbhelper = WorkflowDbHelper(
+    input_user_or_path,
+    input_database,
+    output_user_or_path,
+    output_database,
+    shot_nr,
+    run_in,
+    run_out,
+)
+inputDb = dbhelper.getInputDatabase()
+outputDb = dbhelper.getOutputDatabase()
+machineDb = dbhelper.getMachineDatabase()
+
+globallistReader = WorkflowGlobalsReader(globalListPath)
+inputMds = ["nbi", "ic_antennas", "ec_launchers", "lh_antennas", "wall"]
+
+# Prepare Memory DB
+# Check if Machine description is exists and write to memory db
+for idsName in inputMds:
+    idsObject = inputDb.get(idsName)
+    machineDb.put(idsObject)
+
+# Overwrite with configured waveform if it exists  to memory db
+waveform_presets = globallistReader.getWaveformPresetsList()
+for filename in os.listdir(config_folder_path):
+    filePath = os.path.join(config_folder_path, filename)
+    if filePath.endswith("waveforms.yaml"):
+        if os.path.exists(filePath):
+            idsObject = add_dynamic(filePath)
+        machineDb.put(idsObject)
+
+timeArray = dbhelper.getTimeArray(inputDb)
+
+timenow = 320.00
+equilibrium = inputDb.get_slice("equilibrium", timenow, 1)
+core_profiles = inputDb.get_slice("core_profiles", timenow, 1)
+workflow = inputDb.get_slice("workflow", timenow, 1)
+
+nbi = machineDb.get_slice("nbi", timenow, 1)
+ic_antennas = machineDb.get_slice("ic_antennas", timenow, 1)
+ec_launchers = machineDb.get_slice("ec_launchers", timenow, 1)
+lh_antennas = machineDb.get_slice("lh_antennas", timenow, 1)
+wall = machineDb.get_slice("wall", timenow, 1)
+
+hcdWorkflow = HCDWorkflow()
+hcdWorkflow.initialize(config_folder_path)
+
+# Set status TRUE for all processes
+hcdWorkflow.setProcessStatus()
+
+idsData = hcdWorkflow.run(
+    equilibrium,
+    core_profiles,
+    workflow,
+    nbi=nbi,
+    ic_antennas=ic_antennas,
+    ec_launchers=ec_launchers,
+    lh_antennas=lh_antennas,
+    wall=wall,
+)
+print("<--------------------Type of idsData-------------------->")
+print(type(idsData))
+print("<--------------------Availables Keys in idsData-------------------->")
+print(idsData.keys())
+print("<--------------------Check contents of idsData[waves]-------------------->")
+import pprint
+pprint.pprint(idsData["waves"])
+hcdWorkflow.finalize()
+
+inputDb.close()
+outputDb.close()
+machineDb.close()
+
+
+# manadatory idses, optional idses (static + dynamic)
+# initialize ids
+# workflow wrapper with gui
+# workflow parameters code parameters -  workflow wrapper
+#

@@ -1,4 +1,4 @@
-import os,sys,copy
+import os, sys, copy
 
 import waveform_cooker
 
@@ -39,7 +39,7 @@ try:
         load,
         create_maindict,
         saved_folder_name,
-)
+    )
     from wftools.gui_tools import edit_codeparam, CreateToolTip
     from wftools.waveform_edition import edit_waveforms
     import wftools.time_base_edition as tbe
@@ -52,7 +52,7 @@ except:
     )
     sys.exit()
 
-    
+
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
 
@@ -71,14 +71,17 @@ window.option_add("*font", "courier " + str(fontsize))
 window.title("HCD WORKFLOW")
 window.configure(bg=col.c1)
 
+
 # --------------------------------------------------------------------------------------------
 def open_gui(wf_param_file):
-
     # CHECK THAT MANDATORY ACTORS ARE THERE
-    file = os.path.dirname(os.path.abspath(__file__))\
-                + "/global_configuration/" + "global_lists.yaml"
-    merge_actor_list = loadlist(file,"merge_actor_list")
-    process_list = loadlist(file,"process_list")
+    file = (
+        os.path.dirname(os.path.abspath(__file__))
+        + "/global_configuration/"
+        + "global_lists.yaml"
+    )
+    merge_actor_list = loadlist(file, "merge_actor_list")
+    process_list = loadlist(file, "process_list")
     err_global = 0
     for actor in merge_actor_list:
         err = import_actor(actor, 1)
@@ -112,9 +115,13 @@ def open_gui(wf_param_file):
     workflow_param = create_workflow_param_from_file(wf_param_file)
 
     # LIST OF PRE-CONFIGURED WAVEFORMS
-    device = loadlist(file,'device')[0]
-    waveform_folder = os.path.join(os.path.dirname(os.path.abspath(waveform_cooker.__file__))+"/../../../../", "presets", device)
-    waveform_presets = loadlist(file,'waveform_presets')
+    device = loadlist(file, "device")[0]
+    waveform_folder = os.path.join(
+        os.path.dirname(os.path.abspath(waveform_cooker.__file__)) + "/../../../../",
+        "presets",
+        device,
+    )
+    waveform_presets = loadlist(file, "waveform_presets")
 
     # Setup
 
@@ -131,13 +138,15 @@ def open_gui(wf_param_file):
     fr_fc.grid_remove()
 
     ## LEFT - CONFIGURING THE WORKFLOW PARAMETERS
-    tkinter.Label(fr_wfp, text=workflow_param['workflow_parameters'][1], bg=col.c3, font=('Courier',fontsize,'bold')).grid(
-        row=0, column=0, columnspan=3, pady=10, padx=5, sticky="we"
-    )
+    tkinter.Label(
+        fr_wfp,
+        text=workflow_param["workflow_parameters"][1],
+        bg=col.c3,
+        font=("Courier", fontsize, "bold"),
+    ).grid(row=0, column=0, columnspan=3, pady=10, padx=5, sticky="we")
     irow = 1
-    for elem in workflow_param['workflow_parameters'][0]:
-
-        elem_name = workflow_param['workflow_parameters'][0][elem][1]
+    for elem in workflow_param["workflow_parameters"][0]:
+        elem_name = workflow_param["workflow_parameters"][0][elem][1]
 
         label = tkinter.Label(fr_wfp, text=elem_name, bg=col.c3).grid(
             row=irow, column=0, padx=1, pady=2, sticky="w"
@@ -145,12 +154,11 @@ def open_gui(wf_param_file):
 
         # Catch any update of the variable from the interface
         entrystring = tkinter.StringVar()
-        entrystring.set(workflow_param['workflow_parameters'][0][elem][0])
+        entrystring.set(workflow_param["workflow_parameters"][0][elem][0])
         entrystring.trace(
             "w",
-            lambda name, index, mode, elem=elem, entrystring=entrystring,
-            ref='workflow_parameters': update_workflow_param(
-                workflow_param, 'workflow_parameters', '', '', elem, entrystring.get()
+            lambda name, index, mode, elem=elem, entrystring=entrystring, ref="workflow_parameters": update_workflow_param(
+                workflow_param, "workflow_parameters", "", "", elem, entrystring.get()
             ),
         )
         # if an entry is changed, the new values should immediately be changed
@@ -165,45 +173,76 @@ def open_gui(wf_param_file):
     complex_button = {}
     for main_key in maindict.keys():
         for category in maindict[main_key]:
-            tkinter.Label(fr_as, text=workflow_param['actor_selection'][0][main_key][0][category][1], \
-                          bg=col.c1, font=('Courier',fontsize,'bold'),fg='darkcyan').grid(
-                row=rrow, column=0, columnspan=2, sticky="w"
-            )
+            tkinter.Label(
+                fr_as,
+                text=workflow_param["actor_selection"][0][main_key][0][category][1],
+                bg=col.c1,
+                font=("Courier", fontsize, "bold"),
+                fg="darkcyan",
+            ).grid(row=rrow, column=0, columnspan=2, sticky="w")
             rrow += 1
 
             for process in maindict[main_key][category]:
-                process_name = workflow_param['actor_selection'][0][main_key][0][category][0][process][1]
+                process_name = workflow_param["actor_selection"][0][main_key][0][
+                    category
+                ][0][process][1]
                 proc_dict = copy.deepcopy(maindict[main_key][category][process])
                 tkinter.Label(
-                    fr_as, text=' - '+process_name, bg=col.c1, anchor=tkinter.W, justify=tkinter.LEFT
+                    fr_as,
+                    text=" - " + process_name,
+                    bg=col.c1,
+                    anchor=tkinter.W,
+                    justify=tkinter.LEFT,
                 ).grid(row=rrow, column=0, sticky=tkinter.W)
-                cb = tkinter.ttk.Combobox(
-                    fr_as, value=[""] + list(proc_dict)
-                )
+                cb = tkinter.ttk.Combobox(fr_as, value=[""] + list(proc_dict))
                 cb.grid(row=rrow, column=1, padx=20, pady=5, sticky="ew")
-                cb.current(workflow_param['actor_selection'][0][main_key][0][category][0][process][0])
+                cb.current(
+                    workflow_param["actor_selection"][0][main_key][0][category][0][
+                        process
+                    ][0]
+                )
                 cb.bind(
                     "<<ComboboxSelected>>",
                     lambda event, main_key=main_key, process=process, cb=cb, category=category: update_workflow_param(
-                        workflow_param, 'actor_selection', main_key, category, process, str(cb.current())
+                        workflow_param,
+                        "actor_selection",
+                        main_key,
+                        category,
+                        process,
+                        str(cb.current()),
                     ),
                 )
-                complex_button[process] = tkinter.Button(master=fr_as,text="Time Base",bg=col.c2)
-                complex_button[process]['font'] = font.Font(size=8)
+                complex_button[process] = tkinter.Button(
+                    master=fr_as, text="Time Base", bg=col.c2
+                )
+                complex_button[process]["font"] = font.Font(size=8)
                 complex_button[process].config(activebackground=col.c4)
-                complex_button[process].grid(row=rrow, column=2, padx=0, pady=0, sticky="w")
-                complex_button[process].configure(command=lambda process=process: \
-                                tbe.time_base_edition(fr_as,process,workflow_param))
-                CreateToolTip(complex_button[process],\
-                    'Edit the time base to select the time slices for which the model is called')
+                complex_button[process].grid(
+                    row=rrow, column=2, padx=0, pady=0, sticky="w"
+                )
+                complex_button[process].configure(
+                    command=lambda process=process: tbe.time_base_edition(
+                        fr_as, process, workflow_param
+                    )
+                )
+                CreateToolTip(
+                    complex_button[process],
+                    "Edit the time base to select the time slices for which the model is called",
+                )
                 font.Font(size=fontsize)
                 rrow += 1
 
     # -------------------------------------------------------------------------------------
 
-    saved_folder = saved_folder_name(default_wf_param_file,maindict,
-                uncompiled_actors,workflow_param,\
-                'workflow_parameters','actor_selection',process_list)
+    saved_folder = saved_folder_name(
+        default_wf_param_file,
+        maindict,
+        uncompiled_actors,
+        workflow_param,
+        "workflow_parameters",
+        "actor_selection",
+        process_list,
+    )
 
     # -------------------------------------------------------------------------------------
 
@@ -229,12 +268,12 @@ def open_gui(wf_param_file):
             process_list,
         )
     )
-    CreateToolTip(button_loadconfig,'Load another configuration folder')
+    CreateToolTip(button_loadconfig, "Load another configuration folder")
 
     button_saveconfig = tkinter.Button(fr_wfp, text="Save", bg=col.c2)
     button_saveconfig.grid(row=53, column=0, padx=5, pady=5, sticky="ew")
     button_saveconfig.configure(command=lambda: saved_folder.Save(None, init_folder))
-    CreateToolTip(button_saveconfig,'Save the current configuration folder')
+    CreateToolTip(button_saveconfig, "Save the current configuration folder")
 
     button_saveas = tkinter.Button(fr_wfp, text="Save as", bg=col.c2)
     button_saveas.grid(row=54, column=0, padx=5, pady=5, sticky="ew")
@@ -246,29 +285,33 @@ def open_gui(wf_param_file):
             init_folder,
         )
     )
-    CreateToolTip(button_saveas,'Save as another configuration folder name')
+    CreateToolTip(button_saveas, "Save as another configuration folder name")
 
     button_loadlconfig = tkinter.Button(fr_wfp, text="Load latest", bg=col.c2)
     button_loadlconfig.grid(row=52, column=1, padx=5, pady=5, sticky="ew")
     button_loadlconfig.configure(command=lambda: load("latest", open_gui, process_list))
-    CreateToolTip(button_loadlconfig,'Load the latest created configuration folder')
+    CreateToolTip(button_loadlconfig, "Load the latest created configuration folder")
 
     button_saveandrun = tkinter.Button(fr_wfp, text="Run", bg=col.c2, state="normal")
     button_saveandrun.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
     button_saveandrun.configure(
         command=lambda: run(saved_folder.Save(None, init_folder))
     )
-    CreateToolTip(button_saveandrun,'Run the H&CD workflow with the current configuration')
+    CreateToolTip(
+        button_saveandrun, "Run the H&CD workflow with the current configuration"
+    )
 
     button_restore_def = tkinter.Button(fr_wfp, text="Restore Default", bg=col.c2)
     button_restore_def.grid(row=54, column=1, padx=5, pady=5, sticky="ew")
     button_restore_def.configure(command=lambda: open_gui(default_wf_param_file))
-    CreateToolTip(button_restore_def,'Restore the default parameters of the H&CD workflow')
+    CreateToolTip(
+        button_restore_def, "Restore the default parameters of the H&CD workflow"
+    )
 
     button_exit = tkinter.Button(fr_wfp, text="Exit", bg="light grey")
     button_exit.grid(row=56, column=0, padx=5, pady=5, sticky="w")
     button_exit.configure(command=lambda: sys.exit())
-    CreateToolTip(button_exit,'Exit the interface')
+    CreateToolTip(button_exit, "Exit the interface")
 
     # Middle panel
     button_edit_codeparameters = tkinter.Button(
@@ -282,20 +325,25 @@ def open_gui(wf_param_file):
             saved_folder.Save(None, init_folder),
         )
     )
-    CreateToolTip(button_edit_codeparameters,'Edit the code parameters for the selected models')
+    CreateToolTip(
+        button_edit_codeparameters, "Edit the code parameters for the selected models"
+    )
 
     button_edit_waveforms = tkinter.Button(fr_as, text="Edit H&CD waveforms", bg=col.c2)
     button_edit_waveforms.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
     button_edit_waveforms.configure(
-        command=lambda: edit_waveforms(\
-            waveform_presets,waveform_folder,saved_folder.Save(None, init_folder)))
-    CreateToolTip(button_edit_waveforms,\
-    'Edit the dynamic variables of H&CD sources (power, energy, angles, etc.)')
+        command=lambda: edit_waveforms(
+            waveform_presets, waveform_folder, saved_folder.Save(None, init_folder)
+        )
+    )
+    CreateToolTip(
+        button_edit_waveforms,
+        "Edit the dynamic variables of H&CD sources (power, energy, angles, etc.)",
+    )
 
     window.mainloop()
 
 
 # ---------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-
     open_gui(default_wf_param_file)
