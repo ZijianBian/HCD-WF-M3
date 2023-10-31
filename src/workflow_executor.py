@@ -70,6 +70,7 @@ class WorkflowExecutor:
         for process in self.process_bundle.keys():
             if (
                 "nbi" in self.process_bundle[process]["input"]
+                and "nuclear" not in process
                 and self.process_bundle[process]["input"][
                     "nbi"
                 ].ids_properties.homogeneous_time

@@ -96,7 +96,6 @@ prerequisites:
        nbi_source: [nemo, bbnbi_serial, bbnbi_parallel]
    nuclear_source: None
    nuclear_fp:
-       spot: None
        ascot_serial:
           nuclear_source: [bbnbi_serial, bbnbi_parallel]
        ascot_parallel:
