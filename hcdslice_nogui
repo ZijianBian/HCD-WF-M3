@@ -100,11 +100,11 @@ idsData = hcdWorkflow.run(
     lh_antennas=lh_antennas,
     wall=wall,
 )
-print("<--------------------IDS OUT-------------------->")
+print("<--------------------Type of idsData-------------------->")
 print(type(idsData))
-print("<--------------------IDS OUT-------------------->")
+print("<--------------------Availables Keys in idsData-------------------->")
 print(idsData.keys())
-print("<--------------------IDS OUT-------------------->")
+print("<--------------------Check contents of idsData[waves]-------------------->")
 import pprint
 pprint.pprint(idsData["waves"])
 hcdWorkflow.finalize()
