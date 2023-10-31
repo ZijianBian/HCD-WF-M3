@@ -55,10 +55,10 @@ class WorkflowData:
         self.code_selection = {k: v.name for (k, v) in allProcesses.items()}
         self.process_bundle = self.workflowConfig.getProcessBundle()
         self.workflowParameters = self.workflowConfig.getWorkflowParameters()
-        self.dt_required = self.workflowParameters["dt_required"]
-        self.one_time_slice = self.workflowParameters["one_time_slice"]
-        self.tbegin = self.workflowParameters["tbegin"]
-        self.tend = self.workflowParameters["tend"]
+        self.dt_required = float(self.workflowParameters["dt_required"])
+        self.one_time_slice = int(self.workflowParameters["one_time_slice"])
+        self.tbegin = float(self.workflowParameters["tbegin"])
+        self.tend = float(self.workflowParameters["tend"])
 
         self.prerequisites = self.globalListReader.getPrerequisites()
         self.waveform_presets = self.globalListReader.getWaveformPresetsList()
