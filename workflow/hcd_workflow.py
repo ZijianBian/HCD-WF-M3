@@ -90,7 +90,7 @@ def hcd_workflow(process_bundle, workflow_xml, dictionary_of_actors):
     # DO NOT RUN THE CODE(S) FOR THIS SOURCE
     for process in  process_bundle.keys():
 
-        if 'nbi' in process_bundle[process]['input'] \
+        if 'nbi' in process_bundle[process]['input'] and 'nuclear' not in process \
            and process_bundle[process]['input']['nbi'].ids_properties.homogeneous_time < 0:
             print('  NBI required but no waveform!!!',file=sys.stderr)
             print('  --> Edit H&CD waveforms before executing the workflow.',file=sys.stderr)
