@@ -12,10 +12,7 @@ def wf_wrapper(par_path):
     config_folder_path = os.path.abspath(par_path)
 
     rootPath = os.path.dirname(os.path.abspath(__file__))
-    globalListPath = os.path.join(
-        rootPath, "..", r"global_configuration/global_lists.yaml"
-    )
-    print(globalListPath)
+    globalListPath = os.path.join(rootPath,"..","src/global_configuration/global_lists.yaml")
     inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
 
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[

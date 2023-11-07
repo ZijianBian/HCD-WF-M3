@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+import glob
 import os
 import pathlib
 import subprocess
+from typing import Dict, List
 
 from setuptools import find_packages, setup
 
@@ -16,7 +18,6 @@ if os.path.isfile(requirement_path):
     with open(requirement_path) as f:
         install_requires = f.read().splitlines()
 
-data_files = []
 
 setup(
     name="HCDWorkflow",
@@ -47,6 +48,23 @@ setup(
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
-    data_files=data_files,
+    include_package_data=True,
 )
 
+# configFiles :List = ['global_configuration/global_lists.yaml', 'global_configuration/input_workflow_default.xml']
+# # [('global_configuration', ['global_configuration/global_lists.yaml', 'global_configuration/input_workflow_default.xml'])]/
+
+
+# # create dictionary from glob files
+# files : Dict[str,List] = {}
+# for file_path in configFiles:
+#     folder_name = os.path.dirname(file_path)
+#     # folder_name = folder_name.replace(source_folder, target_folder)
+#     if folder_name not in files.keys():
+#         files[folder_name] = []
+#     files[folder_name].append(file_path)
+
+# # Create data structure which setup file is needed
+# data_files = []
+# for file_path, list_of_files in files.items():
+#     data_files.append((file_path, list_of_files))

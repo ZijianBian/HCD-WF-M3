@@ -53,7 +53,7 @@ inputDb = dbhelper.getInputDatabase()
 outputDb = dbhelper.getOutputDatabase()
 machineDb = dbhelper.getMachineDatabase()
 
-globallistReader = WorkflowGlobalsReader(globalListPath)
+# globallistReader = WorkflowGlobalsReader(globalListPath)
 inputMds = ["nbi", "ic_antennas", "ec_launchers", "lh_antennas", "wall"]
 
 # Prepare Memory DB
@@ -62,8 +62,28 @@ for idsName in inputMds:
     idsObject = inputDb.get(idsName)
     machineDb.put(idsObject)
 
+waveform_presets = {
+  "ec":{
+     "custom":  ['ec_waveforms.yaml','Custom'],
+     "preset1": ['ec_launchers_standard_Omode_mirrors.yaml','O-mode'],
+     "preset2": ['ec_launchers_standard_Xmode_mirrors.yaml','X-mode']},
+  "lh":{
+     "custom":  ['lh_waveforms.yaml','Custom'],
+     "preset1": ['None','Default']},
+  "ic":{
+     "custom":  ['ic_waveforms.yaml','nbi_waveforms.yaml','Custom'],
+     "preset1": ['ic_53MHz_default.yaml','53 MHz']},
+  "nbi":{
+     "custom":  ['nbi_waveforms.yaml','Custom'],
+     "preset1": ['nbi_D_1MeV_off_off.yaml','D 1MeV off-off'],
+     "preset2": ['nbi_D_1MeV_off_on.yaml','D 1MeV off-on'],
+     "preset3": ['nbi_D_1MeV_on_on.yaml','D 1MeV on-on'],
+     "preset4": ['nbi_H_870keV_off_off.yaml','H 870keV off-off'],
+     "preset5": ['nbi_H_870keV_off_on.yaml','H 870keV off-on'],
+     "preset6": ['nbi_H_870keV_on_on.yaml','H 870keV on-on']}
+    }
 # Overwrite with configured waveform if it exists  to memory db
-waveform_presets = globallistReader.getWaveformPresetsList()
+# waveform_presets = globallistReader.getWaveformPresetsList()
 for filename in os.listdir(config_folder_path):
     filePath = os.path.join(config_folder_path, filename)
     if filePath.endswith("waveforms.yaml"):

@@ -12,11 +12,10 @@ from src.workflow_config_reader import WorkflowConfigReader
 class WorkflowData:
     def __init__(self, workflowConfig) -> None:
         workflowConfig = os.path.join(workflowConfig, "input_workflow.xml")
-        self.globalList = (
-            os.path.dirname(os.path.abspath(__file__))
-            + "/../global_configuration/"
-            + "global_lists.yaml"
-        )
+        rootPath = os.path.dirname(os.path.abspath(__file__))
+        self.globalList = os.path.join(rootPath,"global_configuration/global_lists.yaml")
+    
+        print(self.globalList)
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
         self.globalListReader = WorkflowGlobalsReader(self.globalList)
         self.catdict = self.workflowConfig.getCategories()
