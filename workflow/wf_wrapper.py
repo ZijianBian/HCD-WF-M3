@@ -2,7 +2,7 @@ import os
 
 from waveform_cooker import add_dynamic
 from wftools.wf_tools import create_workflow_param_from_file
-
+from importlib_resources import files
 from src.workflow_dbhelper import WorkflowDbHelper
 from src.workflow_globals_reader import WorkflowGlobalsReader
 from src.workflow_driver import WorkflowDriver
@@ -12,8 +12,8 @@ def wf_wrapper(par_path):
     config_folder_path = os.path.abspath(par_path)
 
     rootPath = os.path.dirname(os.path.abspath(__file__))
-    globalListPath = os.path.join(rootPath,"..","src/global_configuration/global_lists.yaml")
-    inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
+    globalListPath = str(files('src.global_configuration').joinpath('global_lists.yaml'))
+    inputworkflow_xml = str(files('src.global_configuration').joinpath('input_workflow.xml'))
 
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
         "workflow_parameters"

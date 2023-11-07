@@ -3,7 +3,7 @@ import os
 import sys
 
 import imas
-
+from importlib_resources import files
 from src.workflow_globals_reader import WorkflowGlobalsReader
 from src.workflow_config_reader import WorkflowConfigReader
 
@@ -12,8 +12,7 @@ from src.workflow_config_reader import WorkflowConfigReader
 class WorkflowData:
     def __init__(self, workflowConfig) -> None:
         workflowConfig = os.path.join(workflowConfig, "input_workflow.xml")
-        rootPath = os.path.dirname(os.path.abspath(__file__))
-        self.globalList = os.path.join(rootPath,"global_configuration/global_lists.yaml")
+        self.globalList = str(files('src.global_configuration').joinpath('global_lists.yaml'))
     
         print(self.globalList)
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
