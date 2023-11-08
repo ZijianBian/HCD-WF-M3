@@ -77,6 +77,9 @@ class WorkflowActor:
     def initializeActor(self, actorName: str, xmlPath: str, xsdPath: str):
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
         if WorkflowActor._import(actorName) != 0:
+            logger.critical(
+                f"ERROR! Couldn't import actor {self.name }"
+            )
             return None
 
         actor = eval(actorName)

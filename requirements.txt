@@ -1,3 +1,6 @@
+importlib-resources
 lxml 
 numpy
-importlib-resources
+pyparsing
+python-dateutil
+six

@@ -14,7 +14,6 @@ class WorkflowData:
         workflowConfig = os.path.join(workflowConfig, "input_workflow.xml")
         self.globalList = str(files('src.global_configuration').joinpath('global_lists.yaml'))
     
-        print(self.globalList)
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
         self.globalListReader = WorkflowGlobalsReader(self.globalList)
         self.catdict = self.workflowConfig.getCategories()
@@ -42,7 +41,7 @@ class WorkflowData:
     def getParamProcess(self):
         return self.workflowConfig.getParamProcess()
 
-    # TODO make it objet variable
+    # TODO make it object variable
     def getTimeBase(self):
         return self.workflowConfig.getTimeBase()
 
