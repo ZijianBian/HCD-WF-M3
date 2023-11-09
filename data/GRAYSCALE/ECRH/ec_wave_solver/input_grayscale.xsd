@@ -1,0 +1,78 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+   <xs:annotation>
+     <xs:documentation>Code parameters for Grayscale actor</xs:documentation>
+   </xs:annotation>
+ 
+   <xs:simpleType name="integer_shot">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="214748"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_run">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="99999"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_01">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="10"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+  <xs:simpleType name="float_minInclusive_dot0001">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="0.0001"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="string_field">
+     <xs:restriction base="xs:string">
+     </xs:restriction>
+   </xs:simpleType>
+
+   <!-- document element -->
+   <xs:element name="parameters">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="ec_power" minOccurs="0"/>
+         <xs:element ref="ec_gauss_location" minOccurs="0"/>
+         <xs:element ref="ec_gauss_sigma" minOccurs="0"/>
+         <xs:element ref="eccd_prefactor" minOccurs="0"/>
+       </xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <!-- Deposited EC power in W                              -->
+   <xs:element name="ec_power" type="float_minInclusive_dot0001">
+      <xs:annotation>
+          <xs:documentation>Deposited EC power in W</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Location of Gaussian EC peak in rho_tor_norm         -->
+   <xs:element name="ec_gauss_location" type="float_minInclusive_dot0001">
+      <xs:annotation>
+          <xs:documentation>Location of Gaussian EC peak in rho_tor_norm</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Sigma width of Gaussian EC peak in rho_tor_norm      -->
+   <xs:element name="ec_gauss_sigma" type="float_minInclusive_dot0001">
+      <xs:annotation>
+          <xs:documentation>Sigma width of Gaussian EC peak in rho_tor_norm</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Pre-factor to be applied to ECCD GRAY-based scacling -->
+   <xs:element name="eccd_prefactor" type="float_minInclusive_dot0001">
+      <xs:annotation>
+          <xs:documentation>Pre-factor to be applied to ECCD GRAY-based scacling</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+ </xs:schema>
