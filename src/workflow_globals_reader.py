@@ -49,3 +49,9 @@ class WorkflowGlobalsReader:
 
     def getAlgorithms(self):
         return self.getList("algorithm")
+
+    def getProcessList(self):
+        return self.getList("process_list")
+
+    def getDeviceList(self):
+        return self.getList("device")

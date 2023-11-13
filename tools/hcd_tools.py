@@ -1,4 +1,9 @@
-from wftools.wf_tools import find_nearest
+import numpy as np
+
+def find_nearest(a, a0):
+    "Element in nd array `a` closest to the scalar value `a0`"
+    idx = np.abs(a - a0).argmin()
+    return a.flat[idx], idx
 
 #####################################################################################
 

@@ -1,6 +1,17 @@
 import os, sys, copy
+from gui.gui_methods import create_maindict, edit_codeparam, load, saved_folder_name, update_workflow_param
+from gui.waveform_edition import edit_waveforms
+from src.Workflow_actor import WorkflowActor
+from src.workflow_config_reader import WorkflowConfigReader
+from workflow.wf_wrapper import wf_wrapper
 
-import waveform_cooker
+from src.workflow_globals_reader import WorkflowGlobalsReader
+
+isWaveformCookerPresent = True
+try:
+    import waveform_cooker
+except:
+    isWaveformCookerPresent = False
 
 try:
     import tkinter
@@ -15,46 +26,57 @@ except:
     )
     sys.exit()
 
-try:
-    from lxml import etree
-except:
-    print("ERROR: lxml module not found", file=sys.stderr)
-    print(
-        "---> TIP: load the HCD module or source the configuration file",
-        file=sys.stderr,
-    )
-    sys.exit()
+# try:
+#     from lxml import etree
+# except:
+#     print("ERROR: lxml module not found", file=sys.stderr)
+#     print(
+#         "---> TIP: load the HCD module or source the configuration file",
+#         file=sys.stderr,
+#     )
+#     sys.exit()
 
-try:
-    import wftools.colour_definitions.bluish as col
-    from wftools.wf_tools import (
-        import_actor,
-        create_workflow_param_from_file,
-        dict_merge,
-        save,
-        run,
-        destr_and_make,
-        update_workflow_param,
-        loadlist,
-        load,
-        create_maindict,
-        saved_folder_name,
-    )
-    from wftools.gui_tools import edit_codeparam, CreateToolTip
-    from wftools.waveform_edition import edit_waveforms
-    import wftools.time_base_edition as tbe
-except:
-    raise
-    print("ERROR while loading internal HCD modules", file=sys.stderr)
-    print(
-        "---> TIP: load the HCD module or source the configuration file",
-        file=sys.stderr,
-    )
-    sys.exit()
+# try:
+#     import wftools.colour_definitions.bluish as col
+#     from wftools.wf_tools import (
+#         import_actor,
+#         create_workflow_param_from_file,
+#         dict_merge,
+#         save,
+#         run,
+#         destr_and_make,
+#         update_workflow_param,
+#         loadlist,
+#         load,
+#         create_maindict,
+#         saved_folder_name,
+#     )
+#     from wftools.gui_tools import edit_codeparam, CreateToolTip
+#     from wftools.waveform_edition import edit_waveforms
+#     import wftools.time_base_edition as tbe
+# except:
+#     raise
+#     print("ERROR while loading internal HCD modules", file=sys.stderr)
+#     print(
+#         "---> TIP: load the HCD module or source the configuration file",
+#         file=sys.stderr,
+#     )
+#     sys.exit()
 
-
+import gui.colour_definitions.bluish as col
+from gui.tooltip import  CreateToolTip
+import gui.time_base_edition as tbe
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
+# col
+# loadlist
+# import_actor
+# create_maindict
+# create_workflow_param_from_file
+# update_workflow_param
+# saved_folder_name
+# CreateToolTip
+# load
 
 hcd_path = "/".join(os.path.realpath(__file__).split("/")[:-1])
 default_wf_param_file = hcd_path + "/global_configuration/input_workflow_default.xml"
@@ -71,7 +93,14 @@ window.option_add("*font", "courier " + str(fontsize))
 window.title("HCD WORKFLOW")
 window.configure(bg=col.c1)
 
+def run(current_config_folder):
 
+    if current_config_folder != None:
+
+        wf_wrapper(current_config_folder)
+    else:
+        print("Aborted.")
+        
 # --------------------------------------------------------------------------------------------
 def open_gui(wf_param_file):
     # CHECK THAT MANDATORY ACTORS ARE THERE
@@ -80,11 +109,15 @@ def open_gui(wf_param_file):
         + "/global_configuration/"
         + "global_lists.yaml"
     )
-    merge_actor_list = loadlist(file, "merge_actor_list")
-    process_list = loadlist(file, "process_list")
+    
+    workflowGlobalsReader = WorkflowGlobalsReader(file)
+    merge_actor_list = workflowGlobalsReader.getMergeActorList() # loadlist(file, "merge_actor_list")
+    process_list =  workflowGlobalsReader.getProcessList() #loadlist(file, "process_list")
     err_global = 0
     for actor in merge_actor_list:
-        err = import_actor(actor, 1)
+        workflowActor = WorkflowActor(actor) # err = import_actor(actor, 1)
+        
+        err=0 if workflowActor is not None else 1
         err_global = err_global + err
     if err_global != 0:
         print("---------------------------------------------", file=sys.stderr)
@@ -101,7 +134,9 @@ def open_gui(wf_param_file):
         window.geometry("+%d+%d" % (wx, wy))
     except:
         pass
-
+    print(f"Selected configuration file :{wf_param_file}")
+    workflowConfigReader = WorkflowConfigReader(wf_param_file)
+    # maindict = workflowConfigReader.initializeWorkflow()
     # CREATE THE DICTIONARY CONTAINING THE INFORMATION OF ALL CHOSEN ACTORS
     # (SYSTEM, CATEGORY, ACTOR NAME, INPUT/OUTPUT IDSS)
     (
@@ -112,16 +147,19 @@ def open_gui(wf_param_file):
         catlist,
     ) = create_maindict(wf_param_file, 1)
 
-    workflow_param = create_workflow_param_from_file(wf_param_file)
+    # workflow_param = create_workflow_param_from_file(wf_param_file)
 
+    workflow_param = workflowConfigReader.xml2dict(workflowConfigReader.xmlRoot)
     # LIST OF PRE-CONFIGURED WAVEFORMS
-    device = loadlist(file, "device")[0]
-    waveform_folder = os.path.join(
-        os.path.dirname(os.path.abspath(waveform_cooker.__file__)) + "/../../../../",
-        "presets",
-        device,
-    )
-    waveform_presets = loadlist(file, "waveform_presets")
+    device = workflowGlobalsReader.getDeviceList()[0] # loadlist(file, "device")[0]
+    waveform_folder=""
+    if isWaveformCookerPresent:
+        waveform_folder = os.path.join(
+            os.path.dirname(os.path.abspath(waveform_cooker.__file__)) + "/../../../../",
+            "presets",
+            device,
+        )
+    waveform_presets = workflowGlobalsReader.getWaveformPresetsList() # loadlist(file, "waveform_presets")
 
     # Setup
 
@@ -233,7 +271,6 @@ def open_gui(wf_param_file):
                 rrow += 1
 
     # -------------------------------------------------------------------------------------
-
     saved_folder = saved_folder_name(
         default_wf_param_file,
         maindict,

@@ -1,7 +1,12 @@
 import os
+from gui.gui_methods import create_workflow_param_from_file
 
-from waveform_cooker import add_dynamic
-from wftools.wf_tools import create_workflow_param_from_file
+try:
+    from waveform_cooker import add_dynamic
+except ImportError:
+    # create dummy function which does nothing
+    def add_dynamic(configuration_file, ksave=0, kplot=0, kverif=0, ids=None):
+        print("Couldn't import add_dynamic function from waveform_cooker")
 
 from src.workflow_dbhelper import WorkflowDbHelper
 from src.workflow_globals_reader import WorkflowGlobalsReader
@@ -17,7 +22,6 @@ def wf_wrapper(par_path):
     )
     print(globalListPath)
     inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
-
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
         "workflow_parameters"
     ][0]
