@@ -1,0 +1,90 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+   <xs:annotation>
+     <xs:documentation>Code parameters for Pion (ICRH wave and Fokker-Planck code)</xs:documentation>
+   </xs:annotation>
+ 
+   <xs:simpleType name="integer_minmaxInclusive_01">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="0"/>
+       <xs:maxInclusive value="1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_12">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_10">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="0"/>
+       <xs:maxInclusive value="10"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_spec">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="-1"/>
+       <xs:maxInclusive value="10"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_shotnumber">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="0"/>
+       <xs:maxInclusive value="1000000000000"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <!-- document element -->
+   <xs:element name="parameters">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="loss" minOccurs="0"/>
+         <xs:element ref="nrs" minOccurs="0"/>
+         <xs:element ref="debug" minOccurs="0"/>
+         <xs:element ref="nshot" minOccurs="0"/>
+         <xs:element ref="rfdifi" minOccurs="0"/>
+       </xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <!-- Flag 1/0 depending on whether first orbit losses are taken into account or not -->
+   <xs:element name="loss" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Flag 1/0 depending on whether first orbit losses are taken into account or not</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Variable used for choosing a given resonating ions species and harmonic -->
+   <xs:element name="nrs" type="integer_minmaxInclusive_spec">
+      <xs:annotation>
+          <xs:documentation>Variable used for choosing a given resonating ions species and harmonic</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Debug flag (0= normal mode, 1= debug mode) -->
+   <xs:element name="debug" type="integer_minmaxInclusive_10">
+      <xs:annotation>
+          <xs:documentation>Debug flag (0= normal mode, 1= debug mode)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Shot number for the run -->
+   <xs:element name="nshot" type="integer_minmaxInclusive_shotnumber">
+      <xs:annotation>
+          <xs:documentation> Shot number for the run </xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Diffusion model Flag (1 -> old, 2 -> new) -->
+   <xs:element name="rfdifi" type="integer_minmaxInclusive_12">
+      <xs:annotation>
+          <xs:documentation> Diffusion model Flag (1 -&gt; old, 2 -&gt; new) </xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+ </xs:schema>

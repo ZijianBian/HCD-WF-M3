@@ -1,0 +1,267 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- document element -->
+  <xs:element name="parameters">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="code_specific" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="output_control" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="data_adjust" minOccurs="1" maxOccurs="1"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="code_specific">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="i_warm" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="i_larm" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="i_eccd" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="i_grad" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="n_rad_ray" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="n_ang_ray" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="rho_max" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="ds" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="n_steps" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="imx_dispersion" minOccurs="0" maxOccurs="1"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="output_control">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="save_data_along_beams" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="i_rho" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="n_proj_ec" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="i_step_proj" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="i_step_ray" minOccurs="1" maxOccurs="1"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="data_adjust">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="i_x_pos" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="psi_ne_bnd" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="spline_psi" minOccurs="1" maxOccurs="1"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- 0=beamtr only, 1=weakly rel, 2=relativistic w/ asympt expansion, 3=rel w/ num integration -->
+  <xs:element name="i_warm">
+    <xs:annotation>
+      <xs:documentation>0=beamtr only, 1=weakly rel, 2=relativistic w/ asympt expansion, 3=rel w/ num integration</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:pattern value="0|1|2|3"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- order of larmor expansion -->
+  <xs:element name="i_larm">
+    <xs:annotation>
+      <xs:documentation>order of larmor expansion</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- 0=no, 1=yes ECCD calculation -->
+  <xs:element name="i_eccd">
+    <xs:annotation>
+      <xs:documentation>0=no, 1=yes ECCD calculation</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="0"/>
+        <xs:maxInclusive value="11"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- 0=raytracing, 1=gaussian beam -->
+  <xs:element name="i_grad">
+    <xs:annotation>
+      <xs:documentation>0=raytracing, 1=gaussian beam</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:pattern value="0|1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  
+  <!-- radial # of rays -->
+  <xs:element name="n_rad_ray">
+    <xs:annotation>
+      <xs:documentation>radial number of rays</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="31"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  
+  <!-- angular # of rays -->
+  <xs:element name="n_ang_ray">
+    <xs:annotation>
+      <xs:documentation>angular numbers of rays</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="36"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  
+  <!-- beam truncation (1=last ray at P=e^-2) -->
+  <xs:element name="rho_max">
+    <xs:annotation>
+      <xs:documentation>beam truncation (1=last ray at P=e^-2)</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:float">
+        <xs:minExclusive value="0"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- beamtracing step (cm) -->
+  <xs:element name="ds">
+    <xs:annotation>
+      <xs:documentation>beamtracing step (cm)</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:float">
+        <xs:minExclusive value="0"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- max # of beamtracing steps -->
+  <xs:element name="n_steps">
+    <xs:annotation>
+      <xs:documentation>max number of beamtracing steps</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  
+  <!-- max # of iterations to find the imaginary part of the wave vector from the dispersion relation -->
+  <xs:element name="imx_dispersion">
+    <xs:annotation>
+      <xs:documentation>max number of iterations to find the imaginary part of the wave vector from the dispersion relation</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  
+  <!-- Save beam data for all points along the beam line in the output waves IDS -->
+  <xs:element name="save_data_along_beams" type="xs:boolean">
+    <xs:annotation>
+      <xs:documentation>If true, save beam data along for each beam-line in the output waves IDS. Note that each beam may include large amounts of data.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <!-- 0=dpsi, 1=drhop constant in EC profiles -->
+  <xs:element name="i_rho">
+    <xs:annotation>
+      <xs:documentation>0=dpsi, 1=drhop constant in EC profiles</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:pattern value="0|1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  
+  <!-- # of points in EC profiles -->
+  <xs:element name="n_proj_ec">
+    <xs:annotation>
+      <xs:documentation>Number of points in EC profiles</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- beam shape data every i_step_proj points -->
+  <xs:element name="i_step_proj">
+    <xs:annotation>
+      <xs:documentation>beam shape data every i_step_proj points</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- ray data every i_step_ray points -->
+  <xs:element name="i_step_ray">
+    <xs:annotation>
+      <xs:documentation>ray data every i_step_ray points</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- -1=lower, 1=upper, 0=no X-point -->
+  <xs:element name="i_x_pos">
+    <xs:annotation>
+      <xs:documentation>-1=lower, 1=upper, 0=no X-point</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:pattern value="-1|0|1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- density boundary (psi_norm) -->
+  <xs:element name="psi_ne_bnd">
+    <xs:annotation>
+      <xs:documentation>density boundary (psi_norm)</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:float">
+        <xs:minExclusive value="0"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <!-- psi smoothing coefficient -->
+  <xs:element name="spline_psi">
+    <xs:annotation>
+      <xs:documentation>psi smoothing coefficient</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:float">
+        <xs:minInclusive value="0"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+</xs:schema>

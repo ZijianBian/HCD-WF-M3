@@ -4,17 +4,18 @@ import os
 import sys
 
 import imas
+
+from gui.gui_methods import create_workflow_param_from_file
+from src.hcd_workflow import HCDWorkflow
+from src.workflow_dbhelper import WorkflowDbHelper
+
+isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
-except ImportError:
-    # create dummy function which does nothing
-    def add_dynamic(configuration_file, ksave=0, kplot=0, kverif=0, ids=None):
-        print("Couldn't import add_dynamic function from waveform_cooker")
-from gui.gui_methods import create_workflow_param_from_file
+except:
+    isWaveformCookerPresent = False
+    
 
-from src.workflow_dbhelper import WorkflowDbHelper
-from src.workflow_globals_reader import WorkflowGlobalsReader
-from src.hcd_workflow import HCDWorkflow
 
 # Management of input arguments
 parser = argparse.ArgumentParser(
@@ -91,8 +92,9 @@ for filename in os.listdir(config_folder_path):
     filePath = os.path.join(config_folder_path, filename)
     if filePath.endswith("waveforms.yaml"):
         if os.path.exists(filePath):
-            idsObject = add_dynamic(filePath)
-        machineDb.put(idsObject)
+            idsObject = add_dynamic(filePath) if isWaveformCookerPresent else None
+        if idsObject is not None:
+            machineDb.put(idsObject)
 
 timeArray = dbhelper.getTimeArray(inputDb)
 
@@ -129,6 +131,7 @@ print("<--------------------Availables Keys in idsData-------------------->")
 print(idsData.keys())
 print("<--------------------Check contents of idsData[waves]-------------------->")
 import pprint
+
 pprint.pprint(idsData["waves"])
 hcdWorkflow.finalize()
 

@@ -1,12 +1,12 @@
 import os
 from gui.gui_methods import create_workflow_param_from_file
 
+isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
-except ImportError:
-    # create dummy function which does nothing
-    def add_dynamic(configuration_file, ksave=0, kplot=0, kverif=0, ids=None):
-        print("Couldn't import add_dynamic function from waveform_cooker")
+except:
+    isWaveformCookerPresent = False
+    
 from importlib_resources import files
 from src.workflow_dbhelper import WorkflowDbHelper
 from src.workflow_globals_reader import WorkflowGlobalsReader
@@ -65,8 +65,9 @@ def wf_wrapper(par_path):
         filePath = os.path.join(config_folder_path, filename)
         if filePath.endswith("waveforms.yaml"):
             if os.path.exists(filePath):
-                idsObject = add_dynamic(filePath)
-            machineDb.put(idsObject)
+                idsObject = add_dynamic(filePath) if isWaveformCookerPresent else None
+            if idsObject is not None:
+                machineDb.put(idsObject)
 
     workflowWrapper = WorkflowDriver(config_folder_path)
     workflowWrapper.initialize(inputDb, outputDb, machineDb, inputIds, inputMds)

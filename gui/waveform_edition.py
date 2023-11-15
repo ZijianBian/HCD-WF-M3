@@ -3,12 +3,12 @@ import tkinter as tk
 from tkinter import ttk
 from shutil import copy2
 from .colour_definitions import bluish as col
+isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
-except ImportError:
-    # create dummy function which does nothing
-    def add_dynamic(configuration_file, ksave=0, kplot=0, kverif=0, ids=None):
-        print("Couldn't import add_dynamic function from waveform_cooker")
+except:
+    isWaveformCookerPresent = False
+    
 fontsize = 12
 
 ############################################################################
@@ -458,12 +458,13 @@ class edit_waveforms:
                 bg=col.c2,
             )
             add_button_plot.grid(padx=2, pady=2, sticky="we")
-            add_button_plot.configure(
-                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: add_dynamic(
-                    config_folder + "/" + waveform_presets[process]["custom"][0],
-                    kplot=1,
+            if isWaveformCookerPresent:
+                add_button_plot.configure(
+                    command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: add_dynamic(
+                        config_folder + "/" + waveform_presets[process]["custom"][0],
+                        kplot=1,
+                    )
                 )
-            )
 
             # Buttons for presets (2nd column)
             for preset_key in waveform_presets[process]:

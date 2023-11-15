@@ -1,0 +1,249 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+   <xs:annotation>
+     <xs:documentation>Code parameters for Nemo (neutral beam deposition code)</xs:documentation>
+   </xs:annotation>
+ 
+   <xs:simpleType name="integer_minInclusive_1">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minInclusive_2">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_01">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="0"/>
+       <xs:maxInclusive value="1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_02">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="0"/>
+       <xs:maxInclusive value="2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_marker">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="1000000"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_12">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_1_10000">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="10000"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="string_field">
+     <xs:restriction base="xs:string">
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="float_minmaxInclusive_dot001_dot100">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="0.01"/>
+       <xs:maxInclusive value="100.0"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <!-- document element -->
+   <xs:element name="parameters">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="n_out_profiles" minOccurs="1"/>
+         <xs:element ref="n_pitch_resol" minOccurs="1"/>
+         <xs:element ref="n_output_2d_x" minOccurs="1"/>
+         <xs:element ref="n_output_2d_y" minOccurs="1"/>
+         <xs:element ref="n_output_2d_r" minOccurs="1"/>
+         <xs:element ref="n_output_2d_z" minOccurs="1"/>
+         <xs:element ref="n_output_2d_f" minOccurs="1"/>
+         <xs:element ref="crossec_flag" minOccurs="1"/>
+         <xs:element ref="adas_path" minOccurs="1"/>
+         <xs:element ref="ref_path" minOccurs="1"/>
+         <xs:element ref="source_shape" minOccurs="1"/>
+         <xs:element ref="npath_internal" minOccurs="1"/>
+         <xs:element ref="npath_reduc" minOccurs="1"/>
+         <xs:element ref="nthemin" minOccurs="1"/>
+         <xs:element ref="nthemax" minOccurs="1"/>
+         <xs:element ref="nphi" minOccurs="1"/>
+         <xs:element ref="nphi_reduc" minOccurs="1"/>
+         <xs:element ref="theta_resol" minOccurs="1"/>
+         <xs:element ref="ibeamletflag" minOccurs="1"/>
+         <xs:element ref="fokker_flag" minOccurs="1"/>
+         <xs:element ref="nmarker" minOccurs="1"/>
+         <xs:element ref="fast_and_wrong" minOccurs="1"/>
+       </xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <!-- Resolution of the output 1D profiles -->
+   <xs:element name="n_out_profiles" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>Resolution of the output 1D profiles</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Resolution of the output pitch angle profile -->
+   <xs:element name="n_pitch_resol" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>Resolution of the output pitch angle profile</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- X-resolution of the output birth matrix for display -->
+   <xs:element name="n_output_2d_x" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>X-resolution of the output birth matrix for display</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Y-resolution of the output birth matrix for display  -->
+   <xs:element name="n_output_2d_y" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>R-resolution of the output birth matrix for display</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- R-resolution of the output (R,Z) 2D profiles -->
+   <xs:element name="n_output_2d_r" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>R-resolution of the output (R,Z) 2D profiles</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Z-resolution of the output (R,Z) 2D profiles -->
+   <xs:element name="n_output_2d_z" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>Z-resolution of the output (R,Z) 2D profiles</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- PHI-resolution of the output (R,Z,PHI) profiles -->
+   <xs:element name="n_output_2d_f" type="integer_minInclusive_1">
+      <xs:annotation>
+          <xs:documentation>PHI-resolution of the output (R,Z,PHI) profiles</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Flag for ionization cross sections  (1 = Janev, 2 = ADAS) -->
+   <xs:element name="crossec_flag" type="integer_minmaxInclusive_12">
+      <xs:annotation>
+          <xs:documentation> Flag for ionization cross sections  (1 = Janev, 2 = ADAS)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Complete path to ADAS directory -->
+   <xs:element name="adas_path" type="string_field">
+      <xs:annotation>
+          <xs:documentation>Complete path to ADAS directory</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Complete path to CI reference directory -->
+   <xs:element name="ref_path" type="string_field">
+      <xs:annotation>
+          <xs:documentation>Complete path to CI reference directory</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Flag for source shape (0 = rectangular, 1 = circular) -->
+   <xs:element name="source_shape" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Flag for source shape (0 = rectangular, 1 = circular)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Path length resolution for beam deposition -->
+   <xs:element name="npath_internal" type="integer_minmaxInclusive_1_10000">
+      <xs:annotation>
+          <xs:documentation>Path length resolution for beam deposition</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Path length resolution for beam intensity calculation -->
+   <xs:element name="npath_reduc" type="integer_minmaxInclusive_1_10000">
+      <xs:annotation>
+          <xs:documentation>Path length resolution for beam intensity calculation</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Minimum THETA resolution for beam divergence -->
+   <xs:element name="nthemin" type="integer_minmaxInclusive_1_10000">
+      <xs:annotation>
+          <xs:documentation>Minimum THETA resolution for beam divergence</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Maximum THETA resolution for beam divergence -->
+   <xs:element name="nthemax" type="integer_minmaxInclusive_1_10000">
+      <xs:annotation>
+          <xs:documentation>Maximum THETA resolution for beam divergence</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- PHI resolution for beam deposition -->
+   <xs:element name="nphi" type="integer_minmaxInclusive_1_10000">
+      <xs:annotation>
+          <xs:documentation>PHI resolution for beam deposition</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- PHI resolution for beam intensity calculation -->
+   <xs:element name="nphi_reduc" type="integer_minmaxInclusive_1_10000">
+      <xs:annotation>
+          <xs:documentation>PHI resolution for beam intensity calculation</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Variable for tuning THETA resolution for beam divergence -->
+   <xs:element name="theta_resol" type="float_minmaxInclusive_dot001_dot100">
+      <xs:annotation>
+          <xs:documentation>Variable for tuning THETA resolution for beam divergence</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Flag to use the beamlet information for the source witdth and height or not -->
+   <xs:element name="ibeamletflag" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Flag to use the beamlet information for the source width and height or not</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Flag to export markers according to downstream FP code: 0 = Default (SPOT, etc.), 1 = RISK, 2 = PION -->
+   <xs:element name="fokker_flag" type="integer_minmaxInclusive_02">
+      <xs:annotation>
+          <xs:documentation>Flag to export markers according to downstream FP code: 0 = Default (SPOT, etc.), 1 = RISK, 2 = PION</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Number of output generated markers -->
+   <xs:element name="nmarker" type="integer_minmaxInclusive_marker">
+      <xs:annotation>
+          <xs:documentation>Number of output generated markers</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+    
+   <!-- Flag for quick test (0 = slow and right, 1 = fast and wrong) -->
+   <xs:element name="fast_and_wrong" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Flag for quick test (0 = slow and right, 1 = fast and wrong)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+    
+ </xs:schema>

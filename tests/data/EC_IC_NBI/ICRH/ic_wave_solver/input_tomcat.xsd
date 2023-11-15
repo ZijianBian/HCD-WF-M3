@@ -1,0 +1,103 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+ 
+   <!-- document element -->
+   <xs:element name="parameters">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="TOMCAT"/>
+       </xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <xs:element name="TOMCAT">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="iautobreak"/>
+         <xs:element ref="inewBC"/>
+         <xs:element ref="IHFS"/>
+         <xs:element ref="ntor"/>
+         <xs:element ref="iSPA"/>
+         <xs:element ref="Nradout"/>
+         <xs:element ref="power"/>
+         <xs:element ref="xfracHFS"/>
+         <xs:element ref="xfracLFS"/>
+         <xs:element ref="widthfrac"/>
+         <xs:element ref="include_nbi"/>
+         <xs:element ref="ispline"/>
+       </xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <xs:element name="iautobreak" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>iautobreak value</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="inewBC" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>inewBC value</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="IHFS" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>IHFS value</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="ntor" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>ntor value</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="iSPA" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>single (1) or mutiple (2) transits</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="Nradout" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>grid number wave output</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="power" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>power value </xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="xfracHFS" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>value HFS ap-fraction </xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="xfracLFS" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>value LFS ap-fraction </xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="widthfrac" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>value ap-fraction P spread </xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="include_nbi" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Include NBI species (0: don't include, 1: from corefast, 2: from distribution) -NOT READY-</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="ispline" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Use spline (1: use spline and actual profiles, 0: no spline and use profile factor ) </xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+ </xs:schema>

@@ -7,10 +7,10 @@
     <run_in display="Input run">4</run_in>
     <output_user_or_path display="Output user or path">default</output_user_or_path>
     <output_database display="Output database">default</output_database>
-    <run_out display="Output run">5</run_out>
-    <tbegin display="Start Time [s]">30.0</tbegin>
-    <tend display="End Time   [s]">350.0</tend>
-    <dt_required display="Time Step  [s]">20</dt_required>
+    <run_out display="Output run">25</run_out>
+    <tbegin display="Start Time [s]">150.0</tbegin>
+    <tend display="End Time   [s]">156.0</tend>
+    <dt_required display="Time Step  [s]">2.0</dt_required>
     <parallel_workflow display="Parallel workflow [0-1]">0</parallel_workflow> 
     <one_time_slice display="Single time slice [0-1]">0</one_time_slice> 
   </workflow_parameters>
@@ -19,7 +19,7 @@
     <main_process display="Main processes">
       
       <ECRH display="ECH">
-	<ec_wave_solver display="Wave solver" list="genray gray grayscale torbeam toray">3</ec_wave_solver>
+	<ec_wave_solver display="Wave solver" list="genray gray grayscale torbeam toray">2</ec_wave_solver>
 	<ec_wave_fp display="Electron Fokker-Planck" list="relax">0</ec_wave_fp>
       </ECRH>
 
@@ -29,7 +29,7 @@
 
       <ICRH display="ICRH">
 	<ic_coup display="Coupling" list="iccoup">0</ic_coup> 
-	<ic_wave_solver display="Wave solver" list="cyrano tomcat pion lion">0</ic_wave_solver>
+	<ic_wave_solver display="Wave solver" list="cyrano tomcat pion lion">3</ic_wave_solver>
 	<ic_wave_fp display="Ion Fokker-Planck" list="stixredist fopla">0</ic_wave_fp>
       </ICRH>
     
@@ -46,7 +46,7 @@
 
     <post_process display="Post-processing">
       <source display="Fill core_sources">
-	<fill_core_sources display="core_sources IDS" list="hcd2core_sources">0</fill_core_sources> 
+	<fill_core_sources display="core_sources IDS" list="hcd2core_sources">1</fill_core_sources> 
       </source>
       <profiles display="Fill core_profiles">
 	<fill_core_profiles display="core_profiles IDS" list="hcd2core_profiles">0</fill_core_profiles>

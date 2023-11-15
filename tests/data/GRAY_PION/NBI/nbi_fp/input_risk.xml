@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<parameters>
+
+    <!-- Resolution of the output 1D-profiles -->
+    <n_out_profiles>10</n_out_profiles>
+
+    <!-- Normalized velocity resolution (v/vth) -->
+    <dx_resolution>0.01</dx_resolution>
+
+    <!-- Implicit/explicit contribution for integration scheme (Crank-Nicholson or so) -->
+    <fac_implicit>0.7</fac_implicit>
+
+    <!-- Factor for internal time step (to decrease when NSTEP becomes too small) -->
+    <dt_factor>5.e-4</dt_factor>
+
+    <!-- Flag telling if RISK is called for NUCLEAR source (0) or NBI source (1) -->
+    <ksource>1</ksource>
+
+<!-- Number of processors for parallel run (parameter added by HCD wf) -->
+  <nproc_actor>4</nproc_actor>
+</parameters>

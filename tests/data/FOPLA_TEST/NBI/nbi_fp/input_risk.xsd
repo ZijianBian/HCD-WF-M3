@@ -1,0 +1,88 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+   <xs:annotation>
+     <xs:documentation>Code parameters for Risk (Fokker-Planck code)</xs:documentation>
+   </xs:annotation>
+ 
+   <xs:simpleType name="integer_minInclusive_2">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="integer_minmaxInclusive_01">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="0"/>
+       <xs:maxInclusive value="1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+  <xs:simpleType name="float_minInclusive_dot0001">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="0.0001"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="float_minInclusive_dot1">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="0.1"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="float_dt">
+     <xs:restriction base="xs:float">
+       <xs:minInclusive value="1.e-5"/>
+       <xs:maxInclusive value="1.e-2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <!-- document element -->
+   <xs:element name="parameters">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="n_out_profiles" minOccurs="0"/>
+         <xs:element ref="dx_resolution" minOccurs="0"/>
+         <xs:element ref="fac_implicit" minOccurs="0"/>
+         <xs:element ref="dt_factor" minOccurs="0"/>
+         <xs:element ref="ksource" minOccurs="0"/>
+       <xs:element ref="nproc_actor" minOccurs="0"/></xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <!-- Resolution of the output 1D profiles -->
+   <xs:element name="n_out_profiles" type="integer_minInclusive_2">
+      <xs:annotation>
+          <xs:documentation>Resolution of the output 1D profiles</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Normalized velocity resolution (v/vth) -->
+   <xs:element name="dx_resolution" type="float_minInclusive_dot0001">
+      <xs:annotation>
+          <xs:documentation>Normalized velocity resolution (v/vth)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Implicit/explicit contribution for integration scheme (Crank-Nicholson or so) -->
+   <xs:element name="fac_implicit" type="float_minInclusive_dot1">
+      <xs:annotation>
+          <xs:documentation>Implicit/explicit contribution for integration scheme (Crank-Nicholson or so)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Factor for internal time step (to decrease when NSTEP becomes too small) -->
+   <xs:element name="dt_factor" type="float_dt">
+      <xs:annotation>
+          <xs:documentation>Factor for internal time step (to decrease when NSTEP becomes too small)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Flag telling if RISK is called for NUCLEAR source (0) or NBI source (1) -->
+   <xs:element name="ksource" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Flag telling if RISK is called for NUCLEAR source (0) or NBI source (1)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+
+
+ <xs:element name="nproc_actor" type="xs:integer"><xs:annotation><xs:documentation/></xs:annotation></xs:element></xs:schema>

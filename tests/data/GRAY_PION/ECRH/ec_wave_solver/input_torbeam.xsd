@@ -1,0 +1,174 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+   <xs:annotation>
+     <xs:documentation>Code parameters for TORBEAM</xs:documentation>
+   </xs:annotation>
+ 
+   <!-- document element -->
+   <xs:element name="parameters">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="npow" minOccurs="1"/>
+         <xs:element ref="ncd" minOccurs="1"/>
+         <xs:element ref="ncdroutine" minOccurs="1"/>
+         <xs:element ref="nprofv" minOccurs="1"/>
+         <xs:element ref="noout" minOccurs="1"/>
+         <xs:element ref="nrela" minOccurs="1"/>
+         <xs:element ref="nmaxh" minOccurs="1"/>
+         <xs:element ref="nabsroutine" minOccurs="1"/>
+         <xs:element ref="nastra" minOccurs="1"/>
+         <xs:element ref="nprofcalc" minOccurs="1"/>
+         <xs:element ref="ncdharm" minOccurs="1"/>
+         <xs:element ref="npnts_extrap" minOccurs="1"/>
+         <xs:element ref="nfreq_extrap" minOccurs="1"/>
+         <xs:element ref="nrel" minOccurs="1"/>
+         <xs:element ref="xrtol" minOccurs="1"/>
+         <xs:element ref="xatol" minOccurs="1"/>
+         <xs:element ref="xstep" minOccurs="1"/>
+         <xs:element ref="rhostop" minOccurs="1"/>
+         <xs:element ref="xzsrch" minOccurs="1"/>
+         <xs:element ref="ascii_export" minOccurs="1"/>
+       </xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <!-- Power absorption on(1)/off(0) -->
+   <xs:element name="npow" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Power absorption on(1)/off(0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Current drive calc. on(1)/off(0) (set to 0 if npow=0) -->
+   <xs:element name="ncd" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Current drive calc. on(1)/off(0) (set to 0 if npow=0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Curba, 1 => Lin-Liu, 2 => Lin-Liu+mom. conserv. -->
+   <xs:element name="ncdroutine" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Curba, 1 =&gt; Lin-Liu, 2 =&gt; Lin-Liu+mom. conserv.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Number of radial points for volume prof. -->
+   <xs:element name="nprofv" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Number of radial points for volume prof.</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Screen output (0) or no output -->
+   <xs:element name="noout" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Screen output (0) or no output</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Weakly (0) or fully (1) rel. absorption -->
+   <xs:element name="nrela" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Weakly (0) or fully (1) rel. absorption</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Number of harmonics 1 <= nmaxh <= 5 -->
+   <xs:element name="nmaxh" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Number of harmonics nmaxh:[1,5]</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Westerhof's (0) or Farina's absorption routine -->
+   <xs:element name="nabsroutine" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Westerhof's (0) or Farina's absorption routine</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Def. of j-CD: Lin-Liu (0), ASTRA (1), JINTRAC (2) -->
+   <xs:element name="nastra" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Def. of j-CD: Lin-Liu (0), ASTRA (1), JINTRAC (2)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Standard dep. profiles (0), profiles 'a\ la Maj' -->
+   <xs:element name="nprofcalc" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Standard dep. profiles (0), profiles 'a\ la Maj'</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Only lowest (0) or also next (1) harmonic in CD efficiency -->
+   <xs:element name="ncdharm" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Only lowest (0) or also next (1) harmonic in CD efficiency</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Number of points used in coef. extrapolation -->
+   <xs:element name="npnts_extrap" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Number of points used in coef. extrapolation</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Number of steps on which coef. are extrapolated -->
+   <xs:element name="nfreq_extrap" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Number of steps on which coef. are extrapolated</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- 1 => rel. mass correction for reflectometry -->
+   <xs:element name="nrel" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>1 =&gt; rel. mass correction for reflectometry</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Required rel. error -->
+   <xs:element name="xrtol" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Required rel. error</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Required abs. error -->
+   <xs:element name="xatol" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Required abs. error</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Integration step in vacuum [cm] -->
+   <xs:element name="xstep" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Integration step in vacuum [cm]</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Max. value of rho on exit -->
+   <xs:element name="rhostop" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Max. value of rho on exit</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Vert. position for search of magn. axis (def. 0) -->
+   <xs:element name="xzsrch" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Vert. position for search of magn. axis (def. 0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+  
+   <!-- Write Torbeam input/output ascii files (1) or not (0) -->
+   <xs:element name="ascii_export" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Write Torbeam input/output ascii files (1) or not (0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+     
+</xs:schema>

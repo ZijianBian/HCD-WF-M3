@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<parameters>
+  <stix_redist>
+    <max_iterations>10</max_iterations>             <!--Maximum number of iterations per magnetic surface -->
+    <tolerance_Teff>20</tolerance_Teff>            <!--Tolerance on Teff evolution to stop the iterative scheme -->
+    <N_velocity_grid>3000</N_velocity_grid>        <!--Number of points in velocity grid  -->
+    <target_ions>0</target_ions>                   <!--target ion index (0 for all ions non-Maxwellian) -->
+    <use_new_proc>true</use_new_proc>              <!--true: use new procedure for subtracting equipartition; false: original procedure  -->
+    <use_internal_power>false</use_internal_power> <!--1: compute RF absorption internally, 0: importing it from CPOs -->
+    <total_power>0</total_power>               <!--Total RF Power [W] (=0 do not normalize, larger than 0 normalize) -->
+    <Ntor>0</Ntor>                                 <!--Toroidal mode number (=0 read from waves, otherwise impose value) -->
+    <only_perp>false</only_perp>                   <!--FALSE: default 1D procedure, TRUE: force RF power in perp. direction only -->
+    <impose_EminoEplus>0</impose_EminoEplus>       <!--Emin/Eplus, 0: use polarization from waves, value: impose given value -->
+    <impose_EparoEplus>0</impose_EparoEplus>       <!--Epar/Eplus, 0: use polarization from waves, value: impose given value -->
+  </stix_redist>
+  <verbosity>1</verbosity>
+  <rm_tmp>false</rm_tmp>                            <!--TRUE: Delete temporary data folder -->
+</parameters>

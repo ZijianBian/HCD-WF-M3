@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<parameters>
+
+    <!-- Shot number for the run -->
+    <nshot> 99999 </nshot>
+
+    <!-- Flag 1/2 depending on which model to use for the diffusion coefs -->
+    <rfdifi> 1 </rfdifi>
+
+    <!-- Flag 1/0 depending on whether first orbit losses are taken into account or not -->
+    <loss> 1 </loss>
+
+    <!-- Variable used for choosing a given resonating ions species and harmonic -->
+    <nrs> -1 </nrs>
+
+    <!-- Debug flag (0= normal mode, 1= debug mode) -->
+    <debug> 5 </debug>
+</parameters>

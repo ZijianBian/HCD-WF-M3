@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<parameters>
+  <TOMCAT>
+    <iautobreak>0</iautobreak>   <!--auto-find break point at edge or not --> 
+    <inewBC>2</inewBC>    <!--type of boundary condition -->
+    <IHFS>0</IHFS>        <!--low or high field side incidence -->
+    <ntor>32</ntor>        <!--toroidal mode number -->
+    <iSPA>1</iSPA>        <!--single(1) or multiple (2) transits -->
+    <Nradout>200</Nradout>        <!-- number grid points wave output  -->
+    <power>10.0e6</power>     <!--launched power in W -->
+    <xfracHFS>0.84</xfracHFS>     <!-- clipping fraction HFS  -->
+    <xfracLFS>0.86</xfracLFS>     <!-- clipping fraction LFS  -->
+    <widthfrac>0.4</widthfrac>     <!-- ap-fraction for P spreading  -->
+    <include_nbi>2</include_nbi> <!-- 0: Don't include NBI species, 1: use corefast, 2: use distribution (NOT READY) -->
+    <ispline>1</ispline> <!-- 1: use spline and actual profiles, 0: use profile factor computed from 3 relevant points -->
+</TOMCAT>
+</parameters>

@@ -1,0 +1,108 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+ 
+   <!-- document element -->
+   <xs:element name="parameters">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="stix_redist"/>
+         <xs:element name="verbosity" type="xs:integer" minOccurs="0">
+           <xs:annotation>
+             <xs:documentation>Determines how much information the code will print to stdout and stderr</xs:documentation>
+           </xs:annotation>
+         </xs:element>
+	 <xs:element name="rm_tmp" type="xs:boolean">
+	   <xs:annotation>
+             <xs:documentation>TRUE: Delete temporary data folder</xs:documentation>
+	   </xs:annotation>
+	 </xs:element>
+       </xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <xs:element name="stix_redist">
+     <xs:complexType>
+       <xs:all>
+         <xs:element ref="max_iterations"/>
+         <xs:element ref="tolerance_Teff"/>
+         <xs:element ref="N_velocity_grid"/>
+         <xs:element ref="target_ions"/> 
+         <xs:element ref="use_new_proc"/>
+         <xs:element ref="use_internal_power"/>
+         <xs:element ref="total_power"/>
+         <xs:element ref="Ntor"/>
+         <xs:element ref="only_perp"/>
+         <xs:element ref="impose_EminoEplus"/>
+         <xs:element ref="impose_EparoEplus"/>
+       </xs:all>
+     </xs:complexType>
+   </xs:element>
+ 
+   <xs:element name="max_iterations" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Maximum number of iterations per magnetic surface</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="tolerance_Teff" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Tolerance on Teff evolution to stop the iterative scheme</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+ 
+   <xs:element name="N_velocity_grid" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Number of points in velocity grid</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="target_ions" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Switch to choose between iterating on all ion species(=0) 
+or on a single one(=ion_index)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   
+   <xs:element name="use_new_proc" type="xs:boolean">
+      <xs:annotation>
+          <xs:documentation>Switch for using new procedure to subtract equipartition (true) or using original procedure (=false)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="use_internal_power" type="xs:boolean">
+      <xs:annotation>
+          <xs:documentation>Switch for computing RF power absorption internally(=1) 
+or importing it from CPOs(=0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+ 
+   <xs:element name="total_power" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Total RF Power [W] (only used when use_internal_power=1)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+ 
+   <xs:element name="Ntor" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Impose toroidal mode number or use from waves (=0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="only_perp" type="xs:boolean">
+      <xs:annotation>
+          <xs:documentation>FALSE: default 1D procedure, TRUE: force RF power in perp. direction only</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="impose_EminoEplus" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Emin/Eplus, 0: use polarization from waves, value: impose given value</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <xs:element name="impose_EparoEplus" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>Epar/Eplus, 0: use polarization from waves, value: impose given value</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+ </xs:schema>

@@ -5,7 +5,9 @@ from gui.waveform_edition import edit_waveforms
 from src.workflow_actor import WorkflowActor
 from src.workflow_config_reader import WorkflowConfigReader
 from workflow.wf_wrapper import wf_wrapper
-
+import gui.colour_definitions.bluish as col
+from gui.tooltip import  CreateToolTip
+import gui.time_base_edition as tbe
 from src.workflow_globals_reader import WorkflowGlobalsReader
 from importlib_resources import files
 isWaveformCookerPresent = True
@@ -64,9 +66,7 @@ except:
 #     )
 #     sys.exit()
 
-import gui.colour_definitions.bluish as col
-from gui.tooltip import  CreateToolTip
-import gui.time_base_edition as tbe
+
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
 hcd_path = "/".join(os.path.realpath(__file__).split("/")[:-1])
