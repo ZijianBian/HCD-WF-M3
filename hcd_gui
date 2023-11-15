@@ -1,15 +1,21 @@
 #!/usr/bin/env python
-import os, sys, copy
-from gui.gui_methods import create_maindict, edit_codeparam, load, saved_folder_name, update_workflow_param
+import copy
+import os
+import sys
+
+from importlib_resources import files
+
+import gui.colour_definitions.bluish as col
+import gui.time_base_edition as tbe
+from gui.gui_methods import (create_maindict, edit_codeparam, load,
+                             saved_folder_name, update_workflow_param)
+from gui.tooltip import CreateToolTip
 from gui.waveform_edition import edit_waveforms
 from src.workflow_actor import WorkflowActor
 from src.workflow_config_reader import WorkflowConfigReader
-from workflow.wf_wrapper import wf_wrapper
-import gui.colour_definitions.bluish as col
-from gui.tooltip import  CreateToolTip
-import gui.time_base_edition as tbe
 from src.workflow_globals_reader import WorkflowGlobalsReader
-from importlib_resources import files
+from workflow.wf_wrapper import wf_wrapper
+
 isWaveformCookerPresent = True
 try:
     import waveform_cooker
@@ -18,9 +24,9 @@ except:
 
 try:
     import tkinter
-    import tkinter.ttk
     import tkinter.filedialog
     import tkinter.font as font
+    import tkinter.ttk
 except:
     print("ERROR: tkinter not found", file=sys.stderr)
     print(

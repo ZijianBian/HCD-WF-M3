@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<parameters>
+
+    <!-- EC POWER in W                              -->
+    <ec_power> 1.0e7 </ec_power>
+
+    <!-- GAUSSIAN EC PEAK LOCATION IN RHO_TOR_NORM -->
+    <ec_gauss_location> 0.2 </ec_gauss_location>
+
+    <!-- GAUSSIAN EC PEAK SIGMA WIDTH IN RHO_TOR_NORM -->
+    <ec_gauss_sigma> 0.2 </ec_gauss_sigma>
+
+    <!-- ECCD SCALING PRE-FACTOR                      -->
+    <eccd_prefactor> 12.0 </eccd_prefactor>
+</parameters>

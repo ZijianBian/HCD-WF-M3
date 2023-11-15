@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Start from clean environment
 module purge >&/dev/null
 
