@@ -3,7 +3,7 @@ import os
 import sys
 
 import imas
-
+from importlib_resources import files
 from src.workflow_globals_reader import WorkflowGlobalsReader
 from src.workflow_config_reader import WorkflowConfigReader
 
@@ -12,11 +12,8 @@ from src.workflow_config_reader import WorkflowConfigReader
 class WorkflowData:
     def __init__(self, workflowConfig) -> None:
         workflowConfig = os.path.join(workflowConfig, "input_workflow.xml")
-        self.globalList = (
-            os.path.dirname(os.path.abspath(__file__))
-            + "/../global_configuration/"
-            + "global_lists.yaml"
-        )
+        self.globalList = str(files('src.global_configuration').joinpath('global_lists.yaml'))
+    
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
         self.globalListReader = WorkflowGlobalsReader(self.globalList)
         self.catdict = self.workflowConfig.getCategories()
@@ -44,7 +41,7 @@ class WorkflowData:
     def getParamProcess(self):
         return self.workflowConfig.getParamProcess()
 
-    # TODO make it objet variable
+    # TODO make it object variable
     def getTimeBase(self):
         return self.workflowConfig.getTimeBase()
 

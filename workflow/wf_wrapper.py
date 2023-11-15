@@ -7,7 +7,7 @@ except ImportError:
     # create dummy function which does nothing
     def add_dynamic(configuration_file, ksave=0, kplot=0, kverif=0, ids=None):
         print("Couldn't import add_dynamic function from waveform_cooker")
-
+from importlib_resources import files
 from src.workflow_dbhelper import WorkflowDbHelper
 from src.workflow_globals_reader import WorkflowGlobalsReader
 from src.workflow_driver import WorkflowDriver
@@ -17,10 +17,7 @@ def wf_wrapper(par_path):
     config_folder_path = os.path.abspath(par_path)
 
     rootPath = os.path.dirname(os.path.abspath(__file__))
-    globalListPath = os.path.join(
-        rootPath, "..", r"global_configuration/global_lists.yaml"
-    )
-    print(globalListPath)
+    globalListPath = str(files('src.global_configuration').joinpath('global_lists.yaml'))
     inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
         "workflow_parameters"
