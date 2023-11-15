@@ -6,7 +6,7 @@ import sys
 class WorkflowGlobalsReader:
     def __init__(self, globalListPath: str) -> None:
         if not os.path.exists(globalListPath):
-            raise "Global List Path doesn't exists"
+            raise Exception(f"Global List Path doesn't exists : {globalListPath}")
         self.globalListPath = globalListPath
 
         with open(globalListPath, "r") as fileObject:

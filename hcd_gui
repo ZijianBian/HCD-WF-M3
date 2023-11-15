@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 import os, sys, copy
 from gui.gui_methods import create_maindict, edit_codeparam, load, saved_folder_name, update_workflow_param
 from gui.waveform_edition import edit_waveforms
-from src.Workflow_actor import WorkflowActor
+from src.workflow_actor import WorkflowActor
 from src.workflow_config_reader import WorkflowConfigReader
 from workflow.wf_wrapper import wf_wrapper
 
 from src.workflow_globals_reader import WorkflowGlobalsReader
-
+from importlib_resources import files
 isWaveformCookerPresent = True
 try:
     import waveform_cooker
@@ -68,19 +69,9 @@ from gui.tooltip import  CreateToolTip
 import gui.time_base_edition as tbe
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
-# col
-# loadlist
-# import_actor
-# create_maindict
-# create_workflow_param_from_file
-# update_workflow_param
-# saved_folder_name
-# CreateToolTip
-# load
-
 hcd_path = "/".join(os.path.realpath(__file__).split("/")[:-1])
-default_wf_param_file = hcd_path + "/global_configuration/input_workflow_default.xml"
-
+# default_wf_param_file = hcd_path + "/global_configuration/input_workflow_default.xml"
+default_wf_param_file = str(files('src.global_configuration').joinpath('input_workflow_default.xml'))
 # --------------------------------------------------------------------------------------------
 # Create the main window (define font, title and background colour)
 window = tkinter.Tk()
@@ -104,12 +95,12 @@ def run(current_config_folder):
 # --------------------------------------------------------------------------------------------
 def open_gui(wf_param_file):
     # CHECK THAT MANDATORY ACTORS ARE THERE
-    file = (
-        os.path.dirname(os.path.abspath(__file__))
-        + "/global_configuration/"
-        + "global_lists.yaml"
-    )
-    
+    # file = (
+    #     os.path.dirname(os.path.abspath(__file__))
+    #     + "/global_configuration/"
+    #     + "global_lists.yaml"
+    # )
+    file = str(files('src.global_configuration').joinpath('global_lists.yaml'))
     workflowGlobalsReader = WorkflowGlobalsReader(file)
     merge_actor_list = workflowGlobalsReader.getMergeActorList() # loadlist(file, "merge_actor_list")
     process_list =  workflowGlobalsReader.getProcessList() #loadlist(file, "process_list")
