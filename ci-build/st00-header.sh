@@ -27,6 +27,8 @@ module load IMAS
 module load WFtools
 module load Waveform-Cooker/1.3.3-GCCcore-10.2.0
 
+source "ci-build/common.sh"
+
 export PREFIX_DIR=HCDWorkflow
-export ACTOR_FOLDER=/work/imas/opt//bamboo_deploy/PYTHON_ACTORS/
+export ACTOR_FOLDER=/work/imas/opt/bamboo_deploy/PYTHON_ACTORS/
 export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
