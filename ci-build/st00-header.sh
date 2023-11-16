@@ -27,6 +27,8 @@ module load IMAS
 module load WFtools
 module load Waveform-Cooker/1.3.3-GCCcore-10.2.0
 
+pip install -r requirements.txt 
+
 source "ci-build/common.sh"
 
 export PREFIX_DIR=HCDWorkflow
