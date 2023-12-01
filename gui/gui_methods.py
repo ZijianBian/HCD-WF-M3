@@ -724,7 +724,10 @@ def save(
     if current_config_folder == None:
         first_save = 1
         current_config_folder = os.path.join(
-            os.getcwd(), "data/run_" + datetime.now().strftime("%y%m%d_%H:%M:%S")
+            # os.getcwd(), "data/run_" + datetime.now().strftime("%y%m%d_%H:%M:%S")
+            # Prasad 01/12/2023: Stop creating multtple folder with different date and time rather save them in default and when user 
+            # clicks save as button configuration will be saved with new name
+            os.getcwd(), "data/run_default"
         )
     else:
         first_save = 0
