@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 import copy
-from src.hcd_workflow import HCDWorkflow
+from hcdworkflow.hcd_workflow import HCDWorkflow
 
 
 log = logging.getLogger()

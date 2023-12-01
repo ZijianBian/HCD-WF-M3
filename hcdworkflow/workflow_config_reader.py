@@ -7,7 +7,7 @@ import numpy as np
 root_path = os.path.dirname(__file__)
 sys.path.append(root_path)
 
-from src.workflow_actor import WorkflowActor
+from hcdworkflow.workflow_actor import WorkflowActor
 
 
 class XmlReader:

@@ -4,9 +4,9 @@ import os
 import sys
 import numpy as np
 
-from src.workflow_base import WorkflowBase
-from src.workflow_data import WorkflowData
-from src.workflow_executor import WorkflowExecutor
+from hcdworkflow.workflow_base import WorkflowBase
+from hcdworkflow.workflow_data import WorkflowData
+from hcdworkflow.workflow_executor import WorkflowExecutor
 
 log = logging.getLogger()
 log.setLevel(logging.ERROR)

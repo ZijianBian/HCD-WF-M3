@@ -1,23 +1,26 @@
 import os
 from gui.gui_methods import create_workflow_param_from_file
-
+import hcdworkflow
+from pathlib import Path
+import inspect
 isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
 except:
     isWaveformCookerPresent = False
     
-from importlib_resources import files
-from src.workflow_dbhelper import WorkflowDbHelper
-from src.workflow_globals_reader import WorkflowGlobalsReader
-from src.workflow_driver import WorkflowDriver
+from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
+from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
+from hcdworkflow.workflow_driver import WorkflowDriver
 
 
 def wf_wrapper(par_path):
     config_folder_path = os.path.abspath(par_path)
 
-    rootPath = os.path.dirname(os.path.abspath(__file__))
-    globalListPath = str(files('src.global_configuration').joinpath('global_lists.yaml'))
+    pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"
+
+    globalListPath = str(pathGlobalConfiguration / "global_lists.yaml")
+        
     inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
         "workflow_parameters"

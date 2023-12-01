@@ -1,19 +1,23 @@
 import copy
 import os
 import sys
-
+import hcdworkflow
+from pathlib import Path
+import inspect
 import imas
-from importlib_resources import files
-from src.workflow_globals_reader import WorkflowGlobalsReader
-from src.workflow_config_reader import WorkflowConfigReader
+
+from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
+from hcdworkflow.workflow_config_reader import WorkflowConfigReader
 
 
 # TODO Separate static and runtime part of the data
 class WorkflowData:
     def __init__(self, workflowConfig) -> None:
         workflowConfig = os.path.join(workflowConfig, "input_workflow.xml")
-        self.globalList = str(files('src.global_configuration').joinpath('global_lists.yaml'))
-    
+
+        pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"
+
+        self.globalList = str(pathGlobalConfiguration / "global_lists.yaml")
         self.workflowConfig = WorkflowConfigReader(workflowConfig)
         self.globalListReader = WorkflowGlobalsReader(self.globalList)
         self.catdict = self.workflowConfig.getCategories()

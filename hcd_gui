@@ -3,8 +3,6 @@ import copy
 import os
 import sys
 
-from importlib_resources import files
-
 import gui.colour_definitions.bluish as col
 import gui.time_base_edition as tbe
 from gui.gui_methods import (create_maindict, edit_codeparam, load,
@@ -73,11 +71,18 @@ except:
 #     sys.exit()
 
 
+import inspect
+
 # --------------------------------------------------------------------------------------------
 # Path to the default parameter file
-hcd_path = "/".join(os.path.realpath(__file__).split("/")[:-1])
+# root_path = os.path.join(os.path.abspath(__file__), "..")
+import hcdworkflow
+from pathlib import Path
+pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"
+
+# hcd_path = "/".join(os.path.realpath(__file__).split("/")[:-1])
 # default_wf_param_file = hcd_path + "/global_configuration/input_workflow_default.xml"
-default_wf_param_file = str(files('src.global_configuration').joinpath('input_workflow_default.xml'))
+default_wf_param_file = pathGlobalConfiguration / "input_workflow_default.xml"
 # --------------------------------------------------------------------------------------------
 # Create the main window (define font, title and background colour)
 window = tkinter.Tk()
@@ -106,7 +111,7 @@ def open_gui(wf_param_file):
     #     + "/global_configuration/"
     #     + "global_lists.yaml"
     # )
-    file = str(files('src.global_configuration').joinpath('global_lists.yaml'))
+    file =  pathGlobalConfiguration  / "global_lists.yaml"
     workflowGlobalsReader = WorkflowGlobalsReader(file)
     merge_actor_list = workflowGlobalsReader.getMergeActorList() # loadlist(file, "merge_actor_list")
     process_list =  workflowGlobalsReader.getProcessList() #loadlist(file, "process_list")
