@@ -9,9 +9,9 @@ from gui.gui_methods import (create_maindict, edit_codeparam, load,
                              saved_folder_name, update_workflow_param)
 from gui.tooltip import CreateToolTip
 from gui.waveform_edition import edit_waveforms
-from src.workflow_actor import WorkflowActor
-from src.workflow_config_reader import WorkflowConfigReader
-from src.workflow_globals_reader import WorkflowGlobalsReader
+from hcdworkflow.workflow_actor import WorkflowActor
+from hcdworkflow.workflow_config_reader import WorkflowConfigReader
+from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 from workflow.wf_wrapper import wf_wrapper
 
 isWaveformCookerPresent = True
