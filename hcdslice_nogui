@@ -6,8 +6,8 @@ import sys
 import imas
 
 from gui.gui_methods import create_workflow_param_from_file
-from src.hcd_workflow import HCDWorkflow
-from src.workflow_dbhelper import WorkflowDbHelper
+from hcdworkflow.hcd_workflow import HCDWorkflow
+from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
 
 isWaveformCookerPresent = True
 try:

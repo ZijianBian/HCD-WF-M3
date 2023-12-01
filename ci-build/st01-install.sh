@@ -22,7 +22,7 @@ echo "PATH :" $PATH | grep -i hcdworkflow
 
 echo "Installing HCDWorkflow in the local directory"
 try python3 -m pip --disable-pip-version-check install --no-deps . --prefix=${PREFIX_DIR} || exit 1
-try python3 -c "from src.workflow_actor import WorkflowActor" || exit 1
+try python3 -c "from hcdworkflow.workflow_actor import WorkflowActor" || exit 1
 
 COMMITHASH=$(git rev-parse HEAD)
 VERSION=$(git describe  --tags --always)

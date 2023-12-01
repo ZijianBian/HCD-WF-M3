@@ -2,6 +2,6 @@ include README.md
 include LICENSE.md
 recursive-exclude * *.py[co]
 include versioneer.py
-include src/_version.py
-include src/global_configuration/global_lists.yaml
-include src/global_configuration/input_workflow_default.xml
+include hcdworkflow/_version.py
+include hcdworkflow/global_configuration/global_lists.yaml
+include hcdworkflow/global_configuration/input_workflow_default.xml
