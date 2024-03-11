@@ -1,0 +1,49 @@
+easyblock = 'PythonBundle'
+
+name = 'HCDWORKFLOW'
+version = '__VERSION__'
+local_imasver =  "__IMAS_VERSION__" + "-AL-" +"__AL_VERSION__"
+versionsuffix = "-DD-%s" % local_imasver
+local_commit = "__COMMITHASH__"
+
+homepage = 'https://git.iter.org/projects/WF/repos/hcd'
+description = """This actor version(__RAWVERSION__) provides HCD mergers
+Git Repo : https://git.iter.org/projects/WF/repos/hcd
+"""
+
+toolchain = {'name': '__TOOLCHAIN_NAME__', 'version': '__TOOLCHAIN_VERSION__'}
+
+
+# checksums = ['']
+
+dependencies = [
+   __EBRUN_MODULES__
+]
+
+exts_list = [
+    (
+        name,
+        version,
+        {
+            "source_urls": [
+                 'https://git.iter.org/rest/api/latest/projects/WF/repos/hcd/archive?at='
+                 + local_commit
+                 + "&filename=%(namelower)s-%(version)s.zip"
+            ],
+            "sources": [SOURCE_ZIP],
+        },
+    ),
+]
+
+use_pip = True
+exts_download_dep_fail = True
+sanity_pip_check = True
+
+sanity_check_paths = {
+    "files": [],
+    "dirs": ["/work/imas/"],
+}
+
+sanity_check_commands = ["python3 -c 'from hcdworkflow.workflow_actor import WorkflowActor'"]
+
+moduleclass = 'phys'

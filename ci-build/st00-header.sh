@@ -1,36 +1,144 @@
 #!/bin/bash
-# Bamboo script
-# Stage 0 : load modules
-
-get_abs_filename() 
-{
-  # $1 : relative filename
-  if [ -d "$(dirname "$1")" ]; then
-    echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
-  fi
-}
-
-# Start from clean environment
-module purge >&/dev/null
-
-# Set up environment for compilation
-source /usr/share/Modules/init/sh
+source ./ci-build/utils.sh
+##########################################################################################
+#                     Set environment based on toolchain                                 #
+##########################################################################################
+. /usr/share/Modules/init/sh
 module use /work/imas/etc/modules/all
+module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 
-# Need to remove the stack limit to avoid segmentation fault inside codes
-ulimit -Ss unlimited
+module purge
 
-# Load the default IMAS version
-module load IMAS
+# expand aliases
+shopt -s expand_aliases
 
-# Workflow tools needed mostly for the HCD gui
-module load WFtools
-module load Waveform-Cooker/1.3.3-GCCcore-10.2.0
+#print hostname
+hostname -f
 
-pip install -r requirements.txt 
+# Get toolchain version
+if [ -z "$1" ]; then
+    TOOLCHAIN_VERSION="intel-2020b"
+else
+    TOOLCHAIN_VERSION="$1"
+fi
 
-source "ci-build/common.sh"
+# Get AL version
+if [ -z "$2" ]; then
+    ACCESS_LAYER_VERSION="4"
+else
+    ACCESS_LAYER_VERSION="$2"
+fi
 
-export PREFIX_DIR=HCDWorkflow
-export ACTOR_FOLDER=/work/imas/opt/bamboo_deploy/PYTHON_ACTORS/
-export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
+echo "Building for $TOOLCHAIN_VERSION and Access Layer $ACCESS_LAYER_VERSION"
+
+if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
+    FCOMPILER="ifort"
+fi
+if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
+    FCOMPILER="gfortran"
+fi
+
+IMAS_MODULE_VERSION=$(getIMASModuleName "$TOOLCHAIN_VERSION" "$ACCESS_LAYER_VERSION")
+# load IMAS module first
+module load "$IMAS_MODULE_VERSION"
+
+GCCcore_VERSION=$(getGCCcoreVersion)
+
+buildtime_dependencies="./ci-build/buildtime_dependencies.txt"
+runtime_dependencies="./ci-build/runtime_dependencies.txt"
+# Check if the file exists
+if [ ! -f "$buildtime_dependencies" ]; then
+    echo "File $buildtime_dependencies not found."
+    exit 1
+fi
+
+# Check if the file exists
+if [ ! -f "$runtime_dependencies" ]; then
+    echo "File $runtime_dependencies not found."
+    exit 1
+fi
+
+declare -a BUILDMODULES=()
+declare -a RUNMODULES=()
+declare -a EBBUILDMODULES=()
+declare -a EBBRUNMODULES=()
+
+# actors have version suffix so better to provide them as EXTERNAL_MODULE
+actorslist=("GRAYSCALE" "GRAY" "HCD2CORE_PROFILES" "HCD2CORE_SOURCES" "HCD_MERGERS")
+
+counter=0
+# Read the file line by line
+while IFS= read -r line || [[ -n $line ]]; do
+    if [[ -z "${line// /}" ]]; then
+        counter=$(("$counter" + 1))
+        continue
+    fi
+    isModuleNameSolved=no
+    for actor in "${actorslist[@]}"; do
+        if [[ "$line" == "$actor" ]]; then
+            module_version=$(getModuleName "$line" "$TOOLCHAIN_VERSION" "$GCCcore_VERSION")
+            RUNMODULES["$counter"]="$module_version"
+            EBBRUNMODULES["$counter"]="('$module_version', EXTERNAL_MODULE),"
+            isModuleNameSolved=yes
+            break
+        fi
+    done
+    if [[ $isModuleNameSolved == "yes" ]]; then
+        counter=$(("$counter" + 1))
+        continue
+    fi
+    if [[ $line == *"IMAS"* ]]; then
+        BUILDMODULES["$counter"]="$IMAS_MODULE_VERSION"
+        EBBUILDMODULES["$counter"]="('$IMAS_MODULE_VERSION', EXTERNAL_MODULE),"
+    else
+        module_version=$(getModuleName "$line" "$TOOLCHAIN_VERSION" "$GCCcore_VERSION")
+        BUILDMODULES["$counter"]="$module_version"
+        EBBUILDMODULES["$counter"]=$(getModuleNameAndVersion "$module_version")
+    fi
+    counter=$(("$counter" + 1))
+done <"$buildtime_dependencies"
+
+counter=0
+while IFS= read -r line || [[ -n $line ]]; do
+    if [[ -z "${line// /}" ]]; then
+        counter=$(("$counter" + 1))
+        continue
+    fi
+    isModuleNameSolved=no
+    for actor in "${actorslist[@]}"; do
+        if [[ "$line" == "$actor" ]]; then
+            module_version=$(getModuleName "$line" "$TOOLCHAIN_VERSION" "$GCCcore_VERSION")
+            RUNMODULES["$counter"]="$module_version"
+            EBBRUNMODULES["$counter"]="('$module_version', EXTERNAL_MODULE),"
+            isModuleNameSolved=yes
+            break
+        fi
+    done
+    if [[ $isModuleNameSolved == "yes" ]]; then
+        counter=$(("$counter" + 1))
+        continue
+    fi
+    if [[ $line == *"IMAS"* ]]; then
+        RUNMODULES["$counter"]="$IMAS_MODULE_VERSION"
+        EBBRUNMODULES["$counter"]="('$IMAS_MODULE_VERSION', EXTERNAL_MODULE),"
+    else
+        module_version=$(getModuleName "$line" "$TOOLCHAIN_VERSION" "$GCCcore_VERSION")
+        RUNMODULES["$counter"]="$module_version"
+        EBBRUNMODULES["$counter"]=$(getModuleNameAndVersion "$module_version")
+    fi
+    counter=$(("$counter" + 1))
+done <"$runtime_dependencies"
+
+echo "TOOLCHAIN_VERSION : $TOOLCHAIN_VERSION"
+echo "GCCcore_VERSION : $GCCcore_VERSION"
+echo "IMAS VERSION : $IMAS_MODULE_VERSION"
+echo "BUILDMODULES : " "${BUILDMODULES[@]}"
+echo "RUNMODULES : " "${RUNMODULES[@]}"
+echo "EBBUILDMODULES : " "${EBBUILDMODULES[@]}"
+echo "EBRUNMODULES : " "${EBBRUNMODULES[@]}"
+echo "Compiler : $FCOMPILER"
+
+echo "Loading modules..."
+module load "${BUILDMODULES[@]}"
+module load "${RUNMODULES[@]}"
+echo "Done loading modules..."
