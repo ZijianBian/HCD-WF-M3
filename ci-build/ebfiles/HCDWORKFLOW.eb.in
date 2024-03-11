@@ -7,7 +7,7 @@ versionsuffix = "-DD-%s" % local_imasver
 local_commit = "__COMMITHASH__"
 
 homepage = 'https://git.iter.org/projects/WF/repos/hcd'
-description = """This actor version(__RAWVERSION__) provides HCD mergers
+description = """This actor version(__RAWVERSION__) provides workflow for HCD
 Git Repo : https://git.iter.org/projects/WF/repos/hcd
 """
 

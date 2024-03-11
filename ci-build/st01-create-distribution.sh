@@ -7,7 +7,12 @@
 source ./ci-build/st00-header.sh $1 $2
 
 # Note Disable set -e option when using on local as it will exit the shell on error
-# set -e -u -o pipefail
+set -e -u -o pipefail
+
+if [ -d "dist" ]; then
+    rm -rf "dist"
+fi
+
 # Debuggging:
 set -x
 # create a source distribution

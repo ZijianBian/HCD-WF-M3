@@ -12,7 +12,7 @@ HOSTNAME=$(hostname -f)
 echo "Executing on $HOSTNAME"
 
 # Note Disable set -e option when using on local as it will exit the shell on error
-# set -e -u -o pipefail
+set -e -u -o pipefail
 
 MODULE_NAME_LOWER=hcdworkflow
 # upper case
@@ -37,11 +37,6 @@ EBRUNMODULES=$(awk -F "=" '/EBRUNMODULES/ {print $2}' $VERSION_FILE)
 
 # Get raw version
 RAWVERSION=$(awk -F "=" '/MODULE_VERSION/ {print $2}' $VERSION_FILE)
-# echo "$RAWVERSION"
-# RAWVERSION="${RAWVERSION//./\\.}"
-# echo "$RAWVERSION"
-# RAWVERSION="${RAWVERSION//-/\\-}"
-# echo "$RAWVERSION"
 
 MODULE_VERSION=$RAWVERSION
 if [[ $RAWVERSION == *-* ]]; then
@@ -91,7 +86,7 @@ if [[ "$(uname -n)" != "sdcc"* ]]; then
 else
     DEPLOY_DIRECTORY=$(pwd)
     # Provide Git Token when running on local
-    bamboo_HTTP_AUTH_BEARER_PASSWORD=OTMxNDM4Mjg3ODgzOpyt4ATQqKGejeKonsLJi0/fN/sb
+    bamboo_HTTP_AUTH_BEARER_PASSWORD=
 fi
 
 # contents of eb file
@@ -125,14 +120,12 @@ fi
 if [ -d "$EASYBUILD_DIR"/software/"$MODULE_NAME" ]; then
     ls -lt "$EASYBUILD_DIR"/software/"$MODULE_NAME"
 fi
-echo "$MODULEPATH"
+
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
-# export MODULEPATH=$(echo $MODULEPATH | awk -v RS=: -v ORS=: '!a[$0]++' | sed 's/:$//')
-echo "$MODULEPATH"
 # # execute eb command
 # eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --stylecheck
 
-MODULEPATH="$MODULEPATH" eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 if [ $? -eq 0 ]; then
     echo "$MODULE_FULL_VERSION is installed"
