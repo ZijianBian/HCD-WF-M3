@@ -8,24 +8,24 @@ source ./ci-build/utils.sh
 shopt -s expand_aliases
 
 #print hostname
-HOSTNAME=$(hostname -f)
-echo "Executing on $HOSTNAME"
+hostname -f
 
 # Note Disable set -e option when using on local as it will exit the shell on error
 set -e -u -o pipefail
 
-MODULE_NAME_LOWER=hcdworkflow
+MODULE_NAME_LOWER=hcd-wf
 # upper case
 MODULE_NAME=$(getUpperCase "$MODULE_NAME_LOWER")
 ################################################################################################
 #                        Prepare Easybuild Modulefile                                          #
 ################################################################################################
 VERSION_FILE="./ci-build/versioninfo.txt"
-# Ensure version file is present and print contents of versioninfo.txt
 echo "--------------------------------------"
 echo "VERSION_FILE Contents: "
+# Ensure version file is present and print contents of versioninfo.txt
 cat $VERSION_FILE
 echo "--------------------------------------"
+
 # Get commit hash
 COMMITHASH=$(awk -F "=" '/COMMITHASH/ {print $2}' $VERSION_FILE)
 IMAS_VERSION=$(awk -F "=" '/IMAS_VERSION/ {print $2}' $VERSION_FILE)
@@ -63,7 +63,7 @@ IFS='-' read -r TNAME TVERSION <<<"$TOOLCHAIN_VERSION"
 
 MODULE_FULL_VERSION=$MODULE_NAME-$MODULE_VERSION-$TNAME-$TVERSION-DD-$IMAS_VERSION-AL-$AL_VERSION.eb
 
-echo "MODULE_FULL_VERSION : $MODULE_FULL_VERSION"
+echo "$MODULE_FULL_VERSION"
 echo "--------------------------------------"
 sed -e "s;__COMMITHASH__;${COMMITHASH};" \
     -e "s;__VERSION__;${MODULE_VERSION};" \
@@ -106,25 +106,32 @@ EASYBUILD_DIR="$DEPLOY_DIRECTORY/easybuild"
 # create directory EASYBUILD_DIR if not exists"
 mkdir -p "$EASYBUILD_DIR"
 
-# Change permission to write
-chmod -R u+w "$EASYBUILD_DIR"
-
 # prepare EB options enable if needs to debug--logtostdout
-EB_OPTS="--force  --force-download --modules-tool=EnvironmentModules --module-syntax=Tcl --allow-modules-tool-mismatch --allow-use-as-root-and-accept-consequences --prefix=$EASYBUILD_DIR --optarch=Intel:axAVX,CORE-AVX2;GCC:march=sandybridge"
+EB_OPTS="--force --force-download --modules-tool=EnvironmentModules --module-syntax=Tcl --allow-modules-tool-mismatch --allow-use-as-root-and-accept-consequences --prefix=$EASYBUILD_DIR --optarch=Intel:axAVX,CORE-AVX2;GCC:march=sandybridge"
 EB_HTTP_OPTS=$(writeGitHeaderFile "$bamboo_HTTP_AUTH_BEARER_PASSWORD")
 
 #Check contents of the paths
 if [ -d "$EASYBUILD_DIR"/sources/"${MODULE_NAME_LOWER:0:1}"/"$MODULE_NAME" ]; then
-    ls -lt "$EASYBUILD_DIR"/sources/"${MODULE_NAME_LOWER:0:1}"/"$MODULE_NAME"
+    ls "$EASYBUILD_DIR"/sources/"${MODULE_NAME_LOWER:0:1}"/"$MODULE_NAME"
 fi
 if [ -d "$EASYBUILD_DIR"/software/"$MODULE_NAME" ]; then
-    ls -lt "$EASYBUILD_DIR"/software/"$MODULE_NAME"
+    ls "$EASYBUILD_DIR"/software/"$MODULE_NAME"
 fi
 
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
-# # execute eb command
-# eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --stylecheck
 
+# format eb file
+python3 -m venv build_venv
+. "build_venv/bin/activate"
+pip install black
+black ./ci-build/ebfiles/"$MODULE_FULL_VERSION"
+deactivate
+rm -rf build_venv
+
+# check style
+eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --check-style --modules-tool=EnvironmentModules --module-syntax=Tcl --allow-modules-tool-mismatch
+
+# # execute eb command
 eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 if [ $? -eq 0 ]; then
@@ -135,9 +142,9 @@ fi
 
 # Replace mnt with /work/imas/opt/ to work internal path on sdcc"
 if [[ "$(uname -n)" != "sdcc"* ]]; then
-    chmod -R u+w "$EASYBUILD_DIR"
     find "$EASYBUILD_DIR"/software/"$MODULE_NAME"/dev-"$TOOLCHAIN_VERSION"-DD-"$IMAS_VERSION"-AL-"$AL_VERSION" -type f -not -path '*/\.*' -exec sed -i -- 's/mnt/work\/imas\/opt/g' {} +
-    find "$EASYBUILD_DIR"/modules -type f -not -path '*/\.*' -exec sed -i -- 's/mnt/work\/imas\/opt/g' {} +
+    find "$EASYBUILD_DIR"/modules/all/"$MODULE_NAME" -type f -not -path '*/\.*' -exec sed -i -- 's/mnt/work\/imas\/opt/g' {} +
+    find "$EASYBUILD_DIR"/modules/phys/"$MODULE_NAME" -type f -not -path '*/\.*' -exec sed -i -- 's/mnt/work\/imas\/opt/g' {} +
 fi
 
 # Check available module"
@@ -146,6 +153,6 @@ if [[ "$(uname -n)" != "sdcc"* ]]; then
 else
     module use -p "$EASYBUILD_DIR"/modules/all
 fi
-module avail -i "$MODULE_NAME"
+module avail -i "$MODULE_NAME"/
 deleteGitHeaderFile
 echo "Done"
