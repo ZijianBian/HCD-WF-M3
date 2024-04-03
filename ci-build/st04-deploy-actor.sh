@@ -121,11 +121,7 @@ fi
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 
 # format eb file
-python3 -m venv build_venv
-. "build_venv/bin/activate"
-pip install black
-black ./ci-build/ebfiles/"$MODULE_FULL_VERSION"
-deactivate
+python3 -m venv build_venv && source build_venv/bin/activate && pip install black && black ./ci-build/ebfiles/"$MODULE_FULL_VERSION" && deactivate
 rm -rf build_venv
 
 # check style
