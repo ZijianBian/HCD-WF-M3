@@ -11,7 +11,7 @@ shopt -s expand_aliases
 hostname -f
 
 # Note Disable set -e option when using on local as it will exit the shell on error
-set -e -u -o pipefail
+set -e -o pipefail
 
 MODULE_NAME_LOWER=hcd-wf
 # upper case
