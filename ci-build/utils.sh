@@ -16,10 +16,10 @@ getIMASModuleName() {
     IMASVERSIONSLIST=$(module av -t IMAS/ 2>&1 | grep "3.*.*-$ACCESS_LAYER_VERSION.*.*-$TOOLCHAIN_VERSION")
 
     if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
-        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "intel" | sort -r | head -n 1)
+        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "intel" | sort -rV | head -n 1)
     fi
     if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
-        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "foss" | sort -r | head -n 1)
+        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "foss" | sort -rV | head -n 1)
     fi
     echo "${IMAS_MODULE_VERSION//(default)/}"
 }
@@ -34,29 +34,29 @@ getModuleName() {
     IMASVERSIONSLIST=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "3.*.*-$ACCESS_LAYER_VERSION.*.*-$TOOLCHAIN_VERSION")
     # Check GCCcore version first
     gcccore_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "GCCcore-$GCCcore_VERSION")
-    MODULE_VERSION=$(echo "$gcccore_filtered" | sort -r | head -n 1)
+    MODULE_VERSION=$(echo "$gcccore_filtered" | sort -rV | head -n 1)
     if [ -z "$MODULE_VERSION" ]; then
         if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
             intel_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "$TOOLCHAIN_VERSION")
-            MODULE_VERSION=$(echo "$intel_filtered" | sort -r | head -n 1)
+            MODULE_VERSION=$(echo "$intel_filtered" | sort -rV | head -n 1)
         fi
         if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
             foss_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "$TOOLCHAIN_VERSION")
-            MODULE_VERSION=$(echo "$foss_filtered" | sort -r | head -n 1)
+            MODULE_VERSION=$(echo "$foss_filtered" | sort -rV | head -n 1)
             if [ -z "$MODULE_VERSION" ]; then
                 gcc_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "GCC-$GCCcore_VERSION")
-                MODULE_VERSION=$(echo "$gcc_filtered" | sort -r | head -n 1)
+                MODULE_VERSION=$(echo "$gcc_filtered" | sort -rV | head -n 1)
             fi
             if [ -z "$MODULE_VERSION" ]; then
                 gfbf_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "gfbf-""$TVERSION")
-                MODULE_VERSION=$(echo "$gfbf_filtered" | sort -r | head -n 1)
+                MODULE_VERSION=$(echo "$gfbf_filtered" | sort -rV | head -n 1)
             fi
         fi
     fi
     if [ -z "$MODULE_VERSION" ]; then
         # TOOLCHAIN_VERSION and GCCcore_VERSION is not present
         modules_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "$MODULE_NAME")
-        MODULE_VERSION=$(echo "$modules_filtered" | sort -r | head -n 1)
+        MODULE_VERSION=$(echo "$modules_filtered" | sort -rV | head -n 1)
     fi
     echo "${MODULE_VERSION//(default)/}"
 }
@@ -116,7 +116,7 @@ deleteGitHeaderFile() {
 # module use /work/imas/etc/modules/all
 # module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 # TEST
-# toolchain=intel-2020b
+# toolchain=foss-2020b
 # module purge
 # getIMASModuleName $toolchain 4
 # module load "$(getIMASModuleName $toolchain 4)"

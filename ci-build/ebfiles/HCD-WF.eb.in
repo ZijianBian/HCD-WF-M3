@@ -14,7 +14,7 @@ Git Repo : https://git.iter.org/projects/WF/repos/hcd
 toolchain = {"name": "__TOOLCHAIN_NAME__", "version": "__TOOLCHAIN_VERSION__"}
 
 
-# checksums = ['']
+checksums = [""]
 
 dependencies = [__EBRUN_MODULES__]
 
