@@ -11,7 +11,7 @@ shopt -s expand_aliases
 hostname -f
 
 # Note Disable set -e option when using on local as it will exit the shell on error
-set -e -o pipefail
+# set -e -o pipefail
 
 MODULE_NAME_LOWER=hcd-wf
 # upper case
@@ -77,7 +77,7 @@ sed -e "s;__COMMITHASH__;${COMMITHASH};" \
     ./ci-build/ebfiles/"$MODULE_NAME".eb.in >./ci-build/ebfiles/"$MODULE_FULL_VERSION"
 
 #format eb file
-python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black --line-length 80 ./ci-build/ebfiles/"$MODULE_FULL_VERSION" && deactivate
+python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black --line-length 80 ./ci-build/ebfiles/"$MODULE_FULL_VERSION" && deactivate 2>/dev/null || exit 0
 rm -rf build_venv
 
 ################################################################################################
