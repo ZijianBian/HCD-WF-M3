@@ -77,7 +77,7 @@ sed -e "s;__COMMITHASH__;${COMMITHASH};" \
     ./ci-build/ebfiles/"$MODULE_NAME".eb.in >./ci-build/ebfiles/"$MODULE_FULL_VERSION"
 
 #format eb file
-python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black ./ci-build/ebfiles/"$MODULE_FULL_VERSION" && deactivate
+python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black --line-length 80 ./ci-build/ebfiles/"$MODULE_FULL_VERSION" && deactivate
 rm -rf build_venv
 
 ################################################################################################
@@ -125,10 +125,10 @@ fi
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 
 # inject checksum
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums  ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 # check style
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --check-style  ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --check-style ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 # # execute eb command
 eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
