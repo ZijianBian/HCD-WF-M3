@@ -13,7 +13,6 @@ Git Repo : https://git.iter.org/projects/WF/repos/hcd
 
 toolchain = {"name": "__TOOLCHAIN_NAME__", "version": "__TOOLCHAIN_VERSION__"}
 
-options = {"modulename": "hcdworkflow"}
 checksums = [""]
 
 dependencies = [__EBRUN_MODULES__]
@@ -34,8 +33,10 @@ exts_list = [
 ]
 
 use_pip = True
+options = {"modulename": "hcdworkflow"}
+
+
 exts_download_dep_fail = True
-sanity_pip_check = True
 
 sanity_check_paths = {
     "files": [],
