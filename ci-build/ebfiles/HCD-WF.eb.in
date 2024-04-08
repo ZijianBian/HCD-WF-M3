@@ -28,13 +28,12 @@ exts_list = [
                 + "&filename=%(namelower)s-%(version)s.zip"
             ],
             "sources": [SOURCE_ZIP],
+            "modulename": "hcdworkflow",
         },
     ),
 ]
 
 use_pip = True
-options = {"modulename": "hcdworkflow"}
-
 
 exts_download_dep_fail = True
 
