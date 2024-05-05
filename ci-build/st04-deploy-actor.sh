@@ -11,7 +11,9 @@ shopt -s expand_aliases
 hostname -f
 
 # Note Disable set -e option when using on local as it will exit the shell on error
-# set -e -o pipefail
+if [[ "$(uname -n)" == *"bamboo"* ]]; then
+    set -e -o pipefail
+fi
 
 MODULE_NAME_LOWER=hcd-wf
 # upper case
@@ -77,7 +79,7 @@ sed -e "s;__COMMITHASH__;${COMMITHASH};" \
     ./ci-build/ebfiles/"$MODULE_NAME".eb.in >./ci-build/ebfiles/"$MODULE_FULL_VERSION"
 
 #format eb file
-python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black --line-length 80 ./ci-build/ebfiles/"$MODULE_FULL_VERSION" && deactivate 2>/dev/null || exit 0
+python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black ./ci-build/ebfiles/"$MODULE_FULL_VERSION" && deactivate
 rm -rf build_venv
 
 ################################################################################################
@@ -111,7 +113,7 @@ EASYBUILD_DIR="$DEPLOY_DIRECTORY/easybuild"
 mkdir -p "$EASYBUILD_DIR"
 
 # prepare EB options enable if needs to debug--logtostdout
-EB_OPTS="--force --force-download --modules-tool=EnvironmentModules --module-syntax=Tcl --allow-modules-tool-mismatch --allow-use-as-root-and-accept-consequences --prefix=$EASYBUILD_DIR --optarch=Intel:axAVX,CORE-AVX2;GCC:march=sandybridge"
+EB_OPTS="--force --force-download --modules-tool=EnvironmentModules --module-syntax=Tcl --allow-modules-tool-mismatch --allow-use-as-root-and-accept-consequences --prefix=$EASYBUILD_DIR --optarch=Intel:axAVX,CORE-AVX2,AVX512;GCC:march=sandybridge"
 EB_HTTP_OPTS=$(writeGitHeaderFile "$bamboo_HTTP_AUTH_BEARER_PASSWORD")
 
 #Check contents of the paths
@@ -125,10 +127,10 @@ fi
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 
 # inject checksum
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums  ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 # check style
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --check-style ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --check-style  ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 # # execute eb command
 eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
