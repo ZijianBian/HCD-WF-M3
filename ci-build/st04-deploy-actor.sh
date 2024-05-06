@@ -87,12 +87,16 @@ rm -rf build_venv
 ################################################################################################
 
 # Set up environment for compilation
-if [[ "$(uname -n)" != "sdcc"* ]]; then
+if [[ "$(uname -n)" == *"bamboo"* ]]; then
     DEPLOY_DIRECTORY="/mnt/bamboo_deploy"
 else
-    DEPLOY_DIRECTORY=$(pwd)
+    if [ -z "$DEPLOY_DIRECTORY" ]; then
+        DEPLOY_DIRECTORY=$(pwd)
+    fi
     # Provide Git Token when running on local
-    bamboo_HTTP_AUTH_BEARER_PASSWORD=
+    if [ -z "$bamboo_HTTP_AUTH_BEARER_PASSWORD" ]; then
+        bamboo_HTTP_AUTH_BEARER_PASSWORD=
+    fi
 fi
 
 # contents of eb file
@@ -127,10 +131,10 @@ fi
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 
 # inject checksum
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums  ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 # check style
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --check-style  ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --check-style ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 # # execute eb command
 eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
