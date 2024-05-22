@@ -4,7 +4,7 @@
 
 # setup environment
 # Get toolchain version
-source ./ci-build/st00-header.sh $1 $2
+source ./ci-sdcc/st00-header.sh $1 $2
 
 # Note Disable set -e option when using on local as it will exit the shell on error
 set -e -u -o pipefail

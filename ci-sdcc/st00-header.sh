@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./ci-build/utils.sh
+source ./ci-sdcc/utils.sh
 ##########################################################################################
 #                     Set environment based on toolchain                                 #
 ##########################################################################################
@@ -44,8 +44,8 @@ module load "$IMAS_MODULE_VERSION"
 
 GCCcore_VERSION=$(getGCCcoreVersion)
 
-buildtime_dependencies="./ci-build/buildtime_dependencies.txt"
-runtime_dependencies="./ci-build/runtime_dependencies.txt"
+buildtime_dependencies="./ci-sdcc/buildtime_dependencies.txt"
+runtime_dependencies="./ci-sdcc/runtime_dependencies.txt"
 # Check if the file exists
 if [ ! -f "$buildtime_dependencies" ]; then
     echo "File $buildtime_dependencies not found."

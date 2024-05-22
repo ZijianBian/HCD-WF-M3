@@ -2,13 +2,13 @@
 # Bamboo CI script to create build information for easybuild
 # Execute script from root directory
 
-source ./ci-build/st00-header.sh $1 $2
+source ./ci-sdcc/st00-header.sh $1 $2
 
 # if successuful create hash and store in actor directory
 COMMITHASH=$(git rev-parse HEAD)
 VERSION=$(git describe --tags --always)
-rm -f ./ci-build/versioninfo.txt
-cat >>./ci-build/versioninfo.txt <<EOF
+rm -f ./ci-sdcc/versioninfo.txt
+cat >>./ci-sdcc/versioninfo.txt <<EOF
 COMMITHASH=$COMMITHASH
 MODULE_VERSION=$VERSION
 IMAS_VERSION=$IMAS_VERSION
@@ -21,13 +21,13 @@ EBRUNMODULES=${EBBRUNMODULES[@]}
 EOF
 
 set -x
-cat ./ci-build/versioninfo.txt
+cat ./ci-sdcc/versioninfo.txt
 set +x
 
 # Create ci acrtifact
-tar -cvzf ci-build.tar.gz ci-build inputs >/dev/null 2>&1
+tar -cvzf ci-sdcc.tar.gz ci-sdcc inputs >/dev/null 2>&1
 
 # show contents of artifact
-tar -tzvf ci-build.tar.gz
+tar -tzvf ci-sdcc.tar.gz
 
 echo "Done"

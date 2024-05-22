@@ -18,16 +18,19 @@ getIMASModuleName() {
     else
         DD_VERSION="$3"
     fi
-
-    IMASVERSIONSLIST=$(module av -t IMAS/ 2>&1 | grep "$DD_VERSION.*.*-$ACCESS_LAYER_VERSION.*.*-$TOOLCHAIN_VERSION")
-
+    #Semantic versioning
+    IMASVERSIONSLIST=$(module av -t IMAS/ 2>&1 | grep -E "$DD_VERSION\.[0-9]+\.[0-9]+-$ACCESS_LAYER_VERSION\.[0-9]+\.[0-9]+-$TOOLCHAIN_VERSION")
+    # CalVar versioning
+    if [[ $ACCESS_LAYER_VERSION == "5" ]]; then
+        IMASCALVERVERSIONSLIST=$(module av -t IMAS/ 2>&1 | grep -E "$DD_VERSION\.[0-9]+\.[0-9]+-[0-9]+\.[0-9]+-$TOOLCHAIN_VERSION")
+    fi
     if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
-        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "intel" | sort -rV | head -n 1)
+        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST"$'\n'"$IMASCALVERVERSIONSLIST" | grep "intel" | sort -rV | head -n 1)
     fi
     if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
-        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "foss" | sort -rV | head -n 1)
+        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST"$'\n'"$IMASCALVERVERSIONSLIST" | grep "foss" | sort -rV | head -n 1)
     fi
-    echo "${IMAS_MODULE_VERSION//(default)/}"
+    echo "$IMAS_MODULE_VERSION" | sed 's/(.*//'
 }
 
 getModuleName() {
@@ -38,23 +41,24 @@ getModuleName() {
     local GCCcore_VERSION=$3
     IFS='-' read -r TNAME TVERSION <<<"$TOOLCHAIN_VERSION"
 
+    module_versions=$(module av -t "$MODULE_NAME"/ 2>&1 | grep -E "$MODULE_NAME/[0-9]+\.[0-9]+\.[0-9]+")
     # Check GCCcore version
-    gcccore_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "GCCcore-$GCCcore_VERSION")
+    gcccore_filtered=$(echo "$module_versions" 2>&1 | grep "GCCcore-$GCCcore_VERSION")
     MODULE_VERSION=$(echo "$gcccore_filtered" | sort -rV | head -n 1)
     if [ -z "$MODULE_VERSION" ]; then
         if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
-            intel_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "$TOOLCHAIN_VERSION")
+            intel_filtered=$(echo "$module_versions" 2>&1 | grep "$TOOLCHAIN_VERSION")
             MODULE_VERSION=$(echo "$intel_filtered" | sort -rV | head -n 1)
         fi
         if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
-            foss_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "$TOOLCHAIN_VERSION")
+            foss_filtered=$(echo "$module_versions" 2>&1 | grep "$TOOLCHAIN_VERSION")
             MODULE_VERSION=$(echo "$foss_filtered" | sort -rV | head -n 1)
             if [ -z "$MODULE_VERSION" ]; then
-                gcc_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "GCC-$GCCcore_VERSION")
+                gcc_filtered=$(echo "$module_versions" 2>&1 | grep "GCC-$GCCcore_VERSION")
                 MODULE_VERSION=$(echo "$gcc_filtered" | sort -rV | head -n 1)
             fi
             if [ -z "$MODULE_VERSION" ]; then
-                gfbf_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "gfbf-""$TVERSION")
+                gfbf_filtered=$(echo "$module_versions" 2>&1 | grep "gfbf-""$TVERSION")
                 MODULE_VERSION=$(echo "$gfbf_filtered" | sort -rV | head -n 1)
             fi
         fi
@@ -63,18 +67,18 @@ getModuleName() {
     if [ -z "$MODULE_VERSION" ]; then
         if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
             IIMPI_VERSION=${TOOLCHAIN_VERSION//intel/iimpi}
-            iimpi_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "$IIMPI_VERSION")
+            iimpi_filtered=$(echo "$module_versions" 2>&1 | grep "$IIMPI_VERSION")
             MODULE_VERSION=$(echo "$iimpi_filtered" | sort -rV | head -n 1)
         fi
         if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
             GOMPI_VERSION=${TOOLCHAIN_VERSION//foss/gompi}
-            gompi_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "$GOMPI_VERSION")
+            gompi_filtered=$(echo "$module_versions" 2>&1 | grep "$GOMPI_VERSION")
             MODULE_VERSION=$(echo "$gompi_filtered" | sort -rV | head -n 1)
         fi
     fi
     # TOOLCHAIN_VERSION and GCCcore_VERSION is not present
     if [ -z "$MODULE_VERSION" ]; then
-        modules_filtered=$(module av -t "$MODULE_NAME"/ 2>&1 | grep "$MODULE_NAME")
+        modules_filtered=$(echo "$module_versions" 2>&1 | grep "$MODULE_NAME")
         MODULE_VERSION=$(echo "$modules_filtered" | sort -rV | head -n 1)
     fi
     echo "${MODULE_VERSION//(default)/}"
@@ -91,13 +95,17 @@ getModuleNameAndVersion() {
     local input=$1
     local mname=
     local mversion=
+    local mversionsuffix=
     mname=$(echo "$input" | cut -d'/' -f1)
     mversion=$(echo "$input" | cut -d'/' -f2)
-
+    mversionsuffix=$(echo "$input" | cut -d'/' -f2 | cut -d'-' -f4-)
     local version=${mversion%%-*}
     if [[ $input == *"intel"* ]] || [[ $input == *"foss"* ]] || [[ $input == *"gfbf"* ]] || [[ $input == *"GCC"* ]] || [[ $input == *"iimpi"* ]] || [[ $input == *"gompi"* ]]; then
-
-        echo "('$mname', '$version'),"
+        if [ -z "$mversionsuffix" ]; then
+            echo "('$mname', '$version'),"
+        else
+            echo "('$mname', '$version', '-$mversionsuffix'),"
+        fi
     else
         echo "('$mname', '$version','', True),"
     fi
@@ -137,12 +145,13 @@ deleteGitHeaderFile() {
 # module use /work/imas/etc/modules/all
 # module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 # TEST
-# toolchain=intel-2020b
+# toolchain=foss-2020b
 # module purge
 # getIMASModuleName $toolchain 4
 # getIMASModuleName $toolchain 5
 # getIMASModuleName $toolchain 5 3
 # module load "$(getIMASModuleName $toolchain 4)"
+# getModuleName FRUIT $toolchain
 # getModuleName netCDF-Fortran $toolchain
 # getModuleName netCDF-Fortran foss-2020b
 # getModuleName netCDF-Fortran intel-2023b
@@ -153,7 +162,9 @@ deleteGitHeaderFile() {
 # getModuleName iWrap $toolchain "$(getGCCcoreVersion)"
 # getModuleName Waveform-Cooker $toolchain "$(getGCCcoreVersion)"
 # getModuleName INTERPOS $toolchain "$(getGCCcoreVersion)"
+# getModuleName PSPLINE iimpi-2020b
 # getModuleNameAndVersion Waveform-Cooker/1.4.0-GCCcore-10.2.0
 # getModuleNameAndVersion iWrap/0.9.2-GCCcore-10.2.0
 # getModuleNameAndVersion netCDF-Fortran/4.5.3-iimpi-2020b
 # getModuleNameAndVersion Fundamental-Constants/0.1.1
+# getModuleNameAndVersion FRUIT/3.4.3-gompi-2020b-Ruby-2.7.2

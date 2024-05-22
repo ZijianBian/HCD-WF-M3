@@ -2,7 +2,7 @@
 # Bamboo deploy script using Easybuild
 # Execute script from root directory
 
-source ./ci-build/utils.sh
+source ./ci-sdcc/utils.sh
 
 # expand aliases
 shopt -s expand_aliases
@@ -21,7 +21,7 @@ MODULE_NAME=$(getUpperCase "$MODULE_NAME_LOWER")
 ################################################################################################
 #                        Prepare Easybuild Modulefile                                          #
 ################################################################################################
-VERSION_FILE="./ci-build/versioninfo.txt"
+VERSION_FILE="./ci-sdcc/versioninfo.txt"
 echo "--------------------------------------"
 echo "VERSION_FILE Contents: "
 # Ensure version file is present and print contents of versioninfo.txt
@@ -76,11 +76,13 @@ sed -e "s;__COMMITHASH__;${COMMITHASH};" \
     -e "s;__TOOLCHAIN_VERSION__;${TVERSION};" \
     -e "s;__EBBUILD_MODULES__;${EBBUILDMODULES};" \
     -e "s;__EBRUN_MODULES__;${EBRUNMODULES};" \
-    ./ci-build/ebfiles/"$MODULE_NAME".eb.in >./ci-build/ebfiles/"$MODULE_FULL_VERSION"
+    ./ci-sdcc/ebfiles/"$MODULE_NAME".eb.in >./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION"
 
 #format eb file
-python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black ./ci-build/ebfiles/"$MODULE_FULL_VERSION" && deactivate
+python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" && deactivate
 rm -rf build_venv
+# create eb tar file
+tar -cvzf eb.tar.gz ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" >/dev/null 2>&1
 
 ################################################################################################
 #                                   Easybuild                                                  #
@@ -101,7 +103,7 @@ fi
 
 # contents of eb file
 echo "----------------------------------------------------"
-cat ./ci-build/ebfiles/"$MODULE_FULL_VERSION"
+cat ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION"
 echo "----------------------------------------------------"
 # Load modules
 
@@ -117,7 +119,7 @@ EASYBUILD_DIR="$DEPLOY_DIRECTORY/easybuild"
 mkdir -p "$EASYBUILD_DIR"
 
 # prepare EB options enable if needs to debug--logtostdout
-EB_OPTS="--force --force-download --modules-tool=EnvironmentModules --module-syntax=Tcl --allow-modules-tool-mismatch --allow-use-as-root-and-accept-consequences --prefix=$EASYBUILD_DIR --optarch=Intel:axAVX,CORE-AVX2,AVX512;GCC:march=sandybridge"
+EB_OPTS="--force --force-download --modules-tool=EnvironmentModules --module-syntax=Tcl --allow-modules-tool-mismatch --allow-use-as-root-and-accept-consequences --prefix=$EASYBUILD_DIR --optarch=GENERIC"
 EB_HTTP_OPTS=$(writeGitHeaderFile "$bamboo_HTTP_AUTH_BEARER_PASSWORD")
 
 #Check contents of the paths
@@ -131,13 +133,13 @@ fi
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 
 # inject checksum
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 # check style
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" --check-style ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --check-style ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 # # execute eb command
-eb ./ci-build/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
 
 if [ $? -eq 0 ]; then
     echo "$MODULE_FULL_VERSION is installed"
