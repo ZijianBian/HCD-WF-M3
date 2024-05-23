@@ -5,7 +5,9 @@
 source ./ci-sdcc/st00-header.sh $1 $2
 
 # Note Disable set -e option when using on local as it will exit the shell on error
-set -e -u -o pipefail
+if [[ "$(uname -n)" == *"bamboo"* ]]; then
+    set -e -u -o pipefail
+fi
 #remove previously created environment
 VIRTUALENV_DIR=virtualenvdir
 if [ -d "$VIRTUALENV_DIR" ]; then
@@ -39,7 +41,7 @@ echo "Executing single time slice"
 # python hcdslice_nogui -c tests/data/EC_IC_NBI || exit 1
 # python hcdslice_nogui -c tests/data/FOPLA_TEST || exit 1
 # hcdslice_nogui -c tests/data/GRAYSCALE >hcdslice_grayscale.log
-
-deactivate
 set +x
+deactivate
+
 echo "Done"

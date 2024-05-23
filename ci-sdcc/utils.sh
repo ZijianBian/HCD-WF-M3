@@ -40,8 +40,8 @@ getModuleName() {
     local TOOLCHAIN_VERSION=$2
     local GCCcore_VERSION=$3
     IFS='-' read -r TNAME TVERSION <<<"$TOOLCHAIN_VERSION"
-
-    module_versions=$(module av -t "$MODULE_NAME"/ 2>&1 | grep -E "$MODULE_NAME/[0-9]+\.[0-9]+\.[0-9]+")
+     
+    module_versions=$(module av -t "$MODULE_NAME"/ 2>&1 | grep -E "$MODULE_NAME/[0-9]+\.[0-9]+\.[0-9]+|dev")
     # Check GCCcore version
     gcccore_filtered=$(echo "$module_versions" 2>&1 | grep "GCCcore-$GCCcore_VERSION")
     MODULE_VERSION=$(echo "$gcccore_filtered" | sort -rV | head -n 1)
@@ -145,7 +145,7 @@ deleteGitHeaderFile() {
 # module use /work/imas/etc/modules/all
 # module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 # TEST
-# toolchain=foss-2020b
+# toolchain=intel-2020b
 # module purge
 # getIMASModuleName $toolchain 4
 # getIMASModuleName $toolchain 5
@@ -168,3 +168,9 @@ deleteGitHeaderFile() {
 # getModuleNameAndVersion netCDF-Fortran/4.5.3-iimpi-2020b
 # getModuleNameAndVersion Fundamental-Constants/0.1.1
 # getModuleNameAndVersion FRUIT/3.4.3-gompi-2020b-Ruby-2.7.2
+# getModuleName GRAY $toolchain "$(getGCCcoreVersion)"
+# getModuleName GRAYSCALE $toolchain "$(getGCCcoreVersion)"
+# getModuleName FPSIM $toolchain "$(getGCCcoreVersion)"
+# getModuleName HCD2CORE_PROFILES $toolchain "$(getGCCcoreVersion)"
+# getModuleName HCD2CORE_SOURCES $toolchain "$(getGCCcoreVersion)"
+# getModuleName HCD_MERGERS $toolchain "$(getGCCcoreVersion)"

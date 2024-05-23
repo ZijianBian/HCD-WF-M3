@@ -6,8 +6,9 @@
 # Get toolchain version
 source ./ci-sdcc/st00-header.sh $1 $2
 
-# Note Disable set -e option when using on local as it will exit the shell on error
-set -e -u -o pipefail
+if [[ "$(uname -n)" == *"bamboo"* ]]; then
+    set -e -u -o pipefail
+fi
 
 if [ -d "dist" ]; then
     rm -rf "dist"

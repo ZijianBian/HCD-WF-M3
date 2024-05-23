@@ -64,7 +64,7 @@ declare -a EBBUILDMODULES=()
 declare -a EBBRUNMODULES=()
 
 # actors have version suffix so better to provide them as EXTERNAL_MODULE
-actorslist=("GRAYSCALE" "GRAY" "HCD2CORE_PROFILES" "HCD2CORE_SOURCES" "HCD_MERGERS")
+actorslist=("GRAYSCALE" "GRAY" "FPSIM" "HCD2CORE_PROFILES" "HCD2CORE_SOURCES" "HCD_MERGERS")
 
 counter=0
 # Read the file line by line
