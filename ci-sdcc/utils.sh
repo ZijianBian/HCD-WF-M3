@@ -100,7 +100,13 @@ getModuleNameAndVersion() {
     mversion=$(echo "$input" | cut -d'/' -f2)
     mversionsuffix=$(echo "$input" | cut -d'/' -f2 | cut -d'-' -f4-)
     local version=${mversion%%-*}
-    if [[ $input == *"intel"* ]] || [[ $input == *"foss"* ]] || [[ $input == *"gfbf"* ]] || [[ $input == *"GCC"* ]] || [[ $input == *"iimpi"* ]] || [[ $input == *"gompi"* ]]; then
+    if [[ $input == *"intel-compilers"* ]]; then
+        echo "('$input', EXTERNAL_MODULE),"
+    elif [[ $input == *"GCCcore"* ]]; then
+        # gcccorename=$(echo "$input" | grep -oP '(?<=-)(GCCcore)(?=-)')
+        gcccoreversion=$(echo "$input" | grep -oP '(?<=GCCcore-)[0-9]+\.[0-9]+\.[0-9]+$')
+        echo "('$mname', '$version',  '', ('GCCcore', '$gcccoreversion')),"
+    elif [[ $input == *"intel"* ]] || [[ $input == *"foss"* ]] || [[ $input == *"gfbf"* ]] || [[ $input == *"GCC"* ]] || [[ $input == *"iimpi"* ]] || [[ $input == *"gompi"* ]]; then
         if [ -z "$mversionsuffix" ]; then
             echo "('$mname', '$version'),"
         else
@@ -141,16 +147,15 @@ deleteGitHeaderFile() {
     fi
 }
 
-
 # module use /work/imas/etc/modules/all
 # module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 # TEST
-# toolchain=intel-2020b
+# toolchain=intel-2023b
 # module purge
 # getIMASModuleName $toolchain 4
 # getIMASModuleName $toolchain 5
 # getIMASModuleName $toolchain 5 3
-# module load "$(getIMASModuleName $toolchain 4)"
+# module load "$(getIMASModuleName $toolchain 5)"
 # getModuleName FRUIT $toolchain
 # getModuleName netCDF-Fortran $toolchain
 # getModuleName netCDF-Fortran foss-2020b
@@ -160,6 +165,7 @@ deleteGitHeaderFile() {
 # getModuleName Fundamental-Constants foss-2023b 13.2.0
 # getModuleName XMLlib $toolchain "$(getGCCcoreVersion)"
 # getModuleName iWrap $toolchain "$(getGCCcoreVersion)"
+# getModuleName iWrap $toolchain
 # getModuleName Waveform-Cooker $toolchain "$(getGCCcoreVersion)"
 # getModuleName INTERPOS $toolchain "$(getGCCcoreVersion)"
 # getModuleName PSPLINE iimpi-2020b
@@ -168,9 +174,23 @@ deleteGitHeaderFile() {
 # getModuleNameAndVersion netCDF-Fortran/4.5.3-iimpi-2020b
 # getModuleNameAndVersion Fundamental-Constants/0.1.1
 # getModuleNameAndVersion FRUIT/3.4.3-gompi-2020b-Ruby-2.7.2
-# getModuleName GRAY $toolchain "$(getGCCcoreVersion)"
-# getModuleName GRAYSCALE $toolchain "$(getGCCcoreVersion)"
-# getModuleName FPSIM $toolchain "$(getGCCcoreVersion)"
-# getModuleName HCD2CORE_PROFILES $toolchain "$(getGCCcoreVersion)"
-# getModuleName HCD2CORE_SOURCES $toolchain "$(getGCCcoreVersion)"
-# getModuleName HCD_MERGERS $toolchain "$(getGCCcoreVersion)"
+# getModuleNameAndVersion XMLlib/3.3.1-intel-compilers-2023.2.1
+
+# if [ -z "$MODULE_VERSION" ]; then
+#     if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
+#         intel_filtered=$(echo "$module_versions" 2>&1 | grep "$TOOLCHAIN_VERSION")
+#         MODULE_VERSION=$(echo "$intel_filtered" | sort -rV | head -n 1)
+#     fi
+#     if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
+#         foss_filtered=$(echo "$module_versions" 2>&1 | grep "$TOOLCHAIN_VERSION")
+#         MODULE_VERSION=$(echo "$foss_filtered" | sort -rV | head -n 1)
+#         if [ -z "$MODULE_VERSION" ]; then
+#             gcc_filtered=$(echo "$module_versions" 2>&1 | grep "GCC-$GCCcore_VERSION")
+#             MODULE_VERSION=$(echo "$gcc_filtered" | sort -rV | head -n 1)
+#         fi
+#         if [ -z "$MODULE_VERSION" ]; then
+#             gfbf_filtered=$(echo "$module_versions" 2>&1 | grep "gfbf-""$TVERSION")
+#             MODULE_VERSION=$(echo "$gfbf_filtered" | sort -rV | head -n 1)
+#         fi
+#     fi
+# fi

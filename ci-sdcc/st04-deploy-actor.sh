@@ -79,7 +79,7 @@ sed -e "s;__COMMITHASH__;${COMMITHASH};" \
     ./ci-sdcc/ebfiles/"$MODULE_NAME".eb.in >./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION"
 
 #format eb file
-python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black --line-length 80 ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" && deactivate
+python3 -m venv build_venv && source build_venv/bin/activate && pip install --upgrade pip && pip install black && black ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" && deactivate
 rm -rf build_venv
 # create eb tar file
 tar -cvzf eb.tar.gz ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" >/dev/null 2>&1
@@ -118,9 +118,22 @@ EASYBUILD_DIR="$DEPLOY_DIRECTORY/easybuild"
 # create directory EASYBUILD_DIR if not exists"
 mkdir -p "$EASYBUILD_DIR"
 
-# prepare EB options enable if needs to debug--logtostdout
-EB_OPTS="--force --force-download --modules-tool=EnvironmentModules --module-syntax=Tcl --allow-modules-tool-mismatch --allow-use-as-root-and-accept-consequences --prefix=$EASYBUILD_DIR --optarch=GENERIC"
+# prepare HTTP auth file
 EB_HTTP_OPTS=$(writeGitHeaderFile "$bamboo_HTTP_AUTH_BEARER_PASSWORD")
+# prepare EB options
+EB_OPTS=(
+    --force
+    --force-download
+    --modules-tool=EnvironmentModules
+    --module-syntax=Tcl
+    --allow-modules-tool-mismatch
+    --allow-use-as-root-and-accept-consequences
+    "--prefix=$EASYBUILD_DIR"
+    "--optarch=Intel:axAVX,CORE-AVX2;GCC:march=sandybridge"
+    "$EB_HTTP_OPTS"
+)
+# enable if need to debug
+EB_OPTS=(${EB_OPTS[@]} --logtostdout --debug --trace)
 
 #Check contents of the paths
 if [ -d "$EASYBUILD_DIR"/sources/"${MODULE_NAME_LOWER:0:1}"/"$MODULE_NAME" ]; then
@@ -131,15 +144,16 @@ if [ -d "$EASYBUILD_DIR"/software/"$MODULE_NAME" ]; then
 fi
 
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
-
+set -x
 # inject checksum
-eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS[@]}
 
 # check style
-# eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --check-style ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --check-style ${EB_OPTS[@]}
 
 # # execute eb command
-eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS//\'/} "$EB_HTTP_OPTS"
+eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION"  ${EB_OPTS[@]}
+set +x
 
 if [ $? -eq 0 ]; then
     echo "$MODULE_FULL_VERSION is installed"
@@ -149,7 +163,6 @@ fi
 
 # Replace mnt with /work/imas/opt/ to work internal path on sdcc"
 if [[ "$(uname -n)" != "sdcc"* ]]; then
-    find "$EASYBUILD_DIR"/software/"$MODULE_NAME"/dev-"$TOOLCHAIN_VERSION"-DD-"$IMAS_VERSION"-AL-"$AL_VERSION" -type f -not -path '*/\.*' -exec sed -i -- 's/mnt/work\/imas\/opt/g' {} +
     find "$EASYBUILD_DIR"/modules/all/"$MODULE_NAME" -type f -not -path '*/\.*' -exec sed -i -- 's/mnt/work\/imas\/opt/g' {} +
     find "$EASYBUILD_DIR"/modules/phys/"$MODULE_NAME" -type f -not -path '*/\.*' -exec sed -i -- 's/mnt/work\/imas\/opt/g' {} +
 fi
@@ -161,5 +174,6 @@ else
     module use -p "$EASYBUILD_DIR"/modules/all
 fi
 module avail -i "$MODULE_NAME"/
+
 deleteGitHeaderFile
 echo "Done"

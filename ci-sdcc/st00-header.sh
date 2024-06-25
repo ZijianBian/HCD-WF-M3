@@ -17,14 +17,14 @@ hostname -f
 
 # Get toolchain version
 if [ -z "$1" ]; then
-    TOOLCHAIN_VERSION="intel-2020b"
+    TOOLCHAIN_VERSION="intel-2023b"
 else
     TOOLCHAIN_VERSION="$1"
 fi
 
 # Get AL version
 if [ -z "$2" ]; then
-    ACCESS_LAYER_VERSION="4"
+    ACCESS_LAYER_VERSION="5"
 else
     ACCESS_LAYER_VERSION="$2"
 fi
