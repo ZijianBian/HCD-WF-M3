@@ -9,6 +9,17 @@ from setuptools import find_packages, setup
 
 import versioneer
 
+
+# pep440 version conversion 4.1.1-202-gab0f789 -> 4.1.1+202.gab0f789
+def convertGitToPep440(versionStr):
+    parts = versionStr.split("-")
+    if len(parts) == 3:
+        baseVersion, iterations, commitHash = parts
+        return f"{baseVersion}+{iterations}.{commitHash}"
+    else:
+        return versionStr
+
+
 current_directory = pathlib.Path(__file__).parent.resolve()
 long_description = (current_directory / "README.md").read_text(encoding="utf-8")
 
@@ -18,10 +29,10 @@ if os.path.isfile(requirement_path):
     with open(requirement_path) as f:
         install_requires = f.read().splitlines()
 
-
+version = convertGitToPep440(versioneer.get_version())
 setup(
     name="HCDWorkflow",
-    version=versioneer.get_version(),
+    version=version,
     cmdclass=versioneer.get_cmdclass(),
     description="Python H&CD Workflow",
     long_description=long_description,
