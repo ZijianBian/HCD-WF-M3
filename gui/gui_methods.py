@@ -40,7 +40,6 @@ def string2num(string):
         return string  # string array
 
 
-
 def xml2dict(root):
     children = {}
     for child in root:
@@ -56,6 +55,7 @@ def xml2dict(root):
                 children[key] = [string2num(child.text), display]
 
     return children
+
 
 def create_workflow_param_from_file(workflow_parameters_path):
 
@@ -170,6 +170,7 @@ def import_actor(actor_input, verbose):
 
     return error
 
+
 def update_codeparam_file(codeparam_destination_path, codeparam_dict, verbose):
 
     tree = etree.parse(codeparam_destination_path)
@@ -188,10 +189,11 @@ def update_codeparam_file(codeparam_destination_path, codeparam_dict, verbose):
 
     return 0
 
+
 def update_codeparam_dict_check_xsd(
     codeparam_dict, elem, newvalue, root=None, xmlschema=None, entry1=None
 ):
-    
+
     codeparam_dict[elem.tag] = newvalue
     if root != None:  # Check rules of xsd file
         elem.text = codeparam_dict[elem.tag]
@@ -200,7 +202,8 @@ def update_codeparam_dict_check_xsd(
         else:
             entry1.config(bg="salmon1")
     return codeparam_dict
-    
+
+
 def update_workflow_param(workflow_param, ref, main_key, category, elem, newvalue):
     if main_key == "":
         workflow_param[ref][0][elem][0] = newvalue
@@ -270,6 +273,7 @@ def codeparam_interface(
 
     return codeparam_dict
 
+
 def make_frame(
     category,
     process,
@@ -280,7 +284,6 @@ def make_frame(
     current_config_folder,
     default,
 ):
-
 
     # WINDOW CONFIGURATION
     canvas = tk.Canvas(cp_top, borderwidth=0, highlightthickness=0, background=col.c1)
@@ -344,7 +347,8 @@ def make_frame(
     tk.Button(fr_top, text="Exit", bg=col.c2, command=lambda: cp_top.destroy()).grid(
         row=0, column=4, padx=(20, 5), pady=5
     )
-    
+
+
 def edit_codeparam(maindict, workflow_param, current_config_folder):
 
     cp_top = tk.Toplevel()
@@ -398,8 +402,8 @@ def edit_codeparam(maindict, workflow_param, current_config_folder):
                             False,
                         ),
                     ).grid(padx=5, pady=5, sticky="ew")
-                    
-                    
+
+
 def read_and_save_codeparam(
     current_config_folder, previous_folder, category, process, actor_name, default
 ):
@@ -549,6 +553,7 @@ def read_and_save_codeparam(
         xmlschema,
     )
 
+
 def dict2xml(param_dict, root):
     for child in root.iter():
         if child.tag != etree.Comment and len(child) == 0:
@@ -560,6 +565,7 @@ def dict2xml(param_dict, root):
                         child.text = str(value[0])
                         child.attrib["display"] = value[1]
     return root
+
 
 def save_workflow_param_to_file(
     default_wf_param_file, current_wf_param_file, workflow_param, wfp_ref, cod_ref
@@ -628,6 +634,7 @@ def save_workflow_param_to_file(
     tree.write(current_wf_param_file, xml_declaration=True, encoding="UTF-8")
     return 0
 
+
 def save_waveforms_to_file(current_config_folder, previous_folder):
 
     err = -1
@@ -638,8 +645,6 @@ def save_waveforms_to_file(current_config_folder, previous_folder):
                 copy2(waveform_file, current_config_folder, follow_symlinks=True)
     err = 0
     return err
-
-
 
 
 def save_codeparam_to_file(
@@ -704,7 +709,7 @@ def save_codeparam_to_file(
 
     return 0
 
-                        
+
 def save(
     current_config_folder,
     default_wf_param_file,
@@ -725,9 +730,10 @@ def save(
         first_save = 1
         current_config_folder = os.path.join(
             # os.getcwd(), "data/run_" + datetime.now().strftime("%y%m%d_%H:%M:%S")
-            # Prasad 01/12/2023: Stop creating multtple folder with different date and time rather save them in default and when user 
+            # Prasad 01/12/2023: Stop creating multtple folder with different date and time rather save them in default and when user
             # clicks save as button configuration will be saved with new name
-            os.getcwd(), "data/run_default"
+            os.getcwd(),
+            "data/run_default",
         )
     else:
         first_save = 0
@@ -803,8 +809,8 @@ def save(
     return current_config_folder
 
 
-
 #####################################################################################
+
 
 # ---------------------------------------------------------------------------------
 # Create a python dictionary (maindict) that contains the name of all SD models,
@@ -925,7 +931,6 @@ def create_maindict(workflow_parameters_path, verbose):
 
 def read_actor_ids(name, verbose):
 
-
     ids_list = [ids.value for ids in list(imas.IDSName)]
     input_ids_list = []
     output_ids_list = []
@@ -935,13 +940,16 @@ def read_actor_ids(name, verbose):
     if err == 0:
 
         # IMAS-4679
-        for ilist in actor.code_description['arguments']:
-            if ilist['intent'] == "IN":
-                input_ids_list.append(ilist['type'])
-            elif ilist['intent'] == "OUT":
-                output_ids_list.append(ilist['type'])
+        for ilist in actor.code_description["implementation"]["subroutines"]["main"][
+            "arguments"
+        ]:
+            if ilist["intent"] == "IN":
+                input_ids_list.append(ilist["type"])
+            elif ilist["intent"] == "OUT":
+                output_ids_list.append(ilist["type"])
 
     return (input_ids_list, output_ids_list, err)
+
 
 class saved_folder_name(object):
     def __init__(

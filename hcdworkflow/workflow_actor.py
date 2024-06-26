@@ -77,9 +77,7 @@ class WorkflowActor:
     def initializeActor(self, actorName: str, xmlPath: str, xsdPath: str):
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
         if WorkflowActor._import(actorName) != 0:
-            logger.critical(
-                f"ERROR! Couldn't import actor {self.name }"
-            )
+            logger.critical(f"ERROR! Couldn't import actor {self.name }")
             return None
 
         actor = eval(actorName)
@@ -144,7 +142,9 @@ class WorkflowActor:
         if self.actor is not None:
             idsList.extend(
                 ilist["type"]
-                for ilist in self.actor.code_description["arguments"]
+                for ilist in self.actor.code_description["implementation"][
+                    "subroutines"
+                ]["main"]["arguments"]
                 if ilist["intent"] == intentType
             )
         return idsList
