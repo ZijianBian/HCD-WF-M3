@@ -9,7 +9,19 @@ source ./ci-sdcc/st00-header.sh $1 $2
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
     set -e -u -o pipefail
 fi
+#remove previously created environment
+VIRTUALENV_DIR=virtualenvdir
+if [ -d "$VIRTUALENV_DIR" ]; then
+    rm -r "$VIRTUALENV_DIR"
+fi
 
+# create virtual env
+python3 -m venv "$VIRTUALENV_DIR"
+
+# activate virtual env
+source "$VIRTUALENV_DIR"/bin/activate
+pip install --upgrade pip
+pip install build
 if [ -d "dist" ]; then
     rm -rf "dist"
 fi
@@ -21,5 +33,5 @@ python -m build --sdist
 # create wheel compiled version of the package
 python -m build --wheel
 set +x
-
+deactivate
 echo "Done"
