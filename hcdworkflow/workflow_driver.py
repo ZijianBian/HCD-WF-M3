@@ -41,17 +41,17 @@ class WorkflowDriver:
         # -----------------------------------------
         if self.workflowObject.workflowData.one_time_slice == 0:
             # INPUT TIME ARRAY
-            try:
-                time_array = self.inputDb.partial_get(
-                    ids_name="equilibrium", data_path="time"
-                )
-            except:
-                print(
-                    "  ERROR while reading the core_profiles IDS: is it really present in the input file?",
-                    file=sys.stderr,
-                )
-                print("  ----> Aborted.", file=sys.stderr)
-                return
+            # try:
+            time_array = self.inputDb.partial_get(
+                ids_name="equilibrium", data_path="time"
+            )
+            # except:
+            #     print(
+            #         "  ERROR while reading the equilibrium IDS: is it really present in the input file?",
+            #         file=sys.stderr,
+            #     )
+            #     print("  ----> Aborted.", file=sys.stderr)
+            #     return
 
             # CHECK & ADJUST CHOSEN TIME TO CORE_PROFILES IF NECESSARY
             if self.workflowObject.workflowData.tbegin < 0:

@@ -8,9 +8,12 @@ from getpass import getuser
 from datetime import datetime
 from io import open
 
-import yaml
 import sh
-
+from yaml import load as yamlload
+try:
+    from yaml import CLoader as yamlLoader
+except ImportError:
+    from yaml import Loader as yamlLoader
 
 # adapted from $MODULESHOME/init/python.py
 def module(*args):
@@ -283,7 +286,7 @@ for yml in args.yml:
         continue
 
     try:
-        desc = yaml.load(yml, Loader=yaml.CLoader)
+        desc = yamlload(yml, Loader=yamlLoader)
 
         if args.verbose:
             print(desc)

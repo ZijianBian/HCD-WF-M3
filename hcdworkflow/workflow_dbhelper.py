@@ -113,7 +113,7 @@ class WorkflowDbHelper:
             time_array = inputDb.partial_get(ids_name="equilibrium", data_path="time")
         except Exception:
             print(
-                "  ERROR while reading the core_profiles IDS: is it really present in the input file?",
+                "  ERROR while reading the equilibrium IDS: is it really present in the input file?",
                 file=sys.stderr,
             )
             print("  ----> Aborted.", file=sys.stderr)

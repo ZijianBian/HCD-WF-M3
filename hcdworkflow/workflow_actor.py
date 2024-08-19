@@ -156,7 +156,7 @@ class WorkflowActor:
         try:
             _ = import_module(actorName)
         except Exception:
-            print(f"ERROR! Actor {actorName.upper()} not found.")
+            print(f"WARNING! Actor {actorName.upper()} not found.")
             return 1
 
         actor_function = getattr(import_module(f"{actorName}.actor"), actorName)()
@@ -184,7 +184,8 @@ class WorkflowActor:
             input_ids_list = []
             output_ids_list = []
             # IMAS-4679
-            for ilist in actor.code_description["arguments"]:
+            
+            for ilist in actor.code_description["implementation"]["subroutines"]["main"]["arguments"]:
                 if ilist["intent"] == "IN":
                     input_ids_list.append(ilist["type"])
                 elif ilist["intent"] == "OUT":

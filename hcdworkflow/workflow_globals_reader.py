@@ -1,7 +1,10 @@
 import os
-import yaml
 import sys
-
+from yaml import load as yamlload
+try:
+    from yaml import CLoader as yamlLoader
+except ImportError:
+    from yaml import Loader as yamlLoader
 
 class WorkflowGlobalsReader:
     def __init__(self, globalListPath: str) -> None:
@@ -10,7 +13,7 @@ class WorkflowGlobalsReader:
         self.globalListPath = globalListPath
 
         with open(globalListPath, "r") as fileObject:
-            self.rawData = yaml.load(fileObject, Loader=yaml.CLoader)
+            self.rawData = yamlload(fileObject, Loader=yamlLoader)
 
     def getList(self, listName: str):
         if listName not in self.rawData.keys():
