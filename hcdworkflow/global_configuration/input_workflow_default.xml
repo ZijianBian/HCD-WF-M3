@@ -2,10 +2,12 @@
   <workflow_parameters      display= "Workflow parameters (standalone)">
     <input_user_or_path     display= "Input user or path">public</input_user_or_path>
     <input_database         display= "Input database">ITER</input_database>
+    <input_backend          display= "Input backend">MDSPLUS</input_backend>
     <shot_nr                display= "Input shot">130012</shot_nr>
-    <run_in                 display= "Input run">4</run_in>
+    <run_in                 display= "Input run">5</run_in>
     <output_user_or_path    display= "Output user or path">default</output_user_or_path>
     <output_database        display= "Output database">default</output_database>
+    <output_backend         display= "Output backend">MDSPLUS</output_backend>
     <run_out                display= "Output run">5</run_out>
     <tbegin                 display= "Start Time [s]">30.</tbegin>
     <tend                   display= "End Time   [s]">350.</tend>

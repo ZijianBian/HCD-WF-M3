@@ -12,7 +12,7 @@ except:
 from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
 from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 from hcdworkflow.workflow_driver import WorkflowDriver
-
+import imas
 
 def wf_wrapper(par_path):
     config_folder_path = os.path.abspath(par_path)
@@ -22,14 +22,21 @@ def wf_wrapper(par_path):
     globalListPath = str(pathGlobalConfiguration / "global_lists.yaml")
         
     inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
+    print("path of the input workflow", inputworkflow_xml)
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
         "workflow_parameters"
     ][0]
 
     input_user_or_path = wf_parameters["input_user_or_path"][0]
     input_database = wf_parameters["input_database"][0]
+    input_backend="MDSPLUS"
+    if "input_backend" in wf_parameters:
+        input_backend = wf_parameters["input_backend"][0]
     output_user_or_path = wf_parameters["output_user_or_path"][0]
     output_database = wf_parameters["output_database"][0]
+    output_backend="MDSPLUS"
+    if "output_backend" in wf_parameters:
+        output_backend = wf_parameters["output_backend"][0]
     shot_nr = wf_parameters["shot_nr"][0]
     run_in = wf_parameters["run_in"][0]
     run_out = wf_parameters["run_out"][0]
@@ -37,8 +44,10 @@ def wf_wrapper(par_path):
     dbhelper = WorkflowDbHelper(
         input_user_or_path,
         input_database,
+        input_backend,
         output_user_or_path,
         output_database,
+        output_backend,
         shot_nr,
         run_in,
         run_out,
@@ -56,7 +65,10 @@ def wf_wrapper(par_path):
     # Prepare Memory DB, Check if Machine description is exists and write to memory db
     for idsName in inputMds:
         idsObject = inputDb.get(idsName)
-        machineDb.put(idsObject)
+        if idsObject.ids_properties.homogeneous_time != imas.imasdef.EMPTY_INT:
+            machineDb.put(idsObject)
+        else:
+            print(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required")
 
     # feature/repair_231017
     # TODO This change is not needed as input slices are separate from process

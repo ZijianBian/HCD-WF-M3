@@ -462,7 +462,7 @@ def read_and_save_codeparam(
                         follow_symlinks=True,
                     )
             found_xml = True
-
+    # Do not update XSD # https://jira.iter.org/browse/IMAS-5213
     try:
         codeparam_xsd_path = glob.glob(actor.actor_dir + "/input/*.xsd")[0]
         found_xsd = True

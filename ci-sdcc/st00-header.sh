@@ -49,13 +49,13 @@ runtime_dependencies="./ci-sdcc/runtime_dependencies.txt"
 # Check if the file exists
 if [ ! -f "$buildtime_dependencies" ]; then
     echo "File $buildtime_dependencies not found."
-    exit 1
+    return 1
 fi
 
 # Check if the file exists
 if [ ! -f "$runtime_dependencies" ]; then
     echo "File $runtime_dependencies not found."
-    exit 1
+    return 1
 fi
 
 declare -a BUILDMODULES=()

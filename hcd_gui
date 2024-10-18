@@ -159,11 +159,8 @@ def open_gui(wf_param_file):
     device = workflowGlobalsReader.getDeviceList()[0] # loadlist(file, "device")[0]
     waveform_folder=""
     if isWaveformCookerPresent:
-        waveform_folder = os.path.join(
-            os.path.dirname(os.path.abspath(waveform_cooker.__file__)) + "/../../../../",
-            "presets",
-            device,
-        )
+        waveform_cooker_base_path= Path(waveform_cooker.__file__).resolve().parents[4]
+        waveform_folder = str(waveform_cooker_base_path / "presets" / device)
     waveform_presets = workflowGlobalsReader.getWaveformPresetsList() # loadlist(file, "waveform_presets")
 
     # Setup

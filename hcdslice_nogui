@@ -14,7 +14,7 @@ try:
     from waveform_cooker import add_dynamic
 except:
     isWaveformCookerPresent = False
-    
+
 
 
 # Management of input arguments
@@ -39,8 +39,15 @@ wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
 
 input_user_or_path = wf_parameters["input_user_or_path"][0]
 input_database = wf_parameters["input_database"][0]
+input_backend="MDSPLUS"
+if "input_backend" in wf_parameters:
+    input_backend = wf_parameters["input_backend"][0]
 output_user_or_path = wf_parameters["output_user_or_path"][0]
 output_database = wf_parameters["output_database"][0]
+
+output_backend="MDSPLUS"
+if "output_backend" in wf_parameters:
+    output_backend = wf_parameters["output_backend"][0]
 shot_nr = wf_parameters["shot_nr"][0]
 run_in = wf_parameters["run_in"][0]
 run_out = wf_parameters["run_out"][0]
@@ -48,8 +55,10 @@ run_out = wf_parameters["run_out"][0]
 dbhelper = WorkflowDbHelper(
     input_user_or_path,
     input_database,
+    input_backend,
     output_user_or_path,
     output_database,
+    output_backend,
     shot_nr,
     run_in,
     run_out,
@@ -64,7 +73,11 @@ inputMds = ["nbi", "ic_antennas", "ec_launchers", "lh_antennas", "wall"]
 # Check if Machine description is exists and write to memory db
 for idsName in inputMds:
     idsObject = inputDb.get(idsName)
-    machineDb.put(idsObject)
+
+    if idsObject.ids_properties.homogeneous_time != imas.imasdef.EMPTY_INT:
+        machineDb.put(idsObject)
+    else:
+        logger.warning(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required")
 
 waveform_presets = {
   "ec":{

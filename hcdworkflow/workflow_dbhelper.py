@@ -8,8 +8,10 @@ class WorkflowDbHelper:
         self,
         input_user_or_path,
         input_database,
+        input_backend,
         output_user_or_path,
         output_database,
+        output_backend,
         shot_number,
         input_run,
         output_run,
@@ -38,9 +40,11 @@ class WorkflowDbHelper:
 
         self.input_user_or_path = input_user_or_path
         self.input_database = input_database
+        self.input_backend = input_backend
 
         self.output_user_or_path = output_user_or_path
         self.output_database = output_database
+        self.output_backend = output_backend
         self.shot_number = shot_number
         self.input_run = input_run
         self.output_run = output_run
@@ -49,7 +53,7 @@ class WorkflowDbHelper:
         # OPEN INPUT DATAFILE
         print("-- Open input and output file --", file=sys.stdout)
         inputDb = imas.DBEntry(
-            imas.imasdef.MDSPLUS_BACKEND,
+            getattr(imas.imasdef, f"{self.input_backend}_BACKEND"),
             self.input_database,
             self.shot_number,
             self.input_run,
@@ -74,7 +78,7 @@ class WorkflowDbHelper:
     def getOutputDatabase(self):
         # CREATE OUTPUT DATAFILE
         outputDb = imas.DBEntry(
-            imas.imasdef.MDSPLUS_BACKEND,
+            getattr(imas.imasdef, f"{self.output_backend}_BACKEND"),
             self.output_database,
             self.shot_number,
             self.output_run,
