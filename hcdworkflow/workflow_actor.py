@@ -12,13 +12,12 @@ logger = logging.getLogger("module")
 # TODO Make generic process actor using class method which can initialize any actor (iwrap, muscle etc).. keep interface same
 # Current implementation is only iwrap
 class WorkflowActor:
-    def __init__(self, actorName: str, xmlPath: str = "", xsdPath: str = ""):
+    def __init__(self, actorName: str, xmlPath: str = ""):
         self.name = actorName
         self.xmlPath = xmlPath
-        self.xsdPath = xsdPath
 
         self.validate()
-        self.actor = self.initializeActor(actorName, xmlPath, xsdPath)
+        self.actor = self.initializeActor(actorName, xmlPath)
 
         self.inputIDSList = self.getInputIDSList()
         self.outputIDSList = self.getOutputIDSList()
@@ -29,10 +28,6 @@ class WorkflowActor:
     @classmethod
     def getObject(cls, actorName):
         return WorkflowActor(actorName)
-
-    @classmethod
-    def getObjectByXmlXsdPath(cls, actorName, xmlPath: str, xsdPath: str):
-        return WorkflowActor(actorName, xmlPath, xsdPath)
 
     @classmethod
     def getObjectByXmlDirectory(cls, actorName, xmlDirectory: str):
@@ -47,24 +42,12 @@ class WorkflowActor:
         ):
             print(f"Actor configuration not found for actor name : [{actorName}]")
             return None
-        if not os.path.exists(
-            os.path.join(
-                xmlDirectory,
-                f"input_{actorName}.xsd",
-            )
-        ):
-            print(f"Actor configuration not found for actor name : [{actorName}]")
-            return None
         return WorkflowActor(
             actorName,
             os.path.join(
                 xmlDirectory,
                 f"input_{actorName}.xml",
-            ),
-            os.path.join(
-                xmlDirectory,
-                f"input_{actorName}.xsd",
-            ),
+            )
         )
 
     def validate(self):
@@ -74,7 +57,7 @@ class WorkflowActor:
             )
             return None
 
-    def initializeActor(self, actorName: str, xmlPath: str, xsdPath: str):
+    def initializeActor(self, actorName: str, xmlPath: str):
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
         if WorkflowActor._import(actorName) != 0:
             logger.critical(f"ERROR! Couldn't import actor {self.name }")
@@ -84,7 +67,7 @@ class WorkflowActor:
         runtime_settings = actor.get_runtime_settings()
         runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND  # IMAS-4055
         code_parameters = actor.get_code_parameters()
-        if xmlPath and xsdPath:
+        if xmlPath:
             code_parameters.parameters_path = xmlPath
             if actor.is_mpi_code is True:
                 tree = etree.parse(xmlPath)
@@ -93,10 +76,7 @@ class WorkflowActor:
                     if elem.tag == "nproc_actor":
                         nproc_actor = int(elem.text)
                 runtime_settings.mpi.mpi_processes = nproc_actor
-                code_parameters.__init__(
-                    default_parameters_path=xmlPath,
-                    schema_path=xsdPath,
-                )
+       
         # feature/repair_231017
         # TODO Need to move out and keep it separate
         if actorName == "pion":
@@ -107,10 +87,12 @@ class WorkflowActor:
             runtime_settings.sandbox.path = (
                 os.getcwd()
             )  # To be fixed later on (pion fails if it does not know where to write)
-        actor.initialize(
-            code_parameters=code_parameters,
-            runtime_settings=runtime_settings,
-        )
+        arguments={}
+        if code_parameters is not None:
+            arguments['code_parameters']=code_parameters
+        if runtime_settings is not None:
+            arguments['runtime_settings']=runtime_settings
+        actor.initialize(**arguments)
         return actor
 
     def getActor(self):
