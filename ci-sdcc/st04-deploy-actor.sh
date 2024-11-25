@@ -84,10 +84,6 @@ rm -rf build_venv
 # create eb tar file
 tar -cvzf eb.tar.gz ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" >/dev/null 2>&1
 
-################################################################################################
-#                                   Easybuild                                                  #
-################################################################################################
-
 # Set up environment for compilation
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
     DEPLOY_DIRECTORY="/mnt/bamboo_deploy"
@@ -101,6 +97,10 @@ else
     fi
 fi
 
+################################################################################################
+#                                   Easybuild                                                  #
+################################################################################################
+
 # contents of eb file
 echo "----------------------------------------------------"
 cat ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION"
@@ -108,7 +108,7 @@ echo "----------------------------------------------------"
 # Load modules
 
 echo "Loading Modules"
-. /usr/share/Modules/init/sh
+source /etc/profile.d/modules.sh
 module purge
 module load EasyBuild
 echo "Done loading modules..."
@@ -124,7 +124,7 @@ EB_HTTP_OPTS=$(writeGitHeaderFile "$bamboo_HTTP_AUTH_BEARER_PASSWORD")
 EB_OPTS=(
     --force
     --force-download
-    --modules-tool=EnvironmentModules
+    "--modules-tool=Lmod"
     --module-syntax=Tcl
     --allow-modules-tool-mismatch
     --allow-use-as-root-and-accept-consequences
@@ -132,8 +132,8 @@ EB_OPTS=(
     "--optarch=Intel:axAVX,CORE-AVX2;GCC:march=sandybridge"
     "$EB_HTTP_OPTS"
 )
-# enable if need to debug
-EB_OPTS=(${EB_OPTS[@]} --logtostdout --debug --trace)
+# enable if need to debug --logtostdout --debug --trace
+EB_OPTS=(${EB_OPTS[@]})
 
 #Check contents of the paths
 if [ -d "$EASYBUILD_DIR"/sources/"${MODULE_NAME_LOWER:0:1}"/"$MODULE_NAME" ]; then
@@ -142,18 +142,22 @@ fi
 if [ -d "$EASYBUILD_DIR"/software/"$MODULE_NAME" ]; then
     ls "$EASYBUILD_DIR"/software/"$MODULE_NAME"
 fi
+echo "=============================================================================="
 
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
-set -x
-# inject checksum
+
+echo "> Injecting checksum"
 eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS[@]}
 
-# check style
+echo "=============================================================================="
+echo "> Checking style"
+$EB_INSTALLPYTHON -m venv stylevenv && source ./stylevenv/bin/activate && pip install -- pycodestyle && eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS[@]} --check-style && deactivate
+rm -rf stylevenv
 # eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --check-style ${EB_OPTS[@]}
 
-# # execute eb command
+echo "=============================================================================="
+echo "> execute eb"
 eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" ${EB_OPTS[@]}
-set +x
 
 if [ $? -eq 0 ]; then
     echo "$MODULE_FULL_VERSION is installed"
@@ -173,7 +177,8 @@ if [[ "$(uname -n)" != "sdcc"* ]]; then
 else
     module use -p "$EASYBUILD_DIR"/modules/all
 fi
-module avail -i "$MODULE_NAME"/
+
+module -r -t avail "$MODULE_NAME"/
 
 deleteGitHeaderFile
 echo "Done"

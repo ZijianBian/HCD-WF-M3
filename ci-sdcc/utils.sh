@@ -19,10 +19,12 @@ getIMASModuleName() {
         DD_VERSION="$3"
     fi
     #Semantic versioning
-    IMASVERSIONSLIST=$(module av -t IMAS/ 2>&1 | grep -E "$DD_VERSION\.[0-9]+\.[0-9]+-$ACCESS_LAYER_VERSION\.[0-9]+\.[0-9]+-$TOOLCHAIN_VERSION")
+    IMASVERSIONSLIST=$(module -r -t avail IMAS/ 2>&1 | grep -E "^IMAS/$DD_VERSION\.[0-9]+\.[0-9]+-$ACCESS_LAYER_VERSION\.[0-9]+\.[0-9]+-$TOOLCHAIN_VERSION")
     # CalVar versioning
-    if [[ $ACCESS_LAYER_VERSION == "5" ]]; then
-        IMASCALVERVERSIONSLIST=$(module av -t IMAS/ 2>&1 | grep -E "$DD_VERSION\.[0-9]+\.[0-9]+-[0-9]+\.[0-9]+-$TOOLCHAIN_VERSION")
+    if [[ "$ACCESS_LAYER_VERSION" -ge 5 ]]; then
+        IMASCALVERVERSIONSLIST=$(module -r -t avail IMAS/ 2>&1 | grep -E "^IMAS/$DD_VERSION\.[0-9]+\.[0-9]+-[0-9]{4}\.[0-9]+(\.[0-9]+)?-$TOOLCHAIN_VERSION")
+    else
+        IMASCALVERVERSIONSLIST=""
     fi
     if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
         IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST"$'\n'"$IMASCALVERVERSIONSLIST" | grep "intel" | sort -rV | head -n 1)
@@ -30,7 +32,11 @@ getIMASModuleName() {
     if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
         IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST"$'\n'"$IMASCALVERVERSIONSLIST" | grep "foss" | sort -rV | head -n 1)
     fi
-    echo "$IMAS_MODULE_VERSION" | sed 's/(.*//'
+    # IMAS_MODULE_VERSION="$IMAS_MODULE_VERSION" | sed 's/(.*//'
+    IMAS_MODULE_VERSION="${IMAS_MODULE_VERSION%%(*}"
+    IMAS_MODULE_VERSION="${IMAS_MODULE_VERSION// (D)/}"
+    IMAS_MODULE_VERSION="${IMAS_MODULE_VERSION// /}"
+    echo "${IMAS_MODULE_VERSION}"
 }
 
 getModuleName() {
@@ -40,8 +46,12 @@ getModuleName() {
     local TOOLCHAIN_VERSION=$2
     local GCCcore_VERSION=$3
     IFS='-' read -r TNAME TVERSION <<<"$TOOLCHAIN_VERSION"
-     
-    module_versions=$(module av -t "$MODULE_NAME"/ 2>&1 | grep -E "$MODULE_NAME/[0-9]+\.[0-9]+\.[0-9]+|dev")
+
+    if [[ $MODULE_NAME == *-* ]]; then
+        module_versions=$(module -t avail "$MODULE_NAME"/ 2>&1 | grep -E "$MODULE_NAME/[0-9]+\.[0-9]+\.[0-9]+|dev")
+    else
+        module_versions=$(module -r -t avail ^"$MODULE_NAME"/ 2>&1 | grep -E "$MODULE_NAME/[0-9]+\.[0-9]+\.[0-9]+|dev")
+    fi
     # Check GCCcore version
     gcccore_filtered=$(echo "$module_versions" 2>&1 | grep "GCCcore-$GCCcore_VERSION")
     MODULE_VERSION=$(echo "$gcccore_filtered" | sort -rV | head -n 1)
@@ -81,13 +91,16 @@ getModuleName() {
         modules_filtered=$(echo "$module_versions" 2>&1 | grep "$MODULE_NAME")
         MODULE_VERSION=$(echo "$modules_filtered" | sort -rV | head -n 1)
     fi
-    echo "${MODULE_VERSION//(default)/}"
+    MODULE_VERSION="${MODULE_VERSION//(default)/}"
+    MODULE_VERSION="${MODULE_VERSION// (D)/}"
+    MODULE_VERSION="${MODULE_VERSION// /}"
+    echo "${MODULE_VERSION}"
 }
 
 getGCCcoreVersion() {
     # Get GCCcore version loaded
     # ensure that IMAS module should be loaded before calling this function
-    GCCcore_VERSION=$(module -t list 2>&1 | grep GCCcore | head -n 1 | awk -F'/' '{print $2}')
+    GCCcore_VERSION=$(module -r -t list 2>&1 | grep GCCcore | head -n 1 | awk -F'/' '{print $2}')
     echo "$GCCcore_VERSION"
 }
 
@@ -103,10 +116,9 @@ getModuleNameAndVersion() {
     if [[ $input == *"intel-compilers"* ]]; then
         echo "('$input', EXTERNAL_MODULE),"
     elif [[ $input == *"GCCcore"* ]]; then
-        # gcccorename=$(echo "$input" | grep -oP '(?<=-)(GCCcore)(?=-)')
         gcccoreversion=$(echo "$input" | grep -oP '(?<=GCCcore-)[0-9]+\.[0-9]+\.[0-9]+$')
         echo "('$mname', '$version',  '', ('GCCcore', '$gcccoreversion')),"
-    elif [[ $input == *"intel"* ]] || [[ $input == *"foss"* ]] || [[ $input == *"gfbf"* ]] || [[ $input == *"GCC"* ]] || [[ $input == *"iimpi"* ]] || [[ $input == *"gompi"* ]]; then
+    elif [[ $input == *"intel"* ]] || [[ $input == *"foss"* ]] || [[ $input == *"gfbf"* ]] || [[ $input == *"GCC"* ]] || [[ $input == *"iimpi"* ]] || [[ $input == *"gompi"* ]]  || [[ $input == *"iimkl"* ]]; then
         if [ -z "$mversionsuffix" ]; then
             echo "('$mname', '$version'),"
         else
@@ -155,7 +167,9 @@ deleteGitHeaderFile() {
 # getIMASModuleName $toolchain 4
 # getIMASModuleName $toolchain 5
 # getIMASModuleName $toolchain 5 3
+# getIMASModuleName $toolchain 5
 # module load "$(getIMASModuleName $toolchain 5)"
+# getGCCcoreVersion
 # getModuleName FRUIT $toolchain
 # getModuleName netCDF-Fortran $toolchain
 # getModuleName netCDF-Fortran foss-2020b

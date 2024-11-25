@@ -1,13 +1,11 @@
 #!/bin/bash
+source /etc/profile.d/modules.sh
 source ./ci-sdcc/utils.sh
 ##########################################################################################
 #                     Set environment based on toolchain                                 #
 ##########################################################################################
-. /usr/share/Modules/init/sh
 module use /work/imas/etc/modules/all
 module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
-
-module purge
 
 # expand aliases
 shopt -s expand_aliases
@@ -15,32 +13,56 @@ shopt -s expand_aliases
 #print hostname
 hostname -f
 
-# Get toolchain version
-if [ -z "$1" ]; then
+IMAS_EXISTS=$(module -r -t list 2>&1 | grep -E "IMAS/"  | head -n 1)
+if [ -n "$IMAS_EXISTS" ]; then
+    echo "> Found already loaded IMAS Module : $IMAS_EXISTS"
+    IMAS_MODULE_VERSION="$IMAS_EXISTS"
+    ACCESS_LAYER_VERSION=$(echo "$AL_VERSION" | cut -d '.' -f 1)
+    TOOLCHAIN_VERSION=$(echo "$IMAS_EXISTS" | awk -F '-' '{print $(NF-1)"-"$NF}')
+else
+    echo "> IMAS Module is not loaded"
+fi
+
+if [ -n "$1" ] || [ -n "$2" ]; then
+    echo "> Compiling with $1 and Access Layer $2 with latest version of installed modules.Previously loaded modules will be purged.."
+    module purge
+    # If toolchain version is passed then purge all modules
+    if [ -n "$1" ]; then
+        TOOLCHAIN_VERSION="$1"
+    fi
+
+    # Get AL version
+    if [ -n "$2" ]; then
+        ACCESS_LAYER_VERSION="$2"
+    else
+        ACCESS_LAYER_VERSION="5"
+    fi
+fi
+
+if [ -z "$TOOLCHAIN_VERSION" ]; then
+    echo "> No toolchain found, Setting it to default : intel-2023b"
     TOOLCHAIN_VERSION="intel-2023b"
-else
-    TOOLCHAIN_VERSION="$1"
 fi
 
-# Get AL version
-if [ -z "$2" ]; then
+if [ -z "$ACCESS_LAYER_VERSION" ]; then
     ACCESS_LAYER_VERSION="5"
-else
-    ACCESS_LAYER_VERSION="$2"
 fi
 
-echo "Building for $TOOLCHAIN_VERSION and Access Layer $ACCESS_LAYER_VERSION"
+echo "> Building for $TOOLCHAIN_VERSION and Access Layer $ACCESS_LAYER_VERSION"
 
 if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
-    FCOMPILER="ifort"
+    FC="ifort"
 fi
 if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
-    FCOMPILER="gfortran"
+    FC="gfortran"
 fi
 
-IMAS_MODULE_VERSION=$(getIMASModuleName "$TOOLCHAIN_VERSION" "$ACCESS_LAYER_VERSION")
-# load IMAS module first
-module load "$IMAS_MODULE_VERSION"
+if [ -z "$IMAS_EXISTS" ]; then
+    IMAS_MODULE_VERSION=$(getIMASModuleName "$TOOLCHAIN_VERSION" "$ACCESS_LAYER_VERSION")
+    # load IMAS module first
+    echo "> IMAS is not loaded.. Loading Module $IMAS_MODULE_VERSION"
+    module load "$IMAS_MODULE_VERSION"
+fi
 
 GCCcore_VERSION=$(getGCCcoreVersion)
 
@@ -57,14 +79,18 @@ if [ ! -f "$runtime_dependencies" ]; then
     echo "File $runtime_dependencies not found."
     return 1
 fi
+echo "> Listing available modules"
+echo "-------------------------------------------------------"
+echo "> build time modules"
 
 declare -a BUILDMODULES=()
 declare -a RUNMODULES=()
 declare -a EBBUILDMODULES=()
 declare -a EBBRUNMODULES=()
 
+
 # actors have version suffix so better to provide them as EXTERNAL_MODULE
-actorslist=("GRAYSCALE" "GRAY" "FPSIM" "HCD2CORE_PROFILES" "HCD2CORE_SOURCES" "HCD_MERGERS")
+actorslist=("GENRAY" "GRAY ""GRAYSCALE" "TORBEAM" "TORAY" "HCD2CORE_PROFILES" "HCD2CORE_SOURCES" "HCD_MERGERS")
 
 counter=0
 # Read the file line by line
@@ -139,15 +165,19 @@ while IFS= read -r line || [[ -n $line ]]; do
     fi
     counter=$(("$counter" + 1))
 done <"$runtime_dependencies"
+echo "-------------------------------------------------------"
 
-echo "TOOLCHAIN_VERSION : $TOOLCHAIN_VERSION"
-echo "GCCcore_VERSION : $GCCcore_VERSION"
-echo "IMAS VERSION : $IMAS_MODULE_VERSION"
-echo "BUILDMODULES : " "${BUILDMODULES[@]}"
-echo "RUNMODULES : " "${RUNMODULES[@]}"
-echo "EBBUILDMODULES : " "${EBBUILDMODULES[@]}"
-echo "EBRUNMODULES : " "${EBBRUNMODULES[@]}"
-echo "Compiler : $FCOMPILER"
+echo "> Details of environment"
+echo "    TOOLCHAIN_VERSION : $TOOLCHAIN_VERSION"
+echo "    GCCcore_VERSION : $GCCcore_VERSION"
+echo "    IMAS VERSION : $IMAS_MODULE_VERSION"
+echo "    BUILDMODULES : " "${BUILDMODULES[@]}"
+echo "    RUNMODULES : " "${RUNMODULES[@]}"
+echo "    EBBUILDMODULES : " "${EBBUILDMODULES[@]}"
+echo "    EBRUNMODULES : " "${EBBRUNMODULES[@]}"
+echo "    Compiler : $FC"
+echo "-------------------------------------------------------"
+
 
 echo "Loading modules..."
 module purge
