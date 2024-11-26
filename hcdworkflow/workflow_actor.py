@@ -12,12 +12,12 @@ logger = logging.getLogger("module")
 # TODO Make generic process actor using class method which can initialize any actor (iwrap, muscle etc).. keep interface same
 # Current implementation is only iwrap
 class WorkflowActor:
-    def __init__(self, actorName: str, xmlPath: str = ""):
+    def __init__(self, actorName: str, xmlPath: str = "", verbose=False):
         self.name = actorName
         self.xmlPath = xmlPath
 
         self.validate()
-        self.actor = self.initializeActor(actorName, xmlPath)
+        self.actor = self.initializeActor(actorName, xmlPath, verbose)
 
         self.inputIDSList = self.getInputIDSList()
         self.outputIDSList = self.getOutputIDSList()
@@ -57,9 +57,9 @@ class WorkflowActor:
             )
             return None
 
-    def initializeActor(self, actorName: str, xmlPath: str):
+    def initializeActor(self, actorName: str, xmlPath: str, verbose=False):
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
-        if WorkflowActor._import(actorName) != 0:
+        if WorkflowActor._import(actorName, verbose) != 0:
             logger.critical(f"ERROR! Couldn't import actor {self.name }")
             return None
 
@@ -133,12 +133,13 @@ class WorkflowActor:
 
     # TODO Look for cleaner way of importing actors
     @staticmethod
-    def _import(actorName: str):
+    def _import(actorName: str, verbose=False):
         error = 0
         try:
             _ = import_module(actorName)
         except Exception:
-            print(f"WARNING! Actor {actorName.upper()} not found.")
+            if verbose:
+                print(f"WARNING! Actor {actorName.upper()} not found.")
             return 1
 
         actor_function = getattr(import_module(f"{actorName}.actor"), actorName)()

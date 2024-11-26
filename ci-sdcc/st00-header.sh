@@ -13,10 +13,10 @@ shopt -s expand_aliases
 #print hostname
 hostname -f
 
-IMAS_EXISTS=$(module -r -t list 2>&1 | grep -E "IMAS/"  | head -n 1)
+IMAS_EXISTS=$(module -r -t list 2>&1 | grep -E "IMAS-AL-Core/"  | head -n 1)
 if [ -n "$IMAS_EXISTS" ]; then
     echo "> Found already loaded IMAS Module : $IMAS_EXISTS"
-    IMAS_MODULE_VERSION="$IMAS_EXISTS"
+    IMAS_CORE_MODULE_VERSION="$IMAS_EXISTS"
     ACCESS_LAYER_VERSION=$(echo "$AL_VERSION" | cut -d '.' -f 1)
     TOOLCHAIN_VERSION=$(echo "$IMAS_EXISTS" | awk -F '-' '{print $(NF-1)"-"$NF}')
 else
@@ -58,10 +58,10 @@ if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
 fi
 
 if [ -z "$IMAS_EXISTS" ]; then
-    IMAS_MODULE_VERSION=$(getIMASModuleName "$TOOLCHAIN_VERSION" "$ACCESS_LAYER_VERSION")
+    IMAS_CORE_MODULE_VERSION=$(getIMASCoreModuleName "$TOOLCHAIN_VERSION" "$ACCESS_LAYER_VERSION")
     # load IMAS module first
-    echo "> IMAS is not loaded.. Loading Module $IMAS_MODULE_VERSION"
-    module load "$IMAS_MODULE_VERSION"
+    echo "> IMAS is not loaded.. Loading Module $IMAS_CORE_MODULE_VERSION"
+    module load "$IMAS_CORE_MODULE_VERSION"
 fi
 
 GCCcore_VERSION=$(getGCCcoreVersion)
@@ -115,10 +115,11 @@ while IFS= read -r line || [[ -n $line ]]; do
         continue
     fi
     # latest module version as it is not given
-    if [[ $line == *"IMAS"* ]]; then
-        echo "Using latest version of IMAS $IMAS_MODULE_VERSION"
-        BUILDMODULES["$counter"]="$IMAS_MODULE_VERSION"
-        EBBUILDMODULES["$counter"]="('$IMAS_MODULE_VERSION', EXTERNAL_MODULE),"
+    if [[ $line == *"IMAS-AL-"* ]]; then
+        module_version=$(getIMASHighLevelModuleName "$line" "$TOOLCHAIN_VERSION" "$ACCESS_LAYER_VERSION" "3")
+        echo "Using latest version of $line $module_version"
+        BUILDMODULES["$counter"]="$module_version"
+        EBBUILDMODULES["$counter"]="('$module_version', EXTERNAL_MODULE),"
     else
         module_version=$(getModuleName "$line" "$TOOLCHAIN_VERSION" "$GCCcore_VERSION")
         echo "Using latest version of $line $module_version"
@@ -152,10 +153,11 @@ while IFS= read -r line || [[ -n $line ]]; do
         continue
     fi
     # latest module version as it is not given
-    if [[ $line == *"IMAS"* ]]; then
-        echo "Using latest version of IMAS $IMAS_MODULE_VERSION"
-        RUNMODULES["$counter"]="$IMAS_MODULE_VERSION"
-        EBBRUNMODULES["$counter"]="('$IMAS_MODULE_VERSION', EXTERNAL_MODULE),"
+    if [[ $line == *"IMAS-AL-"* ]]; then
+        module_version=$(getIMASHighLevelModuleName "$line" "$TOOLCHAIN_VERSION" "$ACCESS_LAYER_VERSION" "3")
+        echo "Using latest version of $line $module_version"
+        RUNMODULES["$counter"]="$module_version"
+        EBBRUNMODULES["$counter"]="('$module_version', EXTERNAL_MODULE),"
     else
         module_version=$(getModuleName "$line" "$TOOLCHAIN_VERSION" "$GCCcore_VERSION")
         echo "Using latest version of $line $module_version"
@@ -170,7 +172,7 @@ echo "-------------------------------------------------------"
 echo "> Details of environment"
 echo "    TOOLCHAIN_VERSION : $TOOLCHAIN_VERSION"
 echo "    GCCcore_VERSION : $GCCcore_VERSION"
-echo "    IMAS VERSION : $IMAS_MODULE_VERSION"
+echo "    IMAS CORE VERSION : $IMAS_CORE_MODULE_VERSION"
 echo "    BUILDMODULES : " "${BUILDMODULES[@]}"
 echo "    RUNMODULES : " "${RUNMODULES[@]}"
 echo "    EBBUILDMODULES : " "${EBBUILDMODULES[@]}"

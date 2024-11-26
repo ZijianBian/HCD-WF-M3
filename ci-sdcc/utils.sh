@@ -2,41 +2,66 @@
 ##########################################################################################
 #                              Common functions                                          #
 ##########################################################################################
-getIMASModuleName() {
+getIMASHighLevelModuleName() {
     # This function returns IMAS module name
     # example : getIMASModuleName intel-2020b
-    local TOOLCHAIN_VERSION=$1
-    local ACCESS_LAYER_VERSION=$2
-    local DD_VERSION=$3
+    local IMASHIGHLEVEL_NAME=$1
+    local TOOLCHAIN_VERSION=$2
+    local ACCESS_LAYER_VERSION=$3
+    local DD_VERSION=$4
+
     if [ -z "$ACCESS_LAYER_VERSION" ]; then
         ACCESS_LAYER_VERSION="4"
     else
-        ACCESS_LAYER_VERSION="$2"
+        ACCESS_LAYER_VERSION="$3"
     fi
     if [ -z "$DD_VERSION" ]; then
         DD_VERSION="3"
     else
-        DD_VERSION="$3"
+        DD_VERSION="$4"
     fi
     #Semantic versioning
-    IMASVERSIONSLIST=$(module -r -t avail IMAS/ 2>&1 | grep -E "^IMAS/$DD_VERSION\.[0-9]+\.[0-9]+-$ACCESS_LAYER_VERSION\.[0-9]+\.[0-9]+-$TOOLCHAIN_VERSION")
-    # CalVar versioning
-    if [[ "$ACCESS_LAYER_VERSION" -ge 5 ]]; then
-        IMASCALVERVERSIONSLIST=$(module -r -t avail IMAS/ 2>&1 | grep -E "^IMAS/$DD_VERSION\.[0-9]+\.[0-9]+-[0-9]{4}\.[0-9]+(\.[0-9]+)?-$TOOLCHAIN_VERSION")
-    else
-        IMASCALVERVERSIONSLIST=""
-    fi
+    IMASVERSIONSLIST=$(module -t avail $IMASHIGHLEVEL_NAME/ 2>&1 | grep -E "^$IMASHIGHLEVEL_NAME/$ACCESS_LAYER_VERSION\.[0-9]+\.[0-9]+-$TOOLCHAIN_VERSION-DD-$DD_VERSION\.[0-9]+\.[0-9]+")
+    
     if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
-        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST"$'\n'"$IMASCALVERVERSIONSLIST" | grep "intel" | sort -rV | head -n 1)
+        IMAS_HL_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "intel" | sort -rV | head -n 1)
     fi
     if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
-        IMAS_MODULE_VERSION=$(echo "$IMASVERSIONSLIST"$'\n'"$IMASCALVERVERSIONSLIST" | grep "foss" | sort -rV | head -n 1)
+        IMAS_HL_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "foss" | sort -rV | head -n 1)
     fi
-    # IMAS_MODULE_VERSION="$IMAS_MODULE_VERSION" | sed 's/(.*//'
-    IMAS_MODULE_VERSION="${IMAS_MODULE_VERSION%%(*}"
-    IMAS_MODULE_VERSION="${IMAS_MODULE_VERSION// (D)/}"
-    IMAS_MODULE_VERSION="${IMAS_MODULE_VERSION// /}"
-    echo "${IMAS_MODULE_VERSION}"
+    # IMAS_HL_MODULE_VERSION="$IMAS_HL_MODULE_VERSION" | sed 's/(.*//'
+    IMAS_HL_MODULE_VERSION="${IMAS_HL_MODULE_VERSION%%(*}"
+    IMAS_HL_MODULE_VERSION="${IMAS_HL_MODULE_VERSION// (D)/}"
+    IMAS_HL_MODULE_VERSION="${IMAS_HL_MODULE_VERSION// /}"
+    echo "${IMAS_HL_MODULE_VERSION}"
+}
+
+getIMASCoreModuleName() {
+    # This function returns IMAS module name
+    # example : getIMASModuleName intel-2020b
+    local TOOLCHAIN_VERSION=$1
+    local ACCESS_LAYER_VERSION=$2
+
+    if [ -z "$ACCESS_LAYER_VERSION" ]; then
+        ACCESS_LAYER_VERSION="4"
+    else
+        ACCESS_LAYER_VERSION="$3"
+    fi
+
+    #Semantic versioning
+    IMASVERSIONSLIST=$(module -t avail IMAS-AL-Core/ 2>&1 | grep -E "^IMAS-AL-Core/$ACCESS_LAYER_VERSION\.[0-9]+\.[0-9]+-$TOOLCHAIN_VERSION")
+    
+    if [[ $TOOLCHAIN_VERSION == *"intel"* ]]; then
+        IMAS_CORE_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "intel" | sort -rV | head -n 1)
+    fi
+    if [[ $TOOLCHAIN_VERSION == *"foss"* ]]; then
+        IMAS_CORE_MODULE_VERSION=$(echo "$IMASVERSIONSLIST" | grep "foss" | sort -rV | head -n 1)
+    fi
+    # IMAS_CORE_MODULE_VERSION="$IMAS_CORE_MODULE_VERSION" | sed 's/(.*//'
+    IMAS_CORE_MODULE_VERSION="${IMAS_CORE_MODULE_VERSION%%(*}"
+    IMAS_CORE_MODULE_VERSION="${IMAS_CORE_MODULE_VERSION// (D)/}"
+    IMAS_CORE_MODULE_VERSION="${IMAS_CORE_MODULE_VERSION// /}"
+    echo "${IMAS_CORE_MODULE_VERSION}"
 }
 
 getModuleName() {
@@ -162,11 +187,11 @@ deleteGitHeaderFile() {
 # module use /work/imas/etc/modules/all
 # module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 # TEST
-# toolchain=intel-2023b
+toolchain=intel-2023b
 # module purge
 # getIMASModuleName $toolchain 4
 # getIMASModuleName $toolchain 5
-# getIMASModuleName $toolchain 5 3
+getIMASModuleName IMAS-AL-Python $toolchain 5 3
 # getIMASModuleName $toolchain 5
 # module load "$(getIMASModuleName $toolchain 5)"
 # getGCCcoreVersion
