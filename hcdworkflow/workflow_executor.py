@@ -68,6 +68,11 @@ class WorkflowExecutor:
         # IF AN H&CD SOURCE IS CONFIGURED BUT IT HAS NO POWER FOR THIS TIME SLICE,
         # DO NOT RUN THE CODE(S) FOR THIS SOURCE
         for process in self.process_bundle.keys():
+            time_array= None
+            if isinstance(self.process_bundle[process]["input"], dict) and "core_profiles" in self.process_bundle[process]["input"].keys():
+                time_array= self.process_bundle[process]["input"]["core_profiles"].time
+            elif isinstance(self.process_bundle[process]["input"], dict) and "equilibrium" in self.process_bundle[process]["input"].keys():
+                time_array= self.process_bundle[process]["input"]["equilibrium"].time
             if (
                 "nbi" in self.process_bundle[process]["input"]
                 and "nuclear" not in process
@@ -86,7 +91,7 @@ class WorkflowExecutor:
 
             if "nbi" in self.process_bundle[process]["input"] and not is_nbi_on(
                 self.process_bundle[process]["input"]["nbi"],
-                self.process_bundle[process]["input"]["core_profiles"].time,
+                time_array,
             ):
                 print("  No NBI power for this time slice", file=sys.stdout)
                 self.param_process["nbi_source"] = 0
@@ -109,7 +114,7 @@ class WorkflowExecutor:
 
             if "ic_antennas" in self.process_bundle[process]["input"] and not is_ic_on(
                 self.process_bundle[process]["input"]["ic_antennas"],
-                self.process_bundle[process]["input"]["core_profiles"].time,
+                time_array,
             ):
                 print("  No IC power for this time slice", file=sys.stdout)
                 self.param_process["ic_coup"] = 0
@@ -133,7 +138,7 @@ class WorkflowExecutor:
 
             if "ec_launchers" in self.process_bundle[process]["input"] and not is_ec_on(
                 self.process_bundle[process]["input"]["ec_launchers"],
-                self.process_bundle[process]["input"]["core_profiles"].time,
+                time_array,
             ):
                 print("  No EC power for this time slice", file=sys.stdout)
                 self.param_process["ec_wave_solver"] = 0
@@ -141,7 +146,7 @@ class WorkflowExecutor:
 
             if "lh_antennas" in self.process_bundle[process]["input"] and not is_lh_on(
                 self.process_bundle[process]["input"]["lh_antennas"],
-                self.process_bundle[process]["input"]["core_profiles"].time,
+                time_array,
             ):
                 print("  No LH power for this time slice", file=sys.stdout)
                 self.param_process["lh_wave_solver"] = 0
