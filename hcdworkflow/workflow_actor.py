@@ -22,8 +22,8 @@ class WorkflowActor:
         self.inputIDSList = self.getInputIDSList()
         self.outputIDSList = self.getOutputIDSList()
 
-        self.inputIDSDict = self.getIDSDict(self.inputIDSList)
-        self.outputIDSDict = self.getIDSDict(self.outputIDSList)
+        # self.inputIDSDict = self.getIDSDict(self.inputIDSList)
+        # self.outputIDSDict = self.getIDSDict(self.outputIDSList)
 
     @classmethod
     def getObject(cls, actorName):
@@ -65,7 +65,7 @@ class WorkflowActor:
 
         actor = eval(actorName)
         runtime_settings = actor.get_runtime_settings()
-        runtime_settings.ids_storage.backend = imas.imasdef.MDSPLUS_BACKEND  # IMAS-4055
+        runtime_settings.ids_storage.backend = imas.imasdef.MEMORY_BACKEND  # IMAS-4055
         code_parameters = actor.get_code_parameters()
         if xmlPath:
             code_parameters.parameters_path = xmlPath
@@ -104,11 +104,11 @@ class WorkflowActor:
     def getOutputIDSList(self):
         return self.getIDSList("OUT")
 
-    def getInputIDSDict(self):
-        return self.getIDSList("IN")
+    # def getInputIDSDict(self):
+    #     return self.getIDSDict("IN")
 
-    def getOutputIDSDict(self):
-        return self.getIDSList("OUT")
+    # def getOutputIDSDict(self):
+    #     return self.getIDSDict("OUT")
 
     def getIDSDict(self, idsData):
         idsDict = {}

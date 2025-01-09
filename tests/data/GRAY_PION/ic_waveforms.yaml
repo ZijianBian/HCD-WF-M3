@@ -20,7 +20,7 @@ ids: ic_antennas
 
 database:
   shot: 110000
-  run: 1
+  run: 2
   user: public
   db: ITER_MD
 
@@ -48,12 +48,12 @@ static_variables:
 
   antenna[0].module[0].strap[0].outline.r: [8.45, 8.45, 8.45]
   antenna[0].module[0].strap[0].outline.z: [-0.6, 0., 0.6]
-  antenna[0].module[0].strap[0].outline.phi: [0.]
+  antenna[0].module[0].strap[0].outline.phi: [0., 0., 0.]
   antenna[0].module[0].strap[0].width_tor: 0.2
   antenna[0].module[0].strap[0].distance_to_conductor: 0.2
 
   antenna[0].module[0].strap[1].outline.r: [8.45, 8.45, 8.45]
   antenna[0].module[0].strap[1].outline.z: [-0.6, 0., 0.6]
-  antenna[0].module[0].strap[1].outline.phi: [-0.0836447165337165]
+  antenna[0].module[0].strap[1].outline.phi: [-0.0836447165337165, -0.0836447165337165, -0.0836447165337165]
   antenna[0].module[0].strap[1].width_tor: 0.2
   antenna[0].module[0].strap[1].distance_to_conductor: 0.2
