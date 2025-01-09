@@ -90,7 +90,7 @@ declare -a EBBRUNMODULES=()
 
 
 # actors have version suffix so better to provide them as EXTERNAL_MODULE
-actorslist=("CYRANO", "FOPLA", "FPSIM", "GENRAY", "GRAY", "GRAYSCALE", "HCD2CORE_PROFILES", "HCD2CORE_SOURCES", "HCD_MERGERS", "NEMO", "RELAX", "RISK", "SPOT", "STIXREDIST", "TOMCAT", "TORAY", "TORBEAM")
+actorslist=("CYRANO", "FOPLA", "FPSIM", "GENRAY", "GRAY", "GRAYSCALE", "HCD2CORE_PROFILES", "HCD2CORE_SOURCES", "HCD_MERGERS", "NEMO", "RELAX", "RISK", "SPOT", "STIXREDIST", "TOMCAT", "TORAY", "TORBEAM", "NBISIM", "PION", "LION")
 
 counter=0
 # Read the file line by line
