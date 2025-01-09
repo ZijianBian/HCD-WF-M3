@@ -92,3 +92,5 @@ def wf_wrapper(par_path):
     inputDb.close()
     outputDb.close()
     machineDb.close()
+
+    print('End of wf_wrapper')
