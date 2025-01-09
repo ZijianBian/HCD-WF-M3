@@ -316,6 +316,9 @@ class WorkflowExecutor:
                         self.process_bundle[process]["input"],
                         self.param_process,
                     )
+                    if process == 'equilibrium_solver':
+                        for proc in self.process_bundle:
+                            self.process_bundle[proc]["input"]["equilibrium"] = output_ids_data
                 else:
                     output_ids_data = []
                     for ids in self.process_bundle[process]["output"]:

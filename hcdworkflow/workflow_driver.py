@@ -295,5 +295,6 @@ class WorkflowDriver:
                     process_bundle_out[ids].time[0] > 0
                     or "merge" in process_bundle_out[ids].code.name
                 ):
-                    self.outputDb.put_slice(process_bundle_out[ids])
+                    if ids != 'equilibrium':
+                        self.outputDb.put_slice(process_bundle_out[ids])
         return process_bundle_out
