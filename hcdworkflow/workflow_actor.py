@@ -22,8 +22,8 @@ class WorkflowActor:
         self.inputIDSList = self.getInputIDSList()
         self.outputIDSList = self.getOutputIDSList()
 
-        # self.inputIDSDict = self.getIDSDict(self.inputIDSList)
-        # self.outputIDSDict = self.getIDSDict(self.outputIDSList)
+        self.inputIDSDict = self.getIDSDict(self.inputIDSList)
+        self.outputIDSDict = self.getIDSDict(self.outputIDSList)
 
     @classmethod
     def getObject(cls, actorName):
