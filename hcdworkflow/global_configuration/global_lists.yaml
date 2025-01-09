@@ -30,6 +30,7 @@ ids_process_list:
     waves
 
 process_list:
+    EQUI
     ECRH
     LHCD
     ICRH
@@ -44,6 +45,7 @@ actor_list:
     ascot_serial 
     bbnbi_parallel
     bbnbi_serial
+    chease
     cyrano
     genray 
     gray
@@ -73,11 +75,12 @@ merge_actor_list:
 
 algorithm:
     default:
-        [ec_wave_solver,lh_wave_solver,ic_coup,ic_wave_solver,nbi_source,nuclear_source,ec_wave_fp,ic_wave_fp,nbi_fp,nuclear_fp,fill_core_sources,fill_core_profiles]
+        [equilibrium_solver,ec_wave_solver,lh_wave_solver,ic_coup,ic_wave_solver,nbi_source,nuclear_source,ec_wave_fp,ic_wave_fp,nbi_fp,nuclear_fp,fill_core_sources,fill_core_profiles]
     nbi_ic_synergy:
-        [ec_wave_solver,lh_wave_solver,nbi_source,nbi_fp,nuclear_source,nuclear_fp,ic_coup,ic_wave_solver,ec_wave_fp,ic_wave_fp,fill_core_sources,fill_core_profiles]
+        [equilibrium_solver,ec_wave_solver,lh_wave_solver,nbi_source,nbi_fp,nuclear_source,nuclear_fp,ic_coup,ic_wave_solver,ec_wave_fp,ic_wave_fp,fill_core_sources,fill_core_profiles]
 
 prerequisites:
+   equilibrium_solver: None
    ec_wave_solver: None
    lh_wave_solver: None
    ic_coup: None
