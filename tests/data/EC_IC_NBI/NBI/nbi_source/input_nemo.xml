@@ -2,68 +2,71 @@
 <parameters>
 
     <!-- Resolution of the output 1D profiles -->
-    <n_out_profiles>50</n_out_profiles>
+    <n_out_profiles> 50 </n_out_profiles>
 
     <!-- Resolution of the output pitch angle profile -->
-    <n_pitch_resol>100</n_pitch_resol>
+    <n_pitch_resol> 100 </n_pitch_resol>
 
     <!-- X-resolution of the output birth matrix for display -->
-    <n_output_2d_x>31</n_output_2d_x>
+    <n_output_2d_x> 31 </n_output_2d_x>
 
     <!-- Y-resolution of the output birth matrix for display -->
-    <n_output_2d_y>31</n_output_2d_y>
+    <n_output_2d_y> 31 </n_output_2d_y>
 
     <!-- R-resolution of the output (R,Z) 2D profiles -->
-    <n_output_2d_r>31</n_output_2d_r>
+    <n_output_2d_r> 31 </n_output_2d_r>
 
     <!-- Z-resolution of the output (R,Z) 2D profiles -->
-    <n_output_2d_z>31</n_output_2d_z>
+    <n_output_2d_z> 31 </n_output_2d_z>
 
     <!-- PHI-resolution of the output (R,Z) 2D profiles -->
-    <n_output_2d_f>1</n_output_2d_f>
+    <n_output_2d_f> 1 </n_output_2d_f>
 
     <!-- Flag for ionization cross sections  (1 = Janev, 2 = ADAS) -->
-    <crossec_flag>2</crossec_flag>
+    <crossec_flag> 2 </crossec_flag>
 
     <!-- Complete path to ADAS directory -->
-    <adas_path>/work/imas/shared/heat/nemo</adas_path>
+    <adas_path> /work/imas/shared/heat/nemo </adas_path>
 
     <!-- Complete path to CI reference directory -->
-    <ref_path>/work/imas/shared/heat/nemo/ref/</ref_path>
+    <ref_path>/work/imas/shared/heat/nemo/imasdb</ref_path>
 
     <!-- Flag for source shape (0 = rectangular, 1 = circular) -->
-    <source_shape>0</source_shape>
+    <source_shape> 0 </source_shape>
 
     <!-- Path length resolution for beam deposition -->
-    <npath_internal>300</npath_internal>
+    <npath_internal> 300 </npath_internal>
 
     <!-- Path length resolution for beam intensity calculation -->
-    <npath_reduc>20</npath_reduc>
+    <npath_reduc> 20 </npath_reduc>
 
     <!-- Minimum THETA resolution for beam divergence -->
-    <nthemin>10</nthemin>
+    <nthemin> 10 </nthemin>
 
     <!-- Maximum THETA resolution for beam divergence -->
-    <nthemax>40</nthemax>
+    <nthemax> 40 </nthemax>
 
     <!-- PHI resolution for beam deposition -->
-    <nphi>30</nphi>
+    <nphi> 30 </nphi>
 
     <!-- PHI resolution for beam intensity calculation -->
-    <nphi_reduc>20</nphi_reduc>
+    <nphi_reduc> 20 </nphi_reduc>
 
     <!-- Variable for tuning THETA resolution for beam divergence -->
-    <theta_resol>3.5</theta_resol>
+    <theta_resol> 3.5 </theta_resol>
 
     <!-- Flag to use the beamlet information for the source width and height or not -->
-    <ibeamletflag>1</ibeamletflag>
+    <ibeamletflag> 1 </ibeamletflag>
 
     <!-- Flag to export markers according to downstream FP code: 0 = Default (SPOT, etc.), 1 = RISK, 2 = PION -->
-    <fokker_flag>0</fokker_flag>
+    <fokker_flag> 0 </fokker_flag>
 
     <!-- Number of output generated markers -->
-    <nmarker>10000</nmarker>
+    <nmarker> 10000 </nmarker>
+
+    <!-- Fill GGD grid (1) or not (0) -->
+    <fill_ggd> 0 </fill_ggd>
 
     <!-- Flag for quick test (0 = slow and right, 1 = fast and wrong) -->
-    <fast_and_wrong>1</fast_and_wrong>
+    <fast_and_wrong> 0 </fast_and_wrong>
 </parameters>

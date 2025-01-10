@@ -87,6 +87,7 @@
          <xs:element ref="ibeamletflag" minOccurs="1"/>
          <xs:element ref="fokker_flag" minOccurs="1"/>
          <xs:element ref="nmarker" minOccurs="1"/>
+         <xs:element ref="fill_ggd" minOccurs="1"/>
          <xs:element ref="fast_and_wrong" minOccurs="1"/>
        </xs:all>
      </xs:complexType>
@@ -236,6 +237,13 @@
    <xs:element name="nmarker" type="integer_minmaxInclusive_marker">
       <xs:annotation>
           <xs:documentation>Number of output generated markers</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+    
+   <!-- Fill GGD (1) or not (0) -->
+   <xs:element name="fill_ggd" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Fill GGD (1) or not (0)</xs:documentation>
       </xs:annotation>
    </xs:element>
     
