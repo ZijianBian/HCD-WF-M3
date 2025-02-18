@@ -79,8 +79,10 @@ class HCDWorkflow(WorkflowBase):
                         workflow.time_loop.component.resize(1)
                         workflow.time_loop.workflow_cycle.resize(1)
                         workflow.time_loop.workflow_cycle[0].component.resize(1)
-                        workflow.time_loop.workflow_cycle[0].component[0].time_interval = self.workflowData.dt_required
-                        
+                        try:
+                            workflow.time_loop.workflow_cycle[0].component[0].time_interval_request = self.workflowData.dt_required
+                        except:
+                            workflow.time_loop.workflow_cycle[0].component[0].time_interval = self.workflowData.dt_required
                         workflow.time_loop.component[0].name = self.workflowData.code_selection[process].upper()
                         self.workflowData.process_bundle[process]["input"]["workflow"] = copy.deepcopy(workflow)
                         continue
