@@ -8,6 +8,10 @@ try:
     from waveform_cooker import add_dynamic
 except:
     isWaveformCookerPresent = False
+try:
+  from idstools.cli import get_backend_id
+except ImportError:
+  from idstools.utils.clihelper import get_backend_id    
 
 from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
 from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
@@ -69,7 +73,10 @@ def wf_wrapper(par_path):
         if idsObject.ids_properties.homogeneous_time != imas.imasdef.EMPTY_INT:
             machineDb.put(idsObject)
         else:
-            # To be added here
+            if idsName == 'wall':
+                wall = imas.DBEntry(get_backend_id(wall_md['backend']),wall_md['database'],wall_md['shot'],wall_md['run'],wall_md['user_or_path'])
+                wall.open()
+                machineDb.put(wall.get('wall'))
             print(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required")
 
     # feature/repair_231017

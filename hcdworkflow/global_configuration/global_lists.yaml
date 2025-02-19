@@ -55,7 +55,8 @@ actor_list:
     iccoup 
     lion
     nbisim
-    nemo 
+    nemo
+    rabbit
     pion 
     risk 
     spot 
@@ -96,7 +97,16 @@ prerequisites:
           nbi_fp: any
    nbi_source: None
    nbi_fp:
-       nbi_source: [nemo, bbnbi_serial, bbnbi_parallel]
+       risk:
+         nbi_source: [nemo, bbnbi_serial, bbnbi_parallel]
+       spot:
+         nbi_source: [nemo, bbnbi_serial, bbnbi_parallel]
+       ascot_serial:
+         nbi_source: [nemo, bbnbi_serial, bbnbi_parallel]
+       ascot_parallel:
+         nbi_source: [nemo, bbnbi_serial, bbnbi_parallel]
+       nbisim:
+         nbi_source: [nemo, bbnbi_serial, bbnbi_parallel]
    nuclear_source: None
    nuclear_fp:
        ascot_serial:
