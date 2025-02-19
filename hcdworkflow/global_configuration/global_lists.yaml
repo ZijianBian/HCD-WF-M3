@@ -130,6 +130,14 @@ exec_types:
 
 device: ITER
 
+wall_md:
+  shot:          116000
+  run:           2
+  user_or_path:  public
+  database:      ITER_MD
+  backend:       HDF5
+
+
 waveform_presets:
   ec:
      custom:  ['ec_waveforms.yaml','Custom']
