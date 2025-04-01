@@ -16,15 +16,16 @@
 #          (EXCEPTION: IF THE VARIABLE HAS JUST ONE VALUE, IT IS DUPLICATED OVER THE GENERAL TIME ARRAY)
 # -------------------------------------------------------------------------------------------------------
 
-ids: 'ic_antennas'
+ids: ic_antennas
 
 database:
-   shot: 110000
-   run: 1
-   user: 'public'
-   db: 'ITER_MD'
+  shot: 110000
+  run: 2
+  user: public
+  db: ITER_MD
 
-time: [ 0, 80, 520, 750 ]
+#time: [ 0, 50, 60, 320, 350, 400 ]
+time: [0.]
 
 nantenna: 1
 nmodule: 1
@@ -35,25 +36,24 @@ dynamic_variables:
 
     #antenna[0].power_launched.data: [0, 0, 6.e6, 3.e6, 3.e6,0]
     #antenna[0].power_launched.time: [ 0, 50, 60, 320, 350, 400 ]
-    antenna[0].power_launched.data: [0, 10.e6, 10e6, 0]
-    antenna[0].frequency.data:      [53.e6]
+  antenna[0].power_launched.data: [20.e6]
+  antenna[0].frequency.data: [53.e6]
 
-    antenna[0].module[0].strap[0].phase.data: [0.]
-    antenna[0].module[0].strap[1].phase.data: [3.14159265]
+  antenna[0].module[0].strap[0].phase.data: [0.]
+  antenna[0].module[0].strap[1].phase.data: [3.14159265]
 
 static_variables:
 
-    antenna[0].name: Poloidally Straight 2-Strap
-    
-    antenna[0].module[0].strap[0].outline.r:   [8.45, 8.45, 8.45]
-    antenna[0].module[0].strap[0].outline.z:   [-0.6,  0. ,  0.6]
-    antenna[0].module[0].strap[0].outline.phi: [0.]
-    antenna[0].module[0].strap[0].width_tor:   0.2
-    antenna[0].module[0].strap[0].distance_to_conductor: 0.2
+  antenna[0].name: Poloidally Straight 2-Strap
 
-    antenna[0].module[0].strap[1].outline.r:   [8.45, 8.45, 8.45]
-    antenna[0].module[0].strap[1].outline.z:   [-0.6,  0. ,  0.6]
-    antenna[0].module[0].strap[1].outline.phi: [-0.0836447165337165]
-    antenna[0].module[0].strap[1].width_tor:   0.2
-    antenna[0].module[0].strap[1].distance_to_conductor: 0.2
+  antenna[0].module[0].strap[0].outline.r: [8.45, 8.45, 8.45]
+  antenna[0].module[0].strap[0].outline.z: [-0.6, 0., 0.6]
+  antenna[0].module[0].strap[0].outline.phi: [0., 0., 0.]
+  antenna[0].module[0].strap[0].width_tor: 0.2
+  antenna[0].module[0].strap[0].distance_to_conductor: 0.2
 
+  antenna[0].module[0].strap[1].outline.r: [8.45, 8.45, 8.45]
+  antenna[0].module[0].strap[1].outline.z: [-0.6, 0., 0.6]
+  antenna[0].module[0].strap[1].outline.phi: [-0.0836447165337165, -0.0836447165337165, -0.0836447165337165]
+  antenna[0].module[0].strap[1].width_tor: 0.2
+  antenna[0].module[0].strap[1].distance_to_conductor: 0.2

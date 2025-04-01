@@ -191,7 +191,7 @@ toolchain=intel-2023b
 # module purge
 # getIMASModuleName $toolchain 4
 # getIMASModuleName $toolchain 5
-getIMASModuleName IMAS-AL-Python $toolchain 5 3
+# getIMASModuleName IMAS-AL-Python $toolchain 5 3
 # getIMASModuleName $toolchain 5
 # module load "$(getIMASModuleName $toolchain 5)"
 # getGCCcoreVersion
