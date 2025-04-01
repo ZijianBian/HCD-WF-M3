@@ -84,6 +84,13 @@ class WorkflowDbHelper:
             self.output_run,
             self.output_user_or_path,
         )
+        
+        h5_master_file = os.getenv('HOME')+'/public/imasdb/'\
+            +self.output_database+'/3/'+str(self.shot_number)\
+            +'/'+str(self.output_run)+'/master.h5'
+        if os.path.isfile(h5_master_file): # IMAS-5428 still not fixed!!!
+            os.remove(h5_master_file)
+
         retstatus, idx_out = outputDb.create()
         if retstatus != 0:
             print(

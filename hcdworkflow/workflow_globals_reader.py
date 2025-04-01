@@ -58,3 +58,6 @@ class WorkflowGlobalsReader:
 
     def getDeviceList(self):
         return self.getList("device")
+    
+    def getWallMD(self):
+        return self.getList("wall_md")
