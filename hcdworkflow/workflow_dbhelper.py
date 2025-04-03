@@ -1,6 +1,7 @@
-import imas
 import os
 import sys
+
+import imas
 
 
 class WorkflowDbHelper:
@@ -26,12 +27,10 @@ class WorkflowDbHelper:
 
         # IF THE OUTPUT DATABASE DOES NOT EXIST: CREATE IT
         if output_user_or_path == os.getenv("USER"):
-            output_folder = (
-                os.getenv("HOME") + "/public/imasdb/" + output_database + "/3/0"
-            )
+            output_folder = os.getenv("HOME") + "/public/imasdb/" + output_database + "/3/0"
         else:
             output_folder = f"{output_user_or_path}/{output_database}/3/0"
-        if os.path.isdir(output_folder) == False:
+        if os.path.isdir(output_folder) is False:
             print(
                 f"-- Create local database for output file {output_folder}",
                 file=sys.stdout,
@@ -84,11 +83,18 @@ class WorkflowDbHelper:
             self.output_run,
             self.output_user_or_path,
         )
-        
-        h5_master_file = os.getenv('HOME')+'/public/imasdb/'\
-            +self.output_database+'/3/'+str(self.shot_number)\
-            +'/'+str(self.output_run)+'/master.h5'
-        if os.path.isfile(h5_master_file): # IMAS-5428 still not fixed!!!
+
+        h5_master_file = (
+            os.getenv("HOME")
+            + "/public/imasdb/"
+            + self.output_database
+            + "/3/"
+            + str(self.shot_number)
+            + "/"
+            + str(self.output_run)
+            + "/master.h5"
+        )
+        if os.path.isfile(h5_master_file):  # IMAS-5428 still not fixed!!!
             os.remove(h5_master_file)
 
         retstatus, idx_out = outputDb.create()
@@ -109,7 +115,7 @@ class WorkflowDbHelper:
 
     def getMachineDatabase(self):
         machineDb = imas.DBEntry(
-            imas.imasdef.MEMORY_BACKEND,
+            imas.imasdef.MEMORY_BACKEND,  # pylint: disable=no-member
             self.output_database,
             0,
             self.output_run,

@@ -1,7 +1,7 @@
 import copy
 import logging
-import os
 import sys
+
 import numpy as np
 
 from hcdworkflow.workflow_base import WorkflowBase
@@ -34,7 +34,7 @@ class HCDWorkflow(WorkflowBase):
             message = "Workflow is not initialized. Initialize workflow by calling workflow.initialize() method"
             raise RuntimeError(message)
 
-    def run(self, equilibrium, core_profiles, workflow,**kwargs):
+    def run(self, equilibrium, core_profiles, workflow, **kwargs):
         # self.check_is_initialized()
         inputIDSes = {
             "equilibrium": equilibrium,
@@ -66,11 +66,7 @@ class HCDWorkflow(WorkflowBase):
     def _setIDSes(self, idsSlices):
         for idsName, idsData in idsSlices.items():
             for process in self.workflowData.process_bundle.keys():
-                if (
-                    "merge_" not in process
-                    and idsName
-                    in self.workflowData.process_bundle[process]["input"].keys()
-                ):
+                if "merge_" not in process and idsName in self.workflowData.process_bundle[process]["input"].keys():
                     if idsName == "workflow":
                         # TODO Find way to set workflow IDS, passed from external world
                         workflow = idsData
@@ -80,25 +76,22 @@ class HCDWorkflow(WorkflowBase):
                         workflow.time_loop.workflow_cycle.resize(1)
                         workflow.time_loop.workflow_cycle[0].component.resize(1)
                         try:
-                            workflow.time_loop.workflow_cycle[0].component[0].time_interval_request = self.workflowData.dt_required
-                        except:
-                            workflow.time_loop.workflow_cycle[0].component[0].time_interval = self.workflowData.dt_required
+                            workflow.time_loop.workflow_cycle[0].component[
+                                0
+                            ].time_interval_request = self.workflowData.dt_required
+                        except Exception as _:  # noqa F841
+                            workflow.time_loop.workflow_cycle[0].component[
+                                0
+                            ].time_interval = self.workflowData.dt_required
                         workflow.time_loop.component[0].name = self.workflowData.code_selection[process].upper()
                         self.workflowData.process_bundle[process]["input"]["workflow"] = copy.deepcopy(workflow)
                         continue
-                    self.workflowData.process_bundle[process]["input"][
-                        idsName
-                    ] = idsData
-        
+                    self.workflowData.process_bundle[process]["input"][idsName] = idsData
 
         for process in self.workflowData.process_bundle:
             if "workflow" in self.workflowData.process_bundle[process]["input"]:
-                workflow.time_loop.component[0].name = self.workflowData.code_selection[
-                    process
-                ].upper()
-                self.workflowData.process_bundle[process]["input"]["workflow"] = copy.deepcopy(
-                    workflow
-                )
+                workflow.time_loop.component[0].name = self.workflowData.code_selection[process].upper()
+                self.workflowData.process_bundle[process]["input"]["workflow"] = copy.deepcopy(workflow)
 
     def setProcessStatus(self, timenow=None):
         if timenow is not None:
@@ -108,14 +101,12 @@ class HCDWorkflow(WorkflowBase):
                 if time_base is not None:
                     if process in time_base:
                         [tc, it] = find_nearest(
-                            np.array(
-                                time_base[process][0]["wf_interval"][0]["time_array"][0]
-                            ),
+                            np.array(time_base[process][0]["wf_interval"][0]["time_array"][0]),
                             timenow,
                         )
-                        self.workflowData.process_bundle[process]["status"] = time_base[
-                            process
-                        ][0]["wf_interval"][0]["status"][0][it]
+                        self.workflowData.process_bundle[process]["status"] = time_base[process][0]["wf_interval"][0][
+                            "status"
+                        ][0][it]
                     else:
                         self.workflowData.process_bundle[process]["status"] = 1
                 else:
@@ -133,16 +124,12 @@ class HCDWorkflow(WorkflowBase):
         # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
         for process in self.workflowData.process_bundle.keys():
             if "merge_" in process:
-                key, value = list(
-                    self.workflowData.process_bundle[process]["output"].items()
-                )[0]
+                key, value = list(self.workflowData.process_bundle[process]["output"].items())[0]
                 idsOut[key] = value
 
         # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
         for process in self.workflowData.process_bundle.keys():
-            for key, value in self.workflowData.process_bundle[process][
-                "output"
-            ].items():
+            for key, value in self.workflowData.process_bundle[process]["output"].items():
                 if key not in idsOut.keys():
                     idsOut[key] = value
 

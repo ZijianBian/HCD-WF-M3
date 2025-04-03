@@ -1,14 +1,16 @@
-import os, sys
 import glob
+import os
+import sys
 import tkinter as tk
-from shutil import copy2
-from gui.tooltip import CreateToolTip
-from lxml import etree
-from .colour_definitions import bluish as col
-import numpy as np
-
-import imas
 from inspect import getmodule, stack
+from shutil import copy2
+
+import numpy as np
+from lxml import etree
+
+from gui.tooltip import CreateToolTip
+
+from .colour_definitions import bluish as col
 
 
 def string2num(string):
@@ -19,11 +21,11 @@ def string2num(string):
 
         try:
             return int(string)  # Integer scalar
-        except:
+        except Exception as _:  # noqa F841
             None
         try:
             return float(string)  # Float scalar
-        except:
+        except Exception as _:  # noqa F841
             None
         return string  # String scalar
 
@@ -31,11 +33,11 @@ def string2num(string):
 
         try:
             return np.array([int(i) for i in newstring])  # Integer array
-        except:
+        except Exception as _:  # noqa F841
             None
         try:
             return np.array([float(i) for i in newstring])  # Float array
-        except:
+        except Exception as _:  # noqa F841
             None
         return string  # string array
 
@@ -91,8 +93,7 @@ def load(chosen_folder, open_gui, process_list):
             file=sys.stderr,
         )
         print(
-            "configuration folder since it contains no input_workflow.xml file "
-            + "--> Nothing loaded.",
+            "configuration folder since it contains no input_workflow.xml file " + "--> Nothing loaded.",
             file=sys.stderr,
         )
         return
@@ -100,16 +101,11 @@ def load(chosen_folder, open_gui, process_list):
     for diag_process in process_list:
         if not os.path.exists(chosen_folder + "/" + diag_process):
             print(
-                "The selected folder "
-                + chosen_folder
-                + " does not appear to be a proper",
+                "The selected folder " + chosen_folder + " does not appear to be a proper",
                 file=sys.stderr,
             )
             print(
-                "configuration folder since it contains no "
-                + diag_process
-                + " folder "
-                + "--> Nothing loaded.",
+                "configuration folder since it contains no " + diag_process + " folder " + "--> Nothing loaded.",
                 file=sys.stderr,
             )
             return
@@ -124,8 +120,8 @@ def __syspath_import_actor(actor_name, verbose):
 
     # Import the module of the actor
     try:
-        actor_module = import_module(actor_name)
-    except:
+        _ = import_module(actor_name)  # noqa F841
+    except Exception as _:  # noqa F841
         if verbose == 1:
             print("Actor " + actor_name.upper() + " not found.", file=sys.stderr)
         return [], 1
@@ -149,7 +145,7 @@ def import_actor(actor_input, verbose):
 
     # Import the actor(s) and put into a dictionary
     dictactor = {}
-    if type(actor_input) == str:
+    if isinstance(actor_input, str):
         dictactor[actor_input], error = __syspath_import_actor(actor_input, verbose)
     else:
         for actor_name in actor_input:
@@ -162,7 +158,7 @@ def import_actor(actor_input, verbose):
     # 2) when called from a script, the dictionary of the calling module is modified
 
     # For interactive sessions
-    if getmodule(stack()[1].frame) == None:
+    if getmodule(stack()[1].frame) is None:
         stack()[1].frame.f_locals.update(dictactor)
     # When called from a module
     else:
@@ -183,19 +179,15 @@ def update_codeparam_file(codeparam_destination_path, codeparam_dict, verbose):
     tree.write(codeparam_destination_path, xml_declaration=True, encoding="UTF-8")
 
     if verbose == 1:
-        print(
-            "---> Configuration saved in " + codeparam_destination_path, file=sys.stdout
-        )
+        print("---> Configuration saved in " + codeparam_destination_path, file=sys.stdout)
 
     return 0
 
 
-def update_codeparam_dict_check_xsd(
-    codeparam_dict, elem, newvalue, root=None, xmlschema=None, entry1=None
-):
+def update_codeparam_dict_check_xsd(codeparam_dict, elem, newvalue, root=None, xmlschema=None, entry1=None):
 
     codeparam_dict[elem.tag] = newvalue
-    if root != None:  # Check rules of xsd file
+    if root is not None:  # Check rules of xsd file
         elem.text = codeparam_dict[elem.tag]
         if xmlschema.validate(root):
             entry1.config(bg=col.c1)
@@ -232,7 +224,7 @@ def codeparam_interface(
         if elem.tag is not etree.Comment and len(elem) == 0:
 
             # Field for the name of the variable in the interface
-            l = tk.Label(
+            label_name = tk.Label(
                 frame,
                 text=elem.tag.strip(),
                 bg=col.c1,
@@ -240,7 +232,7 @@ def codeparam_interface(
                 anchor="w",
                 justify=tk.LEFT,
             )
-            l.grid(row=rrow, column=ccolumn, sticky="w")
+            label_name.grid(row=rrow, column=ccolumn, sticky="w")
 
             # Field for the value of the variable: default taken from elem.txt
             entrystring = tk.StringVar()
@@ -251,7 +243,7 @@ def codeparam_interface(
             # Catch any update of the variable from the interface, and check xsd rules
             entrystring.trace(
                 "w",
-                lambda name, index, mode, elem=elem, entrystring=entrystring, entry1=entry1: update_codeparam_dict_check_xsd(
+                lambda name, index, mode, elem=elem, entrystring=entrystring, entry1=entry1: update_codeparam_dict_check_xsd(  # noqa E501
                     codeparam_dict, elem, entrystring.get(), root, xmlschema, entry1
                 ),
             )
@@ -260,8 +252,8 @@ def codeparam_interface(
             codeparam_dict[elem.tag] = entrystring.get()
 
             # Display the definition of the variable from the xsd file information
-            if l.cget("text") in docum_dict.keys():
-                CreateToolTip(l, docum_dict[l.cget("text")])
+            if label_name.cget("text") in docum_dict.keys():
+                CreateToolTip(label_name, docum_dict[label_name.cget("text")])
 
             rrow += 1
 
@@ -300,9 +292,7 @@ def make_frame(
         docum_dict,
         codeparam_xml_path,
         xmlschema,
-    ) = read_and_save_codeparam(
-        current_config_folder, None, category, process, actor_name, default
-    )
+    ) = read_and_save_codeparam(current_config_folder, None, category, process, actor_name, default)
 
     # CREATE/UPDATE THE INTERFACE FOR ALL PARAMETERS, RETURN THEIR UPDATED LIST
     updated_codeparam_dict = codeparam_interface(
@@ -321,9 +311,7 @@ def make_frame(
         fr_top,
         text="Save",
         bg=col.c2,
-        command=lambda: update_codeparam_file(
-            destination_file, updated_codeparam_dict, 1
-        ),
+        command=lambda: update_codeparam_file(destination_file, updated_codeparam_dict, 1),
     ).grid(row=0, column=1, padx=5, pady=5)
 
     # RESTORE DEFAULT CODEPARAM CONFIGURATION
@@ -370,22 +358,10 @@ def edit_codeparam(maindict, workflow_param, current_config_folder):
         for category in maindict[main_key]:
             la_sys = tk.Label(fr_ab, text=category, bg=col.c4)
             for process in maindict[main_key][category]:
-                if (
-                    int(
-                        workflow_param["actor_selection"][0][main_key][0][category][0][
-                            process
-                        ][0]
-                    )
-                    != 0
-                ):
+                if int(workflow_param["actor_selection"][0][main_key][0][category][0][process][0]) != 0:
                     la_sys.grid(padx=5, pady=5, sticky="ew")
                     curval = list(maindict[main_key][category][process].keys())[
-                        int(
-                            workflow_param["actor_selection"][0][main_key][0][category][
-                                0
-                            ][process][0]
-                        )
-                        - 1
+                        int(workflow_param["actor_selection"][0][main_key][0][category][0][process][0]) - 1
                     ]
                     tk.Button(
                         fr_ab,
@@ -404,20 +380,11 @@ def edit_codeparam(maindict, workflow_param, current_config_folder):
                     ).grid(padx=5, pady=5, sticky="ew")
 
 
-def read_and_save_codeparam(
-    current_config_folder, previous_folder, category, process, actor_name, default
-):
+def read_and_save_codeparam(current_config_folder, previous_folder, category, process, actor_name, default):
 
     # NAME OF THE CODEPARAM FILE FOR THIS ACTOR IN THE CURRENT CONFIGURATION FOLDER
     codeparam_destination_path = (
-        current_config_folder
-        + "/"
-        + category
-        + "/"
-        + process
-        + "/input_"
-        + actor_name
-        + ".xml"
+        current_config_folder + "/" + category + "/" + process + "/input_" + actor_name + ".xml"
     )
 
     # INITIALISE INTERFACE STRINGS FOR CODEPARAM XML AND XSD FILES
@@ -430,10 +397,10 @@ def read_and_save_codeparam(
 
     # LOOK FOR ITS XML AND XSD FILES FOR USER-DEFINED PARAMETERS
     found_xml = False
-    founx_xsd = False
+    # founx_xsd = False
 
     # CHECK IF THE XML FILE EXISTS IN THE DESTINATION FOLDER ALREADY
-    if os.path.exists(codeparam_destination_path) and default == False:
+    if os.path.exists(codeparam_destination_path) and default is False:
         codeparam_xml_path = codeparam_destination_path
         found_xml = True
     # IF NOT, COPY IT FROM THE ACTOR LOCATION
@@ -441,10 +408,10 @@ def read_and_save_codeparam(
         try:
             codeparam_xml_path = glob.glob(actor.actor_dir + "/input/*.xml")[0]
             found_xml = True
-        except:
+        except Exception as _:  # noqa F841
             codeparam_xml_path = None
 
-        if codeparam_xml_path != None:
+        if codeparam_xml_path is not None:
             copy2(
                 codeparam_xml_path,
                 codeparam_destination_path,
@@ -452,7 +419,7 @@ def read_and_save_codeparam(
             )
             # IF DEFAULT IS NOT REQUIRED AND IF CONFIG LOADED FROM A PREVIOUS RUN,
             # REPLACE THE XML FILE BY THE ONE OF THE PREVIOUS CONFIGURATION
-            if previous_folder != None and default == False:
+            if previous_folder is not None and default is False:
                 xml_name = category + "/" + process + "/input_" + actor_name + ".xml"
                 codeparam_xml_path = previous_folder + "/" + xml_name
                 if codeparam_xml_path != codeparam_destination_path:
@@ -466,15 +433,13 @@ def read_and_save_codeparam(
     try:
         codeparam_xsd_path = glob.glob(actor.actor_dir + "/input/*.xsd")[0]
         found_xsd = True
-    except:
+    except Exception as _:  # noqa F841
         codeparam_xsd_path = None
 
     # READ THE ADDITIONAL INFORMATION FROM THE XSD FILE
     if found_xsd:
         xmlschema_doc = etree.parse(codeparam_xsd_path)
-        xmlschema_doc.write(
-            codeparam_destination_path.replace(".xml", ".xsd"), pretty_print=True
-        )
+        xmlschema_doc.write(codeparam_destination_path.replace(".xml", ".xsd"), pretty_print=True)
         root_xsd = xmlschema_doc.getroot()
         xmlschema = etree.XMLSchema(xmlschema_doc)
         docum_dict = {}
@@ -502,23 +467,19 @@ def read_and_save_codeparam(
     # TO AN ADDITIONAL XML FILE FOR THIS ACTOR
     # (ONLY WHEN FOUND_XML=TRUE, I.E. ONLY THE FIRST TIME)
     if found_xml:
-        if actor.is_mpi_code == True and "nproc_actor" not in codeparam_dict.keys():
+        if actor.is_mpi_code is True and "nproc_actor" not in codeparam_dict.keys():
             codeparam_dict["nproc_actor"] = " 4 "
-            comment = etree.Comment(
-                " Number of processors for parallel run (parameter added by HCD wf) "
-            )
+            comment = etree.Comment(" Number of processors for parallel run (parameter added by HCD wf) ")
             comment.tail = "\n  "
             nproc = etree.Element("nproc_actor")
             nproc.text = codeparam_dict["nproc_actor"]
             nproc.tail = "\n\n  "
             root.append(comment)
             root.append(nproc)
-            tree.write(
-                codeparam_destination_path, xml_declaration=True, encoding="UTF-8"
-            )
+            tree.write(codeparam_destination_path, xml_declaration=True, encoding="UTF-8")
 
     if found_xsd:
-        if actor.is_mpi_code == True and "nproc_actor" not in docum_dict.keys():
+        if actor.is_mpi_code is True and "nproc_actor" not in docum_dict.keys():
             docum_dict["nproc_actor"] = "Number of processors to run this code"
             xmltype = "{http://www.w3.org/2001/XMLSchema}"
             nproc_xsd = etree.Element(xmltype + "element")
@@ -539,11 +500,9 @@ def read_and_save_codeparam(
             nproc_xsd_description.append(nproc_xsd_annotation)
             root_xsd.append(nproc_xsd_description)
             xmlschema = etree.XMLSchema(xmlschema_doc)
-            if xmlschema.validate(root) == False:
+            if xmlschema.validate(root) is False:
                 print(xmlschema.error_log.filter_from_errors()[0])
-            xmlschema_doc.write(
-                codeparam_destination_path.replace(".xml", ".xsd"), pretty_print=True
-            )
+            xmlschema_doc.write(codeparam_destination_path.replace(".xml", ".xsd"), pretty_print=True)
 
     return (
         codeparam_destination_path,
@@ -558,7 +517,7 @@ def dict2xml(param_dict, root):
     for child in root.iter():
         if child.tag != etree.Comment and len(child) == 0:
             for key, value in param_dict.items():
-                if type(value[0]) == dict:
+                if isinstance(value[0], dict):
                     root = dict2xml(value[0], root)
                 else:
                     if child.tag == key:
@@ -567,9 +526,7 @@ def dict2xml(param_dict, root):
     return root
 
 
-def save_workflow_param_to_file(
-    default_wf_param_file, current_wf_param_file, workflow_param, wfp_ref, cod_ref
-):
+def save_workflow_param_to_file(default_wf_param_file, current_wf_param_file, workflow_param, wfp_ref, cod_ref):
 
     # Copy the default workflow parameter file into the current one
     copy2(default_wf_param_file, current_wf_param_file, follow_symlinks=True)
@@ -602,30 +559,20 @@ def save_workflow_param_to_file(
             process[proc]["tree"] = etree.SubElement(time_base, proc)
             for interval in workflow_param["time_base"][0][proc][0].keys():
                 process[proc][interval] = {}
-                process[proc][interval]["etree"] = etree.SubElement(
-                    process[proc]["tree"], interval
-                )
+                process[proc][interval]["etree"] = etree.SubElement(process[proc]["tree"], interval)
 
-                for subkey in workflow_param["time_base"][0][proc][0][interval][
-                    0
-                ].keys():
-                    process[proc][interval][subkey] = etree.SubElement(
-                        process[proc][interval]["etree"], subkey
-                    )
+                for subkey in workflow_param["time_base"][0][proc][0][interval][0].keys():
+                    process[proc][interval][subkey] = etree.SubElement(process[proc][interval]["etree"], subkey)
                     if isinstance(
                         workflow_param["time_base"][0][proc][0][interval][0][subkey][0],
                         (np.ndarray, np.generic),
                     ):
                         process[proc][interval][subkey].text = str(
-                            workflow_param["time_base"][0][proc][0][interval][0][
-                                subkey
-                            ][0].tolist()
+                            workflow_param["time_base"][0][proc][0][interval][0][subkey][0].tolist()
                         )
                     else:
                         process[proc][interval][subkey].text = str(
-                            workflow_param["time_base"][0][proc][0][interval][0][
-                                subkey
-                            ][0]
+                            workflow_param["time_base"][0][proc][0][interval][0][subkey][0]
                         )
 
         root.append(comment_time_base)
@@ -638,7 +585,7 @@ def save_workflow_param_to_file(
 def save_waveforms_to_file(current_config_folder, previous_folder):
 
     err = -1
-    if previous_folder != None and current_config_folder != previous_folder:
+    if previous_folder is not None and current_config_folder != previous_folder:
         waveform_files = glob.iglob(os.path.join(previous_folder, "*.yaml"))
         for waveform_file in waveform_files:
             if os.path.isfile(waveform_file):
@@ -661,19 +608,9 @@ def save_codeparam_to_file(
     for main_key in maindict:
         for category in maindict[main_key]:
             for process in maindict[main_key][category]:
-                if (
-                    int(
-                        workflow_param[cod_ref][0][main_key][0][category][0][process][0]
-                    )
-                    != 0
-                ):
+                if int(workflow_param[cod_ref][0][main_key][0][category][0][process][0]) != 0:
                     actor_name = list(maindict[main_key][category][process].keys())[
-                        int(
-                            workflow_param[cod_ref][0][main_key][0][category][0][
-                                process
-                            ][0]
-                        )
-                        - 1
+                        int(workflow_param[cod_ref][0][main_key][0][category][0][process][0]) - 1
                     ]
                     if actor_name in uncompiled_actors:
                         print(
@@ -726,13 +663,11 @@ def save(
 
     # Define the current folder (either chosen by the system with 'save'
     # or by the user with 'save as')
-    if current_config_folder == None:
-        first_save = 1
-        current_config_folder = os.path.join(
-            os.getcwd(), "data/run_" + datetime.now().strftime("%y%m%d_%H:%M:%S")
-        )
-    else:
-        first_save = 0
+    if current_config_folder is None:
+        # first_save = 1
+        current_config_folder = os.path.join(os.getcwd(), "data/run_" + datetime.now().strftime("%y%m%d_%H:%M:%S"))
+    # else:
+    # first_save = 0
 
     # When operation is cancelled from the interface
     if current_config_folder == () or current_config_folder == "":
@@ -743,10 +678,7 @@ def save(
     current_wf_param_file = current_config_folder + "/input_workflow.xml"
 
     # Dont want to write configuration directly in $PWD or $PWD/data
-    if (
-        current_config_folder == os.getcwd() + "/data"
-        or current_config_folder == os.getcwd()
-    ):
+    if current_config_folder == os.getcwd() + "/data" or current_config_folder == os.getcwd():
         print(
             "Refuse to write directly in folder " + current_config_folder,
             file=sys.stderr,
@@ -766,7 +698,7 @@ def save(
         return None
 
     # Read the default workflow parameters file
-    root = etree.parse(default_wf_param_file).getroot()
+    # root = etree.parse(default_wf_param_file).getroot()
 
     # Create the current configuration folder and its sub-folders for each process
     if not os.path.exists(current_config_folder):
@@ -774,15 +706,11 @@ def save(
     for main_key in maindict:
         for category in maindict[main_key]:
             for process in maindict[main_key][category]:
-                if not os.path.exists(
-                    current_config_folder + "/" + category + "/" + process
-                ):
+                if not os.path.exists(current_config_folder + "/" + category + "/" + process):
                     os.makedirs(current_config_folder + "/" + category + "/" + process)
 
     # Copy/update the workflow parameter file if changed from the interface
-    err = save_workflow_param_to_file(
-        default_wf_param_file, current_wf_param_file, workflow_param, wfp_ref, cod_ref
-    )
+    err = save_workflow_param_to_file(default_wf_param_file, current_wf_param_file, workflow_param, wfp_ref, cod_ref)
 
     # Copy waveform files
     err = save_waveforms_to_file(current_config_folder, previous_folder)
@@ -873,6 +801,9 @@ def create_maindict(workflow_parameters_path, verbose):
                     dict_actor = {}
                     if process.tag != etree.Comment:
                         for actor_name in process.attrib["list"].split():
+                            err = 0
+                            input_ids_list = []
+                            output_ids_list = []
                             if actor_name in not_compiled_list:
                                 verbose_eff = 0
                             else:
@@ -908,9 +839,7 @@ def create_maindict(workflow_parameters_path, verbose):
                             },
                         )
                         if process.text != "0":
-                            code_selection[process.tag] = process.attrib["list"].split(
-                                " "
-                            )[int(process.text) - 1]
+                            code_selection[process.tag] = process.attrib["list"].split(" ")[int(process.text) - 1]
                         else:
                             code_selection[process.tag] = None
                         dict_process[process.tag] = dict_actor
@@ -927,7 +856,7 @@ def create_maindict(workflow_parameters_path, verbose):
 
 def read_actor_ids(name, verbose):
 
-    ids_list = [ids.value for ids in list(imas.IDSName)]
+    # ids_list = [ids.value for ids in list(imas.IDSName)]
     input_ids_list = []
     output_ids_list = []
     err = import_actor(name, verbose)
@@ -936,97 +865,13 @@ def read_actor_ids(name, verbose):
     if err == 0:
 
         # IMAS-4679
-        for ilist in actor.code_description["implementation"]["subroutines"]["main"][
-            "arguments"
-        ]:
+        for ilist in actor.code_description["implementation"]["subroutines"]["main"]["arguments"]:
             if ilist["intent"] == "IN":
                 input_ids_list.append(ilist["type"])
             elif ilist["intent"] == "OUT":
                 output_ids_list.append(ilist["type"])
 
     return (input_ids_list, output_ids_list, err)
-
-
-class saved_folder_name(object):
-    def __init__(
-        self,
-        default_wf_param_file,
-        global_dict,
-        uncompiled_actors,
-        workflow_param,
-        wfp_ref,
-        cod_ref,
-        process_list,
-    ):
-        self.value = None
-        self.default_wf_param_file = default_wf_param_file
-        self.global_dict = global_dict
-        self.uncompiled_actors = uncompiled_actors
-        self.workflow_param = workflow_param
-        self.wfp_ref = wfp_ref
-        self.cod_ref = cod_ref
-        self.process_list = process_list
-
-    def NoAction(self):
-        self.value = self.value
-
-    def Save(self, chosen_folder, init_folder):
-        previous_folder = init_folder
-        if chosen_folder == init_folder:  # Very first SAVE, or SAVE after a SAVE_AS
-            self.value = save(
-                self.value,
-                self.default_wf_param_file,
-                previous_folder,
-                self.global_dict,
-                self.uncompiled_actors,
-                self.workflow_param,
-                self.wfp_ref,
-                self.cod_ref,
-                self.process_list,
-            )
-        else:
-            if chosen_folder is None:
-                if self.value is None:  # 1st SAVE after a LOAD
-                    self.value = save(
-                        init_folder,
-                        self.default_wf_param_file,
-                        previous_folder,
-                        self.global_dict,
-                        self.uncompiled_actors,
-                        self.workflow_param,
-                        self.wfp_ref,
-                        self.cod_ref,
-                        self.process_list,
-                    )
-                else:  # Next SAVEs after a LOAD; SAVE after a SAVE AS which is after a LOAD;
-                    self.value = save(
-                        self.value,
-                        self.default_wf_param_file,
-                        previous_folder,
-                        self.global_dict,
-                        self.uncompiled_actors,
-                        self.workflow_param,
-                        self.wfp_ref,
-                        self.cod_ref,
-                        self.process_list,
-                    )
-            else:  # SAVE AS
-                if_cancelled = self.value
-                previous_folder = self.value
-                self.value = save(
-                    chosen_folder,
-                    self.default_wf_param_file,
-                    previous_folder,
-                    self.global_dict,
-                    self.uncompiled_actors,
-                    self.workflow_param,
-                    self.wfp_ref,
-                    self.cod_ref,
-                    self.process_list,
-                )
-                if self.value is None:
-                    self.value = if_cancelled
-        return self.value
 
 
 class saved_folder_name(object):

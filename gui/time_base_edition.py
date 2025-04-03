@@ -7,14 +7,17 @@
 # ------------------------------------------------------------------------------------------------
 
 import tkinter as tk
-import numpy as np
+
 import matplotlib
+import numpy as np
+
 from .colour_definitions import bluish as colour
 
 matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-from .gui_methods import CreateToolTip
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # noqa E402
+from matplotlib.figure import Figure  # noqa E402
+
+from .gui_methods import CreateToolTip  # noqa E402
 
 #######################################################################################
 
@@ -22,10 +25,12 @@ from .gui_methods import CreateToolTip
 # Definition of a time interval as a class
 # -----------------------------------------
 
+
 def find_nearest(a, a0):
     "Element in nd array `a` closest to the scalar value `a0`"
     idx = np.abs(a - a0).argmin()
     return a.flat[idx], idx
+
 
 class Interval:
     def __init__(self):
@@ -39,6 +44,7 @@ class Interval:
 
 
 #######################################################################################
+
 
 # -----------------------------------------------------------------------------------
 # Function to add an home-made time interval to the GUI to edit the global time base
@@ -71,9 +77,7 @@ def add_interval(self, new_interval):
                 pady=3,
                 bg=colour.c2,
             )
-            li_interval.grid(
-                row=irow, column=0, columnspan=1, pady=2, padx=5, sticky="w"
-            )
+            li_interval.grid(row=irow, column=0, columnspan=1, pady=2, padx=5, sticky="w")
             li_tminmax = tk.Label(
                 master=self.frame_array[3],
                 text=" ["
@@ -87,14 +91,10 @@ def add_interval(self, new_interval):
                 pady=3,
                 bg=colour.c2,
             )
-            li_tminmax.grid(
-                row=irow, column=1, columnspan=1, pady=2, padx=5, sticky="w"
-            )
+            li_tminmax.grid(row=irow, column=1, columnspan=1, pady=2, padx=5, sticky="w")
 
             var_select[key] = tk.IntVar()
-            if (
-                len(self.all_intervals.keys()) == 1
-            ):  # Select the interval if there is just one
+            if len(self.all_intervals.keys()) == 1:  # Select the interval if there is just one
                 var_select[key].set(1)
                 self.all_intervals[key]["select"] = 1
             select_check[key] = tk.Checkbutton(
@@ -106,9 +106,7 @@ def add_interval(self, new_interval):
                 command=lambda key=key: dict_gui_update(key),
             )
             select_check[key].config(bg=colour.c3, activebackground=colour.c4)
-            select_check[key].grid(
-                row=irow, column=2, columnspan=1, pady=2, padx=5, sticky="w"
-            )
+            select_check[key].grid(row=irow, column=2, columnspan=1, pady=2, padx=5, sticky="w")
 
             # To synchronise the display with the actual interval selection
             for kk in self.all_intervals.keys():
@@ -116,16 +114,10 @@ def add_interval(self, new_interval):
                     var_select[kk].set(self.all_intervals[kk]["select"])
 
             if key != "wf_interval":
-                del_button[key] = tk.Button(
-                    master=self.frame_array[3], text="Delete", bg=colour.c2
-                )
+                del_button[key] = tk.Button(master=self.frame_array[3], text="Delete", bg=colour.c2)
                 del_button[key].config(activebackground=colour.c4)
-                del_button[key].grid(
-                    row=irow, column=3, columnspan=1, pady=2, padx=5, sticky="w"
-                )
-                del_button[key].configure(
-                    command=lambda self=self, key=key: remove_interval(self, key)
-                )
+                del_button[key].grid(row=irow, column=3, columnspan=1, pady=2, padx=5, sticky="w")
+                del_button[key].configure(command=lambda self=self, key=key: remove_interval(self, key))
 
     if new_interval is None:  # for remove_interval()
         for widget in self.frame_array[3].winfo_children():
@@ -141,7 +133,7 @@ def add_interval(self, new_interval):
     for key in ["tmin", "tmax"]:
         try:
             new_interval.object[key] = float(new_interval.object[key])
-        except:
+        except Exception as _:  # noqa F841
             print("Bad value for " + key)
             add_to_gui(self)
             return self
@@ -173,21 +165,11 @@ def add_interval(self, new_interval):
     # Note: these are pointers, i.e. when one interval is changed, it automatically changes wf_interval
     # because all intervals have been created from it
     self.all_intervals[new_interval.object["name"]] = {}
-    self.all_intervals[new_interval.object["name"]]["tmin"] = new_interval.object[
-        "tmin"
-    ]
-    self.all_intervals[new_interval.object["name"]]["tmax"] = new_interval.object[
-        "tmax"
-    ]
-    self.all_intervals[new_interval.object["name"]]["time_array"] = new_interval.object[
-        "time_array"
-    ]
-    self.all_intervals[new_interval.object["name"]]["status"] = new_interval.object[
-        "status"
-    ]
-    self.all_intervals[new_interval.object["name"]]["select"] = new_interval.object[
-        "select"
-    ]
+    self.all_intervals[new_interval.object["name"]]["tmin"] = new_interval.object["tmin"]
+    self.all_intervals[new_interval.object["name"]]["tmax"] = new_interval.object["tmax"]
+    self.all_intervals[new_interval.object["name"]]["time_array"] = new_interval.object["time_array"]
+    self.all_intervals[new_interval.object["name"]]["status"] = new_interval.object["status"]
+    self.all_intervals[new_interval.object["name"]]["select"] = new_interval.object["select"]
     add_to_gui(self)
 
     return self
@@ -240,9 +222,7 @@ class mclass:
         ]
         icol = -1
         for key in self.all_intervals.keys():
-            icol = min(
-                icol + 1, len(col) - 1
-            )  # prevent index to get beyond array dimension
+            icol = min(icol + 1, len(col) - 1)  # prevent index to get beyond array dimension
             if self.all_intervals[key]["time_array"] is not None:
                 a.plot(
                     self.all_intervals[key]["time_array"],
@@ -265,9 +245,7 @@ class mclass:
         nticks = len(time_tick_array)
         index_tick_array = [0] * nticks
         for tick in range(nticks):
-            [tc, it] = find_nearest(
-                self.all_intervals["wf_interval"]["time_array"], time_tick_array[tick]
-            )
+            [tc, it] = find_nearest(self.all_intervals["wf_interval"]["time_array"], time_tick_array[tick])
             index_tick_array[tick] = it
         a2 = a.twiny()
         a2.set_xticks(index_tick_array)
@@ -289,6 +267,7 @@ class mclass:
 def apply_pattern(self):
     select = 0
     print("APPLY!!!!")
+    key_select = ""
     for key in self.all_intervals.keys():
         if self.all_intervals[key]["select"] == 1:
             print("----------------------------- ")
@@ -311,20 +290,13 @@ def apply_pattern(self):
         self.all_intervals["wf_interval"]["time_array"],
         self.all_intervals[key_select]["tmax"],
     )
-    self.all_intervals[key_select]["time_array"] = self.all_intervals["wf_interval"][
-        "time_array"
-    ][it_min:it_max]
-    self.all_intervals[key_select]["status"] = self.all_intervals["wf_interval"][
-        "status"
-    ][it_min:it_max]
+    self.all_intervals[key_select]["time_array"] = self.all_intervals["wf_interval"]["time_array"][it_min:it_max]
+    self.all_intervals[key_select]["status"] = self.all_intervals["wf_interval"]["status"][it_min:it_max]
     print("Number of indices =", len(self.all_intervals[key_select]["time_array"]))
     print("Actual tmin       =", format("%.2f" % tc_min), "s")
     print("Actual tmax       =", format("%.2f" % tc_max), "s")
     if len(self.all_intervals[key_select]["time_array"]) > 1:
-        dt = (
-            self.all_intervals[key_select]["time_array"][1]
-            - self.all_intervals[key_select]["time_array"][0]
-        )
+        dt = self.all_intervals[key_select]["time_array"][1] - self.all_intervals[key_select]["time_array"][0]
         print("Time resolution   =", format("%.2f" % dt), "s")
 
     if status == "On":
@@ -341,7 +313,7 @@ def apply_pattern(self):
         else:
             try:
                 index = int(value)
-            except:
+            except Exception as _:  # noqa F841
                 print("The index must be an integer")
                 return
             if index > len(self.all_intervals[key_select]["time_array"]) - 1:
@@ -360,16 +332,14 @@ def apply_pattern(self):
         else:
             try:
                 time_slice = float(value)
-            except:
+            except Exception as _:  # noqa F841
                 print("The time slice must be a number")
                 return
             if time_slice > tc_max or time_slice < tc_min:
                 print("The chosen time slice is beyond the selected interval")
                 return
             else:
-                [tc, it] = find_nearest(
-                    self.all_intervals[key_select]["time_array"], time_slice
-                )
+                [tc, it] = find_nearest(self.all_intervals[key_select]["time_array"], time_slice)
                 print("Actual time slice =", format("%.2f" % tc), "s")
                 self.all_intervals[key_select]["status"][it] = status_index
                 print("--> Time interval udpated")
@@ -383,7 +353,7 @@ def apply_pattern(self):
         else:
             try:
                 index_step = int(value)
-            except:
+            except Exception as _:  # noqa F841
                 print("The index step must be an integer")
                 return
             if index_step > len(self.all_intervals[key_select]["time_array"]) - 1:
@@ -402,28 +372,22 @@ def apply_pattern(self):
         else:
             try:
                 time_step = float(value)
-            except:
+            except Exception as _:  # noqa F841
                 print("The time step must be a number")
                 return
             if time_step > tc_max - tc_min:
                 print("The chosen time step is larger than the interval")
                 return
             else:
-                [tc1, it1] = find_nearest(
-                    self.all_intervals[key_select]["time_array"], tc_min
-                )
-                [tc2, it2] = find_nearest(
-                    self.all_intervals[key_select]["time_array"], tc_min + time_step
-                )
+                [tc1, it1] = find_nearest(self.all_intervals[key_select]["time_array"], tc_min)
+                [tc2, it2] = find_nearest(self.all_intervals[key_select]["time_array"], tc_min + time_step)
                 index_step = it2 - it1
                 if index_step == 0:
                     print("The time step is too small")
                     return
                 else:
                     print("Actual time step =", format("%.2f" % (tc2 - tc1)), "s")
-                    self.all_intervals[key_select]["status"][
-                        0::index_step
-                    ] = status_index
+                    self.all_intervals[key_select]["status"][0::index_step] = status_index
                     print("--> Time interval udpated")
 
     # Full interval updated according to the on-off selection of the current interval
@@ -467,19 +431,14 @@ def soft_reset_intervals(self):
 def create_wf_interval(self):
     parameters = self.wf_param[list(self.wf_param.keys())[0]][0]
 
-    nstep = int(
-        (float(parameters["tend"][0]) - float(parameters["tbegin"][0]))
-        / float(parameters["dt_required"][0])
-    )
+    nstep = int((float(parameters["tend"][0]) - float(parameters["tbegin"][0])) / float(parameters["dt_required"][0]))
     wf_interval = Interval()
     wf_interval.update("name", "wf_interval")
     wf_interval.update("tmin", float(parameters["tbegin"][0]))
     wf_interval.update("tmax", float(parameters["tend"][0]))
     wf_interval.update(
         "time_array",
-        np.linspace(
-            float(parameters["tbegin"][0]), float(parameters["tend"][0]), nstep
-        ),
+        np.linspace(float(parameters["tbegin"][0]), float(parameters["tend"][0]), nstep),
     )
     wf_interval.update("status", np.linspace(1, 1, nstep))
     return wf_interval
@@ -530,7 +489,7 @@ class time_base_edition:
         ncol = 2
 
         # Define the grid of frames nrow*ncol
-        frame_array = [0] * nrow * ncol
+        frame_array = [None] * nrow * ncol
         k = -1
         for irow in range(nrow):
             self.master.rowconfigure(irow, weight=1, minsize=minrowsize)
@@ -538,17 +497,11 @@ class time_base_edition:
                 k = k + 1
                 self.master.columnconfigure(jcol, weight=1, minsize=mincolumnsize)
                 if k == 0:
-                    frame_array[k] = tk.Frame(
-                        master=self.master, relief=tk.GROOVE, borderwidth=2
-                    )
-                    frame_array[k].grid(
-                        row=irow, column=jcol, columnspan=2, padx=2, pady=2
-                    )
+                    frame_array[k] = tk.Frame(master=self.master, relief=tk.GROOVE, borderwidth=2)
+                    frame_array[k].grid(row=irow, column=jcol, columnspan=2, padx=2, pady=2)
                 else:
                     if k == 3:
-                        frame_array[k] = tk.Frame(
-                            master=self.master, relief=tk.RAISED, borderwidth=2
-                        )
+                        frame_array[k] = tk.Frame(master=self.master, relief=tk.RAISED, borderwidth=2)
                         frame_array[k].grid(
                             row=irow,
                             column=jcol,
@@ -558,12 +511,8 @@ class time_base_edition:
                             sticky="nw",
                         )
                     else:
-                        frame_array[k] = tk.Frame(
-                            master=self.master, relief=tk.RAISED, borderwidth=2
-                        )
-                        frame_array[k].grid(
-                            row=irow, column=jcol, padx=2, pady=2, sticky="nw"
-                        )
+                        frame_array[k] = tk.Frame(master=self.master, relief=tk.RAISED, borderwidth=2)
+                        frame_array[k].grid(row=irow, column=jcol, padx=2, pady=2, sticky="nw")
                 frame_array[k].config(bg=colour.c3)
 
         self.frame_array = frame_array
@@ -587,31 +536,19 @@ class time_base_edition:
                     interval.update("name", interval_name)
                     interval.update(
                         "tmin",
-                        self.wf_param["time_base"][0][process][0][interval_name][0][
-                            "tmin"
-                        ][0],
+                        self.wf_param["time_base"][0][process][0][interval_name][0]["tmin"][0],
                     )
                     interval.update(
                         "tmax",
-                        self.wf_param["time_base"][0][process][0][interval_name][0][
-                            "tmax"
-                        ][0],
+                        self.wf_param["time_base"][0][process][0][interval_name][0]["tmax"][0],
                     )
                     interval.update(
                         "time_array",
-                        np.array(
-                            wf_param["time_base"][0][process][0][interval_name][0][
-                                "time_array"
-                            ][0]
-                        ),
+                        np.array(wf_param["time_base"][0][process][0][interval_name][0]["time_array"][0]),
                     )
                     interval.update(
                         "status",
-                        np.array(
-                            wf_param["time_base"][0][process][0][interval_name][0][
-                                "status"
-                            ][0]
-                        ),
+                        np.array(wf_param["time_base"][0][process][0][interval_name][0]["status"][0]),
                     )
                     interval.update("select", 0)
                     self = add_interval(self, interval)
@@ -634,9 +571,7 @@ class time_base_edition:
         # --------
         ni_label_general = tk.Label(master=self.frame_array[2], text="New Interval:")
         ni_label_general.config(bg=colour.c3)
-        ni_label_general.grid(
-            row=0, column=0, columnspan=1, pady=2, padx=5, sticky="we"
-        )
+        ni_label_general.grid(row=0, column=0, columnspan=1, pady=2, padx=5, sticky="we")
 
         # Name
         ni_label_name = tk.Label(master=self.frame_array[2], text="Name:")
@@ -645,9 +580,7 @@ class time_base_edition:
         ni_name = tk.StringVar()
         ni_name.trace(
             "w",
-            lambda name, index, mode, ni_name=ni_name: new_interval.update(
-                "name", ni_name.get()
-            ),
+            lambda name, index, mode, ni_name=ni_name: new_interval.update("name", ni_name.get()),
         )
         ni_entry_name = tk.Entry(master=self.frame_array[2], textvariable=ni_name)
         ni_entry_name.config(bg=colour.c2)
@@ -660,9 +593,7 @@ class time_base_edition:
         ni_tmin = tk.StringVar()
         ni_tmin.trace(
             "w",
-            lambda name, index, mode, ni_tmin=ni_tmin: new_interval.update(
-                "tmin", ni_tmin.get()
-            ),
+            lambda name, index, mode, ni_tmin=ni_tmin: new_interval.update("tmin", ni_tmin.get()),
         )
         ni_entry_tmin = tk.Entry(master=self.frame_array[2], textvariable=ni_tmin)
         ni_entry_tmin.config(bg=colour.c2)
@@ -675,17 +606,13 @@ class time_base_edition:
         ni_tmax = tk.StringVar()
         ni_tmax.trace(
             "w",
-            lambda name, index, mode, ni_tmax=ni_tmax: new_interval.update(
-                "tmax", ni_tmax.get()
-            ),
+            lambda name, index, mode, ni_tmax=ni_tmax: new_interval.update("tmax", ni_tmax.get()),
         )
         ni_entry_tmax = tk.Entry(master=self.frame_array[2], textvariable=ni_tmax)
         ni_entry_tmax.config(bg=colour.c2)
         ni_entry_tmax.grid(row=3, column=1, columnspan=1, pady=2, padx=5, sticky="we")
 
-        ni_add_button = tk.Button(
-            master=self.frame_array[2], text="Add", height=3, bg=colour.c2
-        )
+        ni_add_button = tk.Button(master=self.frame_array[2], text="Add", height=3, bg=colour.c2)
         ni_add_button.config(activebackground=colour.c4)
         ni_add_button.grid(row=1, column=2, rowspan=3, pady=2, padx=5, sticky="we")
         ni_add_button.configure(command=lambda: add_interval(self, new_interval))
@@ -693,9 +620,7 @@ class time_base_edition:
         # --------
         # FRAME 3
         # --------
-        li_label_general = tk.Label(
-            master=self.frame_array[3], text="List of intervals:"
-        )
+        li_label_general = tk.Label(master=self.frame_array[3], text="List of intervals:")
         li_label_general.config(bg=colour.c3)
         li_label_general.grid(row=0, column=0, columnspan=2, pady=2, padx=5, sticky="w")
         # The rest is displayed by the add_interval function
@@ -703,32 +628,24 @@ class time_base_edition:
         # --------
         # FRAME 4
         # --------
-        si_label_general = tk.Label(
-            master=self.frame_array[4], text="Edit selected interval:"
-        )
+        si_label_general = tk.Label(master=self.frame_array[4], text="Edit selected interval:")
         si_label_general.config(bg=colour.c3)
         si_label_general.grid(row=0, column=0, columnspan=3, pady=2, padx=5, sticky="w")
 
         si_label_interval = tk.Label(master=self.frame_array[4], text="Pattern:")
         si_label_interval.config(bg=colour.c3)
-        si_label_interval.grid(
-            row=1, column=0, columnspan=1, pady=2, padx=5, sticky="w"
-        )
+        si_label_interval.grid(row=1, column=0, columnspan=1, pady=2, padx=5, sticky="w")
         OptionList = ["At index", "At time", "Index step", "Time step", "Full interval"]
         OptionList = ["Full interval", "Time step", "At time", "Index step", "At index"]
         self.si_option_list = tk.StringVar()
         self.si_option_list.set(OptionList[0])
-        opt_option = tk.OptionMenu(
-            self.frame_array[4], self.si_option_list, *OptionList
-        )
+        opt_option = tk.OptionMenu(self.frame_array[4], self.si_option_list, *OptionList)
         opt_option.config(bg=colour.c2, activebackground=colour.c4)
         opt_option["menu"].config(bg=colour.c2)
         opt_option.grid(row=2, column=0, columnspan=1, pady=2, padx=5, sticky="w")
 
         self.edit_field = tk.StringVar()
-        entry_field = tk.Entry(
-            master=self.frame_array[4], textvariable=self.edit_field, width=6
-        )
+        entry_field = tk.Entry(master=self.frame_array[4], textvariable=self.edit_field, width=6)
         entry_field.config(bg=colour.c2)
         entry_field.grid(row=2, column=1, columnspan=1, pady=2, padx=5, sticky="w")
 
@@ -742,9 +659,7 @@ class time_base_edition:
         opt_onoff.config(bg=colour.c2, activebackground=colour.c4)
         opt_onoff["menu"].config(bg=colour.c2)
         opt_onoff.grid(row=2, column=2, columnspan=1, pady=2, padx=5, sticky="w")
-        si_apply_button = tk.Button(
-            master=self.frame_array[4], text="Apply", height=2, bg=colour.c2
-        )
+        si_apply_button = tk.Button(master=self.frame_array[4], text="Apply", height=2, bg=colour.c2)
         si_apply_button.config(activebackground=colour.c4)
         si_apply_button.grid(row=1, column=3, rowspan=2, pady=2, padx=5, sticky="we")
         si_apply_button.configure(command=lambda: apply_pattern(self))
@@ -752,9 +667,7 @@ class time_base_edition:
         # --------
         # FRAME 5
         # --------
-        gl_sreset = tk.Button(
-            master=self.frame_array[6], text="Soft Reset", height=1, bg=colour.c2
-        )
+        gl_sreset = tk.Button(master=self.frame_array[6], text="Soft Reset", height=1, bg=colour.c2)
         gl_sreset.config(activebackground=colour.c4)
         gl_sreset.grid(row=0, column=0, rowspan=1, pady=2, padx=5, sticky="se")
         gl_sreset.configure(command=lambda: soft_reset_intervals(self))
@@ -763,9 +676,7 @@ class time_base_edition:
             "Reset all time intervals such that the model is called for all time slices",
         )
 
-        gl_hreset = tk.Button(
-            master=self.frame_array[6], text="Hard Reset", height=1, bg=colour.c2
-        )
+        gl_hreset = tk.Button(master=self.frame_array[6], text="Hard Reset", height=1, bg=colour.c2)
         gl_hreset.config(activebackground=colour.c4)
         gl_hreset.grid(row=0, column=1, rowspan=1, pady=2, padx=5, sticky="se")
         gl_hreset.configure(command=lambda: hard_reset_intervals(self))
@@ -774,9 +685,7 @@ class time_base_edition:
             "Remove all intervals and reload the workflow one (in case it changed",
         )
 
-        gl_close = tk.Button(
-            master=self.frame_array[6], text="Close", height=1, bg=colour.c2
-        )
+        gl_close = tk.Button(master=self.frame_array[6], text="Close", height=1, bg=colour.c2)
         gl_close.config(activebackground=colour.c4)
         gl_close.grid(row=0, column=2, rowspan=1, pady=2, padx=5, sticky="se")
         gl_close.configure(command=lambda: self.master.destroy())

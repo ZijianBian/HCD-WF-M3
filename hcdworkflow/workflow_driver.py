@@ -1,9 +1,8 @@
 import logging
 import os
 import sys
-import copy
-from hcdworkflow.hcd_workflow import HCDWorkflow
 
+from hcdworkflow.hcd_workflow import HCDWorkflow
 
 log = logging.getLogger()
 log.setLevel(logging.ERROR)
@@ -25,9 +24,7 @@ class WorkflowDriver:
         self.inputMds = inputMds
         self.inputIds = inputIds
 
-    def executeTimeloop(
-        self, one_time_slice=None, tbegin=None, tend=None, dt_required=None
-    ):
+    def executeTimeloop(self, one_time_slice=None, tbegin=None, tend=None, dt_required=None):
         if one_time_slice is not None:
             self.workflowObject.workflowData.one_time_slice = one_time_slice
         if tbegin is not None:
@@ -42,9 +39,7 @@ class WorkflowDriver:
         if self.workflowObject.workflowData.one_time_slice == 0:
             # INPUT TIME ARRAY
             # try:
-            time_array = self.inputDb.partial_get(
-                ids_name="equilibrium", data_path="time"
-            )
+            time_array = self.inputDb.partial_get(ids_name="equilibrium", data_path="time")
             # except:
             #     print(
             #         "  ERROR while reading the equilibrium IDS: is it really present in the input file?",
@@ -62,10 +57,7 @@ class WorkflowDriver:
                     file=sys.stdout,
                 )
 
-            if (
-                self.workflowObject.workflowData.tbegin > 0
-                and self.workflowObject.workflowData.tbegin < time_array[0]
-            ):
+            if self.workflowObject.workflowData.tbegin > 0 and self.workflowObject.workflowData.tbegin < time_array[0]:
                 print(
                     "ERROR: tbegin out of range: "
                     + str(self.workflowObject.workflowData.tbegin)
@@ -84,10 +76,7 @@ class WorkflowDriver:
                     file=sys.stdout,
                 )
 
-            if (
-                self.workflowObject.workflowData.tend > 0
-                and self.workflowObject.workflowData.tend > time_array[-1]
-            ):
+            if self.workflowObject.workflowData.tend > 0 and self.workflowObject.workflowData.tend > time_array[-1]:
                 print(
                     "ERROR: tend out of range: "
                     + str(self.workflowObject.workflowData.tend)
@@ -99,8 +88,7 @@ class WorkflowDriver:
                 return
         else:
             self.workflowObject.workflowData.tend = (
-                self.workflowObject.workflowData.tbegin
-                + self.workflowObject.workflowData.dt_required
+                self.workflowObject.workflowData.tbegin + self.workflowObject.workflowData.dt_required
             )
 
         ##################################################################
@@ -116,24 +104,14 @@ class WorkflowDriver:
 
         if self.workflowObject.workflowData.one_time_slice == 0:
             nsteps = int(
-                (
-                    self.workflowObject.workflowData.tend
-                    - self.workflowObject.workflowData.tbegin
-                )
+                (self.workflowObject.workflowData.tend - self.workflowObject.workflowData.tbegin)
                 / self.workflowObject.workflowData.dt_required
             )
         else:
             nsteps = 1
         if (
             self.workflowObject.workflowData.dt_required * nsteps
-            < int(
-                (
-                    self.workflowObject.workflowData.tend
-                    - self.workflowObject.workflowData.tbegin
-                )
-                * 10**5
-            )
-            / 10**5
+            < int((self.workflowObject.workflowData.tend - self.workflowObject.workflowData.tbegin) * 10**5) / 10**5
         ):
             nsteps = nsteps + 1
 
@@ -154,13 +132,10 @@ class WorkflowDriver:
 
             idsSlices = self.getIDSSlices(timenow)
             nonmandatoryIDSes = {
-                k: v
-                for k, v in idsSlices.items()
-                if k not in ["equilibrium", "core_profiles", "workflow"]
+                k: v for k, v in idsSlices.items() if k not in ["equilibrium", "core_profiles", "workflow"]
             }
-            
-            self.workflowObject.setProcessStatus(timenow)
 
+            self.workflowObject.setProcessStatus(timenow)
 
             idsData = self.workflowObject.run(
                 equilibrium=idsSlices["equilibrium"],
@@ -178,13 +153,8 @@ class WorkflowDriver:
             process_bundle_out = self.storeIDSSlices(idsOut)
 
             for ids in process_bundle_out.keys():
-                if (
-                    len(process_bundle_out[ids].time) > 0
-                ):  # Empty if process deactivated by an is_xx_on function
-                    if (
-                        process_bundle_out[ids].time[0] > 0
-                        or "merge" in process_bundle_out[ids].code.name
-                    ):
+                if len(process_bundle_out[ids].time) > 0:  # Empty if process deactivated by an is_xx_on function
+                    if process_bundle_out[ids].time[0] > 0 or "merge" in process_bundle_out[ids].code.name:
                         previous_time[ids] = process_bundle_out[ids].time[0]
             # ------------------------------------------------------------------------------------------
             # PREPARE FOR THE NEXT TIME STEP: COPY OUTPUT IDS IN INPUT OF ACTORS FOR THE NEXT TIME STEP
@@ -192,37 +162,15 @@ class WorkflowDriver:
             timenow = timenow * 1.0 + self.workflowObject.workflowData.dt_required * 1.0
             for process in self.workflowObject.workflowData.process_bundle.keys():
                 if "merge_" not in process:
-                    for ids in self.workflowObject.workflowData.process_bundle[process][
-                        "output"
-                    ].keys():
+                    for ids in self.workflowObject.workflowData.process_bundle[process]["output"].keys():
                         if (
-                            type(
-                                self.workflowObject.workflowData.process_bundle[
-                                    process
-                                ]["input"]
-                            )
-                            is dict
-                            and ids
-                            in self.workflowObject.workflowData.process_bundle[process][
-                                "input"
-                            ].keys()
+                            type(self.workflowObject.workflowData.process_bundle[process]["input"]) is dict
+                            and ids in self.workflowObject.workflowData.process_bundle[process]["input"].keys()
                         ):
-                            print(
-                                "Copy "
-                                + ids
-                                + " from output to input for "
-                                + process
-                                + " for next time slice"
+                            print("Copy " + ids + " from output to input for " + process + " for next time slice")
+                            self.workflowObject.workflowData.process_bundle[process]["input"][ids] = (
+                                self.workflowObject.workflowData.process_bundle[process]["output"][ids]
                             )
-                            self.workflowObject.workflowData.process_bundle[process][
-                                "input"
-                            ][ids] = self.workflowObject.workflowData.process_bundle[
-                                process
-                            ][
-                                "output"
-                            ][
-                                ids
-                            ]
 
     def getIDSSlices(self, timenow):
         idsSlices = {}
@@ -245,7 +193,7 @@ class WorkflowDriver:
             # print("  Get", ids, file=sys.stdout)
             try:
                 # feature/repair_231017
-                #TODO This change is not needed as input slices are separate from process
+                # TODO This change is not needed as input slices are separate from process
                 # if 'merge_' not in process:
                 idsSlices[ids] = self.md.get_slice(ids, timenow, 1)
             except Exception:
@@ -271,30 +219,19 @@ class WorkflowDriver:
         # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
         for process in self.workflowObject.workflowData.process_bundle.keys():
             if "merge_" in process:
-                key, value = list(
-                    self.workflowObject.workflowData.process_bundle[process][
-                        "output"
-                    ].items()
-                )[0]
+                key, value = list(self.workflowObject.workflowData.process_bundle[process]["output"].items())[0]
                 process_bundle_out[key] = value
 
         # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
         for process in self.workflowObject.workflowData.process_bundle.keys():
-            for key, value in self.workflowObject.workflowData.process_bundle[process][
-                "output"
-            ].items():
+            for key, value in self.workflowObject.workflowData.process_bundle[process]["output"].items():
                 if key not in process_bundle_out.keys():
                     process_bundle_out[key] = value
 
         # SAVE TO DISK
         for ids in process_bundle_out:
-            if (
-                len(process_bundle_out[ids].time) > 0
-            ):  # Empty if process deactivated by an is_xx_on function
-                if (
-                    process_bundle_out[ids].time[0] > 0
-                    or "merge" in process_bundle_out[ids].code.name
-                ):
-                    if ids != 'equilibrium':
+            if len(process_bundle_out[ids].time) > 0:  # Empty if process deactivated by an is_xx_on function
+                if process_bundle_out[ids].time[0] > 0 or "merge" in process_bundle_out[ids].code.name:
+                    if ids != "equilibrium":
                         self.outputDb.put_slice(process_bundle_out[ids])
         return process_bundle_out

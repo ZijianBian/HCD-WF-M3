@@ -1,10 +1,13 @@
 import os
 import sys
+
 from yaml import load as yamlload
+
 try:
     from yaml import CLoader as yamlLoader
 except ImportError:
     from yaml import Loader as yamlLoader
+
 
 class WorkflowGlobalsReader:
     def __init__(self, globalListPath: str) -> None:
@@ -16,9 +19,9 @@ class WorkflowGlobalsReader:
             self.rawData = yamlload(fileObject, Loader=yamlLoader)
 
     def getList(self, listName: str):
+        outputList = []
         if listName not in self.rawData.keys():
             print("Error: bad listname in loadlist()", file=sys.stderr)
-            outputList = []
 
         for key in self.rawData.keys():
             if listName == key:
@@ -58,6 +61,6 @@ class WorkflowGlobalsReader:
 
     def getDeviceList(self):
         return self.getList("device")
-    
+
     def getWallMD(self):
         return self.getList("wall_md")

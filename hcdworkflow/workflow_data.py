@@ -1,13 +1,14 @@
 import copy
+import inspect
 import os
 import sys
-import hcdworkflow
 from pathlib import Path
-import inspect
+
 import imas
 
-from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
+import hcdworkflow
 from hcdworkflow.workflow_config_reader import WorkflowConfigReader
+from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 
 
 # TODO Separate static and runtime part of the data
@@ -83,42 +84,29 @@ class WorkflowData:
 
         for process in self.process_bundle.keys():
             if "workflow" in self.process_bundle[process]["input"].keys():
-                workflow.time_loop.component[0].name = self.code_selection[
-                    process
-                ].upper()
-                self.process_bundle[process]["input"]["workflow"] = copy.deepcopy(
-                    workflow
-                )
+                workflow.time_loop.component[0].name = self.code_selection[process].upper()
+                self.process_bundle[process]["input"]["workflow"] = copy.deepcopy(workflow)
 
     # TODO Refactor this
     def validatePrerquisitesOfCodes(self):
         global_error = 0
         for entry, _ in self.code_selection.items():
-            if self.code_selection != None:
+            if self.code_selection is not None:
                 err = 0
                 code = self.code_selection[entry]
                 if self.prerequisites[entry] == "None":
                     self.prerequisites[entry] = None
-                if (
-                    self.prerequisites[entry] != None
-                    and code in self.prerequisites[entry]
-                ):
-                    fulfills_all_prerequisites = [1] * (
-                        len(self.prerequisites[entry][code])
-                    )
+                if self.prerequisites[entry] is not None and code in self.prerequisites[entry]:
                     for dep in [self.prerequisites[entry][code]]:
                         for i in dep.keys():
-                            if "any" in str(dep[i]) and self.code_selection[i] != None:
+                            if "any" in str(dep[i]) and self.code_selection[i] is not None:
                                 pass
                             elif str(dep[i]).find(str(self.code_selection[i])) != -1:
                                 pass
                             else:
                                 if str(dep[i]) == "any":
                                     print(
-                                        "ERROR: "
-                                        + code.upper()
-                                        + " needs any code as "
-                                        + str(i),
+                                        "ERROR: " + code.upper() + " needs any code as " + str(i),
                                         file=sys.stderr,
                                     )
                                 else:
@@ -137,9 +125,7 @@ class WorkflowData:
                                             "ERROR: "
                                             + code.upper()
                                             + " needs the "
-                                            + " or ".join(dep[i])
-                                            .upper()
-                                            .replace("OR", "or")
+                                            + " or ".join(dep[i]).upper().replace("OR", "or")
                                             + " codes as "
                                             + str(i),
                                             file=sys.stderr,

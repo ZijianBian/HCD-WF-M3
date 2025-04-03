@@ -1,8 +1,11 @@
 import numpy as np
+
+
 def find_nearest(a, a0):
     "Element in nd array `a` closest to the scalar value `a0`"
     idx = np.abs(a - a0).argmin()
     return a.flat[idx], idx
+
 
 #####################################################################################
 
@@ -11,8 +14,9 @@ def find_nearest(a, a0):
 # --> CHECK THE POWER ON ALL UNITS FOR THIS TIME SLICE
 # ------------------------------------------------------
 
+
 def is_nbi_on(nbi, time_slice):
-    if nbi.ids_properties.homogeneous_time==1:
+    if nbi.ids_properties.homogeneous_time == 1:
         if len(nbi.time) > 0:
             time_array = nbi.time
         else:
@@ -55,8 +59,9 @@ def is_nbi_on(nbi, time_slice):
 # --> CHECK THE POWER ON ALL LAUNCHERS FOR THIS TIME SLICE
 # ------------------------------------------------------
 
+
 def is_ec_on(ec_launchers, time_slice):
-    if ec_launchers.ids_properties.homogeneous_time==1:
+    if ec_launchers.ids_properties.homogeneous_time == 1:
         if len(ec_launchers.time) > 0:
             time_array = ec_launchers.time
         else:
@@ -90,7 +95,8 @@ def is_ec_on(ec_launchers, time_slice):
                 return True
         else:
             return False
-        
+
+
 #####################################################################################
 
 # ------------------------------------------------------
@@ -98,8 +104,9 @@ def is_ec_on(ec_launchers, time_slice):
 # --> CHECK THE POWER ON ALL ANTENNAS FOR THIS TIME SLICE
 # ------------------------------------------------------
 
+
 def is_ic_on(ic_antennas, time_slice):
-    if ic_antennas.ids_properties.homogeneous_time==1:
+    if ic_antennas.ids_properties.homogeneous_time == 1:
         if len(ic_antennas.time) > 0:
             time_array = ic_antennas.time
         else:
@@ -133,7 +140,8 @@ def is_ic_on(ic_antennas, time_slice):
                 return True
         else:
             return False
-    
+
+
 #####################################################################################
 
 # ------------------------------------------------------
@@ -141,8 +149,9 @@ def is_ic_on(ic_antennas, time_slice):
 # --> CHECK THE POWER ON ALL LAUNCHERS FOR THIS TIME SLICE
 # ------------------------------------------------------
 
+
 def is_lh_on(lh_antennas, time_slice):
-    if lh_antennas.ids_properties.homogeneous_time==1:
+    if lh_antennas.ids_properties.homogeneous_time == 1:
         if len(lh_antennas.time) > 0:
             time_array = lh_antennas.time
         else:
@@ -176,6 +185,6 @@ def is_lh_on(lh_antennas, time_slice):
                 return True
         else:
             return False
-        
-#####################################################################################
 
+
+#####################################################################################

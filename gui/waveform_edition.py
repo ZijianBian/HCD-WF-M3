@@ -1,14 +1,16 @@
 import os
 import tkinter as tk
-from tkinter import ttk
 from shutil import copy2
+from tkinter import ttk
+
 from .colour_definitions import bluish as col
+
 isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
-except:
+except Exception as _:  # noqa F841
     isWaveformCookerPresent = False
-    
+
 fontsize = 12
 
 ############################################################################
@@ -58,9 +60,7 @@ class TextScrollCombo(ttk.Frame):
         self.grid_columnconfigure(0, weight=1)
 
         # Create a Text widget
-        self.txt = CustomText(
-            self, width=40, height=4, bg="black", fg="white", insertbackground="white"
-        )
+        self.txt = CustomText(self, width=40, height=4, bg="black", fg="white", insertbackground="white")
         self.txt.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
 
         # Create a Scrollbar and associate it with text
@@ -90,10 +90,7 @@ def fileDropDownHandeler(window, txt, myfile, action):
 
         if "NOT SAVED" in window.title():
 
-            message = (
-                "Your modifications have not been saved. "
-                + "Do you really wante to leave?"
-            )
+            message = "Your modifications have not been saved. " + "Do you really wante to leave?"
             MsgBox = tk.messagebox.askquestion("Exit Application", message)
             if MsgBox == "yes":
                 window.destroy()
@@ -118,9 +115,7 @@ def edit_yaml(myfile):
     edit_yaml_window.title(myfile)  # Title
     edit_yaml_window.configure(bg=col.c4)  # Background colour
     edit_yaml_window.geometry("1000x600")  # Dimension
-    edit_yaml_window.columnconfigure(
-        0, weight=1
-    )  # Resize frames along with main window
+    edit_yaml_window.columnconfigure(0, weight=1)  # Resize frames along with main window
     edit_yaml_window.rowconfigure(0, weight=1)  # idem
 
     # Text + scrollbar
@@ -156,15 +151,11 @@ def edit_yaml(myfile):
     fileDropdown = tk.Menu(menu, tearoff=False)
     fileDropdown.add_command(
         label="Save (Ctrl-S)",
-        command=lambda: fileDropDownHandeler(
-            edit_yaml_window, combo.txt, myfile, "save"
-        ),
+        command=lambda: fileDropDownHandeler(edit_yaml_window, combo.txt, myfile, "save"),
     )
     fileDropdown.add_command(
         label="Exit (Ctrl-Q)",
-        command=lambda: fileDropDownHandeler(
-            edit_yaml_window, combo.txt, myfile, "exit"
-        ),
+        command=lambda: fileDropDownHandeler(edit_yaml_window, combo.txt, myfile, "exit"),
     )
     menu.add_cascade(label="File", menu=fileDropdown)
     edit_yaml_window.config(menu=menu)
@@ -185,16 +176,17 @@ def preset_copy(waveform_folder, config_folder, process, preset_file, custom_fil
     # Copy the default workflow parameter file into the current one
     def CopyWaveform(waveform_folder, preset_file, config_folder, custom_file):
 
-        if os.path.isfile(waveform_folder+'/' + preset_file):
-        
+        if os.path.isfile(waveform_folder + "/" + preset_file):
+
             copy2(
-                waveform_folder+'/' + preset_file,
+                waveform_folder + "/" + preset_file,
                 config_folder + "/" + custom_file,
                 follow_symlinks=True,
             )
             print(
                 "  --> "
-                + waveform_folder+'/'
+                + waveform_folder
+                + "/"
                 + preset_file
                 + "\n"
                 + "      copied into "
@@ -206,13 +198,11 @@ def preset_copy(waveform_folder, config_folder, process, preset_file, custom_fil
             edit_yaml(config_folder + "/" + custom_file)
 
         else:
-            print('The file '+waveform_folder+'/' + preset_file+' does not exist.')
-            print('--> Preset copy aborted.')
+            print("The file " + waveform_folder + "/" + preset_file + " does not exist.")
+            print("--> Preset copy aborted.")
 
     # Check that the user is happy with overwriting the file
-    def AreYouSure_preset_copy(
-        process, waveform_folder, preset_file, config_folder, custom_file
-    ):
+    def AreYouSure_preset_copy(process, waveform_folder, preset_file, config_folder, custom_file):
         message = (
             "A custom file for "
             + process.upper()
@@ -230,9 +220,7 @@ def preset_copy(waveform_folder, config_folder, process, preset_file, custom_fil
     # If the file exists, check that the user is happy with overwriting,
     # then copy preset file to custom file
     if os.path.exists(config_folder + "/" + custom_file):
-        AreYouSure_preset_copy(
-            process, waveform_folder, preset_file, config_folder, custom_file
-        )
+        AreYouSure_preset_copy(process, waveform_folder, preset_file, config_folder, custom_file)
     else:
         CopyWaveform(waveform_folder, preset_file, config_folder, custom_file)
 
@@ -268,10 +256,7 @@ def use_waveform_from_scenario(config_folder, custom_file):
 
     # Check that the user is happy with overwriting the file
     def AreYouSure_use_waveform_from_scenario(config_folder, custom_file):
-        message = (
-            "This will remove your existing\nwaveform configuration.\n"
-            + "Do you want to continue?"
-        )
+        message = "This will remove your existing\nwaveform configuration.\n" + "Do you want to continue?"
         MsgBox = tk.messagebox.askquestion("Exit Application", message)
         if MsgBox == "yes":
             os.remove(config_folder + "/" + custom_file)
@@ -331,15 +316,11 @@ class edit_waveforms:
                 k = k + 1
                 self.master.columnconfigure(jcol, weight=1, minsize=mincolumnsize)
                 if k < nrow * ncol - 1 and irow > 1 and jcol > 0:
-                    frame_array[k] = tk.Frame(
-                        master=self.master, relief=tk.RAISED, borderwidth=2, bg=col.c3
-                    )
+                    frame_array[k] = tk.Frame(master=self.master, relief=tk.RAISED, borderwidth=2, bg=col.c3)
                 else:
                     frame_array[k] = tk.Frame(master=self.master, bg=col.c4)
                 if k > 0:
-                    frame_array[k].grid(
-                        row=irow, column=jcol, padx=2, pady=2, sticky="nw"
-                    )
+                    frame_array[k].grid(row=irow, column=jcol, padx=2, pady=2, sticky="nw")
                 else:
                     frame_array[k].grid(
                         row=irow,
@@ -358,7 +339,8 @@ class edit_waveforms:
         # General information
         general_info = tk.Label(
             master=self.frame_array[0],
-            text="Do not configure if you plan to read waveforms from      \ninput scenario (can be restored with scenario reset)",
+            text="Do not configure if you plan to read waveforms from     "
+            "\ninput scenario (can be restored with scenario reset)",
             bg=col.c3,
             font=("Arial", fontsize, "bold"),
         )
@@ -410,7 +392,7 @@ class edit_waveforms:
         preset_name.grid(row=1, column=4, sticky="we")
 
         irow = 2
-        iprocess = 1
+        # iprocess = 1
         for process in waveform_presets.keys():
 
             # Labels for processes (1st column)
@@ -431,7 +413,7 @@ class edit_waveforms:
             )
             add_button_custom.grid(padx=2, pady=2, sticky="we")
             add_button_custom.configure(
-                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: waveform_custom_configure(
+                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: waveform_custom_configure(  # noqa E501
                     config_folder, process, waveform_presets[process]["custom"][0]
                 )
             )
@@ -445,7 +427,7 @@ class edit_waveforms:
             )
             add_button_reset.grid(padx=2, pady=2, sticky="we")
             add_button_reset.configure(
-                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: use_waveform_from_scenario(
+                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: use_waveform_from_scenario(  # noqa E501
                     config_folder, waveform_presets[process]["custom"][0]
                 )
             )
@@ -460,7 +442,7 @@ class edit_waveforms:
             add_button_plot.grid(padx=2, pady=2, sticky="we")
             if isWaveformCookerPresent:
                 add_button_plot.configure(
-                    command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: add_dynamic(
+                    command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: add_dynamic(  # noqa E501
                         config_folder + "/" + waveform_presets[process]["custom"][0],
                         kplot=1,
                     )
@@ -477,7 +459,7 @@ class edit_waveforms:
                     )
                     add_button_preset.grid(padx=2, pady=2, sticky="we")
                     add_button_preset.configure(
-                        command=lambda waveform_presets=waveform_presets, waveform_folder=waveform_folder, preset_key=preset_key, process=process, config_folder=config_folder: preset_copy(
+                        command=lambda waveform_presets=waveform_presets, waveform_folder=waveform_folder, preset_key=preset_key, process=process, config_folder=config_folder: preset_copy(  # noqa E501
                             waveform_folder,
                             config_folder,
                             process,
@@ -488,7 +470,7 @@ class edit_waveforms:
                     irow += 1
 
         # Exit the 'edit waveforms' window
-        add_button_exit = tk.Button(
+        tk.Button(
             master=self.frame_array[-1],
             text="Exit",
             bg=col.c2,
@@ -497,4 +479,3 @@ class edit_waveforms:
 
 
 ############################################################################
-

@@ -9,7 +9,8 @@ from lxml import etree
 logger = logging.getLogger("module")
 
 
-# TODO Make generic process actor using class method which can initialize any actor (iwrap, muscle etc).. keep interface same
+# TODO Make generic process actor using class method which
+# can initialize any actor (iwrap, muscle etc).. keep interface same
 # Current implementation is only iwrap
 class WorkflowActor:
     def __init__(self, actorName: str, xmlPath: str = "", verbose=False):
@@ -47,14 +48,12 @@ class WorkflowActor:
             os.path.join(
                 xmlDirectory,
                 f"input_{actorName}.xml",
-            )
+            ),
         )
 
     def validate(self):
         if not self.name:
-            logger.critical(
-                f"ERROR! Actor name {self.name } : Actor name is not provided"
-            )
+            logger.critical(f"ERROR! Actor name {self.name } : Actor name is not provided")
             return None
 
     def initializeActor(self, actorName: str, xmlPath: str, verbose=False):
@@ -65,18 +64,19 @@ class WorkflowActor:
 
         actor = eval(actorName)
         runtime_settings = actor.get_runtime_settings()
-        runtime_settings.ids_storage.backend = imas.imasdef.MEMORY_BACKEND  # IMAS-4055
+        runtime_settings.ids_storage.backend = imas.imasdef.MEMORY_BACKEND  # pylint: disable=no-member # IMAS-4055
         code_parameters = actor.get_code_parameters()
         if xmlPath:
             code_parameters.parameters_path = xmlPath
             if actor.is_mpi_code is True:
                 tree = etree.parse(xmlPath)
                 root = tree.getroot()
+                nproc_actor = 4
                 for elem in root.iter():
                     if elem.tag == "nproc_actor":
                         nproc_actor = int(elem.text)
                 runtime_settings.mpi.mpi_processes = nproc_actor
-       
+
         # feature/repair_231017
         # TODO Need to move out and keep it separate
         if actorName == "pion":
@@ -87,11 +87,11 @@ class WorkflowActor:
             runtime_settings.sandbox.path = (
                 os.getcwd()
             )  # To be fixed later on (pion fails if it does not know where to write)
-        arguments={}
+        arguments = {}
         if code_parameters is not None:
-            arguments['code_parameters']=code_parameters
+            arguments["code_parameters"] = code_parameters
         if runtime_settings is not None:
-            arguments['runtime_settings']=runtime_settings
+            arguments["runtime_settings"] = runtime_settings
         actor.initialize(**arguments)
         return actor
 
@@ -112,7 +112,7 @@ class WorkflowActor:
 
     def getIDSDict(self, idsData):
         idsDict = {}
-        if type(idsData) == list:
+        if isinstance(idsData, list):
             for idsName in idsData:
                 idsDict[idsName] = eval(f"imas.{idsName}()")
         else:
@@ -124,9 +124,7 @@ class WorkflowActor:
         if self.actor is not None:
             idsList.extend(
                 ilist["type"]
-                for ilist in self.actor.code_description["implementation"][
-                    "subroutines"
-                ]["main"]["arguments"]
+                for ilist in self.actor.code_description["implementation"]["subroutines"]["main"]["arguments"]
                 if ilist["intent"] == intentType
             )
         return idsList
@@ -134,7 +132,6 @@ class WorkflowActor:
     # TODO Look for cleaner way of importing actors
     @staticmethod
     def _import(actorName: str, verbose=False):
-        error = 0
         try:
             _ = import_module(actorName)
         except Exception:
@@ -167,7 +164,7 @@ class WorkflowActor:
             input_ids_list = []
             output_ids_list = []
             # IMAS-4679
-            
+
             for ilist in actor.code_description["implementation"]["subroutines"]["main"]["arguments"]:
                 if ilist["intent"] == "IN":
                     input_ids_list.append(ilist["type"])
@@ -179,18 +176,12 @@ class WorkflowActor:
 
 
 if __name__ == "__main__":
-    import os
-
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     print(root_path)
     procesActor = WorkflowActor(
         "torbeam",
-        os.path.join(
-            root_path, "data/DT_baseline_example/ECRH/ec_wave_solver/input_torbeam.xml"
-        ),
-        os.path.join(
-            root_path, "data/DT_baseline_example/ECRH/ec_wave_solver/input_torbeam.xsd"
-        ),
+        os.path.join(root_path, "data/DT_baseline_example/ECRH/ec_wave_solver/input_torbeam.xml"),
+        os.path.join(root_path, "data/DT_baseline_example/ECRH/ec_wave_solver/input_torbeam.xsd"),
     )
     # procesActor = WfActor(
     #     "grayscale",

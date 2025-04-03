@@ -11,7 +11,7 @@ description = """This actor version(__RAWVERSION__) provides workflow for HCD
 Git Repo : https://git.iter.org/projects/WF/repos/hcd
 """
 
-system "ulimit -Ss unlimited"
+prebuildopts = "ulimit -Ss unlimited && "
 
 toolchain = {"name": "__TOOLCHAIN_NAME__", "version": "__TOOLCHAIN_VERSION__"}
 

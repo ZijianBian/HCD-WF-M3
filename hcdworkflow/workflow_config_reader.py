@@ -1,13 +1,14 @@
-import xml.etree.ElementTree as ET
+import functools
 import os
 import sys
-import functools
+import xml.etree.ElementTree as ET
+
 import numpy as np
 
 root_path = os.path.dirname(__file__)
 sys.path.append(root_path)
 
-from hcdworkflow.workflow_actor import WorkflowActor
+from hcdworkflow.workflow_actor import WorkflowActor  # noqa: E402
 
 
 class XmlReader:
@@ -82,18 +83,15 @@ class WorkflowConfigReader(XmlReader):
                         actorsList = process.attrib["list"].split()
                         if int(process.text) - 1 < len(actorsList):
                             selectedActor = actorsList[int(process.text) - 1]
-                            actorConfigPath = os.path.join(
-                                self.workflowDirectory, category.tag, process.tag
-                            )
-                            processActor = WorkflowActor.getObjectByXmlDirectory(
-                                selectedActor, actorConfigPath
-                            )
+                            actorConfigPath = os.path.join(self.workflowDirectory, category.tag, process.tag)
+                            processActor = WorkflowActor.getObjectByXmlDirectory(selectedActor, actorConfigPath)
 
                             if processActor is not None:
                                 processDict[process.tag] = processActor
                         else:
                             print(
-                                f"Please select valid index of actor, List length : [{len(actorsList)}] and selected index is: [{int(process.text) - 1}]"
+                                f"Please select valid index of actor, List length :"
+                                f"[{len(actorsList)}] and selected index is: [{int(process.text) - 1}]"
                             )
                 if bool(processDict):
                     categoryDict[category.tag] = processDict
@@ -267,9 +265,7 @@ class WorkflowConfigReader(XmlReader):
 
 
 if __name__ == "__main__":
-    workflowConfig = WorkflowConfigReader(
-        r"/home/ITER/sawantp1/git/hcd/data/DT_baseline_example/input_workflow.xml"
-    )
+    workflowConfig = WorkflowConfigReader(r"/home/ITER/sawantp1/git/hcd/data/DT_baseline_example/input_workflow.xml")
     # workflowConfig.displayConfig()
     # print("getAllProcesses")
     # print(workflowConfig.getAllProcesses())

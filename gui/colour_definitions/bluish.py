@@ -4,4 +4,3 @@ c3 = "powderblue"
 c4 = "ghost white"
 c5 = "lightblue"
 c6 = "LavenderBlush3"
-

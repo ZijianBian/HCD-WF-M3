@@ -1,22 +1,25 @@
-import os
-from gui.gui_methods import create_workflow_param_from_file
-import hcdworkflow
-from pathlib import Path
 import inspect
+import os
+from pathlib import Path
+
+import imas
+
+import hcdworkflow
+from gui.gui_methods import create_workflow_param_from_file
+from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
+from hcdworkflow.workflow_driver import WorkflowDriver
+from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
+
 isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
-except:
+except Exception as _:  # noqa F841
     isWaveformCookerPresent = False
 try:
-  from idstools.cli import get_backend_id
+    from idstools.cli import get_backend_id
 except ImportError:
-  from idstools.utils.clihelper import get_backend_id    
+    from idstools.utils.clihelper import get_backend_id
 
-from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
-from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
-from hcdworkflow.workflow_driver import WorkflowDriver
-import imas
 
 def wf_wrapper(par_path):
     config_folder_path = os.path.abspath(par_path)
@@ -24,21 +27,19 @@ def wf_wrapper(par_path):
     pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"
 
     globalListPath = str(pathGlobalConfiguration / "global_lists.yaml")
-        
+
     inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
     print("path of the input workflow", inputworkflow_xml)
-    wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
-        "workflow_parameters"
-    ][0]
+    wf_parameters = create_workflow_param_from_file(inputworkflow_xml)["workflow_parameters"][0]
 
     input_user_or_path = wf_parameters["input_user_or_path"][0]
     input_database = wf_parameters["input_database"][0]
-    input_backend="MDSPLUS"
+    input_backend = "MDSPLUS"
     if "input_backend" in wf_parameters:
         input_backend = wf_parameters["input_backend"][0]
     output_user_or_path = wf_parameters["output_user_or_path"][0]
     output_database = wf_parameters["output_database"][0]
-    output_backend="MDSPLUS"
+    output_backend = "MDSPLUS"
     if "output_backend" in wf_parameters:
         output_backend = wf_parameters["output_backend"][0]
     shot_nr = wf_parameters["shot_nr"][0]
@@ -73,10 +74,16 @@ def wf_wrapper(par_path):
         if idsObject.ids_properties.homogeneous_time != imas.imasdef.EMPTY_INT:
             machineDb.put(idsObject)
         else:
-            if idsName == 'wall':
-                wall = imas.DBEntry(get_backend_id(wall_md['backend']),wall_md['database'],wall_md['shot'],wall_md['run'],wall_md['user_or_path'])
+            if idsName == "wall":
+                wall = imas.DBEntry(
+                    get_backend_id(wall_md["backend"]),
+                    wall_md["database"],
+                    wall_md["shot"],
+                    wall_md["run"],
+                    wall_md["user_or_path"],
+                )
                 wall.open()
-                machineDb.put(wall.get('wall'))
+                machineDb.put(wall.get("wall"))
             print(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required")
 
     # feature/repair_231017
@@ -102,4 +109,4 @@ def wf_wrapper(par_path):
     outputDb.close()
     machineDb.close()
 
-    print('End of wf_wrapper')
+    print("End of wf_wrapper")
