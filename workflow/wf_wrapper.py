@@ -15,10 +15,6 @@ try:
     from waveform_cooker import add_dynamic
 except Exception as _:  # noqa F841
     isWaveformCookerPresent = False
-try:
-    from idstools.cli import get_backend_id
-except ImportError:
-    from idstools.utils.clihelper import get_backend_id
 
 
 def wf_wrapper(par_path):
@@ -76,7 +72,7 @@ def wf_wrapper(par_path):
         else:
             if idsName == "wall":
                 wall = imas.DBEntry(
-                    get_backend_id(wall_md["backend"]),
+                    getattr(imas.ids_defs, f"{wall_md['backend']}_BACKEND"),
                     wall_md["database"],
                     wall_md["shot"],
                     wall_md["run"],
