@@ -2,11 +2,11 @@
 # Bamboo CI script to test IDS tools on different toolchains
 # Execute script from root directory
 # Note Disable set -e option when using on local as it will exit the shell on error
+source /etc/profile.d/modules.sh
+
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
     set -e -u -o pipefail
 fi
-
-source /etc/profile.d/modules.sh
 
 # expand aliases
 shopt -s expand_aliases
