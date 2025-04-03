@@ -71,8 +71,9 @@ def wf_wrapper(par_path):
             machineDb.put(idsObject)
         else:
             if idsName == "wall":
+                _backend = getattr(imas.imasdef, wall_md['backend'] + "_BACKEND")
                 wall = imas.DBEntry(
-                    getattr(imas.ids_defs, f"{wall_md['backend']}_BACKEND"),
+                    _backend,
                     wall_md["database"],
                     wall_md["shot"],
                     wall_md["run"],
