@@ -5,7 +5,15 @@
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
     set -e -u -o pipefail
 fi
-set -e -u -o pipefail
+
+source /etc/profile.d/modules.sh
+
+# expand aliases
+shopt -s expand_aliases
+
+#print hostname
+hostname -f
+
 module load Python
 
 ENVIRONEMNT_NAME=env"$TOOLCHAIN_VERSION"_"$ACCESS_LAYER_VERSION"
