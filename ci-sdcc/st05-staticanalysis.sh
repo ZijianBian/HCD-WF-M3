@@ -16,7 +16,7 @@ hostname -f
 
 module load Python
 
-ENVIRONEMNT_NAME=env"$TOOLCHAIN_VERSION"_"$ACCESS_LAYER_VERSION"
+ENVIRONEMNT_NAME=envStaticAnalysis
 
 python -m venv "$ENVIRONEMNT_NAME"
 
