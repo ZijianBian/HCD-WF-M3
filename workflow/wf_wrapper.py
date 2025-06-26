@@ -82,10 +82,13 @@ def wf_wrapper(par_path):
                     )
                     wall.open()
                     machineDb.put(wall.get("wall"))
-                except:
-                    print('The wall IDS is neither in senario data nor found in MD database --> try to run without.')
+                except Exception as _:  # noqa F841
+                    print("The wall IDS is neither in senario data nor found in MD database --> try to run without.")
             else:
-                print(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required.")
+                print(
+                    f"{idsName} is not present in the scenario data, "
+                    "you can provide it with waveform cooker if required."
+                )
 
     # feature/repair_231017
     # TODO This change is not needed as input slices are separate from process
