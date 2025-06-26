@@ -71,17 +71,21 @@ def wf_wrapper(par_path):
             machineDb.put(idsObject)
         else:
             if idsName == "wall":
-                _backend = getattr(imas.imasdef, wall_md["backend"] + "_BACKEND")
-                wall = imas.DBEntry(
-                    _backend,
-                    wall_md["database"],
-                    wall_md["shot"],
-                    wall_md["run"],
-                    wall_md["user_or_path"],
-                )
-                wall.open()
-                machineDb.put(wall.get("wall"))
-            print(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required")
+                try:
+                    _backend = getattr(imas.imasdef, wall_md["backend"] + "_BACKEND")
+                    wall = imas.DBEntry(
+                        _backend,
+                        wall_md["database"],
+                        wall_md["shot"],
+                        wall_md["run"],
+                        wall_md["user_or_path"],
+                    )
+                    wall.open()
+                    machineDb.put(wall.get("wall"))
+                except:
+                    print('The wall IDS is neither in senario data nor found in MD database --> try to run without.')
+            else:
+                print(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required.")
 
     # feature/repair_231017
     # TODO This change is not needed as input slices are separate from process
