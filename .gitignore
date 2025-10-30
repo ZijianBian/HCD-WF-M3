@@ -46,3 +46,6 @@ MANIFEST
 # IDE
 .vscode/
 .idea
+
+# Generated version file
+hcdworkflow/_version.py
