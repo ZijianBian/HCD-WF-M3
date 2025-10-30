@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR:     nemo
 
-MODULES: [IMAS, iWrap, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: nemo
-    CMD: ./build.sh
+    CMD: make DEBUG=yes USE_FRUIT=yes clean validate library FCOMPILER=ifort
 
 ACTORS: 
   - DIR: nemo
-    XML: iwrap/nemo.yaml
+    CMD: make actor FCOMPILER=ifort DEBUG=yes USE_FRUIT=yes
 
 #COMMENTS:  
 ...

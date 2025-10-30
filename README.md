@@ -1,119 +1,402 @@
+# HCD Workflow
 
-Python Heating Current And Drive Workflow
-# For users
-These instructions are for users who needs to run the H&CD workflow for physics analysis purpose.
+[![Development Status](https://img.shields.io/badge/status-production-green.svg)](https://pypi.org/project/HCDWorkflow/)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-See%20LICENSE.md-blue.svg)](LICENSE.md)
 
-## Get the source:
-```
-> git clone ssh://git@git.iter.org/wf/hcd.git
-> git checkout develop
-```
+Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulations.
 
-## Setup the environment
-```
-> cd hcd
-> . config_hcd.sh
-> pip install -r requirements.txt
-```
-You may need to provide path to compiled actors in `config_hcd.sh`
-```
-# Start from clean environment
-module purge >&/dev/null
+## Overview
 
-# Need to remove the stack limit to avoid segmentation fault inside codes
-ulimit -Ss unlimited
+HCD Workflow is a comprehensive workflow management system designed to orchestrate various heating and current drive simulation codes for ITER tokamak plasma physics analysis. It provides integration for:
 
-# Load the default IMAS version
-module load IMAS
+- **ECRH** (Electron Cyclotron Resonance Heating): GRAY, GRAYSCALE, TORBEAM, TORAY, GENRAY
+- **ICRH** (Ion Cyclotron Resonance Heating): CYRANO, TOMCAT, PION, LION
+- **NBI** (Neutral Beam Injection): NEMO, BBNBI, ASCOT, SPOT, RISK, NBISIM
+- **LHCD** (Lower Hybrid Current Drive): LHCD-METIS
+- **Post-processing**: HCD2CORE_SOURCES, HCD2CORE_PROFILES, Mergers
 
-# Workflow tools needed mostly for the HCD gui
-module load WFtools
-module load Waveform-Cooker/1.3.3-GCCcore-10.2.0
+## Quick Start
 
-pip install -r requirements.txt
+### For Users (Recommended)
 
-export ACTOR_FOLDER=~/public/PYTHON_ACTORS  <--- Change here
-export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
-```
+If you just want to run simulations, use the pre-installed EasyBuild module:
 
-## Install HCDWorkflow using pip install
-```
-> python -m build # This will create distribution package
-> pip install dist/HCDWorkflow-<version>-py3-none-any.whl # Install distribution package
-```
+```bash
+# Load the workflow module
+module load HCD-WF
 
-## Using hcd workflow
-```
-# [hcd_nogui ] run standalone hcd workflow 
-> hcd_nogui -c <configuration path> 
+# All dependent actors will be automatically loaded along with other dependencies
+# Loads mandatory actors
+module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
+module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
+module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
 
-# [hcdslice_nogui] run hcd workflow on time slice
-> hcdslice_nogui -c <configuration path> 
+# Loads main actors for your simulation:
+# EC: GRAYSCALE, GRAY, TORBEAM, TORAY, GENRAY
+# IC: CYRANO, FoPla, StixReDist, TOMCAT
+# NBI: NEMO, NBISIM, RISK, SPOT
+# Other: RELAX, SMART, FPSIM
 
-# [hcd_gui] run standalone hcd workflow using gui, create machine description using waveform cooker etc.
-> hcd_gui 
+# Example: Loads GRAYSCALE for EC heating
+module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
 
-# [hcd_batch] batch exectution of hcd_workflow
-> hcd_batch 
+# Optional: suppress verbose warnings
+export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
+
+# Run a simulation
+hcd_nogui -c tests/data/GRAYSCALE/
+
+# Or use the GUI
+hcd_gui
 ```
 
-# For developers
+### For Developers
 
-## First time usage:
+If you need to modify or develop the workflow:
 
-### Get the source:
-```
-> git clone ssh://git@git.iter.org/wf/hcd.git
-> git checkout develop
-```
+```bash
+# Clone the repository
+git clone ssh://git@git.iter.org/wf/hcd-wf.git
+cd hcd-wf
 
+# Setup Python environment
+module load Python
+python -m venv devenv
+source devenv/bin/activate
 
-### Setup the environment
-```
-> cd hcd
-> . config_hcd_iter_sdcc.sh
-```
+# Install in editable mode
+pip install -e .
 
+# Load required modules
+module load Tkinter
+module load matplotlib
+module load waveform-cooker
+module load IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
 
-### Setup the different actors
+# Load actor modules (available at /work/imas/etc/modules/all)
+module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
+module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
+module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
+module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
+# Load additional actors as needed (see /work/imas/etc/modules/all)
 
-```
-> cd actor_install
-> python actor_install.py --skipModules *.yml
-```
-
-You can select which actors you want to install by specifying a complete name instead of the  wildcard. Choose from the different \*.yml files available in this folder.
-
-The build of each actor takes place inside a temporary folder called `build-<DATE>-<TIME>`. This folder is not deleted automatically.
-
-
-### Run
-
-```
-> cd .. #make sure we are back in hcd folder
-> python hcd_gui.py
+# Run tests
+hcd_nogui -c tests/data/GRAYSCALE/
 ```
 
-## Regular usage
+## Features
 
-You just need to setup the environment and  launch the GUI:
-```
-> cd hcd
-> . config_hcd_iter_sdcc.sh
-> python hcd_gui.py
+- **Multiple Execution Modes**: Console, GUI, batch, single time-slice
+- **Flexible Actor System**: Easy integration of new physics codes
+- **IMAS Integration**: Full compatibility with IMAS IDSes
+- **Time-Loop Execution**: Automated multi-timepoint simulations
+- **HPC Support**: SLURM batch job submission
+- **Waveform Management**: Integration with Waveform Cooker
+- **Modular Design**: Clean separation of workflow logic and physics codes
+
+## Commands
+
+### `hcd_gui`
+Interactive graphical interface for workflow configuration and execution.
+
+```bash
+hcd_gui
 ```
 
-## Updating the actors
+### `hcd_nogui`
+Console-based workflow execution with time-loop.
 
-When an actor gets updated, you want to use that new version. Simply go to `actor_install` folder and run `actor_install.py` just for that actor. For example, for the ascot actor:
+```bash
+hcd_nogui -c <configuration_folder>
 ```
+
+### `hcdslice_nogui`
+Execute workflow for a single time slice (useful for testing).
+
+```bash
+hcdslice_nogui -c <configuration_folder>
+```
+
+### `hcd_batch`
+Submit workflow as a batch job to SLURM scheduler.
+
+```bash
+hcd_batch -n <nproc> -t <hours> -e <email> -q <queue> -c <config_folder>
+```
+
+Example:
+```bash
+hcd_batch -n 1 -t 2 -e user@iter.org -q all -c tests/data/GRAYSCALE/
+```
+
+## Documentation
+
+Full documentation is available at:
+- [Confluence Page](https://confluence.iter.org/pages/viewpage.action?pageId=252217231)
+
+Build documentation locally:
+
+```bash
+cd docs
+pip install -e ".[docs]"
+make html
+# Open docs/build/html/index.html in browser
+```
+
+## Installation Methods
+
+### Method 1: EasyBuild Module (Users)
+
+```bash
+module load HCD-WF
+```
+
+This is the recommended method for users who just want to run simulations.
+
+### Method 2: pip install (Developers)
+
+```bash
+# From source
+git clone ssh://git@git.iter.org/wf/hcd-wf.git
+cd hcd-wf
+pip install .
+
+# Or in editable mode for development
+pip install -e .
+
+# With development dependencies
+pip install -e ".[dev]"
+```
+
+### Method 3: Build from source
+
+```bash
+# Build distribution
+python -m build
+
+# Install the wheel
+pip install dist/HCDWorkflow-<version>-py3-none-any.whl
+```
+
+## Configuration
+
+### Basic Configuration
+
+The main configuration file is `input_workflow.xml`:
+
+```xml
+<root>
+  <workflow_parameters>
+    <shot_nr>130012</shot_nr>
+    <run_in>5</run_in>
+    <run_out>6</run_out>
+    <tbegin>30.0</tbegin>
+    <tend>350.0</tend>
+    <dt_required>20</dt_required>
+  </workflow_parameters>
+  
+  <actor_selection>
+    <main_process>
+      <ECRH>
+        <ec_wave_solver list="genray gray grayscale torbeam toray">3</ec_wave_solver>
+      </ECRH>
+    </main_process>
+  </actor_selection>
+</root>
+```
+
+### Waveform Files
+
+Create YAML waveform files for time-dependent parameters:
+- `ec_waveforms.yaml` - ECRH waveforms
+- `ic_waveforms.yaml` - ICRH waveforms  
+- `nbi_waveforms.yaml` - NBI waveforms
+- `lh_waveforms.yaml` - LHCD waveforms
+
+## Project Structure
+
+```
+hcd-wf/
+├── hcdworkflow/           # Main workflow package
+│   ├── hcd_workflow.py    # Main workflow logic
+│   ├── workflow_driver.py # Time-loop driver
+│   ├── workflow_executor.py # Actor execution
+│   └── global_configuration/ # Default configs
+├── gui/                   # GUI components
+├── tools/                 # Utility tools
+├── workflow/              # Workflow wrapper
+├── actor_install/         # Actor installation scripts
+├── tests/                 # Test data
+├── ci-sdcc/              # CI/CD scripts
+├── hcd_gui               # GUI entry point
+├── hcd_nogui             # Console entry point
+├── hcdslice_nogui        # Single slice entry point
+├── hcd_batch             # Batch submission script
+├── pyproject.toml        # Project configuration
+├── setup.cfg             # Tool configurations
+└── README.md             # This file
+```
+
+## Requirements
+
+- Python >= 3.8
+- lxml >= 4.6.0
+- numpy >= 1.20.0
+- pyparsing >= 2.4.0
+- python-dateutil >= 2.8.0
+- pyyaml >= 5.4.0
+- six >= 1.15.0
+
+### Runtime Dependencies
+
+- IMAS-AL-Python (ITER Integrated Modelling & Analysis Suite)
+- Physics actor modules (GRAYSCALE, HCD_MERGERS, etc.)
+- Tkinter (for GUI)
+- matplotlib (for GUI plotting)
+
+## Development
+
+### Setup Development Environment
+
+```bash
+# Clone and setup
+git clone ssh://git@git.iter.org/wf/hcd-wf.git
+cd hcd-wf
+git checkout develop
+
+# Create virtual environment
+module load Python
+python -m venv devenv
+source devenv/bin/activate
+
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
+
+# Load required modules
+module load Tkinter matplotlib
+module load IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
+module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
+module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
+```
+
+### Code Quality
+
+Run static analysis:
+
+```bash
+# Format code
+black --line-length 120 hcdworkflow/ gui/ tools/ workflow/
+
+# Check style
+flake8 --max-line-length=120 --ignore=E203,W503 hcdworkflow/
+
+# Run linter
+pylint --max-line-length=120 hcdworkflow/
+
+# Or use the CI script
+bash ci-sdcc/st05-staticanalysis.sh
+```
+
+### Installing Custom Actors
+
+For testing actors under development:
+
+```bash
 cd actor_install
-python actor_install.py --skipModules ascot.yml
+
+# Install all actors
+python actor_install.py --skipModules *.yml
+
+# Install specific actor
+python actor_install.py --skipModules grayscale.yml
 ```
 
-# Further instructions
+## Examples
 
-For usage instructions, see [this confluence page](https://confluence.iter.org/display/IMP/How+to+install+and+run+the+Python+HCD+workflow).
+### Example 1: ECRH Simulation
 
-At the moment we don't have a central installation of hcd.
- 
+```bash
+module load HCD-WF
+export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
+hcd_nogui -c tests/data/GRAYSCALE/
+```
+
+### Example 2: Batch Job
+
+```bash
+module load HCD-WF
+hcd_batch -n 4 -t 8 -e user@iter.org -q all -c my_config/
+
+# Monitor job
+squeue -u $USER
+tail -f auto_batch_*.o<jobid>
+```
+
+### Example 3: Interactive GUI
+
+```bash
+module load HCD-WF
+hcd_gui
+# Use GUI to configure and run workflow
+```
+
+### Example 4: Single Time Slice Test
+
+```bash
+module load HCD-WF
+hcdslice_nogui -c my_config/
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**KeyError: 'equilibrium_solver'**
+- Solution: Ensure all processes in the algorithm are configured in your XML
+
+**NameError: name 'logger' is not defined**
+- This is a known issue in `hcdslice_nogui`, will be fixed in next release
+
+**Module import errors**
+- Solution: Load required IMAS modules: `module load IMAS-AL-Python`
+
+**Permission denied on batch submission**
+- Solution: Check SLURM partition name with `sinfo`
+
+### Getting Help
+
+- Check the [Confluence documentation](https://confluence.iter.org/pages/viewpage.action?pageId=252217231)
+- Review the `/docs` folder for detailed guides
+- Contact ITER HCD Workflow team
+
+## Contributing
+
+1. Create a feature branch: `git checkout -b feature/my-feature`
+2. Make your changes
+3. Run code quality checks: `black`, `flake8`, `pylint`
+4. Test your changes: `hcdslice_nogui -c tests/data/GRAYSCALE/`
+5. Commit: `git commit -am "Add feature"`
+6. Push: `git push origin feature/my-feature`
+7. Create a Pull Request
+
+## License
+
+See [LICENSE.md](LICENSE.md) for details.
+
+## Authors
+
+ITER Organization
+
+## Links
+
+- [Homepage](https://confluence.iter.org/pages/viewpage.action?pageId=252217231)
+- [Documentation](https://confluence.iter.org/pages/viewpage.action?pageId=252217231)
+- [Source Code](https://git.iter.org/projects/IMAS/repos/hcd-wf)
+
+## Support
+
+For support and questions:
+- Open an issue on the ITER JIRA
+- Contact the ITER HCD Workflow development team
+- Refer to the Confluence documentation

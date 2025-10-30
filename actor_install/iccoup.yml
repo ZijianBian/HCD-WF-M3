@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/fpsim.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR: iccoup
 
-MODULES: [IMAS, iWrap, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib]
 
 BUILDS: 
-  - DIR: iccoup/tools
-    CMD: ./build_imas.sh
+  - DIR: iccoup
+    CMD: make -C iccoup/ DEBUG=yes veryclean clean library FC=ifort
 
 ACTORS: 
-  - DIR: iccoup/tools
-    XML: iccoup.yaml
+  - DIR: iccoup
+    CMD: make -C tools/iccoup/ DEBUG=yes iwrap_actor FC="$FC"
 
 #COMMENTS:  
 ...

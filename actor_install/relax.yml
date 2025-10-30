@@ -3,18 +3,22 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/relax.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR: relax
 
-MODULES: [IMAS, iWrap, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: relax
-    CMD: ./build.sh
+    CMD:
+      - cd lib/nag && FC=ifort ./naglib.mk
+      - cd lib/netlib && FC=ifort ./netlib.mk
+      - cd lib/ppplib && FC=ifort ./ppplib.mk
+      - FC=ifort make -f make/makefile_imas clean librelax.a 
 
 ACTORS: 
   - DIR: relax
-    XML: relax.yaml
+    CMD: make -f make/makefile_imas clean actor FC=ifort
 
 #COMMENTS:  
 ...

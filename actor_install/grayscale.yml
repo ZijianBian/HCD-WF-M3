@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/grayscale.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR: grayscale
 
-MODULES: [IMAS, iWrap, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib,lxml]
 
 BUILDS: 
   - DIR: grayscale
-    CMD: make libgrayscale.a
+    CMD: make clean library FC=ifort DEBUG=yes
 
 ACTORS: 
   - DIR: grayscale
-    XML: grayscale.yaml
+    CMD: make clean iwrap_actor FC=ifort DEBUG=yes
 
 #COMMENTS:  
 ...

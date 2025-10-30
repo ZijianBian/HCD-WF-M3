@@ -1,0 +1,133 @@
+[build-system]
+requires = ["setuptools>=61", "setuptools_scm[toml]>=8", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "HCDWorkflow"
+description = "Python H&CD Workflow for ITER plasma heating and current drive simulations"
+authors = [{name = "ITER Organization"}]
+maintainers = [{name = "ITER Organization"}]
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE.md"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Environment :: Console",
+    "Environment :: X11 Applications",
+    "Natural Language :: English",
+]
+keywords = [
+    "H&CD",
+    "Workflow",
+    "actor",
+    "ITER",
+    "plasma",
+    "fusion",
+    "heating",
+    "current-drive",
+    "IMAS",
+    "ECRH",
+    "ICRH",
+    "NBI",
+    "LHCD",
+]
+dependencies = [
+    "lxml>=4.6.0",
+    "numpy>=1.20.0", 
+    "pyparsing>=2.4.0",
+    "python-dateutil>=2.8.0",
+    "pyyaml>=5.4.0",
+    "six>=1.15.0",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://confluence.iter.org/pages/viewpage.action?pageId=252217231"
+Documentation = "https://confluence.iter.org/pages/viewpage.action?pageId=252217231"
+"Source Code" = "https://git.iter.org/projects/IMAS/repos/hcd-wf"  
+"Bug Tracker" = "https://jira.iter.org"  
+Repository = "https://git.iter.org/projects/IMAS/repos/hcd-wf"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pylint>=2.0",
+    "black>=22.0",
+    "flake8>=5.0",
+    "sphinx>=5.0",
+    "sphinx-rtd-theme>=1.0",
+]
+docs = [
+    "sphinx>=5.0",
+    "sphinx-rtd-theme>=1.0",
+]
+actors = [
+    "pyyaml>=5.1",
+]
+
+[tool.setuptools]
+include-package-data = true
+py-modules = ["hcd_batch", "hcd_gui", "hcd_nogui", "hcdslice_nogui"]
+
+[tool.setuptools.data-files]
+"bin" = ["hcd_batch", "hcd_gui", "hcd_nogui", "hcdslice_nogui"]
+
+[tool.setuptools.packages.find]
+# Let setuptools find packages automatically
+where = ["."]
+include = ["hcdworkflow*", "gui*", "tools*", "workflow*"]
+exclude = [
+    "envs*",
+    "ci-sdcc*",
+    "tests*",
+    "actor_install*",
+    "build*",
+    "dist*",
+    "*.egg-info",
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "*.xml"]
+hcdworkflow = [
+    "global_configuration/global_lists.yaml",
+    "global_configuration/input_workflow_default.xml",
+]
+
+# Exclude compiled Python files
+[tool.setuptools.exclude-package-data]
+"*" = ["*.py[co]"]
+
+[tool.setuptools_scm]
+write_to = "hcdworkflow/_version.py"
+
+[tool.black]
+line-length = 120
+target-version = ['py38', 'py39', 'py310', 'py311']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+  | \.eggs
+  | .*\.egg-info
+)/
+'''
+

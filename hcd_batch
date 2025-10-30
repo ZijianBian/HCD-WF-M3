@@ -5,7 +5,7 @@
 # AND LAUNCH IT VIA QSUB
 # -----------------------------------------------------
 # EXAMPLE:
-# hcd_batch -n 1 -t 1 -e mireille.schneider@iter.org -q gen9_ib-short -c data/batch_test/
+# hcd_batch -n 1 -t 1 -e mireille.schneider@iter.org -q all -c tests/data/batch_test
 
 import argparse, subprocess
 

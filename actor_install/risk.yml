@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR:     risk
 
-MODULES: [IMAS, iWrap, FRUIT, FRUIT_processor, INTERPOS, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, GGD, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: risk
-    CMD: ./build.sh
+    CMD: make clean library FCOMPILER=ifort USE_FRUIT=yes
 
 ACTORS: 
   - DIR: risk
-    XML: iwrap/risk.yaml
+    CMD: make actor FCOMPILER=ifort USE_FRUIT=yes
 
 #COMMENTS:  
 ...

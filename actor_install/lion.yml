@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/lion.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR:     lion
 
-MODULES: [IMAS, iWrap, INTERPOS, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: lion
-    CMD: ./build_imas.csh
+    CMD: make -C src_f90/ clean veryclean libraries IMAS_ENVIRONMENT_LOADED=yes DEBUG=no F90=ifort
 
 ACTORS: 
   - DIR: lion
-    XML: lion.yaml
+    CMD: make -C src_f90/ iwrap_actor IMAS_ENVIRONMENT_LOADED=yes DEBUG=no F90=ifort
 
 #COMMENTS:  
 ...

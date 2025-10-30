@@ -3,18 +3,22 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/toray.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR: toray
 
-MODULES: [IMAS, iWrap, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: toray
-    CMD: ./build.sh
+    CMD:
+      - cd lib/nag && FC=ifort ./naglib.mk
+      - cd lib/netlib && FC=ifort ./netlib.mk
+      - cd lib/ppplib && FC=ifort ./ppplib.mk
+      - FC=ifort make -f make/makefile_imas clean libtoray.a 
 
 ACTORS: 
   - DIR: toray
-    XML: toray.yaml
+    CMD: make -f make/makefile_imas actor FC=ifort
 
 #COMMENTS:  
 ...
