@@ -187,7 +187,7 @@ deleteGitHeaderFile() {
 # module use /work/imas/etc/modules/all
 # module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 # TEST
-toolchain=intel-2023b
+# toolchain=intel-2023b
 # module purge
 # getIMASModuleName $toolchain 4
 # getIMASModuleName $toolchain 5

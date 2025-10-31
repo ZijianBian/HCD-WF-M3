@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61", "setuptools_scm[toml]>=8", "wheel"]
+requires = ["setuptools>=61", "setuptools_scm[toml]>=8", "wheel", "packaging>=24.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,8 @@ description = "Python H&CD Workflow for ITER plasma heating and current drive si
 authors = [{name = "ITER Organization"}]
 maintainers = [{name = "ITER Organization"}]
 readme = {file = "README.md", content-type = "text/markdown"}
-license = {file = "LICENSE.md"}
+license = "LGPL-3.0-only"
+license-files = ["LICENSE.md"]
 requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -130,4 +131,3 @@ exclude = '''
   | .*\.egg-info
 )/
 '''
-

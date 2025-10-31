@@ -23,9 +23,16 @@ source "$VIRTUALENV_DIR"/bin/activate
 # install created wheel package
 pip install dist/*.whl
 set -x
+
+module load IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
+module load Waveform-Cooker matplotlib Tkinter
+module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
+module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
+module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
+module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
 # sanity test
-#TODO Enable test once iwrap issue is resolved
-# python3 -c "from hcdworkflow.workflow_actor import WorkflowActor"
+python3 -c "from hcdworkflow.workflow_actor import WorkflowActor"
+
 
 # test workflow
 echo "Executing standalone workflow"
@@ -33,14 +40,14 @@ echo "Executing standalone workflow"
 # python hcd_nogui -c data/DT_baseline_example || exit 1
 # python hcd_nogui -c tests/data/EC_IC_NBI || exit 1
 # python hcd_nogui -c tests/data/FOPLA_TEST || exit 1
-# hcd_nogui -c tests/data/GRAYSCALE >hcd_grayscale.log
+hcd_nogui -c tests/data/GRAYSCALE >hcd_grayscale.log
 
 echo "Executing single time slice"
 #TODO Enable tests once iwrap issue is resolved
 # python hcdslice_nogui -c data/DT_baseline_example || exit 1
 # python hcdslice_nogui -c tests/data/EC_IC_NBI || exit 1
 # python hcdslice_nogui -c tests/data/FOPLA_TEST || exit 1
-# hcdslice_nogui -c tests/data/GRAYSCALE >hcdslice_grayscale.log
+hcdslice_nogui -c tests/data/GRAYSCALE >hcdslice_grayscale.log
 set +x
 deactivate
 
