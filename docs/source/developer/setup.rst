@@ -51,6 +51,24 @@ Or checkout a specific release:
 Setting Up Development Environment
 -----------------------------------
 
+.. tip::
+
+   On ITER SDCC systems you can automate most of the steps below with the
+   :file:`config_hcd_iter_sdcc.sh` helper that ships at the root of the
+   repository. Running::
+
+      ./config_hcd_iter_sdcc.sh
+
+   loads the standard HCD-WF module stack, creates the ``devenv`` virtual
+   environment, and installs the project in editable mode. Set the
+   ``ACTOR_FOLDER`` environment variable to point at a directory created by
+   ``actor_install.py`` if you prefer to develop against locally built
+   actors::
+
+      ACTOR_FOLDER=~/actors/local ./config_hcd_iter_sdcc.sh 3.42.0
+
+   The manual instructions below remain available if you need finer control.
+
 Load Required Modules
 ~~~~~~~~~~~~~~~~~~~~~~
 

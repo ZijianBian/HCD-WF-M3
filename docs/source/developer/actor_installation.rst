@@ -6,6 +6,17 @@ Overview
 
 The ``actor_install.py`` script automates the process of downloading, building, and installing IMAS actors from source repositories. It uses YAML configuration files to define the build process for each actor.
 
+.. note::
+
+   Before running ``actor_install.py`` on ITER SDCC you can prepare a Python
+   environment with the repository's :file:`config_hcd_iter_sdcc.sh` helper::
+
+      ACTOR_FOLDER=~/actors/local ./config_hcd_iter_sdcc.sh 3.42.0
+
+   This loads the IMAS modules that ``actor_install.py`` expects and adds your
+   local actor folder to ``PYTHONPATH`` so the workflow picks up the freshly
+   built actors.
+
 Usage
 -----
 

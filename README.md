@@ -31,15 +31,13 @@ module load HCD-WF
 module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
 module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
 module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
+module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
 
 # Loads main actors for your simulation:
 # EC: GRAYSCALE, GRAY, TORBEAM, TORAY, GENRAY
 # IC: CYRANO, FoPla, StixReDist, TOMCAT
 # NBI: NEMO, NBISIM, RISK, SPOT
 # Other: RELAX, SMART, FPSIM
-
-# Example: Loads GRAYSCALE for EC heating
-module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
 
 # Optional: suppress verbose warnings
 export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
@@ -52,6 +50,7 @@ hcd_gui
 ```
 
 ### For Developers
+
 
 If you need to modify or develop the workflow:
 
@@ -74,13 +73,33 @@ module load matplotlib
 module load waveform-cooker
 module load IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
 
-# Load actor modules (available at /work/imas/etc/modules/all)
 module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
 module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
 module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
-module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
-# Load additional actors as needed (see /work/imas/etc/modules/all)
 
+# EC heating actors
+module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
+module load GRAY/1.0.0-intel-2023b-DD-3.42.0
+module load TORBEAM/3.8.0-intel-2023b-DD-3.42.0
+module load TORAY/1.0.0-intel-2023b-DD-3.42.0
+module load GENRAY/10.11.3-intel-2023b-DD-3.42.0
+
+# IC heating actors
+module load CYRANO/1.0.0-intel-2023b-DD-3.42.0
+module load FoPla/2.1.0-intel-2023b-DD-3.42.0
+module load StixReDist/2.1.0-intel-2023b-DD-3.42.0
+module load TOMCAT/1.0.0-intel-2023b-DD-3.42.0
+
+# NBI actors
+module load NEMO/2.2.0-intel-2023b-DD-3.42.0
+module load NBISIM/1.3.0-intel-2023b-DD-3.42.0
+module load RISK/2.2.0-intel-2023b-DD-3.42.0
+module load SPOT/2.4.0-intel-2023b-DD-3.42.0
+
+# Other actors
+module load RELAX/1.0.0-intel-2023b-DD-3.42.0
+module load SMART/0.1.0-intel-2023b-DD-3.42.0
+module load FPSIM/1.0.0-intel-2023b-DD-3.42.0
 # Run tests
 hcd_nogui -c tests/data/GRAYSCALE/
 ```
@@ -258,6 +277,28 @@ hcd-wf/
 ## Development
 
 ### Setup Development Environment
+
+You can set up your development environment in several ways:
+
+#### **Option 1: SDCC Helper Script (Recommended for ITER SDCC users)**
+
+On ITER SDCC systems, you can bootstrap all steps with the provided helper script:
+
+```bash
+# Run the helper script (optionally specify DD version)
+./config_hcd_iter_sdcc.sh           # Uses default DD version (3.42.0)
+./config_hcd_iter_sdcc.sh 4.0.0     # Use a different DD version if supported
+
+# If you have locally compiled actors, set ACTOR_FOLDER before running:
+ACTOR_FOLDER=~/public/PYTHON_ACTORS ./config_hcd_iter_sdcc.sh
+```
+
+This script will:
+- Load all required modules (unless `ACTOR_FOLDER` is set)
+- Create and activate the `devenv` virtual environment
+- Install the project and all development dependencies
+
+#### **Option 2: Manual Setup**
 
 ```bash
 # Clone and setup

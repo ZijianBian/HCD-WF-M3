@@ -104,6 +104,21 @@ For Developers (Python Environment)
 
 If you need to develop or modify HCD Workflow, install from source.
 
+.. tip::
+
+   On ITER SDCC you can bootstrap the development environment with the helper
+   script that lives at the root of the repository::
+
+      ./config_hcd_iter_sdcc.sh
+
+   Set ``ACTOR_FOLDER`` to point to a directory of locally compiled actors
+   (created with ``actor_install.py``) if you want to work with custom
+   builds::
+
+      ACTOR_FOLDER=~/actors/local ./config_hcd_iter_sdcc.sh 3.42.0
+
+   The scripted setup mirrors the manual steps documented below.
+
 Prerequisites
 ~~~~~~~~~~~~~
 
