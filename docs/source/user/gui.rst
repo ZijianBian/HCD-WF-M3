@@ -1,11 +1,8 @@
-HCD GUI
+Hcd gui
 =======
 
 .. note::
-   These instructions show how to execute the Python H&CD workflow
-   from the GUI, where the input scenario, the physics actors, and a time loop
-   can be defined. When running the H&CD workflow from a transport solver,
-   the GUI is replaced by the transport code itself.
+   These instructions show how to execute the Python H&CD workflow from the GUI, where the input scenario, the physics actors, and a time loop can be defined. When running the H&CD workflow from a transport solver, the GUI is replaced by the transport code itself.
 
 
 Open and Configure the H&CD Workflow
@@ -15,15 +12,18 @@ To launch the GUI:
 
 .. code-block:: bash
 
-   python hcd_gui.py
+   hcd_gui
 
 The main window appears with the default configuration.
+
 .. figure:: /_static/gui_1.png
    :alt: HCD GUI main window
    :align: center
 
    HCD GUI main window after launch.
-### Workflow Parameters
+
+Workflow Parameters
+-------------------
 
 +----------------------------+------------------------------------------------+
 | **Parameter**              | **Description**                                |
@@ -50,7 +50,8 @@ The main window appears with the default configuration.
 | single_time_slice (0/1)    | Run single time slice or full evolution.       |
 +----------------------------+------------------------------------------------+
 
-### GUI Functions
+GUI Functions
+-------------
 
 - **Load** — Load configuration from a previous simulation.
 - **Load Latest** — Load the most recent configuration.
@@ -58,7 +59,8 @@ The main window appears with the default configuration.
 - **Run** — Save configuration and run the workflow.
 - **Restore Default** — Restore default workflow parameters.
 
-### H&CD Processes
+H&CD Processes
+--------------
 
 The right-hand side of the GUI allows selecting H&CD calculations:
 
@@ -122,9 +124,9 @@ Edit H&CD Waveforms
 
 To simulate H&CD processes, you need:
 
-1. **Input Scenario** — from the `Scenario Database` (e.g., `equilibrium`, `core_profiles`)
-2. **Machine Geometry** — from the `Machine Description Database` (e.g., `ec_launchers`, `ic_antennas`, `nbi`, `lh_antennas`)
-3. **Dynamic Configuration** — via the *Waveform Cooker* GUI, adding parameters like power, steering angle, or beam energy.
+#. **Input Scenario** — from the `Scenario Database` (e.g., ``equilibrium``, ``core_profiles``).
+#. **Machine Geometry** — from the `Machine Description Database` (e.g., ``ec_launchers``, ``ic_antennas``, ``nbi``, ``lh_antennas``).
+#. **Dynamic Configuration** — via the *Waveform Cooker* GUI, adding parameters like power, steering angle, or beam energy.
 
 .. figure:: /_static/gui_4.png
    :alt: Waveform Cooker main window
@@ -132,13 +134,14 @@ To simulate H&CD processes, you need:
 
    Waveform Cooker main window for dynamic configuration of H&CD parameters.
 
-.. figure:: /_static/gui_5.png
+.. figure:: /_static/gui_5.jpg
    :alt: Editing a waveform parameter
    :align: center
 
    Example of editing a specific waveform parameter (e.g., power or steering angle).
 
-Links:
+Useful links:
+
 - `Scenario Database <https://confluence.iter.org/spaces/IMP/pages/151422626/Scenario+Database>`_
 - `Machine Description Database <https://confluence.iter.org/spaces/IMP/pages/302454631/Machine+Description+Database>`_
 
@@ -153,10 +156,10 @@ Example console output (truncated):
 
 .. code-block:: none
 
-   ---> Configuration saved in /home/ITER/schneim/public/git/hcd/data/nemo_spot_tuto
-   -- Open input and output file
-   ---- Enter time loop of the H&CD wrapper
-   Step = 1 / 3
+  ---> Configuration saved in /home/ITER/schneim/public/git/hcd/data/nemo_spot_tuto
+  -- Open input and output file
+  ---- Enter time loop of the H&CD wrapper
+  Step = 1 / 3
    Time = 300.00 s
    Execute H&CD workflow for current time slice
    -- Step 1: Source codes and Wave solvers
@@ -166,4 +169,3 @@ Example console output (truncated):
    SPOT CPU consumption = 38.79 sec
    END OF SPOT
    End of H&CD workflow.
-
