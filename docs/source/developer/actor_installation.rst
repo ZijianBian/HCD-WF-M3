@@ -5,6 +5,7 @@ Overview
 --------
 
 The ``actor_install.py`` script automates the process of downloading, building, and installing IMAS actors from source repositories. It uses YAML configuration files to define the build process for each actor.
+You can compile the H&CD actors yourself if you have access permissions to their GIT projects.
 
 .. note::
 

@@ -173,8 +173,60 @@ hcd-wf/
 
 ## Configuration
 
-- Main configuration: `input_workflow.xml`
-- Example YAML waveform files: `ec_waveforms.yaml`, `ic_waveforms.yaml`, `nbi_waveforms.yaml`, `lh_waveforms.yaml`
+The workflow is configured using a main XML file and optional YAML waveform files. These files define the simulation parameters, selected physics actors, and time-dependent waveforms.
+
+### Main Configuration: `input_workflow.xml`
+- This XML file is required in your configuration folder.
+- It defines:
+  - **Workflow parameters**: shot number, run numbers, time range, time step, etc.
+  - **Actor selection**: which physics codes (actors) to use for each process (e.g., ECRH, ICRH, NBI).
+  - **Database and output settings** (if needed).
+
+**Example structure:**
+```xml
+<root>
+  <workflow_parameters>
+    <shot_nr>130012</shot_nr>
+    <run_in>5</run_in>
+    <run_out>6</run_out>
+    <tbegin>30.0</tbegin>
+    <tend>350.0</tend>
+    <dt_required>20</dt_required>
+  </workflow_parameters>
+  <actor_selection>
+    <main_process>
+      <ECRH>
+        <ec_wave_solver list="genray gray grayscale torbeam toray">3</ec_wave_solver>
+      </ECRH>
+      <ICRH>
+        <ic_wave_solver list="pion cyrano tomcat lion">1</ic_wave_solver>
+      </ICRH>
+    </main_process>
+  </actor_selection>
+</root>
+```
+- The `list` attribute specifies available actors; the value (e.g., `3`) selects which one to use (0-based index).
+- You can enable/disable actors and processes as needed for your simulation scenario.
+
+### Waveform Files (YAML)
+- Used for specifying time-dependent parameters for each heating/current drive system.
+- Typical files:
+  - `ec_waveforms.yaml` – ECRH waveforms
+  - `ic_waveforms.yaml` – ICRH waveforms
+  - `nbi_waveforms.yaml` – NBI waveforms
+  - `lh_waveforms.yaml` – LHCD waveforms
+- Place these files in your configuration folder if your simulation requires time-dependent input.
+
+### Example Configuration Folder
+A typical configuration folder (e.g., `tests/data/GRAY_PION`) contains:
+- `input_workflow.xml` (main workflow definition)
+- `ec_waveforms.yaml`, `ic_waveforms.yaml`, etc. (optional, for time-dependent scenarios)
+
+You can run the workflow using:
+```bash
+hcd_nogui -c tests/data/GRAY_PION
+hcdslice_nogui -c tests/data/GRAY_PION
+```
 
 ---
 
@@ -201,9 +253,7 @@ hcd-wf/
 
 ## Troubleshooting
 
-- **KeyError: 'equilibrium_solver'**: Ensure all processes in the algorithm are configured in your XML
 - **Module import errors**: Load required IMAS modules: `module load IMAS-AL-Python`
-- **Permission denied on batch submission**: Check SLURM partition name with `sinfo`
 
 ---
 

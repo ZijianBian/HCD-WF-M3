@@ -148,14 +148,6 @@ Use ``sinfo`` to see available partitions on your cluster:
 
    sinfo
 
-Common partitions:
-
-* ``all`` - Default partition
-* ``sun`` - Standard compute nodes
-* ``vega`` - High-memory nodes
-* ``sirius`` - General purpose
-* ``all_debug`` - Debug queue (1 hour limit)
-
 **Monitoring Jobs:**
 
 Check job status:
@@ -306,20 +298,6 @@ The test file `tests/test_workflow.py` will run the workflow for several configu
 
 Troubleshooting
 ---------------
-
-"KeyError: 'equilibrium_solver'"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This occurs when a process is referenced in the algorithm but not configured in ``param_process``. 
-
-**Solution**: Either enable the process in your XML or remove it from the algorithm in ``global_lists.yaml``.
-
-"NameError: name 'logger' is not defined"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This is a known issue in ``hcdslice_nogui``.
-
-**Workaround**: This will be fixed in the next release.
 
 Module Import Errors
 ~~~~~~~~~~~~~~~~~~~~~

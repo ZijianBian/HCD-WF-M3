@@ -5,16 +5,17 @@
 
 import os
 import sys
+import datetime
 sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'HCD Workflow'
-copyright = '2025, ITER Organization'
+copyright = f"{datetime.datetime.now().year}, ITER Organization"
 author = 'ITER Organization'
-release = '2.4.1'
-version = '2.4'
+html_theme = "sphinx_immaterial"
+html_title = project
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -27,6 +28,8 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
+    "sphinx.ext.mathjax",
+    "sphinx_immaterial",
 ]
 
 templates_path = ['_templates']
@@ -44,32 +47,65 @@ language = 'en'
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
-# Theme options for sphinx_rtd_theme
+# Theme options 
 html_theme_options = {
-    'logo_only': False,
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
-    'collapse_navigation': False,
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': True,
-    'titles_only': False
+    "repo_url": "https://git.iter.org/projects/WF/repos/hcd-wf/browse",
+    "repo_name": "HCD Workflow",
+    "icon": {
+        "repo": "fontawesome/brands/bitbucket",
+    },
+    # "toc_title_is_page_title": True,
+    # "globaltoc_collapse": True,
+    "features": [
+        # "navigation.expand",
+        # "navigation.tabs",
+        "navigation.sections",
+        "navigation.instant",
+        # "header.autohide",
+        "navigation.top",
+        # "navigation.tracking",
+        # "search.highlight",
+        # "search.share",
+        # "toc.integrate",
+        # "toc.follow",
+        "toc.sticky",
+        # "content.tabs.link",
+        "announce.dismiss",
+    ],
+    "palette": [
+        {
+            "media": "(prefers-color-scheme: light)",
+            "scheme": "default",
+            "primary": "blue",
+            "accent": "light-green",
+            "toggle": {
+                "icon": "material/lightbulb-outline",
+                "name": "Switch to dark mode",
+            },
+        },
+        {
+            "media": "(prefers-color-scheme: dark)",
+            "scheme": "slate",
+            "primary": "light-blue",
+            "accent": "lime",
+            "toggle": {
+                "icon": "material/lightbulb",
+                "name": "Switch to light mode",
+            },
+        },
+    ],
+    "globaltoc_collapse": False,
+    "toc_title_is_page_title": False,
 }
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # Additional HTML options
-html_title = f"{project} {version} Documentation"
 html_short_title = f"{project}"
 html_show_sourcelink = True
 html_show_sphinx = True
 html_show_copyright = True
-
-# Custom CSS files
-html_css_files = [
-    'custom.css',
-]
 
 # -- Options for autodoc ----------------------------------------------------
 autodoc_member_order = 'bysource'
@@ -83,3 +119,4 @@ intersphinx_mapping = {
 
 # -- Options for todo extension ----------------------------------------------
 todo_include_todos = True
+

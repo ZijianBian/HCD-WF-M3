@@ -166,16 +166,6 @@ Submits the workflow to SLURM scheduler for execution on HPC cluster. Automatica
 ``--mail-type <types>``
    When to send email (BEGIN,END,FAIL,ALL).
 
-**Available Partitions:**
-
-* ``all`` - General partition (default)
-* ``sun`` - Sun nodes
-* ``vega`` - Vega nodes
-* ``sirius`` - Sirius nodes
-* ``rigel`` - Rigel nodes
-* ``titan`` - Titan nodes
-* ``*_debug`` - Debug versions of above
-
 **Examples:**
 
 .. code-block:: bash

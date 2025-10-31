@@ -12,6 +12,7 @@ The HCD Workflow is a Python-based workflow management system designed to orches
    user/installation
    user/quickstart
    user/usage
+   user/gui
    user/examples
 
 .. toctree::

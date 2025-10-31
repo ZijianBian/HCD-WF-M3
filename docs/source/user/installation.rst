@@ -1,73 +1,67 @@
 Installation
 ============
 
-For Users (EasyBuild Module)
------------------------------
+What is HCD Workflow?
+---------------------
+HCD Workflow is a Python-based system for orchestrating plasma heating and current drive simulations on HPC systems. It provides both command-line and GUI tools for running, testing, and developing simulation workflows.
 
-The easiest way to use HCD Workflow is through the pre-installed EasyBuild module on ITER HPC systems.
+Quick Start (For Users)
+-----------------------
+If you just want to run simulations on the HPC cluster:
+For step-by-step instructions on using the GUI and creating configuration, see :doc:`gui`.
+
+.. code-block:: bash
+
+   module load HCD-WF
+   hcd_nogui -c <config_folder>   # Run a simulation
+   hcd_gui                       # Launch the GUI
+
+This loads all required dependencies and actors automatically. No manual module loading is needed for standard use.
+
+Creating a Configuration Folder via the GUI
+-------------------------------------------
+
+You can create a new configuration folder directly from the HCD Workflow GUI:
+For a detailed guide to using the GUI, see :doc:`gui`.
+
+1. Launch the GUI:
+
+   .. code-block:: bash
+
+      hcd_gui
+
+2. In the GUI, set up your simulation parameters as needed.
+
+3. Click the **Save** button (usually located in the toolbar or under the "File" menu).
+
+4. When prompted, choose a location and name for your configuration folder. The GUI will create the folder and save all necessary configuration files inside it.
+
+This configuration folder can then be used for running simulations from the command line:
+
+.. code-block:: bash
+
+   hcd_nogui -c <your_config_folder>
+
+Troubleshooting (Common Issues)
+-------------------------------
+- **Command not found**: Make sure you loaded the module and are on a login node.
+- **Module import errors**: Ensure all required modules are loaded (see below).
+- **Permission errors**: Make sure you are using a virtual environment and not installing system-wide.
+
+For Users (Details)
+-------------------
 
 Prerequisites
 ~~~~~~~~~~~~~
-
-* Access to ITER HPC cluster
+* Access to HPC cluster
 * Basic familiarity with Linux commands and module system
 
 Loading the Module
 ~~~~~~~~~~~~~~~~~~
 
-Load the workflow module:
-
 .. code-block:: bash
 
    module load HCD-WF
-
-Following Actor Modules will be automaticall loaded
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**Mandatory Actors:**
-
-.. code-block:: bash
-
-   module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
-   module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
-   module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
-
-**EC Heating Actors:**
-
-.. code-block:: bash
-
-   module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
-   module load GRAY/1.0.0-intel-2023b-DD-3.42.0
-   module load TORBEAM/3.8.0-intel-2023b-DD-3.42.0
-   module load TORAY/1.0.0-intel-2023b-DD-3.42.0
-   module load GENRAY/10.11.3-intel-2023b-DD-3.42.0
-
-**IC Heating Actors:**
-
-.. code-block:: bash
-
-   module load CYRANO/1.0.0-intel-2023b-DD-3.42.0
-   module load FoPla/2.1.0-intel-2023b-DD-3.42.0
-   module load StixReDist/2.1.0-intel-2023b-DD-3.42.0
-   module load TOMCAT/1.0.0-intel-2023b-DD-3.42.0
-
-**NBI Actors:**
-
-.. code-block:: bash
-
-   module load NEMO/2.2.0-intel-2023b-DD-3.42.0
-   module load NBISIM/1.3.0-intel-2023b-DD-3.42.0
-   module load RISK/2.2.0-intel-2023b-DD-3.42.0
-   module load SPOT/2.4.0-intel-2023b-DD-3.42.0
-
-**Other Actors:**
-
-.. code-block:: bash
-
-   module load RELAX/1.0.0-intel-2023b-DD-3.42.0
-   module load SMART/0.1.0-intel-2023b-DD-3.42.0
-   module load FPSIM/1.0.0-intel-2023b-DD-3.42.0
-
 
 This will automatically load:
 
@@ -76,58 +70,52 @@ This will automatically load:
 * matplotlib
 * Tkinter
 * All HCD workflow commands (``hcd_gui``, ``hcd_nogui``, ``hcd_batch``, ``hcdslice_nogui``)
+* All required actor modules (see below for advanced/optional details)
 
-Verify Installation
-~~~~~~~~~~~~~~~~~~~
-
-Check that the commands are available:
-
-.. code-block:: bash
-
-   which hcd_nogui
-   hcd_nogui --help
-
-   which hcd_gui
-   hcd_gui --help
-
-Optional: Suppress IMAS Warnings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To reduce verbose output, you can set:
+**Optional: Suppress IMAS Warnings**
 
 .. code-block:: bash
 
    export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
 
-For Developers (Python Environment)
+
+Verify Installation
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   which hcd_nogui
+   hcd_nogui --help
+   which hcd_gui
+   hcd_gui --help
+
+---
+
+For Developers (Source Installation)
 ------------------------------------
+If you want to develop or modify HCD Workflow, install from source. On ITER SDCC, you can use the helper script:
 
-If you need to develop or modify HCD Workflow, install from source.
+.. code-block:: bash
 
-.. tip::
+   ./config_hcd_iter_sdcc.sh
 
-   On ITER SDCC you can bootstrap the development environment with the helper
-   script that lives at the root of the repository::
+Set ``ACTOR_FOLDER`` to point to a directory of locally compiled actors (created with ``actor_install.py``) if you want to work with custom builds:
 
-      ./config_hcd_iter_sdcc.sh
+.. code-block:: bash
 
-   Set ``ACTOR_FOLDER`` to point to a directory of locally compiled actors
-   (created with ``actor_install.py``) if you want to work with custom
-   builds::
+   ACTOR_FOLDER=~/actors/local ./config_hcd_iter_sdcc.sh 3.42.0
 
-      ACTOR_FOLDER=~/actors/local ./config_hcd_iter_sdcc.sh 3.42.0
-
-   The scripted setup mirrors the manual steps documented below.
+Manual Developer Setup
+~~~~~~~~~~~~~~~~~~~~~~
 
 Prerequisites
-~~~~~~~~~~~~~
-
+^^^^^^^^^^^^^
 * Python 3.8 or higher
 * Git
 * Access to ITER git repository
 
 Clone the Repository
-~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -135,24 +123,16 @@ Clone the Repository
    cd hcd-wf
 
 Checkout the Desired Branch
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For production use:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
-   git checkout release/<tag name> # 2.4.0
+   git checkout develop   # for development
+   git checkout release/<tag name>  # for production
    git pull
 
-For development:
-
-.. code-block:: bash
-
-   git fetch
-   git checkout develop
-
 Setup Python Virtual Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -161,26 +141,23 @@ Setup Python Virtual Environment
    source devenv/bin/activate
 
 Install HCD Workflow
-~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
    pip install -e .
 
-Load Required IMAS Modules
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Load Required IMAS and Actor Modules
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
-   module load Tkinter              # For GUI support
-   module load matplotlib           # For plotting
-   module load waveform-cooker
-   module load IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
+   module load Tkinter matplotlib waveform-cooker IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
+   # Load actor modules as needed (see above)
 
-Load Actor Modules
-~~~~~~~~~~~~~~~~~~
+---
 
-Load the actors you need for your workflow. Available at :
+load specific actor modules (for custom workflows or debugging):
 
 .. code-block:: bash
 
@@ -188,48 +165,7 @@ Load the actors you need for your workflow. Available at :
    module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
    module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
    module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
-   
-   # EC heating actors (load as needed)
-   module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
-   module load GRAY/1.0.0-intel-2023b-DD-3.42.0
-   module load TORBEAM/3.8.0-intel-2023b-DD-3.42.0
-   module load TORAY/1.0.0-intel-2023b-DD-3.42.0
-   module load GENRAY/10.11.3-intel-2023b-DD-3.42.0
-   
-   # IC heating actors (load as needed)
-   module load CYRANO/1.0.0-intel-2023b-DD-3.42.0
-   module load FoPla/2.1.0-intel-2023b-DD-3.42.0
-   module load StixReDist/2.1.0-intel-2023b-DD-3.42.0
-   module load TOMCAT/1.0.0-intel-2023b-DD-3.42.0
-   
-   # NBI actors (load as needed)
-   module load NEMO/2.2.0-intel-2023b-DD-3.42.0
-   module load NBISIM/1.3.0-intel-2023b-DD-3.42.0
-   module load RISK/2.2.0-intel-2023b-DD-3.42.0
-   module load SPOT/2.4.0-intel-2023b-DD-3.42.0
-   
-   # Other actors
-   module load RELAX/1.0.0-intel-2023b-DD-3.42.0
-   module load SMART/0.1.0-intel-2023b-DD-3.42.0
-   module load FPSIM/1.0.0-intel-2023b-DD-3.42.0
-
-Verify Installation
-~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: bash
-
-   which hcd_gui
-   hcd_gui
-
-Uninstall and Reinstall
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you need to reinstall after code changes:
-
-.. code-block:: bash
-
-   pip uninstall hcdworkflow
-   pip install .
+   # EC, IC, NBI, and other actors as needed (see project docs)
 
 Dependencies
 ------------
@@ -254,8 +190,8 @@ Optional Dependencies
 
 This installs:
 
-* sphinx >= 5.0
-* sphinx-rtd-theme >= 1.0
+* sphinx < 8.0
+* sphinx-immaterial >= 0.13
 
 **Development and Testing:**
 
@@ -270,8 +206,8 @@ This installs additional tools:
 * pylint >= 2.0
 * black >= 22.0
 * flake8 >= 5.0
-* sphinx >= 5.0 (for documentation)
-* sphinx-rtd-theme >= 1.0 (for documentation)
+* sphinx < 8.0 (for documentation)
+* sphinx-immaterial >= 0.13 (for documentation)
 
 **Testing Only:**
 
@@ -294,29 +230,10 @@ This installs dependencies for building actors from source:
 
 * pyyaml >= 5.1
 
-Troubleshooting
----------------
+---
 
-Module Not Found
-~~~~~~~~~~~~~~~~
-
-If you get "module not found" errors, ensure you have sourced your virtual environment:
-
-.. code-block:: bash
-
-   source devenv/bin/activate
-
-Import Errors
-~~~~~~~~~~~~~
-
-If IMAS modules are not found, ensure you've loaded the required modules:
-
-.. code-block:: bash
-
-   module list  # Check loaded modules
-   module av IMAS  # List available IMAS modules
-
-Permission Errors
-~~~~~~~~~~~~~~~~~
-
-If you encounter permission errors during installation, ensure you're in a virtual environment and not trying to install system-wide.
+What Next?
+-----------
+- See the user guide for running your first simulation and example configurations.
+- For advanced configuration, see the documentation or ask the HCD Workflow team for help.
+- If you encounter issues, check the troubleshooting section above or contact support.
