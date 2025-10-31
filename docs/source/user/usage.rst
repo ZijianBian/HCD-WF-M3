@@ -279,6 +279,31 @@ Production Batch Run
    squeue -u $USER
    watch -n 5 'squeue -u $USER'
 
+Testing with Pytest
+-------------------
+
+You can run integration tests for the workflow using pytest. These tests execute the main workflow commands for various example configurations and check for successful completion.
+
+**Install pytest (if not already installed):**
+
+.. code-block:: bash
+
+   pip install pytest
+
+**Run all workflow tests:**
+
+.. code-block:: bash
+
+   pytest tests/test_workflow.py
+
+Or run all tests in the directory:
+
+.. code-block:: bash
+
+   pytest tests/
+
+The test file `tests/test_workflow.py` will run the workflow for several configurations and assert that each completes successfully.
+
 Troubleshooting
 ---------------
 

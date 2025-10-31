@@ -279,6 +279,35 @@ Making Changes
       flake8 hcdworkflow/
       pylint hcdworkflow/
 
+Running and Writing Tests with Pytest
+-------------------------------------
+
+Automated integration tests are provided using pytest. These tests run the main workflow commands for various configurations and check for successful completion.
+
+**Install pytest (if not already installed):**
+
+.. code-block:: bash
+
+   pip install pytest
+
+**Run all workflow tests:**
+
+.. code-block:: bash
+
+   pytest tests/test_workflow.py
+
+Or run all tests in the directory:
+
+.. code-block:: bash
+
+   pytest tests/
+
+**Writing new tests:**
+
+- Add new test functions to `tests/test_workflow.py` or create new files in the `tests/` directory.
+- Use `subprocess.run` to invoke CLI commands and assert on their return codes and output.
+- See the existing test file for examples.
+
 Running Tests
 ~~~~~~~~~~~~~
 
