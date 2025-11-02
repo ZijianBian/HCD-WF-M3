@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61", "setuptools_scm[toml]>=8", "wheel", "packaging"]
+requires = ["setuptools>=61", "setuptools_scm[toml]>=8", "wheel", "packaging>=24.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,7 +9,6 @@ authors = [{name = "ITER Organization"}]
 maintainers = [{name = "ITER Organization"}]
 readme = {file = "README.md", content-type = "text/markdown"}
 license = { file = "LICENSE.md" }
-license-files = ["LICENSE.md"]
 requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -83,6 +82,10 @@ docs = [
 actors = [
     "pyyaml>=5.1",
 ]
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE.md"]
 
 [tool.setuptools.data-files]
 "bin" = ["hcd_batch", "hcd_gui", "hcd_nogui", "hcdslice_nogui"]
