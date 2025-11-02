@@ -50,7 +50,8 @@ dependencies = [
     "python-dateutil>=2.8.0",
     "pyyaml>=5.4.0",
     "six>=1.15.0",
-    "packaging",
+    "packaging>=24.2",
+    "build>=1.0.0",
 ]
 dynamic = ["version"]
 
