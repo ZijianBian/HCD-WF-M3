@@ -1,7 +1,8 @@
 try:
     import tkinter as tk
-except:
+except ImportError as _:  # noqa F841
     pass
+
 
 class ToolTip(object):
     def __init__(self, widget):

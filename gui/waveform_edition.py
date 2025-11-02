@@ -1,18 +1,18 @@
 import os
-
 from shutil import copy2
+
 try:
     import tkinter as tk
     from tkinter import ttk
-except:
-    pass
+except Exception as _:  # noqa F841
+    None
 
 from .colour_definitions import bluish as col
 
 isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
-except Exception as _:  # noqa F841
+except ImportError as _:  # noqa F841
     isWaveformCookerPresent = False
 
 fontsize = 12

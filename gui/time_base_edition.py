@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------------------------
 try:
     import tkinter as tk
-except:
+except Exception as _:  # noqa F841
     pass
 import matplotlib
 import numpy as np
