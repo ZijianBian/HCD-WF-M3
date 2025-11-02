@@ -1,6 +1,8 @@
 #!/bin/bash
 # Bamboo CI script to create source distribution and whl package
 # Execute script from root directory
+source /etc/profile.d/modules.sh
+module use /work/imas/etc/modules/all
 
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
     set -e -u -o pipefail
