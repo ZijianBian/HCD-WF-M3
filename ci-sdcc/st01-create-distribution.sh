@@ -5,7 +5,6 @@
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
     set -e -u -o pipefail
 fi
-moduke purge
 module load Python
 #remove previously created environment
 VIRTUALENV_DIR=virtualenvdir
