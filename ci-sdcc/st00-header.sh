@@ -5,7 +5,6 @@ source ./ci-sdcc/utils.sh
 #                     Set environment based on toolchain                                 #
 ##########################################################################################
 module use /work/imas/etc/modules/all
-module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 
 # expand aliases
 shopt -s expand_aliases
@@ -183,6 +182,28 @@ echo "-------------------------------------------------------"
 
 echo "Loading modules..."
 module purge
-module load "${BUILDMODULES[@]}"
-module load "${RUNMODULES[@]}"
+
+# Filter out empty strings from arrays
+BUILDMODULES_FILTERED=()
+for mod in "${BUILDMODULES[@]}"; do
+    if [ -n "$mod" ]; then
+        BUILDMODULES_FILTERED+=("$mod")
+    fi
+done
+
+RUNMODULES_FILTERED=()
+for mod in "${RUNMODULES[@]}"; do
+    if [ -n "$mod" ]; then
+        RUNMODULES_FILTERED+=("$mod")
+    fi
+done
+
+if [ ${#BUILDMODULES_FILTERED[@]} -gt 0 ]; then
+    module load "${BUILDMODULES_FILTERED[@]}"
+fi
+
+if [ ${#RUNMODULES_FILTERED[@]} -gt 0 ]; then
+    module load "${RUNMODULES_FILTERED[@]}"
+fi
+
 echo "Done loading modules..."

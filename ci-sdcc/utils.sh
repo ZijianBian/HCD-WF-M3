@@ -43,9 +43,9 @@ getIMASCoreModuleName() {
     local ACCESS_LAYER_VERSION=$2
 
     if [ -z "$ACCESS_LAYER_VERSION" ]; then
-        ACCESS_LAYER_VERSION="4"
+        ACCESS_LAYER_VERSION="5"
     else
-        ACCESS_LAYER_VERSION="$3"
+        ACCESS_LAYER_VERSION="$2"
     fi
 
     #Semantic versioning

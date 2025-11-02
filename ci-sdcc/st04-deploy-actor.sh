@@ -144,8 +144,6 @@ if [ -d "$EASYBUILD_DIR"/software/"$MODULE_NAME" ]; then
 fi
 echo "=============================================================================="
 
-module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
-
 echo "> Injecting checksum"
 eb ./ci-sdcc/ebfiles/"$MODULE_FULL_VERSION" --inject-checksums ${EB_OPTS[@]}
 

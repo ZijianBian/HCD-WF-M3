@@ -1,5 +1,7 @@
-import tkinter as tk
-
+try:
+    import tkinter as tk
+except:
+    pass
 
 class ToolTip(object):
     def __init__(self, widget):

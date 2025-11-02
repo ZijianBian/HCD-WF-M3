@@ -7,7 +7,7 @@ source /etc/profile.d/modules.sh
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
     set -e -u -o pipefail
 fi
-
+module unload Python-bundle-PyPI
 # expand aliases
 shopt -s expand_aliases
 

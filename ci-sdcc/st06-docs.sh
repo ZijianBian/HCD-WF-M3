@@ -12,7 +12,7 @@ shopt -s expand_aliases
 
 # print hostname
 hostname -f
-
+module purge
 module load Python
 module load IMAS-AL-Python
 module load Tkinter

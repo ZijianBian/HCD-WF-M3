@@ -1,7 +1,11 @@
 import os
-import tkinter as tk
+
 from shutil import copy2
-from tkinter import ttk
+try:
+    import tkinter as tk
+    from tkinter import ttk
+except:
+    pass
 
 from .colour_definitions import bluish as col
 

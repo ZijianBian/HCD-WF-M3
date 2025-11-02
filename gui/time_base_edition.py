@@ -5,9 +5,10 @@
 # - Each model can be called with a frequency varying in time (e.g. more calls in the ramp-up
 #   and ramp-down)
 # ------------------------------------------------------------------------------------------------
-
-import tkinter as tk
-
+try:
+    import tkinter as tk
+except:
+    pass
 import matplotlib
 import numpy as np
 

@@ -8,6 +8,8 @@ source ./ci-sdcc/st00-header.sh $1 $2
 if [[ "$(uname -n)" == *"bamboo"* ]]; then
     set -e -u -o pipefail
 fi
+module unload Python-bundle-PyPI
+
 #remove previously created environment
 VIRTUALENV_DIR=virtualenvdir
 if [ -d "$VIRTUALENV_DIR" ]; then
@@ -22,14 +24,7 @@ source "$VIRTUALENV_DIR"/bin/activate
 
 # install created wheel package
 pip install dist/*.whl
-set -x
 
-module load IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
-module load Waveform-Cooker matplotlib Tkinter
-module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
-module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
-module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
-module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
 # sanity test
 python3 -c "from hcdworkflow.workflow_actor import WorkflowActor"
 
@@ -48,7 +43,6 @@ echo "Executing single time slice"
 # python hcdslice_nogui -c tests/data/EC_IC_NBI || exit 1
 # python hcdslice_nogui -c tests/data/FOPLA_TEST || exit 1
 hcdslice_nogui -c tests/data/GRAYSCALE >hcdslice_grayscale.log
-set +x
 deactivate
 
 echo "Done"

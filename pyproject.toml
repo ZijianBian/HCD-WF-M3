@@ -8,7 +8,7 @@ description = "Python H&CD Workflow for ITER plasma heating and current drive si
 authors = [{name = "ITER Organization"}]
 maintainers = [{name = "ITER Organization"}]
 readme = {file = "README.md", content-type = "text/markdown"}
-license = "LGPL-3.0-only"
+license = { file = "LICENSE.md" }
 license-files = ["LICENSE.md"]
 requires-python = ">=3.8"
 classifiers = [
@@ -51,6 +51,7 @@ dependencies = [
     "python-dateutil>=2.8.0",
     "pyyaml>=5.4.0",
     "six>=1.15.0",
+    "packaging",
 ]
 dynamic = ["version"]
 
@@ -82,10 +83,6 @@ docs = [
 actors = [
     "pyyaml>=5.1",
 ]
-
-[tool.setuptools]
-include-package-data = true
-py-modules = ["hcd_batch", "hcd_gui", "hcd_nogui", "hcdslice_nogui"]
 
 [tool.setuptools.data-files]
 "bin" = ["hcd_batch", "hcd_gui", "hcd_nogui", "hcdslice_nogui"]
