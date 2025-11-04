@@ -8,7 +8,7 @@ description = "Python H&CD Workflow for ITER plasma heating and current drive si
 authors = [{name = "ITER Organization"}]
 maintainers = [{name = "ITER Organization"}]
 readme = {file = "README.md", content-type = "text/markdown"}
-license = { file = "LICENSE.md" }
+license = { file = "LICENSE.txt" }
 requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -81,6 +81,10 @@ docs = [
 ]
 actors = [
     "pyyaml>=5.1",
+]
+
+waveform = [
+    "waveform-Cooker @ git+https://git.iter.org/scm/imex/waveform-cooker.git@1.6.0",
 ]
 
 [tool.setuptools]

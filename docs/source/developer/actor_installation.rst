@@ -466,5 +466,4 @@ See Also
 --------
 
 * IMAS Documentation: https://confluence.iter.org/display/IMP/
-* iWrap Documentation: Available through ``module show iWrap``
-* Available Actors: ``/work/imas/etc/modules/all``
+* iWrap Documentation: https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/IWRAP-doc/iWrap_introduction.html

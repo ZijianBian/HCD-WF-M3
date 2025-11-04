@@ -114,7 +114,7 @@ This installs:
 Load Actor Modules
 ~~~~~~~~~~~~~~~~~~
 
-Load the actors you need for testing. Available actor modules at ``/work/imas/etc/modules/all``:
+Load the actors you need for testing on SDCC. :
 
 .. code-block:: bash
 

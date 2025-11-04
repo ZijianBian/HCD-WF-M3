@@ -1,7 +1,7 @@
 Available Actor Modules
 ========================
 
-This page lists all actor modules available via EasyBuild at ``/work/imas/etc/modules/all``.
+This page lists all actor modules available via EasyBuild (on SDCC).
 
 All modules are built with: **intel-2023b-DD-3.42.0**
 
