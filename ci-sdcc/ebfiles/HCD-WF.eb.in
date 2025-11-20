@@ -39,7 +39,6 @@ use_pip = True
 
 exts_download_dep_fail = True
 
-postinstallcmds = ["python -m pip install --upgrade \"packaging>=24.2\" \"build>=1.0.0\""]
 
 sanity_check_paths = {
     "files": [],
