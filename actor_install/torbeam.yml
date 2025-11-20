@@ -3,19 +3,18 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/torbeam.git
-    VERSION: feature/add_eccd_imas
+    VERSION: master
     DIR: torbeam
 
-MODULES: [IMAS, iWrap, INTERPOS, XMLlib, CMake/3.18.4-GCCcore-10.2.0]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib, CMake]
 
 BUILDS: 
-  - DIR: torbeam/tests/test_imas/build
-    CMD: ./build_imas.sh
+  - DIR: torbeam/tests/test_imas
+    CMD: cd build && export FC=ifort && rm -f CMakeCache.txt && find . -name link.txt -exec rm -rf {} \; && cmake ../../.. -DUSE_PERF=ON -DUSE_LAGR_INTERPOL=ON -DUSE_XHOST=ON -DUSE_OPENMP=ON && make clean && make torbeam_imas
 
 ACTORS: 
-  - DIR: torbeam/tests/test_imas/build
-    XML: torbeam.yaml
-
+  - DIR: torbeam/tests/test_imas
+    CMD: cd build && export FC=ifort && iwrap -f torbeam.yaml -i "$ACTOR_FOLDER"
 #COMMENTS:  
 ...
   

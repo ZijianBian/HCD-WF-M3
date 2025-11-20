@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/spot.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR:     spot
 
-MODULES: [IMAS, iWrap, FRUIT, FRUIT_processor, INTERPOS, PSPLINE, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, FRUIT, FRUIT_processor, INTERPOS, PSPLINE, XMLlib, imkl, GGD]
 
 BUILDS: 
   - DIR: spot
-    CMD: ./build.sh
+    CMD: make clean library USE_FRUIT=yes FCOMPILER=ifort RFOF_FLAG=0
 
 ACTORS: 
   - DIR: spot
-    XML: iwrap/spot.yaml
+    CMD: make actor FCOMPILER=ifort USE_FRUIT=yes RFOF_FLAG=0
 
 #COMMENTS:  
 ...

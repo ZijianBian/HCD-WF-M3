@@ -1,7 +1,0 @@
-lxml 
-numpy
-pyparsing
-python-dateutil
-six
-wftools
-waveform_cooker

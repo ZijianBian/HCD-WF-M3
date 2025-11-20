@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR:     hcd2core-sources
 
-MODULES: [IMAS, iWrap, INTERPOS, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib]
 
 BUILDS: 
   - DIR: hcd2core-sources
-    CMD: ./build.csh
+    CMD: make -C src/ veryclean info library DEBUG=yes FC=ifort
 
 ACTORS: 
   - DIR: hcd2core-sources
-    XML: hcd2core_sources.yaml
+    CMD: make -C src/ iwrapactor FC=ifort DEBUG=yes
 
 #COMMENTS:  
 ...

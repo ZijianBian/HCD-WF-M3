@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/stixredist.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR: stixredist
 
 MODULES: [IMAS, iWrap]
 
 BUILDS:
   - DIR: stixredist 
-    CMD: ./build_imas.sh
+    CMD: make veryclean validate library DEBUG=yes FC=ifort
 
 ACTORS: 
   - DIR: stixredist
-    XML: stixredist.yaml
+    CMD: make iwrap_actor DEBUG=yes FC=ifort
 
 #COMMENTS:  
 ...

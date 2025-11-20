@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR: gray
 
-MODULES: [IMAS, iWrap, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: gray
-    CMD: ./build.sh
+    CMD: make clean libgray.a FC=ifort DEBUG=1
 
 ACTORS: 
   - DIR: gray
-    XML: gray.yaml
+    CMD: make iwrapactor FC=ifort DEBUG=1
 
 #COMMENTS:  
 ...

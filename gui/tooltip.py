@@ -1,4 +1,7 @@
-import tkinter as tk
+try:
+    import tkinter as tk
+except ImportError as _:  # noqa F841
+    pass
 
 
 class ToolTip(object):

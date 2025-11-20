@@ -6,19 +6,15 @@ SOURCES:
     VERSION: develop
     DIR:     hcd_mergers
 
-MODULES: [IMAS, iWrap]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap]
 
 BUILDS: 
   - DIR: hcd_mergers
-    CMD: ./build.sh
+    CMD: make -C mergers/ clean library FC=ifort
 
 ACTORS: 
   - DIR: hcd_mergers
-    XML: 
-      - mergers/merge_core_sources.yaml
-      - mergers/merge_distribution_sources.yaml
-      - mergers/merge_distributions.yaml
-      - mergers/merge_waves.yaml
+    CMD: make -C mergers/ iwrapactor FC=ifort
 
 #COMMENTS: |
 ...

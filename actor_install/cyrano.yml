@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/cyrano.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR: cyrano
 
-MODULES: [IMAS, iWrap, XMLlib/3.3.1-intel-2020b, INTERPOS/9.1.0-intel-2020b]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib, INTERPOS]
 
 BUILDS: 
   - DIR: cyrano
-    CMD: ./build_imas.sh
+    CMD: make veryclean validate library DEBUG=yes FC=ifort
 
 ACTORS: 
   - DIR: cyrano
-    XML: iwrap/cyrano.yaml
+    CMD: make actor DEBUG=yes FC=ifort
 
 #COMMENTS:  
 ...

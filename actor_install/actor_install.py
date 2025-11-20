@@ -8,26 +8,87 @@ from getpass import getuser
 from datetime import datetime
 from io import open
 
-import sh
-from yaml import load as yamlload
+from yaml import load as yamlload, dump as yamldump
+
 try:
     from yaml import CLoader as yamlLoader
 except ImportError:
     from yaml import Loader as yamlLoader
 
+
 # adapted from $MODULESHOME/init/python.py
 def module(*args):
-    if type(args[0]) == type([]):
+    """Universal module function that works with both Environment Modules and Lmod"""
+    if isinstance(args[0], list):
         args = args[0]
     else:
         args = list(args)
-        (output, error) = subprocess.Popen(
-            ["/usr/bin/modulecmd", "python"] + args,
+
+    # Detect module command location and type
+    modulecmd = None
+
+    # Option 1: Check MODULESHOME environment variable (Environment Modules)
+    if os.environ.get("MODULESHOME"):
+        modulecmd_path = os.path.join(os.environ["MODULESHOME"], "bin", "modulecmd")
+        if os.path.exists(modulecmd_path):
+            modulecmd = [modulecmd_path, "python"]
+
+    # Option 2: Check for Lmod
+    if not modulecmd and os.environ.get("LMOD_CMD"):
+        modulecmd = [os.environ["LMOD_CMD"], "python"]
+
+    # Option 3: Try common locations for modulecmd
+    if not modulecmd:
+        for path in [
+            "/usr/bin/modulecmd",
+            "/usr/share/Modules/bin/modulecmd",
+            "/opt/modules/bin/modulecmd",
+            "/sw/modules/bin/modulecmd",
+        ]:
+            if os.path.exists(path):
+                modulecmd = [path, "python"]
+                break
+
+    # Option 4: Try to find modulecmd in PATH
+    if not modulecmd:
+        try:
+            modulecmd_path = subprocess.check_output(["which", "modulecmd"], stderr=subprocess.DEVNULL).decode().strip()
+            if modulecmd_path:
+                modulecmd = [modulecmd_path, "python"]
+        except subprocess.CalledProcessError:
+            pass
+
+    # Fallback: Try using module as a shell function (works with Lmod)
+    if not modulecmd:
+        try:
+            # Try calling module directly as it might be a shell function
+            cmd = [
+                "bash",
+                "-c",
+                f'source /etc/profile.d/modules.sh 2>/dev/null || true; module python {" ".join(args)}',
+            ]
+            with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as proc:
+                output, error = proc.communicate()
+            exec(output)  # pylint: disable=exec-used
+            return str(error.decode("utf-8"))
+        except Exception as e:
+            raise RuntimeError(
+                f"Could not find module command. "
+                f"Please ensure Environment Modules or Lmod is properly configured.\nError: {e}"
+            ) from e
+
+    # Execute the module command
+    try:
+        with subprocess.Popen(
+            modulecmd + args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-        ).communicate()
-        exec(output)
+        ) as proc:
+            output, error = proc.communicate()
+        exec(output)  # pylint: disable=exec-used
         return str(error.decode("utf-8"))
+    except Exception as e:
+        raise RuntimeError(f"Error executing module command: {e}") from e
 
 
 def setup_env(desc, args):
@@ -36,11 +97,16 @@ def setup_env(desc, args):
         print(desc)
     err = module("purge")
     if err != "":
-        print(err)
-        return 1
+        if "ERROR" in err:
+            print("Error during module purge:")
+            print(err)
+            return 1
+        if args.verbose:
+            print(err)
 
-    if args.preModule != None:
+    if args.preModule is not None:
         err = module("load", args.preModule)
+        print(f"loaded {args.preModule}")
         if err != "":
             print(err)
             return 1
@@ -64,13 +130,9 @@ def setup_env(desc, args):
                 if args.verbose:
                     print(err)
 
-    if args.setKEPLER != "":
-        os.environ["KEPLER"] = args.setKEPLER
-        print("Using " + args.setKEPLER + " as destination for actors!")
-
     err = module("list")
     print(err)
-    
+
     return 0
 
 
@@ -84,55 +146,123 @@ def get_sources(desc, args):
             print("Please specify destination DIR for the sources!")
             return 1
 
-        if os.path.isdir(s.get("DIR")):
-            sh.rm("-rf", "." + s.get("DIR") + "_BACKUP")
-            sh.mv(s.get("DIR"), "." + s.get("DIR") + "_BACKUP")
+        source_dir = s.get("DIR")
+        backup_dir = "." + source_dir + "_BACKUP"
+
+        if os.path.isdir(source_dir):
+            if os.path.exists(backup_dir):
+                shutil.rmtree(backup_dir)
+            shutil.move(source_dir, backup_dir)
 
         if s.get("VCS").lower() == "svn":
             try:
-                logs = sh.svn.checkout(s.get("REPO"), s.get("DIR"))
-                print(logs)
-            except Exception as e:
-                print(e)
+                result = subprocess.run(
+                    ["svn", "checkout", s.get("REPO"), s.get("DIR")], capture_output=True, text=True, check=True
+                )
+                print(result.stdout)
+            except subprocess.CalledProcessError as e:
+                print(f"SVN checkout error: {e}")
+                print(e.stderr)
                 return 1
-            wcrev = sh.svnversion(s.get("DIR"))
+
+            try:
+                result = subprocess.run(["svnversion", s.get("DIR")], capture_output=True, text=True, check=True)
+                wcrev = result.stdout.strip()
+            except subprocess.CalledProcessError as e:
+                print(f"SVN version error: {e}")
+                return 1
+
             if args.checkRevision:
                 if wcrev != s.get("VERSION"):
                     print("Wrong revision of checked-out SVN repo")
-                    print(
-                        "Got "
-                        + str(wcrev)
-                        + " and was expecting "
-                        + str(s.get("VERSION"))
-                    )
+                    print("Got " + str(wcrev) + " and was expecting " + str(s.get("VERSION")))
                     return 1
             else:
                 print("Checked-out " + s.get("REPO") + " in revision " + str(wcrev))
 
         elif s.get("VCS").lower() == "git":
             try:
-                logs = sh.git.clone(
-                    "--single-branch", "-b", s.get("VERSION"), s.get("REPO"), s.get("DIR")
+                result = subprocess.run(
+                    ["git", "clone", "--single-branch", "-b", s.get("VERSION"), s.get("REPO"), s.get("DIR")],
+                    capture_output=True,
+                    text=True,
+                    check=True,
                 )
-                print(logs)
-            except Exception as e:
-                print(e)
+                print(result.stdout)
+            except subprocess.CalledProcessError as e:
+                print(f"Git clone error: {e}")
+                print(e.stderr)
                 return 1
+
             prevdir = os.getcwd()
             os.chdir(s.get("DIR"))
-            hhash = sh.git("rev-parse", "--verify", "HEAD")
-            if args.checkRevision:
-                if hhash != s.get("VERSION"):
-                    print("Wrong hash of cloned GIT repo")
-                    print(
-                        "Got "
-                        + str(hhash)
-                        + " and was expecting "
-                        + str(s.get("VERSION"))
-                    )
+
+            try:
+                result = subprocess.run(
+                    ["git", "rev-parse", "--verify", "HEAD"], capture_output=True, text=True, check=True
+                )
+                hhash = result.stdout.strip()
+            except subprocess.CalledProcessError as e:
+                print(f"Git rev-parse error: {e}")
+                os.chdir(prevdir)
+                return 1
+
+            version = s.get("VERSION")
+
+            if not args.checkRevision:
+                print(f"Cloned {s.get('REPO')} with HEAD at {hhash}")
+                os.chdir(prevdir)
+                continue
+
+            # Check if VERSION is a commit hash (40 hex characters)
+            is_hash = len(version) == 40 and all(c in "0123456789abcdef" for c in version.lower())
+
+            if is_hash:
+                # Compare commit hashes
+                if hhash != version:
+                    print("Wrong commit hash of cloned GIT repo")
+                    print(f"Got {hhash} and was expecting {version}")
                     return 1
-            else:
-                print("Cloned " + s.get("REPO") + " with HEAD at " + str(hhash))
+                print(f"Verified commit hash: {hhash}")
+                os.chdir(prevdir)
+                continue
+
+            # VERSION is a branch or tag name - verify we're on it
+            try:
+                # Get current branch name
+                result = subprocess.run(
+                    ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, check=True
+                )
+                current_branch = result.stdout.strip()
+
+                if current_branch == version:
+                    print(f"Verified on branch: {version} (commit: {hhash})")
+                    os.chdir(prevdir)
+                    continue
+
+                # Maybe it's a tag - check if tag exists and points to HEAD
+                try:
+                    result = subprocess.run(
+                        ["git", "rev-parse", version], capture_output=True, text=True, check=True
+                    )
+                    tag_hash = result.stdout.strip()
+
+                    if tag_hash == hhash:
+                        print(f"Verified tag: {version} (commit: {hhash})")
+                    else:
+                        print(
+                            f"Warning: Expected {version}, "
+                            f"got branch {current_branch} (commit: {hhash})"
+                        )
+                except subprocess.CalledProcessError:
+                    print(
+                        f"Warning: Not on expected branch/tag {version}, "
+                        f"on {current_branch} (commit: {hhash})"
+                    )
+            except subprocess.CalledProcessError as e:
+                print(f"Could not verify branch/tag: {e}")
+                print(f"Cloned with HEAD at {hhash}")
+
             os.chdir(prevdir)
 
         else:
@@ -142,25 +272,38 @@ def get_sources(desc, args):
     return 0
 
 
-def build_libs(desc, verb):
+def build_libs(desc, args):
     print("***** BUILD LIBRARIES *****")
     if args.verbose:
         print(desc)
-        cmd = "os.popen('/usr/bin/modulecmd python list')"
-        exec(cmd)
 
     prevdir = os.getcwd()
     for b in desc:
         try:
             os.chdir(b.get("DIR"))
-        except:
+        except OSError:
             print("Can't get in directory " + b.get("DIR"))
             return 1
 
-        status = subprocess.call(b.get("CMD").split(" "))
+        cmd = b.get("CMD")
+
+        if isinstance(cmd, list):
+            for c in cmd:
+                print(f"Executing: {c}")
+                status = subprocess.call(c, shell=True)
+                if status:
+                    print(f"Error executing command: {c}")
+                    os.chdir(prevdir)
+                    return 1
+        else:
+            print(f"Executing: {cmd}")
+            status = subprocess.call(cmd, shell=True)
+            if status:
+                print(f"Error executing command: {cmd}")
+                os.chdir(prevdir)
+                return 1
+
         os.chdir(prevdir)
-        if status:
-            return 1
 
     return 0
 
@@ -174,34 +317,27 @@ def install_actors(desc, args):
     for b in desc:
         try:
             os.chdir(b.get("DIR"))
-        except:
+        except OSError:
             print("Can't get in directory " + b.get("DIR"))
             return 1
 
-        xml = b.get("XML")
-        # print xml
+        cmd = b.get("CMD")
 
-        if isinstance(xml, list):
-            for x in xml:
-                subprocess.call(
-                    [
-                        "iwrap -f "
-                        + x
-                        + " -i "
-                        + os.getenv("ACTOR_FOLDER")
-                    ],
-                    shell=True,
-                )
+        if isinstance(cmd, list):
+            for c in cmd:
+                print(f"Executing: {c}")
+                status = subprocess.call(c, shell=True)
+                if status:
+                    print(f"Error executing command: {c}")
+                    os.chdir(prevdir)
+                    return 1
         else:
-            subprocess.call(
-                [
-                    "iwrap -f "
-                    + xml
-                    + " -i "
-                    + os.getenv("ACTOR_FOLDER")
-                ],
-                shell=True,
-            )
+            print(f"Executing: {cmd}")
+            status = subprocess.call(cmd, shell=True)
+            if status:
+                print(f"Error executing command: {cmd}")
+                os.chdir(prevdir)
+                return 1
 
         os.chdir(prevdir)
 
@@ -222,7 +358,7 @@ argp.add_argument(
 argp.add_argument(
     "-M",
     "--preModule",
-    help="Specifies module to be loaded if for instance imasenv is not available by default",
+    help="Specifies module to be loaded if for instance IMAS environment is not available by default",
 )
 argp.add_argument(
     "-D",
@@ -242,21 +378,10 @@ argp.add_argument(
     action="store_true",
     help="Skip the environment modules setup steps",
 )
-argp.add_argument(
-    "--skipSources", action="store_true", help="Skip the source checkout steps"
-)
+argp.add_argument("--skipSources", action="store_true", help="Skip the source checkout steps")
 argp.add_argument("--skipBuilds", action="store_true", help="Skip the building steps")
-argp.add_argument(
-    "--skipActors", action="store_true", help="Skip the actor install steps"
-)
-argp.add_argument(
-    "--setKEPLER",
-    default="",
-    help="Sets non-standard KEPLER variable (to be used with care!)",
-)
-argp.add_argument(
-    "-v", "--verbose", action="store_true", help="Run the script in verbose mode"
-)
+argp.add_argument("--skipActors", action="store_true", help="Skip the actor install steps")
+argp.add_argument("-v", "--verbose", action="store_true", help="Run the script in verbose mode")
 argp.add_argument(
     "-p",
     "--pedantic",
@@ -270,13 +395,29 @@ args = argp.parse_args()
 if args.verbose:
     print(args.yml)
 
-
-stream = open("RELEASE.yaml", "w")
 release = {}
 if args.skipModules:
     release["Default Modules"] = []
-    for m in module("-t", "list").split(":")[1].split():
-        release["Default Modules"].append(m)
+    try:
+        module_output = module("-t", "list")
+        # Parse module list output (format varies between Environment Modules and Lmod)
+        if ":" in module_output:
+            # Environment Modules format: "Currently Loaded Modulefiles:\nmodule1\nmodule2"
+            # or "Currently Loaded Modulefiles:module1:module2"
+            parts = module_output.split(":")
+            if len(parts) > 1:
+                for m in parts[1].split():
+                    if m.strip():
+                        release["Default Modules"].append(m.strip())
+        else:
+            # Lmod or other format: just split by whitespace/newlines
+            for line in module_output.split("\n"):
+                line = line.strip()
+                if line and not line.startswith("Currently") and not line.startswith("No "):
+                    release["Default Modules"].append(line)
+    except Exception as e:
+        print(f"Warning: Could not parse module list: {e}")
+        release["Default Modules"] = []
 
 release["Projects"] = []
 
@@ -296,10 +437,10 @@ for yml in args.yml:
             "DATE": datetime.now(),
         }  # .strftime('%Y-%m-%d_%Hh%Mm%Ss')}
 
-        #'SOURCES': desc.get('SOURCES'),
-        #'MODULES': desc.get('MODULES'),
-        #'BUILDS': desc.get('BUILDS'),
-        #'ACTORS': desc.get('ACTORS')
+        # 'SOURCES': desc.get('SOURCES'),
+        # 'MODULES': desc.get('MODULES'),
+        # 'BUILDS': desc.get('BUILDS'),
+        # 'ACTORS': desc.get('ACTORS')
         # release['Projects'] += [{fname: project}]
 
         print("============" + len(fname) * "=" + "=======")
@@ -308,6 +449,21 @@ for yml in args.yml:
 
         if args.skipModules:
             print("Bypassing environment modules setup")
+            # But still load preModule if specified
+            if args.preModule is not None:
+                print(f"Loading pre-module: {args.preModule}")
+                err = module("load", args.preModule)
+                if err != "":
+                    if "ERROR" in err:
+                        print(f"Error loading pre-module {args.preModule}")
+                        print(err)
+                        if args.pedantic:
+                            sys.exit()
+                        else:
+                            continue
+                    else:
+                        print(err)
+                print(f"Loaded {args.preModule}")
         else:
             project["MODULES"] = desc.get("MODULES")
             if setup_env(desc.get("MODULES"), args):
@@ -324,7 +480,7 @@ for yml in args.yml:
         try:
             os.mkdir(args.workDir)
             print("Workdir=" + args.workDir + " created successfully")
-        except:
+        except OSError:
             print("Workdir=" + args.workDir + " exists already")
         prevdir = os.getcwd()
         os.chdir(args.workDir)
@@ -333,7 +489,9 @@ for yml in args.yml:
             print("Bypassing sources checkout")
         else:
             project["SOURCES"] = desc.get("SOURCES")
-            if get_sources(desc.get("SOURCES"), args):
+            if desc.get("SOURCES") is None:
+                print(f"Warning: No SOURCES section in {fname}, skipping source checkout")
+            elif get_sources(desc.get("SOURCES"), args):
                 print("Error during SOURCE steps for " + fname)
                 if args.pedantic:
                     sys.exit()
@@ -344,7 +502,9 @@ for yml in args.yml:
             print("Bypassing libraries build")
         else:
             project["BUILDS"] = desc.get("BUILDS")
-            if build_libs(desc.get("BUILDS"), args):
+            if desc.get("BUILDS") is None:
+                print(f"Warning: No BUILDS section in {fname}, skipping build")
+            elif build_libs(desc.get("BUILDS"), args):
                 print("Error during BUILD steps for " + fname)
                 if args.pedantic:
                     sys.exit()
@@ -355,7 +515,9 @@ for yml in args.yml:
             print("Bypassing actors install")
         else:
             project["ACTORS"] = desc.get("ACTORS")
-            if install_actors(desc.get("ACTORS"), args):
+            if desc.get("ACTORS") is None:
+                print(f"Warning: No ACTORS section in {fname}, skipping actor install")
+            elif install_actors(desc.get("ACTORS"), args):
                 print("Error during ACTOR steps for " + fname)
                 if args.pedantic:
                     sys.exit()
@@ -366,8 +528,9 @@ for yml in args.yml:
 
         release["Projects"] += [{fname: project}]
 
-    except yaml.YAMLError as exc:
-        print(exc)
+    except Exception as exc:
+        print(f"Error processing {fname}: {exc}")
 
-
-yaml.dump(release, stream)
+# Write release information to file
+with open("RELEASE.yaml", "w", encoding="utf-8") as stream:
+    yamldump(release, stream)

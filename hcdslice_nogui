@@ -77,7 +77,7 @@ for idsName in inputMds:
     if idsObject.ids_properties.homogeneous_time != imas.imasdef.EMPTY_INT:
         machineDb.put(idsObject)
     else:
-        logger.warning(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required")
+        print(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required", file=sys.stderr)
 
 waveform_presets = {
   "ec":{
@@ -138,23 +138,10 @@ idsData = hcdWorkflow.run(
     lh_antennas=lh_antennas,
     wall=wall,
 )
-print("<--------------------Type of idsData-------------------->")
-print(type(idsData))
-print("<--------------------Availables Keys in idsData-------------------->")
-print(idsData.keys())
-print("<--------------------Check contents of idsData[waves]-------------------->")
-import pprint
 
-pprint.pprint(idsData["waves"])
 hcdWorkflow.finalize()
 
 inputDb.close()
 outputDb.close()
 machineDb.close()
 
-
-# manadatory idses, optional idses (static + dynamic)
-# initialize ids
-# workflow wrapper with gui
-# workflow parameters code parameters -  workflow wrapper
-#

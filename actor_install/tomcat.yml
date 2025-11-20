@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/tomcat.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR:     tomcat
 
-MODULES: [IMAS, iWrap, XMLlib]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib]
 
 BUILDS: 
   - DIR: tomcat
-    CMD: ./build_imas.sh
+    CMD: make -C fortran_sources/ clean library DEBUG=no F90=ifort
 
 ACTORS: 
   - DIR: tomcat
-    XML: tomcat.yaml
+    CMD: make -C fortran_sources/ iwrap_actor FC=ifort DEBUG=no
 
 #COMMENTS:  
 ...

@@ -1,7 +1,11 @@
 import glob
 import os
 import sys
-import tkinter as tk
+
+try:
+    import tkinter as tk
+except Exception as _:  # noqa F841
+    pass
 from inspect import getmodule, stack
 from shutil import copy2
 

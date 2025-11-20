@@ -20,6 +20,10 @@
   <actor_selection display="Actor selection"> <!-- 0 = None; >0 follows code ordering -->
     <main_process display="Main processes">
       
+      <EQUI                 display="EQUILIBRIUM">
+	<equilibrium_solver display="Equilibrium solver" list="chease">0</equilibrium_solver>
+      </EQUI>
+
       <ECRH display="ECH">
 	<ec_wave_solver display="Wave solver" list="genray gray grayscale torbeam toray">2</ec_wave_solver>
 	<ec_wave_fp display="Electron Fokker-Planck" list="relax">0</ec_wave_fp>

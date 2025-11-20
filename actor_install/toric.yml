@@ -3,10 +3,10 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/toric.git
-    VERSION: feature/September_2023
+    VERSION: develop
     DIR: toric
 
-MODULES: [IMAS, iWrap, XMLlib, netCDF-Fortran/4.5.3-iimpi-2020b, FFTW/3.3.8-intel-2020b]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib, netCDF-Fortran, FFTW]
 
 BUILDS: 
   - DIR: toric
@@ -14,7 +14,7 @@ BUILDS:
 
 ACTORS: 
   - DIR: toric
-    XML: iwrap/toric.yaml
+    CMD: iwrap -f iwrap/toric.yaml -i "$ACTOR_FOLDER" 
 
 #COMMENTS:  
 ...

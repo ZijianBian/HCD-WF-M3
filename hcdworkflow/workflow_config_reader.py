@@ -246,7 +246,6 @@ class WorkflowConfigReader(XmlReader):
         parameters = {}
         workflowParameters = self.xmlRoot[0]
         for parameter in workflowParameters:
-            print(parameter.tag)
             parameterValue = parameter.text
             if parameterValue.isdigit():
                 parameters[parameter.tag] = int(parameter.text)

@@ -43,9 +43,9 @@ getIMASCoreModuleName() {
     local ACCESS_LAYER_VERSION=$2
 
     if [ -z "$ACCESS_LAYER_VERSION" ]; then
-        ACCESS_LAYER_VERSION="4"
+        ACCESS_LAYER_VERSION="5"
     else
-        ACCESS_LAYER_VERSION="$3"
+        ACCESS_LAYER_VERSION="$2"
     fi
 
     #Semantic versioning
@@ -187,7 +187,7 @@ deleteGitHeaderFile() {
 # module use /work/imas/etc/modules/all
 # module use -p /work/imas/opt/bamboo_deploy/easybuild/modules/all
 # TEST
-toolchain=intel-2023b
+# toolchain=intel-2023b
 # module purge
 # getIMASModuleName $toolchain 4
 # getIMASModuleName $toolchain 5

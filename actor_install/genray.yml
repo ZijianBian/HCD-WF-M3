@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/genray.git
-    VERSION: feature/dd_compliant
+    VERSION: develop
     DIR: genray
 
-MODULES: [IMAS, iWrap, INTERPOS, XMLlib, netCDF-Fortran/4.5.3-iimpi-2020b]
+MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib, netCDF-Fortran]
 
 BUILDS: 
   - DIR: genray
-    CMD: ./build.sh
+    CMD: make clean libgenray_actor.a F90=ifort
 
 ACTORS: 
   - DIR: genray
-    XML: genray.yaml
+    CMD: make actor FC=ifort
 
 #COMMENTS:  
 ...
