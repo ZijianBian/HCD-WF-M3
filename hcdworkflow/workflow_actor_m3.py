@@ -4,12 +4,12 @@ import imas
 from libmuscle import Instance, Message
 from ymmsl import Operator
 
-# 复用现有的 iwrap 封装
+# Reuse existing iwrap wrapper
 from hcdworkflow.workflow_actor import WorkflowActor
 
 
 def deserialize_ids_dict(serialized_dict):
-    """反序列化 IDS 字典"""
+    """Deserialize IDS dictionary"""
     restored_objects = {}
     for key, data_bytes in serialized_dict.items():
         if hasattr(imas, key):
@@ -31,16 +31,14 @@ def deserialize_ids_dict(serialized_dict):
 
 class GenericM3Actor:
     """
-    通用 MUSCLE3 Actor
-    支持标准 Solver (TORBEAM/IC/EC/NBI)
+    Generic MUSCLE3 Actor
     """
 
     def __init__(self):
         print("[M3 Actor] Initializing...", file=sys.stdout)
         
         # ==========================================
-        # 步骤 1: 定义端口（匹配 yMMSL 配置）
-        # ✅ 正确格式：{"port_name": Operator.TYPE}
+        # Step 1: Define ports (match yMMSL configuration)
         # ==========================================
         ports = {
             Operator.F_INIT: ["state_in"],
@@ -56,7 +54,7 @@ class GenericM3Actor:
             sys.exit(1)
 
         # ==========================================
-        # 步骤 2: 读取配置
+        # Step 2: Read configuration
         # ==========================================
         try:
             self.actor_name = self.instance.get_setting("actor_name", "str")
@@ -74,12 +72,12 @@ class GenericM3Actor:
         print(f"[M3 Actor] Config path: {self.config_folder_path}", file=sys.stdout)
         
         # ==========================================
-        # 步骤 3: 构建 XML 路径
+        # Step 3: Construct XML path
         # ==========================================
         try:
             self.xml_path = self.instance.get_setting("actor_xml_path", "str")
         except KeyError:
-            # 默认命名规则：input_{actor_name}.xml
+            # Default naming rule: input_{actor_name}.xml
             self.xml_path = os.path.join(
                 self.config_folder_path, 
                 f"input_{self.actor_name}.xml"
@@ -89,7 +87,7 @@ class GenericM3Actor:
                 self.xml_path = ""
         
         # ==========================================
-        # 步骤 4: 初始化 Legacy Wrapper
+        # Step 4: Initialize Legacy Wrapper
         # ==========================================
         try:
             self.legacy_wrapper = WorkflowActor(self.actor_name, self.xml_path)
@@ -107,12 +105,12 @@ class GenericM3Actor:
         print(f"[M3 Actor] Outputs: {self.output_keys}", file=sys.stdout)
 
     def run(self):
-        """主循环：接收 → 计算 → 发送"""
+        """Main loop：receive → calculate → send"""
         print(f"[M3 Actor {self.actor_name}] Starting main loop...", file=sys.stdout)
         
         while self.instance.reuse_instance():
             # ==========================================
-            # 步骤 1: 接收数据
+            # step 1: receive data
             # ==========================================
             try:
                 msg = self.instance.receive("state_in")
@@ -124,7 +122,7 @@ class GenericM3Actor:
                 print(f"[M3 Actor {self.actor_name}] Error receiving: {e}", file=sys.stderr)
                 break
             
-            # 反序列化
+            # deserialization
             try:
                 input_data = deserialize_ids_dict(msg.data)
                 print(f"[M3 Actor {self.actor_name}] Deserialized {len(input_data)} IDS objects")
@@ -133,27 +131,36 @@ class GenericM3Actor:
                 input_data = {}
             
             # ==========================================
-            # 步骤 2: 执行计算
+            # step 2: execute calculation
             # ==========================================
             results = None
             
             try:
-                # 准备调用参数
-                call_args = {}
+                # 准备调用参数 (改为有序列表)
+                call_args_list = []
+                # 仅用于打印日志
+                loaded_keys = [] 
+                
                 for key in self.input_keys:
                     if key in input_data:
-                        call_args[key] = input_data[key]
+                        call_args_list.append(input_data[key])
+                        loaded_keys.append(key)
                     else:
                         print(f"[M3 Actor {self.actor_name}] Warning: missing input '{key}'", file=sys.stderr)
+                        # 如果缺失，可能需要填 None，或者让物理代码自己报错
+                        # 这里我们暂时不 append，或者视 wrapper 具体要求而定
+                        # 通常遗留 wrapper 期望参数个数必须对齐
+                        pass 
                 
                 # 检查是否有足够的输入
-                if not call_args:
+                if not call_args_list:
                     print(f"[M3 Actor {self.actor_name}] Error: No valid inputs found", file=sys.stderr)
                     results = {}
                 else:
                     # 调用物理代码
-                    print(f"[M3 Actor {self.actor_name}] Running solver with inputs: {list(call_args.keys())}", file=sys.stdout)
-                    results = self.actor_func(**call_args)
+                    print(f"[M3 Actor {self.actor_name}] Running solver with inputs: {loaded_keys}", file=sys.stdout)
+                    # ✅ 修复：使用 *argsList (位置参数)
+                    results = self.actor_func(*call_args_list)
                     print(f"[M3 Actor {self.actor_name}] Solver finished.", file=sys.stdout)
                     
             except Exception as e:
@@ -163,7 +170,7 @@ class GenericM3Actor:
                 results = {}
 
             # ==========================================
-            # 步骤 3: 序列化结果
+            # step 3: serialize the result
             # ==========================================
             serialized_out = {}
             

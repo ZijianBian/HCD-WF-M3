@@ -334,8 +334,15 @@ class WorkflowDriverM3:
                     # B1. 序列化并广播
                     payload = {}
                     for key, obj in ids_slices.items():
+                        # 跳过 workflow IDS，因为它经常是空的且会导致 crash
+                        if key == "workflow": 
+                            continue
+
                         if hasattr(obj, 'serialize'):
-                            payload[key] = obj.serialize()
+                            try:
+                                payload[key] = obj.serialize()
+                            except Exception as e:
+                                print(f"[M3 Driver] Warning: Skipping serialization of '{key}': {e}", file=sys.stdout)
                         else:
                             payload[key] = obj
                     
