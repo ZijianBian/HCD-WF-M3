@@ -105,7 +105,7 @@ class GenericM3Actor:
         print(f"[M3 Actor] Outputs: {self.output_keys}", file=sys.stdout)
 
     def run(self):
-        """Main loop：receive → calculate → send"""
+        """Main loop: receive → calculate → send"""
         print(f"[M3 Actor {self.actor_name}] Starting main loop...", file=sys.stdout)
         
         while self.instance.reuse_instance():
@@ -136,9 +136,9 @@ class GenericM3Actor:
             results = None
             
             try:
-                # 准备调用参数 (改为有序列表)
+                # Prepare call parameters (ordered list)
                 call_args_list = []
-                # 仅用于打印日志
+                # Only for logging
                 loaded_keys = [] 
                 
                 for key in self.input_keys:
@@ -147,19 +147,19 @@ class GenericM3Actor:
                         loaded_keys.append(key)
                     else:
                         print(f"[M3 Actor {self.actor_name}] Warning: missing input '{key}'", file=sys.stderr)
-                        # 如果缺失，可能需要填 None，或者让物理代码自己报错
-                        # 这里我们暂时不 append，或者视 wrapper 具体要求而定
-                        # 通常遗留 wrapper 期望参数个数必须对齐
+                        # If missing, we may fill None or let the physics code handle the error
+                        # For now we do nothing, depending on wrapper requirement
+                        # Usually legacy wrapper expects exact number of arguments
                         pass 
                 
-                # 检查是否有足够的输入
+                # Check if there is enough input
                 if not call_args_list:
                     print(f"[M3 Actor {self.actor_name}] Error: No valid inputs found", file=sys.stderr)
                     results = {}
                 else:
-                    # 调用物理代码
+                    # Call physics code
                     print(f"[M3 Actor {self.actor_name}] Running solver with inputs: {loaded_keys}", file=sys.stdout)
-                    # ✅ 修复：使用 *argsList (位置参数)
+                    # Use *argsList (positional parameters)
                     results = self.actor_func(*call_args_list)
                     print(f"[M3 Actor {self.actor_name}] Solver finished.", file=sys.stdout)
                     
@@ -178,7 +178,7 @@ class GenericM3Actor:
                 print(f"[M3 Actor {self.actor_name}] Warning: actor returned None", file=sys.stderr)
             
             elif hasattr(results, 'serialize'):
-                # 单个 IDS 对象
+                # Single IDS object
                 out_name = self.output_keys[0] if self.output_keys else self.actor_name
                 try:
                     serialized_out[out_name] = results.serialize()
@@ -187,7 +187,7 @@ class GenericM3Actor:
                     print(f"[M3 Actor {self.actor_name}] Serialization error: {e}", file=sys.stderr)
             
             elif isinstance(results, dict):
-                # 字典（多个 IDS）
+                # Dictionary (multiple IDS)
                 for k, v in results.items():
                     if hasattr(v, 'serialize'):
                         try:
@@ -199,7 +199,7 @@ class GenericM3Actor:
                         print(f"[M3 Actor {self.actor_name}] Warning: '{k}' cannot be serialized", file=sys.stderr)
             
             elif isinstance(results, (list, tuple)):
-                # 列表/元组（多个 IDS）
+                # List/tuple (multiple IDS)
                 for i, val in enumerate(results):
                     if i < len(self.output_keys) and hasattr(val, 'serialize'):
                         key = self.output_keys[i]
@@ -213,7 +213,7 @@ class GenericM3Actor:
                 print(f"[M3 Actor {self.actor_name}] Warning: unexpected result type {type(results)}", file=sys.stderr)
 
             # ==========================================
-            # 步骤 4: 发送结果
+            # step 4: send result
             # ==========================================
             out_msg = Message(timestamp, next_timestamp, serialized_out)
             try:

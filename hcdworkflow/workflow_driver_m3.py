@@ -26,7 +26,7 @@ except Exception as _:
 
 
 def deserialize_ids_dict(serialized_dict):
-    """反序列化 IDS 字典"""
+    """Deserialize IDS dictionary"""
     restored_objects = {}
     for key, data_bytes in serialized_dict.items():
         if hasattr(imas, key):
@@ -48,14 +48,14 @@ def deserialize_ids_dict(serialized_dict):
 class WorkflowDriverM3:
     """
     replace wf_wrapper.py + workflow_driver.py
-    MUSCLE3 分布式 Driver
-    职责：调度、数据分发、结果收集
-    不包含：计算逻辑（在 Actor 中）
+    MUSCLE3 distributed Driver
+    Responsibilities: scheduling, data distribution, result collection
+    Not included: computation logic (inside Actors)
     """
     
     def __init__(self, config_folder_path=None):
         # ==========================================
-        # 步骤 1: 读取 Actor 列表（Instance 创建前）
+        # Step 1: Read Actor list (before Instance creation)
         # ==========================================
         actors_env = os.environ.get("HCD_ACTORS", "")
         self.actor_list = [a.strip() for a in actors_env.split(",") if a.strip()]
@@ -67,27 +67,27 @@ class WorkflowDriverM3:
         print(f"[M3 Driver] Actors: {self.actor_list}", file=sys.stdout)
         
         # ==========================================
-        # 步骤 2: 动态生成端口字典
-        # ✅ 修复核心错误：格式必须是 {"name": Operator}
+        # Step 2: Dynamically generate port dictionary
+        # ✅ Fix core error: format must be {"name": Operator}
         # ==========================================
         ports = {}
         
-        # 1. 定义输出端口 (O_I)
+        # 1. Define output port (O_I)
         ports["state_out"] = Operator.O_I
         
         # ==========================================
-        # 步骤 2: 动态生成端口字典 (强制 Legacy 格式)
+        # Step 2: Dynamically generate port dictionary (force Legacy format)
         # ==========================================
         
-        # 准备端口名称列表
+        # Prepare port names
         out_port_names = ["state_out"]
         in_port_names = [f"result_from_{actor}" for actor in self.actor_list]
         
         print(f"[M3 Driver] Out ports: {out_port_names}", file=sys.stdout)
         print(f"[M3 Driver] In ports: {in_port_names}", file=sys.stdout)
 
-        # 强制使用旧版格式：{ Operator: [List of Strings] }
-        # 你的报错证明系统正在尝试遍历 Value，所以 Value 必须是列表
+        # Force old format: { Operator: [List of Strings] }
+        # Your error shows system tries to iterate Value, so Value must be a list
         ports = {
             Operator.O_I: out_port_names,
             Operator.S:   in_port_names
@@ -96,7 +96,7 @@ class WorkflowDriverM3:
         print(f"[M3 Driver] Ports dictionary constructed with keys: {list(ports.keys())}", file=sys.stdout)
         
         # ==========================================
-        # 步骤 3: 创建 MUSCLE3 Instance
+        # Step 3: Create MUSCLE3 Instance
         # ==========================================
         try:
             self.instance = Instance(ports)
@@ -108,7 +108,7 @@ class WorkflowDriverM3:
             sys.exit(1)
         
         # ==========================================
-        # 步骤 4: 读取配置路径
+        # Step 4: Read configuration path
         # ==========================================
         try:
             self.config_path = self.instance.get_setting("config_folder_path", "str")
@@ -122,12 +122,12 @@ class WorkflowDriverM3:
         print(f"[M3 Driver] Config path: {self.config_path}", file=sys.stdout)
         
         # ==========================================
-        # 步骤 5: 读取收敛参数
+        # Step 5: Read convergence parameters
         # ==========================================
         try:
             self.max_iterations = self.instance.get_setting("max_iterations", "int")
         except:
-            self.max_iterations = 1  # 默认不迭代
+            self.max_iterations = 1  # Default: no iteration
         
         try:
             self.convergence_tol = self.instance.get_setting("convergence_tolerance", "float")
@@ -137,7 +137,7 @@ class WorkflowDriverM3:
         print(f"[M3 Driver] Convergence: max_iter={self.max_iterations}, tol={self.convergence_tol}")
         
         # ==========================================
-        # 步骤 6: 初始化数据库环境
+        # Step 6: Initialize database environment
         self._initialize_full_environment()
 
     def _initialize_full_environment(self):
@@ -176,6 +176,7 @@ class WorkflowDriverM3:
         self.tend = wf_parameters.get("tend", [-1.0])[0]
         self.dt_required = wf_parameters.get("dt_required", [0.1])[0]
         self.one_time_slice = wf_parameters.get("one_time_slice", [0])[0]
+        
         # Initialize database helper
         dbhelper = WorkflowDbHelper(
             input_user_or_path, input_database, input_backend,
@@ -241,7 +242,7 @@ class WorkflowDriverM3:
     # copy from the original WorkflowDriver
     # ---------------------------------------------------------
     def getIDSSlices(self, timenow):
-        """从数据库读取切片 (Copy from legacy driver)"""
+        """Read slices from database (Copy from legacy driver)"""
         idsSlices = {}
 
         # Read scenario IDSes
@@ -257,20 +258,20 @@ class WorkflowDriverM3:
             try:
                 idsSlices[ids] = self.md.get_slice(ids, timenow, 1)
             except Exception:
-                pass  # MD 可能不存在某些切片
+                pass  # MD may not contain some slices
         return idsSlices
 
     def storeIDSSlices(self, ids_dict):
-        """保存 IDS 切片到输出数据库"""
+        """Save IDS slices to output database"""
         for idsName, idsData in ids_dict.items():
             if not hasattr(idsData, 'ids_properties'):
                 continue
             
-            # 跳过输入 IDS（避免重复保存）
+            # Skip input IDS (avoid duplicate saving)
             if idsName in self.inputIds or idsName in self.inputMds:
                 continue
             
-            # 保存有时间数据的输出 IDS
+            # Save output IDS with time data
             if hasattr(idsData, 'time') and len(idsData.time) > 0:
                 try:
                     self.outputDb.put_slice(idsData)
@@ -279,10 +280,10 @@ class WorkflowDriverM3:
                     print(f"[M3 Driver] Error saving {idsName}: {e}", file=sys.stderr)
 
     def run(self):
-        """主循环：时间步 + 耦合迭代"""
+        """Main loop: timestep + coupling iteration"""
         print("[M3 Driver] Starting Main Loop...", file=sys.stdout)
         
-        # 1. 确定时间范围
+        # 1. Determine time range
         try:
             time_array = self.inputDb.partial_get(ids_name="equilibrium", data_path="time")
             if self.tbegin < 0:
@@ -296,18 +297,18 @@ class WorkflowDriverM3:
             if self.tend < 0:
                 self.tend = 1.0
         
-        # 处理单时间切片模式
+        # Handle single-slice mode
         if self.one_time_slice != 0:
             self.tend = self.tbegin + self.dt_required
         
         print(f"[M3 Driver] Time range: {self.tbegin:.3f} -> {self.tend:.3f} s, dt={self.dt_required:.3f}")
         
-        # 2. MUSCLE3 主循环
+        # 2. MUSCLE3 main loop
         while self.instance.reuse_instance():
             timenow = self.tbegin
             step = 0
             
-            # 3. 时间步循环
+            # 3. Time step loop
             while timenow < self.tend:
                 step += 1
                 t_next = timenow + self.dt_required
@@ -316,13 +317,13 @@ class WorkflowDriverM3:
                 print(f"Step {step}: t={timenow:.4f} s")
                 print(f"{'='*60}")
                 
-                # A. 读取输入数据
+                # A. Read input data
                 ids_slices = self.getIDSSlices(timenow)
                 if ids_slices is None:
                     print("[M3 Driver] Failed to read IDS slices, aborting")
                     break
                 
-                # B. 耦合迭代循环
+                # B. Coupling iteration loop
                 converged = False
                 iteration = 0
                 prev_results = None
@@ -331,10 +332,10 @@ class WorkflowDriverM3:
                     iteration += 1
                     print(f"\n--- Iteration {iteration} ---")
                     
-                    # B1. 序列化并广播
+                    # B1. Serialize and broadcast
                     payload = {}
                     for key, obj in ids_slices.items():
-                        # 跳过 workflow IDS，因为它经常是空的且会导致 crash
+                        # Skip workflow IDS because it is often empty and can crash
                         if key == "workflow": 
                             continue
 
@@ -346,7 +347,7 @@ class WorkflowDriverM3:
                         else:
                             payload[key] = obj
                     
-                    # B2. 发送给所有 Actor（使用动态端口）
+                    # B2. Send to all Actors (dynamic ports)
                     msg = Message(timenow, t_next, payload)
                     try:
                         self.instance.send("state_out", msg)
@@ -355,7 +356,7 @@ class WorkflowDriverM3:
                         print(f"[M3 Driver] Error sending: {e}", file=sys.stderr)
                         break
                     
-                    # B3. 收集所有 Actor 结果
+                    # B3. Collect Actor results
                     merged_results = {}
                     for actor in self.actor_list:
                         port_name = f"result_from_{actor}"
@@ -369,27 +370,27 @@ class WorkflowDriverM3:
                         except Exception as e:
                             print(f"  ✗ Error receiving from {actor}: {e}", file=sys.stderr)
                     
-                    # B4. 检查收敛（简化版）
+                    # B4. Check convergence (placeholder)
                     if prev_results is not None and iteration > 1:
-                        # TODO: 实现真正的物理量收敛判据
-                        converged = True  # 暂时假设收敛
+                        # TODO: implement real physical convergence criteria
+                        converged = True  # placeholder
                         print("  ✓ Converged (placeholder logic)")
                     
                     prev_results = merged_results
                     
-                    # B5. 如果未收敛，更新 ids_slices 用于下次迭代
+                    # B5. If not converged, update ids_slices for next iteration
                     if not converged and iteration < self.max_iterations:
-                        # TODO: 根据 merged_results 更新等离子体状态
+                        # TODO: update plasma state from merged_results
                         pass
                 
-                # C. 保存最终结果
+                # C. Save final results
                 self.storeIDSSlices(merged_results)
                 
-                # D. 推进时间
+                # D. Advance time
                 timenow = t_next
                 print(f"[M3 Driver] Step {step} complete.\n")
         
-        # 4. 清理
+        # 4. Cleanup
         self.inputDb.close()
         self.outputDb.close()
         self.md.close()
