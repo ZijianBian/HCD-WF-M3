@@ -9,6 +9,7 @@ model:
 
   conduits:
     driver.state_out: torbeam_solver.state_in
+    driver.ec_launchers_out: torbeam_solver.ec_launchers
     torbeam_solver.ids_out: driver.result_from_torbeam
 
 resources:

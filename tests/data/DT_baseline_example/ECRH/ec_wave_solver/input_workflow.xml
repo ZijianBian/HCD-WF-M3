@@ -4,14 +4,14 @@
     <input_user_or_path display="Input user or path">public</input_user_or_path>
     <input_database display="Input database">ITER</input_database>
     <input_backend  display="Input backend">MDSPLUS</input_backend>
-    <shot_nr display="Input shot">130012</shot_nr>
-    <run_in display="Input run">5</run_in>
+    <shot_nr display="Input shot">134173</shot_nr>
+    <run_in display="Input run">106</run_in>
     <output_user_or_path display="Output user or path">default</output_user_or_path>
     <output_database display="Output database">HCD</output_database>
     <output_backend  display="Output backend">MDSPLUS</output_backend>
-    <run_out display="Output run">108</run_out>
+    <run_out display="Output run">107</run_out>
     <tbegin display="Start Time [s]">5.0</tbegin>
-    <tend display="End Time   [s]">125.0</tend>
+    <tend display="End Time   [s]">745.0</tend>
     <dt_required display="Time Step  [s]">5.</dt_required>
     <parallel_workflow display="Parallel workflow [0-1]">0</parallel_workflow> 
     <one_time_slice display="Single time slice [0-1]">0</one_time_slice> 
@@ -52,7 +52,7 @@
 
     <post_process display="Post-processing">
       <source display="Fill core_sources">
-	<fill_core_sources display="core_sources IDS" list="hcd2core_sources">0</fill_core_sources> 
+	<fill_core_sources display="core_sources IDS" list="hcd2core_sources">1</fill_core_sources> 
       </source>
       <profiles display="Fill core_profiles">
 	<fill_core_profiles display="core_profiles IDS" list="hcd2core_profiles">0</fill_core_profiles>
