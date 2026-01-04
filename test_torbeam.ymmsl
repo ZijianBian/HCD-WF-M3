@@ -9,7 +9,6 @@ model:
 
   conduits:
     driver.state_out: torbeam_solver.state_in
-    driver.ec_launchers_out: torbeam_solver.ec_launchers
     torbeam_solver.ids_out: driver.result_from_torbeam
 
 resources:
@@ -20,20 +19,20 @@ resources:
 
 implementations:
   hcd_driver_impl:
-    executable: /home/ITER/bianz/public/git/repository/hcd-wf/run_env.sh
+    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/run_env.sh
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf/hcdworkflow/workflow_driver_m3.py"
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/workflow_driver_m3.py"
     env:
-      PYTHONPATH: "/home/ITER/bianz/public/git/repository/hcd-wf"
+      PYTHONPATH: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox"
       HCD_ACTORS: "torbeam"
 
   generic_actor_impl:
-    executable: /home/ITER/bianz/public/git/repository/hcd-wf/run_env.sh
+    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/run_env.sh
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf/hcdworkflow/workflow_actor_m3.py"
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/workflow_actor_m3.py"
     env:
-      PYTHONPATH: "/home/ITER/bianz/public/git/repository/hcd-wf"
+      PYTHONPATH: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox"
 
 settings:
-  config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf/tests/data/DT_baseline_example/ECRH/ec_wave_solver"
+  config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3"
   torbeam_solver.actor_name: "torbeam"

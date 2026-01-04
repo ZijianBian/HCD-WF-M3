@@ -1,18 +1,40 @@
+"""
+MUSCLE3 Workflow Driver for HCD-Workflow (Fortran Torbeam Compatible)
+
+This driver directly communicates with the Fortran torbeam_m3.exe,
+following the same architecture as the standalone Torbeam M3 workflow.
+
+Key features:
+- Direct communication with Fortran executable via MUSCLE3
+- Same port structure as standalone Torbeam (coupling.ymmsl)
+- Uses ec_add_dynamic for ITER-specific ec_launchers processing
+- Bypasses WorkflowDbHelper to be DD 4.0.0 compatible
+"""
+
 import logging
 import os
 import sys
 import inspect
+import copy
+import numpy as np
 from pathlib import Path
 
-from libmuscle import Instance, Message
+from libmuscle import Instance, Message, KEEPS_NO_STATE_FOR_NEXT_USE
 from ymmsl import Operator
 
 import imas
-import hcdworkflow
-from gui.gui_methods import create_workflow_param_from_file
-from hcdworkflow.hcd_workflow import HCDWorkflow
-from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
-from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
+
+# Handle different IMAS versions (DD 3.x vs DD 4.0.0)
+try:
+    # DD 4.0.0 (new imas-python)
+    from imas.ids_defs import MEMORY_BACKEND, HDF5_BACKEND, MDSPLUS_BACKEND
+    USE_HAS_VALUE = True
+    print("[Driver] Using IMAS DD 4.0.0 API (imas.ids_defs)")
+except ImportError:
+    # DD 3.x (old imas)
+    from imas.imasdef import MEMORY_BACKEND, HDF5_BACKEND, MDSPLUS_BACKEND
+    USE_HAS_VALUE = False
+    print("[Driver] Using IMAS DD 3.x API (imas.imasdef)")
 
 log = logging.getLogger()
 log.setLevel(logging.ERROR)
@@ -20,272 +42,265 @@ log.setLevel(logging.ERROR)
 # Check for waveform_cooker
 isWaveformCookerPresent = True
 try:
-    from waveform_cooker import add_dynamic
-except Exception as _:
+    from waveform_cooker import add_dynamic, ec_add_dynamic, ec_adjust
+except Exception as e:
     isWaveformCookerPresent = False
+    print(f"[Driver] Warning: waveform_cooker not available: {e}", file=sys.stderr)
 
 
-def deserialize_ids_dict(serialized_dict):
-    """Deserialize IDS dictionary"""
-    restored_objects = {}
-    for key, data_bytes in serialized_dict.items():
-        if hasattr(imas, key):
-            cls = getattr(imas, key)
-            obj = cls()
-            if hasattr(obj, 'deserialize'):
-                obj.deserialize(data_bytes)
-                restored_objects[key] = obj
-            else:
-                try:
-                    obj.put_transfer(data_bytes)
-                    restored_objects[key] = obj
-                except:
-                    print(f"[Driver Warning] Could not deserialize {key}", file=sys.stderr)
-        else:
-            restored_objects[key] = data_bytes
-    return restored_objects
+def get_backend_id(backend_name):
+    """Convert backend name string to IMAS backend constant."""
+    backend_map = {
+        'HDF5': HDF5_BACKEND,
+        'MDSPLUS': MDSPLUS_BACKEND,
+        'MEMORY': MEMORY_BACKEND,
+    }
+    return backend_map.get(backend_name.upper(), HDF5_BACKEND)
 
-class WorkflowDriverM3:
+
+def parse_workflow_xml(xml_path):
+    """Parse input_workflow.xml and extract parameters."""
+    import xml.etree.ElementTree as ET
+    
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    
+    wf = root.find('workflow_parameters')
+    
+    params = {
+        'input_user_or_path': wf.find('input_user_or_path').text,
+        'input_database': wf.find('input_database').text,
+        'input_backend': wf.find('input_backend').text if wf.find('input_backend') is not None else 'HDF5',
+        'shot_nr': int(wf.find('shot_nr').text),
+        'run_in': int(wf.find('run_in').text),
+        'output_user_or_path': wf.find('output_user_or_path').text,
+        'output_database': wf.find('output_database').text,
+        'output_backend': wf.find('output_backend').text if wf.find('output_backend') is not None else 'HDF5',
+        'run_out': int(wf.find('run_out').text),
+        'tbegin': float(wf.find('tbegin').text) if wf.find('tbegin') is not None else -1.0,
+        'tend': float(wf.find('tend').text) if wf.find('tend') is not None else -1.0,
+        'dt_required': float(wf.find('dt_required').text) if wf.find('dt_required') is not None else 0.1,
+        'one_time_slice': int(wf.find('one_time_slice').text) if wf.find('one_time_slice') is not None else 0,
+    }
+    
+    return params
+
+
+class WorkflowDriverM3Fortran:
     """
-    replace wf_wrapper.py + workflow_driver.py
-    MUSCLE3 distributed Driver
-    Responsibilities: scheduling, data distribution, result collection
-    Not included: computation logic (inside Actors)
+    MUSCLE3 Driver that directly communicates with Fortran torbeam_m3.exe
+    
+    Port structure (matching standalone Torbeam coupling.ymmsl):
+    - O_I: equilibrium_out, core_profiles_out, ec_launchers_out
+    - S: waves_in
     """
     
     def __init__(self, config_folder_path=None):
-        # ==========================================
-        # Step 1: Read Actor list (before Instance creation)
-        # ==========================================
-        actors_env = os.environ.get("HCD_ACTORS", "")
-        self.actor_list = [a.strip() for a in actors_env.split(",") if a.strip()]
+        print("[M3 Driver] Initializing (Fortran-compatible mode)...", file=sys.stdout)
         
-        if not self.actor_list:
-            print("[M3 Driver] Warning: No actors in HCD_ACTORS", file=sys.stderr)
-            self.actor_list = []
+        # Initialize steering to None (will be set by _load_ec_launchers if extra_cooking)
+        self.steering = None
         
-        print(f"[M3 Driver] Actors: {self.actor_list}", file=sys.stdout)
-        
-        # ==========================================
-        # Step 2: Dynamically generate port dictionary
-        # ✅ Fix core error: format must be {"name": Operator}
-        # ==========================================
-        ports = {}
-        
-        # 1. Define output port (O_I)
-        ports["state_out"] = Operator.O_I
-        
-        # ==========================================
-        # Step 2: Dynamically generate port dictionary (force Legacy format)
-        # ==========================================
-        
-        # Prepare port names
-        out_port_names = ["state_out"]
-        in_port_names = [f"result_from_{actor}" for actor in self.actor_list]
-        
-        print(f"[M3 Driver] Out ports: {out_port_names}", file=sys.stdout)
-        print(f"[M3 Driver] In ports: {in_port_names}", file=sys.stdout)
-
-        # Force old format: { Operator: [List of Strings] }
-        # Your error shows system tries to iterate Value, so Value must be a list
+        # Create MUSCLE3 Instance with ports matching Fortran Torbeam
         ports = {
-            Operator.O_I: out_port_names,
-            Operator.S:   in_port_names
+            Operator.O_I: ['equilibrium_out', 'core_profiles_out', 'ec_launchers_out'],
+            Operator.S: ['waves_in']
         }
         
-        print(f"[M3 Driver] Ports dictionary constructed with keys: {list(ports.keys())}", file=sys.stdout)
-        
-        # ==========================================
-        # Step 3: Create MUSCLE3 Instance
-        # ==========================================
         try:
-            self.instance = Instance(ports)
+            self.instance = Instance(ports, KEEPS_NO_STATE_FOR_NEXT_USE)
             print("[M3 Driver] ✓ Instance created successfully", file=sys.stdout)
         except Exception as e:
             print(f"[M3 Driver] ✗ Failed to create Instance: {e}", file=sys.stderr)
-            import traceback
-            traceback.print_exc()
             sys.exit(1)
         
-        # ==========================================
-        # Step 4: Read configuration path
-        # ==========================================
+        # Read configuration path from MUSCLE3 settings
         try:
             self.config_path = self.instance.get_setting("config_folder_path", "str")
         except KeyError:
             if config_folder_path:
                 self.config_path = os.path.abspath(config_folder_path)
             else:
-                print("[M3 Driver] Error: config_folder_path missing.", file=sys.stderr)
-                sys.exit(1)
+                self.config_path = os.path.dirname(os.path.abspath(__file__))
+                print(f"[M3 Driver] Warning: Using default config path: {self.config_path}", file=sys.stderr)
         
         print(f"[M3 Driver] Config path: {self.config_path}", file=sys.stdout)
         
-        # ==========================================
-        # Step 5: Read convergence parameters
-        # ==========================================
+        # Read extra_cooking setting (ITER-specific processing)
         try:
-            self.max_iterations = self.instance.get_setting("max_iterations", "int")
-        except:
-            self.max_iterations = 1  # Default: no iteration
+            self.extra_cooking = self.instance.get_setting("extra_cooking", "bool")
+        except KeyError:
+            self.extra_cooking = True  # Default for ITER
         
-        try:
-            self.convergence_tol = self.instance.get_setting("convergence_tolerance", "float")
-        except:
-            self.convergence_tol = 1e-3
+        print(f"[M3 Driver] extra_cooking: {self.extra_cooking}", file=sys.stdout)
         
-        print(f"[M3 Driver] Convergence: max_iter={self.max_iterations}, tol={self.convergence_tol}")
-        
-        # ==========================================
-        # Step 6: Initialize database environment
-        self._initialize_full_environment()
+        # Initialize environment
+        self._initialize_environment()
 
-    def _initialize_full_environment(self):
-        """
-        Initialize databases and configuration (from original wrapper).
-        This replaces the wf_wrapper function's setup logic.
-        """
+    def _initialize_environment(self):
+        """Initialize databases using IMAS API directly (bypassing WorkflowDbHelper)."""
         print("[M3 Driver] Setting up environment...", file=sys.stdout)
         
-        # Load global configuration
-        pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"
-        globalListPath = str(pathGlobalConfiguration / "global_lists.yaml")
-        
-        # Load workflow parameters
+        # Load workflow parameters from XML
         inputworkflow_xml = os.path.join(self.config_path, "input_workflow.xml")
-        print("path of the input workflow", inputworkflow_xml)
+        print(f"[M3 Driver] Loading workflow config: {inputworkflow_xml}")
+        
+        if not os.path.exists(inputworkflow_xml):
+            print(f"[M3 Driver] ERROR: {inputworkflow_xml} not found!", file=sys.stderr)
+            sys.exit(1)
+        
         try:
-            wf_parameters = create_workflow_param_from_file(inputworkflow_xml)["workflow_parameters"][0]
+            params = parse_workflow_xml(inputworkflow_xml)
         except Exception as e:
             print(f"[M3 Driver] Error loading workflow XML: {e}", file=sys.stderr)
             sys.exit(1)
         
-        # Extract database parameters
-        input_user_or_path = wf_parameters["input_user_or_path"][0]
-        input_database = wf_parameters["input_database"][0]
-        input_backend = wf_parameters.get("input_backend", ["MDSPLUS"])[0]
-        output_user_or_path = wf_parameters["output_user_or_path"][0]
-        output_database = wf_parameters["output_database"][0]
-        output_backend = wf_parameters.get("output_backend", ["MDSPLUS"])[0]
-        shot_nr = wf_parameters["shot_nr"][0]
-        run_in = wf_parameters["run_in"][0]
-        run_out = wf_parameters["run_out"][0]
+        # Store parameters
+        self.tbegin = params['tbegin']
+        self.tend = params['tend']
+        self.dt_required = params['dt_required']
+        self.one_time_slice = params['one_time_slice']
         
-        # Extract time parameters (replace workflowObject.workflowData)
-        self.tbegin = wf_parameters.get("tbegin", [-1.0])[0]
-        self.tend = wf_parameters.get("tend", [-1.0])[0]
-        self.dt_required = wf_parameters.get("dt_required", [0.1])[0]
-        self.one_time_slice = wf_parameters.get("one_time_slice", [0])[0]
+        print(f"[M3 Driver] Input: {params['input_user_or_path']}/{params['input_database']}, shot={params['shot_nr']}, run={params['run_in']}")
+        print(f"[M3 Driver] Output: {params['output_user_or_path']}/{params['output_database']}, run={params['run_out']}")
+        print(f"[M3 Driver] Backend: {params['input_backend']}")
         
-        # Initialize database helper
-        dbhelper = WorkflowDbHelper(
-            input_user_or_path, input_database, input_backend,
-            output_user_or_path, output_database, output_backend,
-            shot_nr, run_in, run_out
-        )
-        self.inputDb = dbhelper.getInputDatabase()
-        self.outputDb = dbhelper.getOutputDatabase()
-        self.md = dbhelper.getMachineDatabase()
+        # Initialize databases directly using IMAS API
+        try:
+            input_backend = get_backend_id(params['input_backend'])
+            output_backend = get_backend_id(params['output_backend'])
+            
+            # Open input database with DD version 3 (to match standalone Torbeam)
+            print(f"[M3 Driver] Opening input database (DD version 3)...")
+            self.inputDb = imas.DBEntry(
+                input_backend,
+                params['input_database'],
+                params['shot_nr'],
+                params['run_in'],
+                params['input_user_or_path'],
+                data_version="3"  # Force DD 3 format
+            )
+            self.inputDb.open()
+            print(f"[M3 Driver] ✓ Input database opened")
+            
+            # Determine output user/database
+            output_user = params['output_user_or_path']
+            if output_user == 'default':
+                output_user = os.getenv('USER')
+            output_database = params['output_database']
+            if output_database == 'default':
+                output_database = 'TORBEAM'
+            
+            # Create output database
+            print(f"[M3 Driver] Creating output database: {output_user}/{output_database}")
+            self.outputDb = imas.DBEntry(
+                output_backend,
+                output_database,
+                params['shot_nr'],
+                params['run_out'],
+                output_user
+            )
+            self.outputDb.create()
+            print(f"[M3 Driver] ✓ Output database created")
+            
+            # Create memory database for ec_launchers (also DD 3)
+            print(f"[M3 Driver] Creating memory database...")
+            self.md = imas.DBEntry(
+                MEMORY_BACKEND,
+                output_database,
+                0,
+                params['run_out'],
+                output_user,
+                data_version="3"  # Force DD 3 format
+            )
+            self.md.create()
+            print(f"[M3 Driver] ✓ Memory database created")
+            
+        except Exception as e:
+            print(f"[M3 Driver] ERROR: Failed to initialize databases: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
         
-        # Read global lists
-        globallistReader = WorkflowGlobalsReader(globalListPath)
-        self.inputIds = globallistReader.getIdsScenarioList()
-        self.inputIds.append("workflow")
-        self.inputMds = globallistReader.getIdsMdList()
-        wall_md = globallistReader.getWallMD()
-        
-        # Prepare machine descriptions
-        self._prepare_machine_descriptions(wall_md)
-        
-        # Load waveforms if present
-        self._load_waveforms()
+        # Load ec_launchers from YAML
+        self._load_ec_launchers()
         
         print("[M3 Driver] Environment setup complete.", file=sys.stdout)
 
-    def _prepare_machine_descriptions(self, wall_md):
-        """Prepare machine description database"""
-        for idsName in self.inputMds:
-            try:
-                idsObject = self.inputDb.get(idsName)
-                # TODO: Verify compatibility with IMAS DD 4.0.0
-                if idsObject.ids_properties.homogeneous_time != imas.imasdef.EMPTY_INT:
-                    self.md.put(idsObject)
-                else:
-                    if idsName == "wall":
-                        try:
-                            _backend = getattr(imas.imasdef, wall_md["backend"] + "_BACKEND")
-                            wall = imas.DBEntry(
-                                _backend, wall_md["database"], wall_md["shot"],
-                                wall_md["run"], wall_md["user_or_path"]
-                            )
-                            wall.open()
-                            self.md.put(wall.get("wall"))
-                        except Exception:
-                            print(f"[M3 Driver] Wall IDS not found in MD database")
-                    else:
-                        print(f"[M3 Driver] {idsName} not in scenario data")
-            except Exception as e:
-                print(f"[M3 Driver] Error loading {idsName}: {e}", file=sys.stderr)
-
-    def _load_waveforms(self):
-        """Load waveform configurations if present (from original wrapper)."""
-        for filename in os.listdir(self.config_path):
-            filePath = os.path.join(self.config_path, filename)
-            if filePath.endswith("waveforms.yaml") and os.path.exists(filePath):
-                if isWaveformCookerPresent:
-                    idsObject = add_dynamic(filePath)
-                    if idsObject is not None:
-                        self.md.put(idsObject)
-                        print(f"[M3 Driver] Loaded waveform: {filename}")
-
-# ---------------------------------------------------------
-    # copy from the original WorkflowDriver
-    # ---------------------------------------------------------
-    def getIDSSlices(self, timenow):
-        """Read slices from database (Copy from legacy driver)"""
-        idsSlices = {}
-
-        # Read scenario IDSes
-        for ids in self.inputIds:
-            try:
-                idsSlices[ids] = self.inputDb.get_slice(ids, timenow, 1)
-            except Exception as e:
-                print(f"[M3 Driver] Error reading {ids}: {e}", file=sys.stderr)
-                return None
+    def _load_ec_launchers(self):
+        """
+        Load ec_launchers using the same approach as standalone Torbeam.
+        """
+        if not isWaveformCookerPresent:
+            print("[M3 Driver] ERROR: waveform_cooker not available!", file=sys.stderr)
+            return
         
-        # Read machine description IDSes
-        for ids in self.inputMds:
-            try:
-                idsSlices[ids] = self.md.get_slice(ids, timenow, 1)
-            except Exception:
-                pass  # MD may not contain some slices
-        return idsSlices
-
-    def storeIDSSlices(self, ids_dict):
-        """Save IDS slices to output database"""
-        for idsName, idsData in ids_dict.items():
-            if not hasattr(idsData, 'ids_properties'):
-                continue
+        # Look for ec_waveforms.yaml (preferred) or ec_launchers.yaml
+        ec_waveforms_path = os.path.join(self.config_path, "ec_waveforms.yaml")
+        ec_launchers_path = os.path.join(self.config_path, "ec_launchers.yaml")
+        
+        ec_launchers = None
+        
+        if os.path.exists(ec_waveforms_path):
+            yaml_path = ec_waveforms_path
+            print(f"[M3 Driver] Loading ec_launchers from: {yaml_path}", file=sys.stdout)
             
-            # Skip input IDS (avoid duplicate saving)
-            if idsName in self.inputIds or idsName in self.inputMds:
-                continue
-            
-            # Save output IDS with time data
-            if hasattr(idsData, 'time') and len(idsData.time) > 0:
+            if self.extra_cooking:
+                print(f"[M3 Driver] Using ec_add_dynamic (extra_cooking=True)", file=sys.stdout)
                 try:
-                    self.outputDb.put_slice(idsData)
-                    print(f"[M3 Driver] Saved {idsName}")
+                    ec_launchers, self.steering = ec_add_dynamic(yaml_path, kplot=0)
+                    print(f"[M3 Driver] Steering config: {self.steering}", file=sys.stdout)
                 except Exception as e:
-                    print(f"[M3 Driver] Error saving {idsName}: {e}", file=sys.stderr)
+                    print(f"[M3 Driver] ERROR in ec_add_dynamic: {e}", file=sys.stderr)
+                    import traceback
+                    traceback.print_exc()
+                    raise
+            else:
+                print(f"[M3 Driver] Using add_dynamic (extra_cooking=False)", file=sys.stdout)
+                ec_launchers = add_dynamic(yaml_path, kplot=0)
+                
+        elif os.path.exists(ec_launchers_path):
+            yaml_path = ec_launchers_path
+            print(f"[M3 Driver] Loading ec_launchers from: {yaml_path}", file=sys.stdout)
+            ec_launchers = add_dynamic(yaml_path, kplot=0)
+            
+        else:
+            print(f"[M3 Driver] ERROR: No ec_waveforms.yaml or ec_launchers.yaml found in {self.config_path}", file=sys.stderr)
+            print(f"[M3 Driver] Available files: {os.listdir(self.config_path)}", file=sys.stderr)
+            sys.exit(1)
+        
+        if ec_launchers is not None:
+            n_beams = len(ec_launchers.beam) if hasattr(ec_launchers, 'beam') else 0
+            print(f"[M3 Driver] ec_launchers loaded: {n_beams} beams", file=sys.stdout)
+            
+            # Print beam info (first 3 beams)
+            for i in range(min(3, n_beams)):
+                beam = ec_launchers.beam[i]
+                power = 0
+                if hasattr(beam.power_launched, 'data') and len(beam.power_launched.data) > 0:
+                    power = beam.power_launched.data[0]
+                beam_name = beam.name if hasattr(beam, 'name') else f"beam_{i}"
+                print(f"[M3 Driver]   beam[{i}]: {beam_name}, power={power/1e6:.3f} MW")
+            if n_beams > 3:
+                print(f"[M3 Driver]   ... and {n_beams - 3} more beams")
+            
+            # Store in memory database (critical for proper serialization!)
+            self.md.put(ec_launchers)
+            print(f"[M3 Driver] ec_launchers stored in memory DB", file=sys.stdout)
 
     def run(self):
-        """Main loop: timestep + coupling iteration"""
-        print("[M3 Driver] Starting Main Loop...", file=sys.stdout)
+        """
+        Main workflow loop.
+        """
+        import os  # [FIX] Ensure os is imported locally if not at top level
         
-        # 1. Determine time range
+        print("[M3 Driver] Starting main loop...", file=sys.stdout)
+        
+        # Determine time range from equilibrium
         try:
-            time_array = self.inputDb.partial_get(ids_name="equilibrium", data_path="time")
+            eq_full = self.inputDb.get('equilibrium')
+            time_array = eq_full.time
+            print(f"[M3 Driver] Equilibrium time array: {time_array[:5]}... (len={len(time_array)})")
             if self.tbegin < 0:
                 self.tbegin = time_array[0]
             if self.tend < 0:
@@ -293,22 +308,24 @@ class WorkflowDriverM3:
         except Exception as e:
             print(f"[M3 Driver] Warning: Could not read time array: {e}", file=sys.stderr)
             if self.tbegin < 0:
-                self.tbegin = 0.0
+                self.tbegin = 200.0
             if self.tend < 0:
-                self.tend = 1.0
+                self.tend = 200.1
         
-        # Handle single-slice mode
         if self.one_time_slice != 0:
             self.tend = self.tbegin + self.dt_required
         
         print(f"[M3 Driver] Time range: {self.tbegin:.3f} -> {self.tend:.3f} s, dt={self.dt_required:.3f}")
         
-        # 2. MUSCLE3 main loop
+        # Get target DD version for conversion
+        target_dd_version = os.getenv('IMAS_VERSION', '4.0.0')
+        print(f"[M3 Driver] Target DD version for Fortran: {target_dd_version}")
+
+        # MUSCLE3 main loop
         while self.instance.reuse_instance():
             timenow = self.tbegin
             step = 0
             
-            # 3. Time step loop
             while timenow < self.tend:
                 step += 1
                 t_next = timenow + self.dt_required
@@ -317,87 +334,144 @@ class WorkflowDriverM3:
                 print(f"Step {step}: t={timenow:.4f} s")
                 print(f"{'='*60}")
                 
-                # A. Read input data
-                ids_slices = self.getIDSSlices(timenow)
-                if ids_slices is None:
-                    print("[M3 Driver] Failed to read IDS slices, aborting")
-                    break
+                # Read input data
+                print("=> Read input IDSs")
                 
-                # B. Coupling iteration loop
-                converged = False
-                iteration = 0
-                prev_results = None
+                # Get equilibrium
+                print("   ---> Get equilibrium")
+                try:
+                    # [FIX] autoconvert=False ensures we get original data, then manually convert
+                    input_equilibrium = self.inputDb.get_slice('equilibrium', timenow, 1, autoconvert=False)
+                    
+                    # [FIX] Force conversion to DD 4.0.0 for Fortran compatibility
+                    input_equilibrium = imas.convert_ids(input_equilibrium, target_dd_version)
+                    
+                    print(f"   equilibrium.time = {input_equilibrium.time}")
+                except Exception as e:
+                    print(f"   ERROR getting equilibrium: {e}", file=sys.stderr)
+                    timenow = t_next
+                    continue
                 
-                while not converged and iteration < self.max_iterations:
-                    iteration += 1
-                    print(f"\n--- Iteration {iteration} ---")
+                # Get core_profiles
+                print("   ---> Get core_profiles")
+                try:
+                    input_core_profiles = self.inputDb.get_slice('core_profiles', timenow, 1, autoconvert=False)
                     
-                    # B1. Serialize and broadcast
-                    payload = {}
-                    for key, obj in ids_slices.items():
-                        # Skip workflow IDS because it is often empty and can crash
-                        if key == "workflow": 
-                            continue
-
-                        if hasattr(obj, 'serialize'):
-                            try:
-                                payload[key] = obj.serialize()
-                            except Exception as e:
-                                print(f"[M3 Driver] Warning: Skipping serialization of '{key}': {e}", file=sys.stdout)
-                        else:
-                            payload[key] = obj
+                    # [FIX] Force conversion to DD 4.0.0 for Fortran compatibility
+                    input_core_profiles = imas.convert_ids(input_core_profiles, target_dd_version)
                     
-                    # B2. Send to all Actors (dynamic ports)
-                    msg = Message(timenow, t_next, payload)
+                    print(f"   core_profiles.time = {input_core_profiles.time}")
+                except Exception as e:
+                    print(f"   ERROR getting core_profiles: {e}", file=sys.stderr)
+                    timenow = t_next
+                    continue
+                
+                # Get ec_launchers from memory database
+                print("   ---> Get ec_launchers")
+                try:
+                    input_ec_launchers = self.md.get_slice('ec_launchers', timenow, 3, autoconvert=False)
+                    
+                    # [FIX] Force conversion to DD 4.0.0 for Fortran compatibility
+                    input_ec_launchers = imas.convert_ids(input_ec_launchers, target_dd_version)
+                    
+                    # [FIX] Sync time logic (Critical for Torbeam to match equilibrium)
+                    input_ec_launchers.time = np.array([timenow])
+                    
+                    print(f"   ec_launchers.time = {input_ec_launchers.time}")
+                except Exception as e:
+                    print(f"   ERROR getting ec_launchers: {e}", file=sys.stderr)
+                    timenow = t_next
+                    continue
+                
+                # Apply ec_adjust if using extra_cooking with steering
+                if self.extra_cooking and self.steering is not None:
+                    print("   ---> Applying ec_adjust with steering")
+                    input_ec_launchers = ec_adjust(input_ec_launchers, self.steering)
+                
+                # Print diagnostic info
+                n_beams = len(input_ec_launchers.beam) if hasattr(input_ec_launchers, 'beam') else 0
+                print(f"[M3 Driver] ec_launchers: {n_beams} beams")
+                
+                # Check total power
+                total_power = 0.0
+                for b in input_ec_launchers.beam:
+                    if hasattr(b.power_launched, 'data') and len(b.power_launched.data) > 0:
+                        total_power += b.power_launched.data[0]
+                print(f"[M3 Driver] Total EC power: {total_power/1e6:.2f} MW")
+                
+                if total_power > 0:
+                    # Send data to Torbeam Fortran executable
+                    print("=> Execute TORBEAM")
+                    
                     try:
-                        self.instance.send("state_out", msg)
-                        print(f"  → Broadcast to all actors via state_out")
-                    except Exception as e:
-                        print(f"[M3 Driver] Error sending: {e}", file=sys.stderr)
-                        break
-                    
-                    # B3. Collect Actor results
-                    merged_results = {}
-                    for actor in self.actor_list:
-                        port_name = f"result_from_{actor}"
-                        print(f"  ← Waiting for {actor}...")
+                        # Send equilibrium
+                        equilibrium_timestamp = float(input_equilibrium.time[-1])
+                        equilibrium_data = input_equilibrium.serialize()
+                        equilibrium_msg = Message(equilibrium_timestamp, data=equilibrium_data)
+                        print(f"   Sending equilibrium_out (timestamp={equilibrium_timestamp}, size={len(equilibrium_data)} bytes)...")
+                        self.instance.send("equilibrium_out", equilibrium_msg)
                         
-                        try:
-                            msg_in = self.instance.receive(port_name)
-                            actor_result = deserialize_ids_dict(msg_in.data)
-                            merged_results.update(actor_result)
-                            print(f"  ✓ Received from {actor}")
-                        except Exception as e:
-                            print(f"  ✗ Error receiving from {actor}: {e}", file=sys.stderr)
-                    
-                    # B4. Check convergence (placeholder)
-                    if prev_results is not None and iteration > 1:
-                        # TODO: implement real physical convergence criteria
-                        converged = True  # placeholder
-                        print("  ✓ Converged (placeholder logic)")
-                    
-                    prev_results = merged_results
-                    
-                    # B5. If not converged, update ids_slices for next iteration
-                    if not converged and iteration < self.max_iterations:
-                        # TODO: update plasma state from merged_results
-                        pass
+                        # Send core_profiles
+                        core_profiles_timestamp = float(input_core_profiles.time[-1])
+                        core_profiles_data = input_core_profiles.serialize()
+                        core_profiles_msg = Message(core_profiles_timestamp, data=core_profiles_data)
+                        print(f"   Sending core_profiles_out (timestamp={core_profiles_timestamp}, size={len(core_profiles_data)} bytes)...")
+                        self.instance.send("core_profiles_out", core_profiles_msg)
+                        
+                        # Send ec_launchers
+                        # Note: time is already synced above in the [FIX] block
+                        ec_launchers_timestamp = float(input_ec_launchers.time[-1])
+                        ec_launchers_data = input_ec_launchers.serialize()
+                        ec_launchers_msg = Message(ec_launchers_timestamp, data=ec_launchers_data)
+                        print(f"   Sending ec_launchers_out (timestamp={ec_launchers_timestamp}, size={len(ec_launchers_data)} bytes)...")
+                        self.instance.send("ec_launchers_out", ec_launchers_msg)
+                        
+                        # Receive waves output from Torbeam
+                        print("   Waiting for waves_in...")
+                        waves_msg = self.instance.receive("waves_in")
+                        factory = imas.IDSFactory()
+                        output_waves = factory.waves()
+                        output_waves.deserialize(waves_msg.data)
+                        waves_timestamp = waves_msg.timestamp
+                        
+                        print(f"[M3 Driver] ✓ Received waves output (time={waves_timestamp})")
+                        
+                        # Check if output has valid data and store results
+                        has_valid_output = False
+                        if USE_HAS_VALUE:
+                            has_valid_output = output_waves.ids_properties.homogeneous_time.has_value
+                        else:
+                            from imas.imasdef import EMPTY_INT
+                            has_valid_output = output_waves.ids_properties.homogeneous_time != EMPTY_INT
+                        
+                        if has_valid_output:
+                            print("=> Export output IDSs to database")
+                            self.outputDb.put_slice(output_waves)
+                            self.outputDb.put_slice(input_equilibrium)
+                            self.outputDb.put_slice(input_core_profiles)
+                            self.outputDb.put_slice(input_ec_launchers)
+                            print(f"   Output time = {output_waves.time[0]:.2f} s")
+                        
+                    except Exception as e:
+                        print(f"[M3 Driver] ERROR during Torbeam execution: {e}", file=sys.stderr)
+                        import traceback
+                        traceback.print_exc()
+                else:
+                    print("   No power for this time slice, skipping Torbeam")
                 
-                # C. Save final results
-                self.storeIDSSlices(merged_results)
-                
-                # D. Advance time
                 timenow = t_next
-                print(f"[M3 Driver] Step {step} complete.\n")
         
-        # 4. Cleanup
+        # Cleanup
+        print("[M3 Driver] Closing databases...")
         self.inputDb.close()
         self.outputDb.close()
         self.md.close()
         print("[M3 Driver] Workflow finished.", file=sys.stdout)
 
-
 if __name__ == "__main__":
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.INFO)
+    
     cfg_path = sys.argv[1] if len(sys.argv) > 1 else None
-    driver = WorkflowDriverM3(cfg_path)
+    driver = WorkflowDriverM3Fortran(cfg_path)
     driver.run()
