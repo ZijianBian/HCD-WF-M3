@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<parameters>
+
+  <!-- Input shot number -->
+  <shot_number> 130012 </shot_number>
+
+  <!-- Input run number -->
+  <input_run> 2 </input_run>
+
+  <!-- Output run number -->
+  <output_run> 23 </output_run>
+
+  <!-- Username for input/output database -->
+  <user_in>public</user_in>
+
+  <!-- Machine name for input/output database -->
+  <machine>ITER</machine>
+
+  <!-- Time to simulate (if <0: use IDS first time slice; if =0: use IDS whole time vector; if >0: use the specified time slice) -->
+  <time_to_simulate>200.0</time_to_simulate>
+
+</parameters>
+

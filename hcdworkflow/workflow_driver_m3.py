@@ -7,7 +7,7 @@ following the same architecture as the standalone Torbeam M3 workflow.
 Key features:
 - Direct communication with Fortran executable via MUSCLE3
 - Same port structure as standalone Torbeam (coupling.ymmsl)
-- Uses ec_add_dynamic for ITER-specific ec_launchers processing
+
 - Bypasses WorkflowDbHelper to be DD 4.0.0 compatible
 """
 
@@ -292,8 +292,6 @@ class WorkflowDriverM3Fortran:
         """
         Main workflow loop.
         """
-        import os  # [FIX] Ensure os is imported locally if not at top level
-        
         print("[M3 Driver] Starting main loop...", file=sys.stdout)
         
         # Determine time range from equilibrium
@@ -340,10 +338,9 @@ class WorkflowDriverM3Fortran:
                 # Get equilibrium
                 print("   ---> Get equilibrium")
                 try:
-                    # [FIX] autoconvert=False ensures we get original data, then manually convert
+                    # autoconvert=False ensures we get original data, then manually convert
                     input_equilibrium = self.inputDb.get_slice('equilibrium', timenow, 1, autoconvert=False)
                     
-                    # [FIX] Force conversion to DD 4.0.0 for Fortran compatibility
                     input_equilibrium = imas.convert_ids(input_equilibrium, target_dd_version)
                     
                     print(f"   equilibrium.time = {input_equilibrium.time}")
@@ -357,7 +354,6 @@ class WorkflowDriverM3Fortran:
                 try:
                     input_core_profiles = self.inputDb.get_slice('core_profiles', timenow, 1, autoconvert=False)
                     
-                    # [FIX] Force conversion to DD 4.0.0 for Fortran compatibility
                     input_core_profiles = imas.convert_ids(input_core_profiles, target_dd_version)
                     
                     print(f"   core_profiles.time = {input_core_profiles.time}")
@@ -371,10 +367,8 @@ class WorkflowDriverM3Fortran:
                 try:
                     input_ec_launchers = self.md.get_slice('ec_launchers', timenow, 3, autoconvert=False)
                     
-                    # [FIX] Force conversion to DD 4.0.0 for Fortran compatibility
                     input_ec_launchers = imas.convert_ids(input_ec_launchers, target_dd_version)
                     
-                    # [FIX] Sync time logic (Critical for Torbeam to match equilibrium)
                     input_ec_launchers.time = np.array([timenow])
                     
                     print(f"   ec_launchers.time = {input_ec_launchers.time}")
