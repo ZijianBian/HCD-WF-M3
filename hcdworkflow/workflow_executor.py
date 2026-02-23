@@ -6,6 +6,18 @@ from tools.hcd_tools import is_ec_on, is_ic_on, is_lh_on, is_nbi_on
 from tools.stdout_redirector import redirect_stdout, stdout_back
 
 
+def _ensure_ids_name(ids_obj, name):
+    """Ensure an IDS object has __name__ attribute (IMAS-Python 2.0 compatibility).
+
+    IMAS-Python 2.0 / DD 4.0 no longer provides __name__ on IDS objects.
+    The workflow executor relies on __name__ to identify IDS types.
+    This helper safely sets it using object.__setattr__ to bypass
+    IMAS's custom __setattr__ which rejects unknown attributes.
+    """
+    if not hasattr(ids_obj, '__name__'):
+        object.__setattr__(ids_obj, '__name__', name)
+
+
 class WorkflowExecutor:
     def __init__(
         self,
@@ -283,15 +295,20 @@ class WorkflowExecutor:
                                 output_ids_data = self.process_bundle[process]["input"][ids]
                             else:
                                 output_ids_data = eval("imas." + ids + "()")
+                            _ensure_ids_name(output_ids_data, ids)
                         else:
                             if ids in self.process_bundle[process]["input"]:
-                                output_ids_data.append(self.process_bundle[process]["input"][ids])
+                                _tmp_ids = self.process_bundle[process]["input"][ids]
                             else:
-                                output_ids_data.append(eval("imas." + ids + "()"))
+                                _tmp_ids = eval("imas." + ids + "()")
+                            _ensure_ids_name(_tmp_ids, ids)
+                            output_ids_data.append(_tmp_ids)
             else:
                 # feature/repair_231017
                 actor = self.dictionary_of_actors[process]
                 kmerge = 0
+                _ensure_ids_name(self.process_bundle[process]["input"][0],
+                                 "unknown")
                 ids_to_be_merged = self.process_bundle[process]["input"][0].__name__
                 for each_proc in self.process_bundle.keys():  # merge only if at least one of involved codes is called
                     if (
@@ -311,10 +328,10 @@ class WorkflowExecutor:
 
             for iids in range(len(output_ids_list)):
                 if not hasattr(output_ids_data, "__len__"):
-                    # if hasattr(output_ids_data,'__len__'):
-                    #    for iids in range(len(output_ids_data)):
+                    _ensure_ids_name(output_ids_data, output_ids_list[iids])
                     self.process_bundle[process]["output"][output_ids_data.__name__] = output_ids_data
                 else:
+                    _ensure_ids_name(output_ids_data[iids], output_ids_list[iids])
                     self.process_bundle[process]["output"][output_ids_data[iids].__name__] = output_ids_data[iids]
 
                 if output_ids_list[iids] not in bundle_out.keys() or "merge_" in process:
@@ -332,6 +349,8 @@ class WorkflowExecutor:
                         tmp_output_ids_data = output_ids_data[iids]
                     else:
                         tmp_output_ids_data = output_ids_data
+                    _ensure_ids_name(bundle_out[output_ids_list[iids]], output_ids_list[iids])
+                    _ensure_ids_name(tmp_output_ids_data, output_ids_list[iids])
                     if bundle_out[output_ids_list[iids]].__name__ == tmp_output_ids_data.__name__:
                         self.process_bundle["merge_" + output_ids_list[iids]] = {}
                         self.process_bundle["merge_" + output_ids_list[iids]]["input"] = [
@@ -379,6 +398,15 @@ class WorkflowExecutor:
         # Re-direct the logfile for this specific actor
         if code + "_log" in parameters.keys():
             stdout_back(oldstrout, newstdout)
+
+        # Ensure __name__ on returned IDS (IMAS-Python 2.0 compatibility)
+        output_ids_list = codeinfo["output"]
+        if not hasattr(results, "__len__"):
+            _ensure_ids_name(results, output_ids_list[0] if output_ids_list else "unknown")
+        else:
+            for i, ids_name in enumerate(output_ids_list):
+                if i < len(results):
+                    _ensure_ids_name(results[i], ids_name)
 
         # Call of the chosen code
         return results

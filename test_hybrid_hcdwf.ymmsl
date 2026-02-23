@@ -1,88 +1,83 @@
 ymmsl_version: v0.1
 model:
-  name: hcd_workflow_hybrid_full
+  name: hcd_workflow_hybrid
   components:
-    # === 1. DRIVER / MACRO-MODEL (hcd_workflow) ===
-    # Sends on O_I, receives on S — controls the reuse loop
-    hcd_workflow:
-      implementation: hcd_workflow_impl
+    # === MACRO: Workflow Wrapper ===
+    # Time loop, database I/O, M3 send/receive.
+    wf_wrapper:
+      implementation: wf_wrapper_impl
       ports:
         o_i:
           - equilibrium_out
           - core_profiles_out
+          - workflow_out
           - ec_launchers_out
-          - waves_out 
+          - ic_antennas_out
+          - core_sources_out
           - distributions_out
           - distribution_sources_out
         s:
-          - waves_in
           - core_sources_in
-    # === 2. ACTOR 1 (Torbeam) — MICRO-MODEL ===
-    # Receives on F_INIT, sends on O_F — reused by the driver
-    torbeam:
-      implementation: torbeam_py_impl
+          - waves_in
+          - core_profiles_in
+          - distributions_in
+
+    # === MICRO: HCD Workflow ===
+    # Receives IDS, runs HCDWorkflow.run() with iWrap actors internally.
+    # Torbeam, hcd2core_sources, etc. are invisible to M3.
+    hcd_workflow:
+      implementation: hcd_workflow_impl
       ports:
         f_init:
           - equilibrium_in
           - core_profiles_in
+          - workflow_in
           - ec_launchers_in
-        o_f:
-          - waves_out
-    # === 3. ACTOR 2 (hcd2core_sources) — MICRO-MODEL ===
-    # Receives on F_INIT, sends on O_F — reused by the driver
-    hcd2core_sources:
-      implementation: hcd2core_sources_impl
-      ports:
-        f_init:
-          - core_profiles_in
-          - waves_in
+          - ic_antennas_in
+          - core_sources_in
           - distributions_in
           - distribution_sources_in
         o_f:
           - core_sources_out
+          - waves_out
+          - core_profiles_out
+          - distributions_out
+
   conduits:
-    
-    hcd_workflow.equilibrium_out: torbeam.equilibrium_in
-    
-    hcd_workflow.core_profiles_out:
-      - torbeam.core_profiles_in
-      - hcd2core_sources.core_profiles_in
-    hcd_workflow.ec_launchers_out: torbeam.ec_launchers_in
-    hcd_workflow.waves_out: hcd2core_sources.waves_in
-    hcd_workflow.distributions_out: hcd2core_sources.distributions_in
-    hcd_workflow.distribution_sources_out: hcd2core_sources.distribution_sources_in
-    
-    torbeam.waves_out: hcd_workflow.waves_in
-    hcd2core_sources.core_sources_out: hcd_workflow.core_sources_in
+    # macro O_I  →  micro F_INIT
+    wf_wrapper.equilibrium_out: hcd_workflow.equilibrium_in
+    wf_wrapper.core_profiles_out: hcd_workflow.core_profiles_in
+    wf_wrapper.workflow_out: hcd_workflow.workflow_in
+    wf_wrapper.ec_launchers_out: hcd_workflow.ec_launchers_in
+    wf_wrapper.ic_antennas_out: hcd_workflow.ic_antennas_in
+    wf_wrapper.core_sources_out: hcd_workflow.core_sources_in
+    wf_wrapper.distributions_out: hcd_workflow.distributions_in
+    wf_wrapper.distribution_sources_out: hcd_workflow.distribution_sources_in
+
+    # micro O_F  →  macro S
+    hcd_workflow.core_sources_out: wf_wrapper.core_sources_in
+    hcd_workflow.waves_out: wf_wrapper.waves_in
+    hcd_workflow.core_profiles_out: wf_wrapper.core_profiles_in
+    hcd_workflow.distributions_out: wf_wrapper.distributions_in
+
 settings:
   config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
-  m3_flag: 1
-  
-  torbeam.actor_name: "torbeam"
-  torbeam.code_parameters: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/ECRH/ec_wave_solver/input_torbeam.xml"
-  hcd2core_sources.actor_name: "hcd2core_sources"
-  hcd2core_sources.code_parameters: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/source/fill_core_sources/input_hcd2core_sources.xml"
+
 resources:
+  wf_wrapper:
+    threads: 1
   hcd_workflow:
     threads: 1
-  torbeam:
-    threads: 1
-  hcd2core_sources:
-    threads: 1
+
 implementations:
-  hcd_workflow_impl:
+  wf_wrapper_impl:
     executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/run_env_hybrid.sh
     args:
       - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/workflow/wf_wrapper_m3.py"
       - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
       - "1"
-  torbeam_py_impl:
+  hcd_workflow_impl:
     executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/run_env_hybrid.sh
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/actors/actor_m3_wrapper.py"
-      - "torbeam"
-  hcd2core_sources_impl:
-    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/run_env_hybrid.sh
-    args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/actors/actor_m3_wrapper.py"
-      - "hcd2core_sources"
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/hcd_workflow_m3.py"
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
