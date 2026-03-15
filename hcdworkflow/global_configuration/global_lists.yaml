@@ -60,7 +60,7 @@ actor_list:
     pion 
     risk 
     spot 
-    stixredist
+    stix_redist
     tomcat 
     torbeam
     toray
@@ -89,12 +89,12 @@ prerequisites:
    ec_wave_fp:
        ec_wave_solver: any
    ic_wave_fp:
-       stixredist:
+       stix_redist:
           ic_wave_solver: any
        fopla:
           ic_wave_solver: any
-          nbi_source: any
-          nbi_fp: any
+        #  nbi_source: any
+        #  nbi_fp: any
    nbi_source: None
    nbi_fp:
        risk:

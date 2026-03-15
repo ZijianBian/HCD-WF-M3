@@ -3,14 +3,16 @@
 # HCD-Workflow Benchmark Runner
 # =============================================================================
 # 
-# Two execution modes:
-#   direct : Direct MUSCLE3 mode - Driver directly communicates with
-#            Fortran actors via MUSCLE3 (e.g. torbeam_m3.exe)
-#   hybrid : Hybrid MUSCLE3 mode - Driver communicates with Python iWrap
-#            actors via MUSCLE3 (e.g. actor_m3_wrapper.py)
+# Three execution modes:
+#   traditional : Traditional mode - no MUSCLE3, all actors in-process via iwrap
+#   direct      : Direct MUSCLE3 mode - Driver directly communicates with
+#                 Fortran actors via MUSCLE3 (e.g. torbeam_m3.exe)
+#   hybrid      : Hybrid MUSCLE3 mode - Driver communicates with Python iWrap
+#                 actors via MUSCLE3 (e.g. hcd_workflow_m3.py)
 #
 # Usage:
 #   ./run_benchmark.sh              # Default: direct mode
+#   ./run_benchmark.sh traditional  # Traditional mode (no MUSCLE3)
 #   ./run_benchmark.sh direct       # Direct mode (Fortran actors)
 #   ./run_benchmark.sh hybrid       # Hybrid mode (Python iWrap actors)
 #
@@ -26,18 +28,21 @@ cd "$SCRIPT_DIR"
 MODE="${1:-direct}"
 
 # Validate mode
-if [[ "$MODE" != "direct" && "$MODE" != "hybrid" ]]; then
+if [[ "$MODE" != "direct" && "$MODE" != "hybrid" && "$MODE" != "traditional" ]]; then
     echo "=========================================="
     echo "ERROR: Invalid mode '$MODE'"
     echo "=========================================="
     echo ""
-    echo "Usage: $0 [direct|hybrid]"
+    echo "Usage: $0 [traditional|direct|hybrid]"
     echo ""
-    echo "  direct : Direct MUSCLE3 mode"
-    echo "           Driver -> Fortran M3 actors"
+    echo "  traditional : Traditional mode (no MUSCLE3)"
+    echo "                All actors in-process via iwrap"
     echo ""
-    echo "  hybrid : Hybrid MUSCLE3 mode"
-    echo "           Driver -> Python iWrap actors"
+    echo "  direct      : Direct MUSCLE3 mode"
+    echo "                Driver -> Fortran M3 actors"
+    echo ""
+    echo "  hybrid      : Hybrid MUSCLE3 mode"
+    echo "                Driver -> Python iWrap actors"
     echo ""
     exit 1
 fi
@@ -48,6 +53,12 @@ unset MUSCLE_INSTANCE
 
 # Configuration based on mode
 case "$MODE" in
+    "traditional")
+        TEST_DIR="."
+        MODE_DESC="Traditional (no MUSCLE3, all actors in-process)"
+        RUN_PREFIX="run_traditional"
+        CONFIG_PATH="tests/m3_hybrid"
+        ;;
     "direct")
         TEST_DIR="."
         YMMSL_FILE="test_torbeam_fortran.ymmsl"
@@ -68,11 +79,13 @@ if [ ! -d "$TEST_DIR" ]; then
     exit 1
 fi
 
-# Check if YMMSL file exists
-YMMSL_PATH="$TEST_DIR/$YMMSL_FILE"
-if [ ! -f "$YMMSL_PATH" ]; then
-    echo "ERROR: YMMSL file not found: $YMMSL_PATH"
-    exit 1
+# For M3 modes, check if YMMSL file exists
+if [[ "$MODE" != "traditional" ]]; then
+    YMMSL_PATH="$TEST_DIR/$YMMSL_FILE"
+    if [ ! -f "$YMMSL_PATH" ]; then
+        echo "ERROR: YMMSL file not found: $YMMSL_PATH"
+        exit 1
+    fi
 fi
 
 # Create output directory with incrementing number
@@ -96,7 +109,9 @@ echo "=========================================="
 echo "Mode:             $MODE"
 echo "Description:      $MODE_DESC"
 echo "Test directory:   $TEST_DIR"
-echo "YMMSL file:       $YMMSL_FILE"
+if [[ "$MODE" != "traditional" ]]; then
+    echo "YMMSL file:       $YMMSL_FILE"
+fi
 echo "Output directory: $DIR_NAME"
 echo "=========================================="
 echo ""
@@ -109,7 +124,6 @@ Date:        $(date)
 Mode:        $MODE
 Description: $MODE_DESC
 Test Dir:    $TEST_DIR
-YMMSL:       $YMMSL_FILE
 Output:      $DIR_NAME
 Host:        $(hostname)
 User:        $(whoami)
@@ -121,14 +135,19 @@ cd "$TEST_DIR"
 echo "Starting workflow..."
 echo ""
 
-# Run muscle_manager
-time muscle_manager --start-all "$YMMSL_FILE" || echo "Warning: MUSCLE3 manager exited with an error code."
+if [[ "$MODE" == "traditional" ]]; then
+    # Traditional mode: run wf_wrapper_m3.py directly with m3_flag=0
+    time python workflow/wf_wrapper_m3.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log" \
+        || echo "Warning: Workflow exited with an error code."
+else
+    # M3 modes: run via muscle_manager
+    time muscle_manager --start-all "$YMMSL_FILE" || echo "Warning: MUSCLE3 manager exited with an error code."
 
-# Move MUSCLE3 output directory to our run directory
-# MUSCLE3 creates a directory like run_<model_name>_<timestamp>
-MUSCLE_OUTPUT=$(ls -td run_* 2>/dev/null | head -1)
-if [ -n "$MUSCLE_OUTPUT" ] && [ -d "$MUSCLE_OUTPUT" ]; then
-    mv "$MUSCLE_OUTPUT" "$DIR_NAME/muscle3_output"
-    echo ""
-    echo "MUSCLE3 output moved to: $DIR_NAME/muscle3_output"
+    # Move MUSCLE3 output directory to our run directory
+    MUSCLE_OUTPUT=$(ls -td run_* 2>/dev/null | head -1)
+    if [ -n "$MUSCLE_OUTPUT" ] && [ -d "$MUSCLE_OUTPUT" ]; then
+        mv "$MUSCLE_OUTPUT" "$DIR_NAME/muscle3_output"
+        echo ""
+        echo "MUSCLE3 output moved to: $DIR_NAME/muscle3_output"
+    fi
 fi

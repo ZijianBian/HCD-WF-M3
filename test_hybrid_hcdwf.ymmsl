@@ -71,13 +71,13 @@ resources:
 
 implementations:
   wf_wrapper_impl:
-    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/run_env_hybrid.sh
+    executable: python3
     args:
       - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/workflow/wf_wrapper_m3.py"
       - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
       - "1"
   hcd_workflow_impl:
-    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/run_env_hybrid.sh
+    executable: python3
     args:
       - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/hcd_workflow_m3.py"
       - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"

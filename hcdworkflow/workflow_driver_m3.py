@@ -1,5 +1,5 @@
 """
-Workflow Driver with MUSCLE3 Support
+Workflow Driver with MUSCLE3 Support (Vector Port / Bundle Mode)
 Architecture:
     wf_wrapper_m3.py (entry point)
       └── WorkflowDriver (this file)
@@ -12,9 +12,24 @@ Architecture:
 In M3 mode, the workflow executor naturally resolves dependencies and calls actors.
 Instead of running physics, the injected Proxy Actor sends the inputs via MUSCLE3,
 waits for the remote actor to finish, and returns the real results back to the executor.
+
+Communication via MUSCLE3 vector ports:
+    hcd_workflow (macro)                actor_wrapper[i] (micro)
+    ───────────────────                 ────────────────────────
+    O_I: actor_input[i]  ──conduit──>  F_INIT: actor_input
+    S:   actor_output[i] <──conduit──  O_F:    actor_output
+
+    Each message is a bundled dict: {ids_name: serialized_bytes, ...}
+    packed via msgpack for efficient binary transfer.
+
+NOTE on vector ports:
+    - In the ymmsl file, port names are plain identifiers (e.g., "actor_input")
+    - In the Python Instance() constructor, we append "[]" to declare vector ports
+    - MUSCLE3 auto-detects vector nature from the multiplicity of actor_wrapper
 """
 
 import copy
+import json
 import logging
 import os
 import sys
@@ -40,6 +55,39 @@ try:
     M3_AVAILABLE = True
 except ImportError:
     print("[WorkflowDriver] Warning: MUSCLE3 not available", file=sys.stderr)
+
+# msgpack for efficient binary bundling of multiple IDS
+MSGPACK_AVAILABLE = False
+try:
+    import msgpack
+    MSGPACK_AVAILABLE = True
+except ImportError:
+    print("[WorkflowDriver] Warning: msgpack not available, falling back to json", file=sys.stderr)
+
+
+# =============================================================================
+# Bundle Serialization Helpers
+# =============================================================================
+
+def _pack_bundle(bundle_dict):
+    """Pack a dict of {ids_name: bytes} into a single bytes payload."""
+    if MSGPACK_AVAILABLE:
+        return msgpack.packb(bundle_dict, use_bin_type=True)
+    else:
+        # Fallback: json with base64 encoding for bytes values
+        import base64
+        json_dict = {k: base64.b64encode(v).decode('ascii') for k, v in bundle_dict.items()}
+        return json.dumps(json_dict).encode('utf-8')
+
+
+def _unpack_bundle(data):
+    """Unpack a bytes payload back into a dict of {ids_name: bytes}."""
+    if MSGPACK_AVAILABLE:
+        return msgpack.unpackb(data, raw=True)
+    else:
+        import base64
+        json_dict = json.loads(data.decode('utf-8'))
+        return {k: base64.b64decode(v) for k, v in json_dict.items()}
 
 
 # =============================================================================
@@ -86,7 +134,7 @@ def _create_ids(ids_name: str):
 
 class WorkflowDriver:
     """
-    Workflow Driver with MUSCLE3 support.
+    Workflow Driver with MUSCLE3 support using vector port bundle messaging.
     """
 
     def __init__(self, workflowConfigPath: str, m3_flag=0):
@@ -103,7 +151,7 @@ class WorkflowDriver:
                 raise RuntimeError("MUSCLE3 mode requested but libmuscle is not available!")
             self._init_m3_port_mapping()
             self.m3_instance = self._init_m3_instance()
-            print("[WorkflowDriver] Initialized in Hybrid M3 mode", file=sys.stdout, flush=True)
+            print("[WorkflowDriver] Initialized in Hybrid M3 mode (vector port bundle)", file=sys.stdout, flush=True)
         else:
             print("[WorkflowDriver] Initialized in traditional iwrap mode", file=sys.stdout, flush=True)
 
@@ -112,11 +160,21 @@ class WorkflowDriver:
     # =========================================================================
 
     def _init_m3_port_mapping(self):
+        """
+        Build mapping: process_name -> {code_name, input_ids, output_ids, slot_index}
+
+        slot_index determines which actor_wrapper instance (vector port slot)
+        this process communicates with. The order matches the ymmsl settings:
+            actor_wrapper[0] = first external process
+            actor_wrapper[1] = second external process
+            ...
+        """
         self.m3_port_mapping = {}
         process_bundle = self.workflowObject.workflowData.process_bundle
         catdict = self.workflowObject.workflowData.catdict
         param_process = self.workflowObject.workflowData.getParamProcess()
 
+        slot_index = 0
         for process_name in process_bundle.keys():
             if "merge_" in process_name or process_name not in catdict:
                 continue
@@ -134,25 +192,34 @@ class WorkflowDriver:
                 'code_name': code_name,
                 'input_ids': input_ids,
                 'output_ids': output_ids,
-                'ids_to_port': {ids: f"{ids}_out" for ids in input_ids},
-                'port_to_ids': {f"{ids}_in": ids for ids in output_ids},
+                'slot_index': slot_index,
             }
+            slot_index += 1
 
-        print(f"[WorkflowDriver] M3 port mapping:", file=sys.stdout, flush=True)
+        print(f"[WorkflowDriver] M3 port mapping (vector port bundle mode):", file=sys.stdout, flush=True)
         for proc, cfg in self.m3_port_mapping.items():
-            print(f"  {proc} ({cfg['code_name']}): in={cfg['input_ids']}, out={cfg['output_ids']}", flush=True)
+            print(f"  slot[{cfg['slot_index']}] {proc} ({cfg['code_name']}): "
+                  f"in={cfg['input_ids']}, out={cfg['output_ids']}", flush=True)
 
-    def _get_all_m3_ports(self):
-        all_output_ports, all_input_ports = set(), set()
-        for config in self.m3_port_mapping.values():
-            for ids in config['input_ids']: all_output_ports.add(f"{ids}_out")
-            for ids in config['output_ids']: all_input_ports.add(f"{ids}_in")
-        return {'output_ports': sorted(list(all_output_ports)), 'input_ports': sorted(list(all_input_ports))}
+        self.num_actor_slots = slot_index
+        print(f"[WorkflowDriver] Total actor slots: {self.num_actor_slots}", flush=True)
 
     def _init_m3_instance(self):
-        all_ports = self._get_all_m3_ports()
-        ports = {Operator.O_I: all_ports['output_ports'], Operator.S: all_ports['input_ports']}
-        print(f"[WorkflowDriver] Creating M3 Instance\n  O_I: {ports[Operator.O_I]}\n  S:   {ports[Operator.S]}", flush=True)
+        """
+        Create MUSCLE3 Instance with vector ports.
+
+        NOTE: The '[]' suffix is the Python-side declaration that tells MUSCLE3
+        this port is a vector port. The ymmsl file uses plain names without [].
+        MUSCLE3 auto-sizes the vector port based on the multiplicity of
+        the connected component (actor_wrapper).
+        """
+        ports = {
+            Operator.O_I: ['actor_input[]'],
+            Operator.S:   ['actor_output[]'],
+        }
+        print(f"[WorkflowDriver] Creating M3 Instance with vector ports", flush=True)
+        print(f"  O_I: actor_input[] ({self.num_actor_slots} slots)", flush=True)
+        print(f"  S:   actor_output[] ({self.num_actor_slots} slots)", flush=True)
         return Instance(ports, InstanceFlags.SKIP_MMSF_SEQUENCE_CHECKS)
 
     # =========================================================================
@@ -162,63 +229,76 @@ class WorkflowDriver:
     def _inject_m3_proxies(self):
         """
         Dynamically replace external actors in the executor with MUSCLE3 Proxies.
+
+        Each proxy:
+        1. Bundles all input IDS into a single message (dict of serialized bytes)
+        2. Sends it to actor_input[slot_index] via the vector port
+        3. Receives the bundled result from actor_output[slot_index]
+        4. Unpacks and returns the output IDS
         """
         for process_name, port_config in self.m3_port_mapping.items():
             actor_name = port_config['code_name']
 
             def create_proxy(proc_name, config):
                 def m3_proxy_actor(*inputargs):
-                    print(f"  [M3 Proxy] Intercepted execution for {proc_name} ({config['code_name']})", flush=True)
-                    
+                    slot_idx = config['slot_index']
+                    print(f"  [M3 Proxy] Intercepted {proc_name} ({config['code_name']}) -> slot[{slot_idx}]", flush=True)
+
                     m3_timestamp = self.current_time
 
-                    # 1. Send all input parameters
+                    # === 1. Bundle all input IDS into one message ===
+                    bundle = {}
                     for idx, ids_name in enumerate(config['input_ids']):
-                        port_name = config['ids_to_port'][ids_name]
-                        # ======================================================
-                        # If this port was already sent by another Actor at this time step,
-                        # MUSCLE3 has broadcast it, so skip to avoid queue buildup and timing errors.
-                        # ======================================================
-                        if port_name in self._sent_ports_this_step:
-                            print(f"    -> Skipping {port_name} (already broadcasted to M3 this step)", flush=True)
-                            continue
-
                         ids_data = inputargs[idx]
-                        internal_t = float(ids_data.time[-1]) if hasattr(ids_data, 'time') and len(ids_data.time) > 0 else 0.0
-                        
-                        if hasattr(ids_data, 'time'):
+
+                        # Align IDS timestamp with M3 timestamp
+                        if hasattr(ids_data, 'time') and len(ids_data.time) > 0:
                             import numpy as np
                             ids_data.time = np.array([m3_timestamp], dtype=np.float64)
                             if hasattr(ids_data, 'ids_properties'):
                                 ids_data.ids_properties.homogeneous_time = 1
 
-                        print(f"    -> Sending {port_name} (M3_t={m3_timestamp:.2f}, internal_t updated: {internal_t:.4f} -> {m3_timestamp:.2f})", flush=True)
-                        
-                        self.m3_instance.send(port_name, Message(m3_timestamp, data=ids_data.serialize()))
-                        
-                        # Mark this port as already sent
-                        self._sent_ports_this_step.add(port_name)
+                        bundle[ids_name] = ids_data.serialize()
+                        print(f"    -> Bundled {ids_name} for slot[{slot_idx}]", flush=True)
 
-                    # 2. Wait for and receive the computed outputs
+                    # === 2. Send bundle to actor_input[slot_index] ===
+                    packed = _pack_bundle(bundle)
+                    print(f"    -> Sending bundle to actor_input[{slot_idx}] "
+                          f"(t={m3_timestamp:.2f}, {len(config['input_ids'])} IDS, "
+                          f"{len(packed)} bytes)", flush=True)
+                    self.m3_instance.send('actor_input', Message(m3_timestamp, data=packed), slot_idx)
+
+                    # === 3. Receive result bundle from actor_output[slot_index] ===
+                    print(f"    <- Waiting for actor_output[{slot_idx}]...", flush=True)
+                    msg = self.m3_instance.receive('actor_output', slot_idx)
+                    result_bundle = _unpack_bundle(msg.data)
+                    print(f"    <- Received bundle from slot[{slot_idx}] "
+                          f"(t={msg.timestamp:.2f}, {len(result_bundle)} IDS)", flush=True)
+
+                    # === 4. Unpack output IDS ===
                     received_outputs = []
-                    for port_name, ids_name in config['port_to_ids'].items():
-                        print(f"    <- Waiting for {port_name}...", flush=True)
-                        msg = self.m3_instance.receive(port_name)
-                        
+                    for ids_name in config['output_ids']:
+                        # Handle both str and bytes keys (msgpack may return bytes keys)
+                        ids_name_key = ids_name
+                        if len(result_bundle) > 0 and isinstance(list(result_bundle.keys())[0], bytes):
+                            ids_name_key = ids_name.encode('utf-8')
+
                         output_ids = _create_ids(ids_name)
-                        output_ids.deserialize(msg.data)
-                        
+                        output_ids.deserialize(result_bundle[ids_name_key])
+
                         if not getattr(output_ids, '__name__', None):
                             object.__setattr__(output_ids, '__name__', ids_name)
 
-                        print(f"    <- Received {ids_name} (M3_t={msg.timestamp:.2f})", flush=True)
+                        print(f"    <- Unpacked {ids_name}", flush=True)
                         received_outputs.append(output_ids)
 
-                    # 3. Return matching original actor format
                     return received_outputs[0] if len(received_outputs) == 1 else received_outputs
+
                 return m3_proxy_actor
 
             self.workflowObject.workflowData.dictionary_of_actors[actor_name] = create_proxy(process_name, port_config)
+            print(f"[WorkflowDriver] Injected proxy for {actor_name} (slot[{port_config['slot_index']}])", flush=True)
+
     # =========================================================================
     # Initialization & Time Loop Core
     # =========================================================================
@@ -242,7 +322,7 @@ class WorkflowDriver:
         if dt * nsteps < (tend_val - timenow): nsteps += 1
 
         print("---------------------------------------------", flush=True)
-        print(f"---- Enter time loop (Mode: {'Hybrid M3' if self.m3_flag == 1 else 'iwrap'}) ----", flush=True)
+        print(f"---- Enter time loop (Mode: {'Hybrid M3 Vector Port' if self.m3_flag == 1 else 'iwrap'}) ----", flush=True)
 
         if self.m3_flag == 1:
             self._run_timeloop_m3(timenow, tend_val, dt, nsteps)
@@ -293,15 +373,14 @@ class WorkflowDriver:
         """Unified step execution: works identically for M3 and IWRAP."""
 
         self.current_time = timenow
-        self._sent_ports_this_step = set()
 
         idsSlices = self._getIDSSlices(timenow)
         if idsSlices is None: return
 
         nonmandatoryIDSes = {k: v for k, v in idsSlices.items() if k not in ["equilibrium", "core_profiles", "workflow"]}
-        
+
         self.workflowObject.setProcessStatus(timenow)
-        
+
         # In M3 Mode, calling run() triggers our Proxies automatically!
         self.workflowObject.run(
             equilibrium=idsSlices["equilibrium"],
@@ -329,7 +408,7 @@ class WorkflowDriver:
             try:
                 idsSlices[ids] = self.md.get_slice(ids, timenow, 1)
             except Exception as e:
-                pass # Non-critical if missing
+                pass  # Non-critical if missing
         return idsSlices
 
     def _storeIDSSlices(self, inputSlices, idsOut):

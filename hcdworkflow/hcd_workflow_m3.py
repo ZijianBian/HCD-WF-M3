@@ -174,30 +174,39 @@ def main():
         # --- O_F: Send output IDS back ---
         output_ids = workflow._getIDSes()
 
+        # Build set of IDS types that SHOULD have been produced
+        expected_outputs = set()
+        for process, bundle in workflow.workflowData.process_bundle.items():
+            if bundle.get("status") == 1 and "merge_" not in process:
+                for ids_name in bundle.get("output", {}).keys():
+                    expected_outputs.add(ids_name)
+
         for port_name in connected_send:
             ids_name = _port_to_ids(port_name)
             ids_data = output_ids.get(ids_name)
 
             serialized = None
-            out_t = timestamp
             if ids_data is not None:
-                if hasattr(ids_data, 'time') and len(ids_data.time) > 0:
-                    out_t = float(ids_data.time[-1])
                 try:
                     serialized = ids_data.serialize()
                 except (ValueError, RuntimeError) as e:
-                    print(f"  -> {ids_name} cannot be serialized ({e}), sending empty", flush=True)
+                    print(f"  -> ERROR: {ids_name} serialization failed: {e}", flush=True)
 
             if serialized is None:
+                if ids_name in expected_outputs:
+                    print(
+                        f"  -> WARNING: {ids_name} expected but missing!",
+                        flush=True, file=sys.stderr
+                    )
                 empty_ids = _create_ids(ids_name)
-                empty_ids.ids_properties.homogeneous_time = 0
+                empty_ids.ids_properties.homogeneous_time = -1
                 try:
                     serialized = empty_ids.serialize()
-                except (ValueError, RuntimeError):
+                except Exception:
                     serialized = b''
 
-            print(f"  -> Sending {ids_name} on {port_name} (t={out_t:.4f}, {len(serialized)} bytes)", flush=True)
-            instance.send(port_name, Message(out_t, data=serialized))
+            print(f"  -> Sending {ids_name} on {port_name} (t={timestamp:.4f}, {len(serialized)} bytes)", flush=True)
+            instance.send(port_name, Message(timestamp, data=serialized))
 
         print(f"[hcd_workflow] Iteration {iteration} complete", flush=True)
 

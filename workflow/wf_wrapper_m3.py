@@ -31,12 +31,19 @@ Usage:
 import inspect
 import os
 import sys
+import copy
 from pathlib import Path
 
 sys.stdout.reconfigure(line_buffering=True)
 sys.stderr.reconfigure(line_buffering=True)
 
+import numpy as np
 import imas
+
+try:
+    from scipy.ndimage import gaussian_filter
+except ImportError:
+    gaussian_filter = None
 
 import hcdworkflow
 from gui.gui_methods import create_workflow_param_from_file
@@ -76,10 +83,317 @@ def get_backend(backend_name: str):
         raise RuntimeError(f"Cannot find IMAS backend definitions")
 
 
+def _get_target_dd_version():
+    """Get the DD version of the current IMAS environment."""
+    return os.getenv('IMAS_VERSION', imas.dd_zip.dd_xml_versions()[-1])
+
+
+def _smart_convert(ids_object, ids_name):
+    """Convert IDS to target DD version if needed, with manual fix-ups.
+
+    Follows the Torbeam standalone pattern:
+      1. autoconvert=False by default
+      2. Check DD version mismatch
+      3. Convert only if needed via imas.convert_ids()
+      4. Apply manual fix-ups for fields that don't convert cleanly
+
+    IMPORTANT: For equilibrium, fix-ups are applied unconditionally
+    (not only after DD conversion), because issues like missing b_field,
+    NaN values, and missing triangularity_lower exist regardless of DD version.
+
+    Returns the (possibly converted) IDS object.
+    """
+    target_dd = _get_target_dd_version()
+    source_dd = getattr(ids_object.ids_properties.version_put, 'data_dictionary', '')
+
+    if source_dd and source_dd != target_dd:
+        print(f"  [{ids_name}] Converting DD {source_dd} → {target_dd}", flush=True)
+
+        # Capture fields that will be lost during conversion
+        pre_convert_data = {}
+        if ids_name == 'ec_launchers':
+            pre_convert_data = _capture_ec_launchers_fields(ids_object)
+
+        ids_object = imas.convert_ids(ids_object, target_dd)
+
+        # --- Manual fix-ups after conversion ---
+        if ids_name == 'ec_launchers':
+            ids_object = _fixup_ec_launchers(ids_object, pre_convert_data)
+
+    # --- Unconditional fix-ups (run regardless of DD version match) ---
+    if ids_name == 'equilibrium':
+        ids_object = _fixup_equilibrium(ids_object)
+
+    return ids_object
+
+
+def _capture_ec_launchers_fields(ec):
+    """Capture ec_launchers fields that are lost during DD conversion.
+
+    In DD 3.x: beam.mode (int) and beam.o_mode_fraction (1D array)
+    In DD 4.1.0: beam.polarization.o_mode_fraction (1D array)
+    """
+    data = {}
+    for i, beam in enumerate(ec.beam):
+        beam_data = {}
+        if hasattr(beam, 'o_mode_fraction') and beam.o_mode_fraction.has_value:
+            beam_data['o_mode_fraction'] = np.array(beam.o_mode_fraction)
+        elif hasattr(beam, 'mode'):
+            # mode=1 means O-mode, mode=0 or -1 means X-mode
+            try:
+                mode_val = int(beam.mode)
+                beam_data['o_mode_fraction'] = np.array([1.0 if mode_val == 1 else 0.0])
+            except Exception:
+                pass
+        data[i] = beam_data
+    return data
+
+
+def _fixup_ec_launchers(ec, pre_convert_data):
+    """Apply manual fix-ups for ec_launchers IDS after DD conversion.
+
+    Restores o_mode_fraction from pre-conversion data into the new
+    beam.polarization.o_mode_fraction location.
+    """
+    for i, beam in enumerate(ec.beam):
+        if i in pre_convert_data and 'o_mode_fraction' in pre_convert_data[i]:
+            if hasattr(beam, 'polarization'):
+                p = beam.polarization
+                if not p.o_mode_fraction.has_value:
+                    old_val = pre_convert_data[i]['o_mode_fraction']
+                    p.o_mode_fraction = old_val
+    if pre_convert_data:
+        print(f"  [ec_launchers] Restored o_mode_fraction for {len(pre_convert_data)} beams", flush=True)
+    return ec
+
+
+def _fixup_equilibrium(eq):
+    """Apply manual fix-ups for equilibrium IDS.
+
+    This runs UNCONDITIONALLY (not only after DD conversion) because
+    these issues exist in the source data regardless of DD version:
+      - Missing b_field_r/z/phi computation from psi
+      - NaN values in 2D profiles
+      - b_field_tor → b_field_phi renaming (DD 3.42 legacy)
+      - Missing vacuum toroidal field quantities
+      - Missing triangularity_lower (needed by Cyrano)
+
+    Reference: Torbeam standalone run_torbeam script,
+               Cyrano standalone run_cyrano script.
+    """
+    if len(eq.time_slice) == 0:
+        return eq
+
+    ts = eq.time_slice[0]
+
+    # --- Complete b_field_r/z/phi only if missing ---
+    if len(ts.profiles_2d) > 0 and not ts.profiles_2d[0].b_field_r.has_value:
+        print("  [equilibrium] Completing b_field_r, b_field_z, b_field_phi from psi", flush=True)
+        try:
+            _update_equilibrium_bfield(eq)
+        except Exception as e:
+            print(f"  [equilibrium] WARNING: Could not compute b_field: {e}", flush=True)
+
+    # --- NaN replacement in 2D profiles ---
+    if len(ts.profiles_2d) > 0 and ts.profiles_2d[0].b_field_r.has_value:
+        p2d = ts.profiles_2d[0]
+        if np.isnan(p2d.b_field_r).any():
+            print("  [equilibrium] Replacing NaN in 2D profiles", flush=True)
+            p2d.b_field_r[np.isnan(p2d.b_field_r)] = 0.0
+            p2d.b_field_z[np.isnan(p2d.b_field_z)] = 0.0
+            p2d.b_field_phi[np.isnan(p2d.b_field_phi)] = \
+                np.sign(eq.vacuum_toroidal_field.b0) * 99.0
+            p2d.psi[np.isnan(p2d.psi)] = ts.global_quantities.psi_boundary
+
+            # Smooth to avoid grid irregularities near separatrix
+            if gaussian_filter is not None:
+                p2d.b_field_r = gaussian_filter(p2d.b_field_r, sigma=2)
+                p2d.b_field_z = gaussian_filter(p2d.b_field_z, sigma=2)
+                p2d.b_field_phi = gaussian_filter(p2d.b_field_phi, sigma=2)
+                p2d.psi = gaussian_filter(p2d.psi, sigma=2)
+
+    # --- b_field_tor → b_field_phi (DD 3.42 had both) ---
+    if hasattr(ts.global_quantities.magnetic_axis, 'b_field_tor'):
+        if not ts.global_quantities.magnetic_axis.b_field_phi.has_value \
+           and ts.global_quantities.magnetic_axis.b_field_tor.has_value:
+            print("  [equilibrium] Copying b_field_tor → b_field_phi (magnetic_axis)", flush=True)
+            ts.global_quantities.magnetic_axis.b_field_phi = \
+                ts.global_quantities.magnetic_axis.b_field_tor
+
+    if len(ts.profiles_2d) > 0 and hasattr(ts.profiles_2d[0], 'b_field_tor'):
+        if not ts.profiles_2d[0].b_field_phi.has_value \
+           and ts.profiles_2d[0].b_field_tor.has_value:
+            print("  [equilibrium] Copying b_field_tor → b_field_phi (profiles_2d)", flush=True)
+            ts.profiles_2d[0].b_field_phi = ts.profiles_2d[0].b_field_tor
+
+    # --- Fill vacuum quantities from magnetic axis if missing ---
+    if eq.vacuum_toroidal_field.b0.has_value:
+        pass  # already present
+    elif ts.global_quantities.magnetic_axis.b_field_phi.has_value:
+        print("  [equilibrium] Filling vacuum_toroidal_field from magnetic_axis", flush=True)
+        eq.vacuum_toroidal_field.b0.resize(1)
+        eq.vacuum_toroidal_field.b0[0] = ts.global_quantities.magnetic_axis.b_field_phi
+        eq.vacuum_toroidal_field.r0 = ts.global_quantities.magnetic_axis.r
+
+    # --- triangularity_lower from triangularity_upper if missing ---
+    # Required by Cyrano IC wave solver. Shot 134173 is known to have
+    # triangularity_upper populated but triangularity_lower empty.
+    # Reference: run_cyrano standalone script, confirmed by Mireille.
+    if hasattr(ts, 'profiles_1d'):
+        if not ts.profiles_1d.triangularity_lower.has_value \
+           and ts.profiles_1d.triangularity_upper.has_value:
+            print("  [equilibrium] Copying triangularity_upper → triangularity_lower", flush=True)
+            ts.profiles_1d.triangularity_lower = \
+                copy.deepcopy(ts.profiles_1d.triangularity_upper)
+
+    return eq
+
+
+def _update_equilibrium_bfield(eq):
+    """Compute b_field_r/z/phi from psi for equilibrium profiles_2d.
+
+    Ported from Torbeam's add_bfield.py (UpdateEquilibrium).
+    Handles two cases:
+      - profiles_2d empty (GGD/NICE case): interpolate from ggd to 2D grid
+      - profiles_2d present (DINA case): derive Br/Bz/Bphi from psi and f
+    """
+    from scipy.interpolate import griddata as scipy_griddata
+
+    N_grid_r = 101
+    N_grid_z = 103
+
+    ts = eq.time_slice[0]
+
+    if len(ts.profiles_2d) == 0:
+        # GGD case (NICE): interpolate from ggd to rectangular grid
+        ts.profiles_2d.resize(1)
+        ts.profiles_2d[0].grid_type.index = 1
+
+        phi = np.abs(ts.ggd[0].phi[0].values)
+        phi[np.where(phi > 1.e40)] = np.nan
+        rr = ts.ggd[0].r[0].values
+        zz = ts.ggd[0].z[0].values
+
+        rho = np.full(len(phi), np.nan)
+        valid = np.where(~np.isnan(phi))
+        try:
+            rho[valid] = np.sqrt(phi[valid] / np.max(phi[valid]))
+        except Exception:
+            print("  [equilibrium] WARNING: equilibrium likely did not converge", flush=True)
+            return
+
+        # Use hardcoded ITER-base values for R,Z range
+        r_min, r_max = 3.0, 9.0
+        z_min, z_max = -6.0, 6.0
+
+        R_2D, Z_2D = np.meshgrid(
+            np.linspace(r_min, r_max, N_grid_r),
+            np.linspace(z_min, z_max, N_grid_z))
+
+        ts.profiles_2d[0].grid_type.name = 'rectangular'
+        ts.profiles_2d[0].grid_type.index = 1
+        ts.profiles_2d[0].grid.dim1 = R_2D[0, :]
+        ts.profiles_2d[0].grid.dim2 = Z_2D[:, 0]
+        ts.profiles_2d[0].r = R_2D.T
+        ts.profiles_2d[0].z = Z_2D.T
+
+        for field in ['psi', 'phi', 'b_field_r', 'b_field_phi', 'b_field_z', 'j_phi']:
+            try:
+                src_vals = getattr(ts.ggd[0], field)[0].values
+                setattr(ts.profiles_2d[0], field,
+                        scipy_griddata((rr, zz), src_vals, (R_2D, Z_2D)).T)
+            except Exception as e:
+                print(f"  [equilibrium] WARNING: Could not interpolate {field}: {e}", flush=True)
+    else:
+        # DINA case: derive Br, Bz, Bphi from psi and f profiles
+        _compute_b2d(eq)
+        _compute_bax(eq)
+
+
+def _compute_b2d(eq):
+    """Compute 2D magnetic field components from psi (DINA/profiles_2d case).
+
+    Ported from add_bfield.py: UpdateEquilibriumB2d.
+    """
+    import math
+
+    cocos_psi = 1.0  # 1 for DDV4 (cocos=17), -1 for DDV3 (cocos=11)
+
+    for ts in eq.time_slice:
+        if len(ts.profiles_2d) == 0:
+            continue
+
+        psi2d = cocos_psi * ts.profiles_2d[0].psi
+        psi1d = cocos_psi * ts.profiles_1d.psi
+        f1d = ts.profiles_1d.f
+
+        r = ts.profiles_2d[0].grid.dim1
+        z = ts.profiles_2d[0].grid.dim2
+
+        nr, nz = len(r), len(z)
+        br = np.zeros(psi2d.shape)
+        bz = np.zeros(psi2d.shape)
+        bt = np.zeros(psi2d.shape)
+
+        dr = r[2] - r[1]
+        dz = z[2] - z[1]
+
+        for ir in range(nr):
+            for iz in range(nz):
+                # Br from -dpsi/dz / (2*pi*R)
+                if iz == 0:
+                    br[ir, iz] = -(psi2d[ir, iz+1] - psi2d[ir, iz]) / (2.0 * math.pi * r[ir] * dz)
+                elif iz == nz - 1:
+                    br[ir, iz] = -(psi2d[ir, iz] - psi2d[ir, iz-1]) / (2.0 * math.pi * r[ir] * dz)
+                else:
+                    br[ir, iz] = -0.5 * (psi2d[ir, iz+1] - psi2d[ir, iz-1]) / (2.0 * math.pi * r[ir] * dz)
+
+                # Bz from dpsi/dr / (2*pi*R)
+                if ir == 0:
+                    bz[ir, iz] = (psi2d[ir+1, iz] - psi2d[ir, iz]) / (2.0 * math.pi * r[ir] * dr)
+                elif ir == nr - 1:
+                    bz[ir, iz] = (psi2d[ir, iz] - psi2d[ir-1, iz]) / (2.0 * math.pi * r[ir] * dr)
+                else:
+                    bz[ir, iz] = 0.5 * (psi2d[ir+1, iz] - psi2d[ir-1, iz]) / (2.0 * math.pi * r[ir] * dr)
+
+                # Bt = F(psi) / R
+                bt[ir, iz] = np.interp(psi2d[ir, iz], psi1d, f1d) / r[ir]
+
+        ts.profiles_2d[0].b_field_r = br
+        ts.profiles_2d[0].b_field_z = bz
+        ts.profiles_2d[0].b_field_phi = bt
+
+
+def _compute_bax(eq):
+    """Compute magnetic axis b_field_phi.
+
+    Ported from add_bfield.py: UpdateEquilibriumBax.
+    """
+    for ts in eq.time_slice:
+        rmag = ts.global_quantities.magnetic_axis.r
+        if not (rmag > 0.):
+            rmag = eq.vacuum_toroidal_field.r0
+
+        psi1d = ts.profiles_1d.psi
+        psi_ax = ts.global_quantities.psi_axis
+        if abs(psi1d[0] - psi_ax) < abs(psi1d[-1] - psi_ax):
+            f_ax = ts.profiles_1d.f[0]
+        else:
+            f_ax = ts.profiles_1d.f[-1]
+
+        if abs(f_ax) > 0.:
+            b_field_ax = f_ax / rmag
+        else:
+            b_field_ax = eq.vacuum_toroidal_field.b0[0] * eq.vacuum_toroidal_field.r0 / rmag
+
+        ts.global_quantities.magnetic_axis.b_field_phi = b_field_ax
+
+
 def safe_get_ids(db_entry, ids_name):
-    """Safely get an IDS from database, handling empty/missing cases."""
+    """Safely get an IDS from database, with smart DD conversion."""
     try:
-        ids_object = db_entry.get(ids_name)
+        ids_object = db_entry.get(ids_name, autoconvert=False)
+        ids_object = _smart_convert(ids_object, ids_name)
         if hasattr(ids_object, 'ids_properties'):
             homogeneous_time = getattr(ids_object.ids_properties, 'homogeneous_time', None)
             if homogeneous_time is not None and homogeneous_time != get_empty_int():
@@ -93,7 +407,7 @@ def safe_get_ids(db_entry, ids_name):
         else:
             raise
 
-
+# forget about non-imas-python
 def _create_ids(ids_name: str):
     """Create an empty IDS object by name."""
     if hasattr(imas, 'IDSFactory'):
@@ -112,7 +426,8 @@ def _safe_partial_get(db_entry, ids_name: str, data_path: str, occurrence: int =
             return db_entry.partial_get(ids_name=ids_name, data_path=data_path, occurrence=occurrence)
         else:
             try:
-                ids_object = db_entry.get(ids_name, occurrence)
+                ids_object = db_entry.get(ids_name, occurrence, autoconvert=False)
+                ids_object = _smart_convert(ids_object, ids_name)
                 result = ids_object
                 for part in data_path.split('/'):
                     if part:
@@ -251,11 +566,12 @@ def setup_databases(config_folder_path):
 # =============================================================================
 
 def get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow):
-    """Read all IDS slices at the given time."""
+    """Read all IDS slices at the given time, with smart DD conversion."""
     slices = {}
     for ids_name in inputIds:
         try:
-            slices[ids_name] = inputDb.get_slice(ids_name, timenow, 1)
+            ids_obj = inputDb.get_slice(ids_name, timenow, 1, autoconvert=False)
+            slices[ids_name] = _smart_convert(ids_obj, ids_name)
         except Exception as e:
             if 'empty' in str(e).lower():
                 slices[ids_name] = _create_ids(ids_name)
@@ -264,7 +580,8 @@ def get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow):
                 return None
     for ids_name in inputMds:
         try:
-            slices[ids_name] = machineDb.get_slice(ids_name, timenow, 1)
+            ids_obj = machineDb.get_slice(ids_name, timenow, 1, autoconvert=False)
+            slices[ids_name] = _smart_convert(ids_obj, ids_name)
         except Exception:
             pass
     return slices
@@ -474,10 +791,14 @@ def run_m3_macro(config_folder_path, inputDb, outputDb, machineDb, inputIds, inp
                 if msg.data and len(msg.data) > 0:
                     try:
                         ids_obj.deserialize(msg.data)
+                        if ids_obj.ids_properties.homogeneous_time == -1:
+                            print(f"  <- {ids_name}: marked invalid (not produced this timestep)", flush=True)
+                        else:
+                            # Stamp authoritative global time before writing to DB
+                            if hasattr(ids_obj, 'time'):
+                                ids_obj.time = np.array([timenow])
                     except Exception as e:
                         print(f"  <- WARNING: Could not deserialize {ids_name}: {e}", flush=True)
-                if not getattr(ids_obj, '__name__', None):
-                    object.__setattr__(ids_obj, '__name__', ids_name)
 
                 output_ids[ids_name] = ids_obj
                 print(f"  <- Received {ids_name} (t={msg.timestamp:.4f})", flush=True)

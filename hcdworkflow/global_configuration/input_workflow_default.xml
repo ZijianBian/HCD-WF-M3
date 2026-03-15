@@ -35,7 +35,7 @@
       <ICRH                 display="ICRH">
 	<ic_coup            display="Coupling" list="iccoup">0</ic_coup> 
 	<ic_wave_solver     display="Wave solver" list="cyrano tomcat pion lion">0</ic_wave_solver>
-	<ic_wave_fp         display="Ion Fokker-Planck" list="stixredist fopla">0</ic_wave_fp>
+	<ic_wave_fp         display="Ion Fokker-Planck" list="stix_redist fopla">0</ic_wave_fp>
       </ICRH>
     
       <NBI                  display="NBI">
