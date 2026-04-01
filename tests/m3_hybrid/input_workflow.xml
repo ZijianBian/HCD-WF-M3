@@ -10,10 +10,10 @@
     <output_user_or_path display="Output user or path">default</output_user_or_path>
     <output_database display="Output database">default</output_database>
     <output_backend display="Output backend">HDF5</output_backend>
-    <run_out display="Output run">410</run_out>
-    <tbegin display="Start Time [s]">140.0</tbegin>
-    <tend display="End Time   [s]">190.0</tend>
-    <dt_required display="Time Step  [s]">30</dt_required>
+    <run_out display="Output run">100</run_out>
+    <tbegin display="Start Time [s]">40.0</tbegin>
+    <tend display="End Time   [s]">120.0</tend>
+    <dt_required display="Time Step  [s]">40</dt_required>
     <parallel_workflow display="Parallel workflow [0-1]">0</parallel_workflow> 
     <one_time_slice display="Single time slice [0-1]">0</one_time_slice>  
   </workflow_parameters>
@@ -37,7 +37,7 @@
       <ICRH display="ICRH">
 	<ic_coup display="Coupling" list="iccoup">0</ic_coup> 
 	<ic_wave_solver display="Wave solver" list="cyrano tomcat pion lion">1</ic_wave_solver>
-	<ic_wave_fp display="Ion Fokker-Planck" list="stix_redist fopla">0</ic_wave_fp>
+	<ic_wave_fp display="Ion Fokker-Planck" list="stix_redist fopla">2</ic_wave_fp>
       </ICRH>
     
       <NBI display="NBI">

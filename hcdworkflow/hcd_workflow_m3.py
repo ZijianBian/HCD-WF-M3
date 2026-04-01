@@ -173,7 +173,10 @@ def main():
 
         # --- O_F: Send output IDS back ---
         output_ids = workflow._getIDSes()
-
+##################
+        for k, v in output_ids.items():
+            print(f"  _getIDSes: {k} -> {type(v)}", flush=True)
+######################
         # Build set of IDS types that SHOULD have been produced
         expected_outputs = set()
         for process, bundle in workflow.workflowData.process_bundle.items():

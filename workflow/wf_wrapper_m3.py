@@ -235,16 +235,70 @@ def _fixup_equilibrium(eq):
         eq.vacuum_toroidal_field.b0[0] = ts.global_quantities.magnetic_axis.b_field_phi
         eq.vacuum_toroidal_field.r0 = ts.global_quantities.magnetic_axis.r
 
+
     # --- triangularity_lower from triangularity_upper if missing ---
-    # Required by Cyrano IC wave solver. Shot 134173 is known to have
-    # triangularity_upper populated but triangularity_lower empty.
-    # Reference: run_cyrano standalone script, confirmed by Mireille.
     if hasattr(ts, 'profiles_1d'):
         if not ts.profiles_1d.triangularity_lower.has_value \
            and ts.profiles_1d.triangularity_upper.has_value:
             print("  [equilibrium] Copying triangularity_upper → triangularity_lower", flush=True)
             ts.profiles_1d.triangularity_lower = \
                 copy.deepcopy(ts.profiles_1d.triangularity_upper)
+
+    # --- Compute r_outboard / r_inboard from 2D psi if missing ---
+    # Required by Cyrano IC wave solver. These are the major radius values
+    # at Z=Z_axis (midplane) on the outboard and inboard sides for each
+    # flux surface defined in profiles_1d.psi.
+    # Normally provided by CHEASE; computed here from 2D psi(R,Z) when missing.
+    if (
+        hasattr(ts, 'profiles_1d')
+        and len(ts.profiles_1d.psi) > 0
+        and len(ts.profiles_1d.r_outboard) == 0
+        and len(ts.profiles_2d) > 0
+        and ts.profiles_2d[0].psi.has_value
+        and float(ts.global_quantities.magnetic_axis.r) > 0
+    ):
+        try:
+            from scipy.interpolate import interp1d
+
+            R2d = np.array(ts.profiles_2d[0].r)
+            Z2d = np.array(ts.profiles_2d[0].z)
+            psi2d = np.array(ts.profiles_2d[0].psi)
+            psi1d = np.array(ts.profiles_1d.psi)
+
+            R1d = R2d[:, 0]   # R varies along axis 0
+            Z1d = Z2d[0, :]   # Z varies along axis 1
+
+            r_axis = float(ts.global_quantities.magnetic_axis.r)
+            z_axis = float(ts.global_quantities.magnetic_axis.z)
+
+            # Extract psi(R) at midplane (Z = Z_axis)
+            iz_mid = np.argmin(np.abs(Z1d - z_axis))
+            psi_mid = psi2d[:, iz_mid]
+
+            # Split into outboard (R >= R_axis) and inboard (R <= R_axis)
+            ir_axis = np.argmin(np.abs(R1d - r_axis))
+            R_out = R1d[ir_axis:]
+            psi_out = psi_mid[ir_axis:]
+            R_in = R1d[:ir_axis + 1]
+            psi_in = psi_mid[:ir_axis + 1]
+
+            f_out = interp1d(psi_out, R_out, bounds_error=False, fill_value=np.nan)
+            f_in = interp1d(psi_in, R_in, bounds_error=False, fill_value=np.nan)
+
+            r_outboard = f_out(psi1d)
+            r_inboard = f_in(psi1d)
+
+            # Fill NaN (near axis) with magnetic axis R
+            r_outboard[np.isnan(r_outboard)] = r_axis
+            r_inboard[np.isnan(r_inboard)] = r_axis
+
+            ts.profiles_1d.r_outboard = r_outboard
+            ts.profiles_1d.r_inboard = r_inboard
+
+            print(f"  [equilibrium] Computed r_outboard/r_inboard from 2D psi "
+                  f"({len(psi1d)} points, R_axis={r_axis:.3f})", flush=True)
+        except Exception as e:
+            print(f"  [equilibrium] WARNING: Could not compute r_outboard/r_inboard: {e}", flush=True)
 
     return eq
 
@@ -593,19 +647,26 @@ def store_ids_slices(outputDb, inputMds, input_slices, output_ids, m3_flag=0):
         if ids_name in inputMds:
             continue
         if hasattr(ids_data, 'ids_properties') and ids_data.ids_properties.homogeneous_time >= 0:
-            outputDb.put_slice(ids_data)
+            if ids_data.ids_properties.homogeneous_time == 2:
+                outputDb.put(ids_data)
+            else:
+                outputDb.put_slice(ids_data)
 
     for ids_name, ids_data in output_ids.items():
         if hasattr(ids_data, 'time') and len(ids_data.time) > 0:
             if ids_name != "equilibrium" and ids_data.time[0] > 0:
+                # Skip empty core_sources (no source data) to avoid HDF5 schema
+                # conflict: writing an empty core_sources first establishes an
+                # HDF5 schema without source arrays, causing subsequent put_slice
+                # with populated source data to segfault.
+                if ids_name == "core_sources" and (not hasattr(ids_data, 'source') or len(ids_data.source) == 0):
+                    continue
                 if m3_flag == 1:
-                    # Re-serialize to avoid C-level segfaults with deserialized objects
                     clean_ids = _create_ids(ids_name)
                     clean_ids.deserialize(ids_data.serialize())
                     outputDb.put_slice(clean_ids)
                 else:
                     outputDb.put_slice(ids_data)
-
 
 # =============================================================================
 # Time Range Resolution (shared by both modes)

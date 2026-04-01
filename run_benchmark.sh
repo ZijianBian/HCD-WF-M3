@@ -57,7 +57,7 @@ case "$MODE" in
         TEST_DIR="."
         MODE_DESC="Traditional (no MUSCLE3, all actors in-process)"
         RUN_PREFIX="run_traditional"
-        CONFIG_PATH="tests/m3_hybrid"
+        CONFIG_PATH="tests/105102"
         ;;
     "direct")
         TEST_DIR="."

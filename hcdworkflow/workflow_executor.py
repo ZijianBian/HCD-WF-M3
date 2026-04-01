@@ -41,13 +41,11 @@ class WorkflowExecutor:
 
     def execute(self):
         print("Execute H&CD workflow for current time slice", file=sys.stdout)
-        self.validateAndUpdateProcessBundle()
+        err = self.validateAndUpdateProcessBundle()
+        if err is not None and err < 0:
+            print("  Skipping time slice due to validation error", file=sys.stderr)
+            return err
         final_algorithm, waiting_for, parallel_runs = self.decideAlgorithm()
-        # print("final_algo", final_algorithm)
-        # print(" ")
-        # print("waiting_for", waiting_for)
-        # print(" ")
-        # print("parallel_runs", parallel_runs)
 
         # EXECUTE THE CODES ACCORDING TO THE REQUESTED SEQUENCE
         self.executeAlgorithm(final_algorithm)
@@ -85,18 +83,24 @@ class WorkflowExecutor:
                 and "equilibrium" in self.process_bundle[process]["input"].keys()
             ):
                 time_array = self.process_bundle[process]["input"]["equilibrium"].time
+
+            # --- NBI waveform check ---
             if (
                 "nbi" in self.process_bundle[process]["input"]
                 and "nuclear" not in process
                 and self.process_bundle[process]["input"]["nbi"].ids_properties.homogeneous_time < 0
             ):
-                print("  NBI required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                if self.param_process.get("nbi_source", 0) != 0 or self.param_process.get("nbi_fp", 0) != 0:
+                    print("  NBI required but no waveform!!!", file=sys.stderr)
+                    print(
+                        "  --> Edit H&CD waveforms before executing the workflow.",
+                        file=sys.stderr,
+                    )
+                    print("  --> Abort.", file=sys.stderr)
+                    return -1
+                else:
+                    self.param_process["nbi_source"] = 0
+                    self.param_process["nbi_fp"] = 0
 
             if "nbi" in self.process_bundle[process]["input"] and not is_nbi_on(
                 self.process_bundle[process]["input"]["nbi"],
@@ -106,17 +110,27 @@ class WorkflowExecutor:
                 self.param_process["nbi_source"] = 0
                 self.param_process["nbi_fp"] = 0
 
+            # --- IC waveform check ---
             if (
                 "ic_antennas" in self.process_bundle[process]["input"]
                 and self.process_bundle[process]["input"]["ic_antennas"].ids_properties.homogeneous_time < 0
             ):
-                print("  ICRH required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                if (
+                    self.param_process.get("ic_wave_solver", 0) != 0
+                    or self.param_process.get("ic_coup", 0) != 0
+                    or self.param_process.get("ic_wave_fp", 0) != 0
+                ):
+                    print("  ICRH required but no waveform!!!", file=sys.stderr)
+                    print(
+                        "  --> Edit H&CD waveforms before executing the workflow.",
+                        file=sys.stderr,
+                    )
+                    print("  --> Abort.", file=sys.stderr)
+                    return -1
+                else:
+                    self.param_process["ic_coup"] = 0
+                    self.param_process["ic_wave_solver"] = 0
+                    self.param_process["ic_wave_fp"] = 0
 
             if "ic_antennas" in self.process_bundle[process]["input"] and not is_ic_on(
                 self.process_bundle[process]["input"]["ic_antennas"],
@@ -127,17 +141,22 @@ class WorkflowExecutor:
                 self.param_process["ic_wave_solver"] = 0
                 self.param_process["ic_wave_fp"] = 0
 
+            # --- EC waveform check ---
             if (
                 "ec_launchers" in self.process_bundle[process]["input"]
                 and self.process_bundle[process]["input"]["ec_launchers"].ids_properties.homogeneous_time < 0
             ):
-                print("  ECRH required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                if self.param_process.get("ec_wave_solver", 0) != 0 or self.param_process.get("ec_wave_fp", 0) != 0:
+                    print("  ECRH required but no waveform!!!", file=sys.stderr)
+                    print(
+                        "  --> Edit H&CD waveforms before executing the workflow.",
+                        file=sys.stderr,
+                    )
+                    print("  --> Abort.", file=sys.stderr)
+                    return -1
+                else:
+                    self.param_process["ec_wave_solver"] = 0
+                    self.param_process["ec_wave_fp"] = 0
 
             if "ec_launchers" in self.process_bundle[process]["input"] and not is_ec_on(
                 self.process_bundle[process]["input"]["ec_launchers"],
@@ -147,6 +166,7 @@ class WorkflowExecutor:
                 self.param_process["ec_wave_solver"] = 0
                 self.param_process["ec_wave_fp"] = 0
 
+            # --- LH power check ---
             if "lh_antennas" in self.process_bundle[process]["input"] and not is_lh_on(
                 self.process_bundle[process]["input"]["lh_antennas"],
                 time_array,
@@ -278,269 +298,6 @@ class WorkflowExecutor:
                             "core_profiles"
                         ].time
 
-                # =============================================================
-                # DEBUG: Exhaustive inspection of stix_redist inputs
-                # Compare pre- vs post-reserialize to find data loss.
-                #
-                # Standalone stix_redist prints "Reading RF power profiles..."
-                # after elongation line, but MUSCLE3 integrated run does NOT.
-                # => stix_redist silently fails reading power profiles from waves.
-                # => Re-serialize may be losing profiles_1d array data.
-                #
-                # Remove this entire block once the issue is resolved.
-                # =============================================================
-                if self.catdict[process][self.param_process[process]]["name"] == "stix_redist":
-                    import imas as _dbg_imas
-                    import numpy as np
-
-                    def _dbg_inspect_waves(label, waves_ids):
-                        """Exhaustive dump of waves IDS structure and data sizes."""
-                        print(f"\n{'=' * 70}", flush=True)
-                        print(f"DEBUG [stix_redist] [{label}]: WAVES IDS INSPECTION", flush=True)
-                        print(f"{'=' * 70}", flush=True)
-
-                        # Top-level attributes
-                        print(f"  type(waves) = {type(waves_ids)}", flush=True)
-                        print(f"  ids_properties.homogeneous_time = {waves_ids.ids_properties.homogeneous_time}", flush=True)
-                        try:
-                            _t = waves_ids.time
-                            print(f"  time = {_t} (len={len(_t)})", flush=True)
-                        except Exception as e:
-                            print(f"  time: ERROR {e}", flush=True)
-
-                        # vacuum_toroidal_field
-                        try:
-                            vtf = waves_ids.vacuum_toroidal_field
-                            print(f"  vacuum_toroidal_field.r0 = {vtf.r0}", flush=True)
-                            print(f"  vacuum_toroidal_field.b0 = {vtf.b0} (len={len(vtf.b0) if hasattr(vtf.b0, '__len__') else 'scalar'})", flush=True)
-                        except Exception as e:
-                            print(f"  vacuum_toroidal_field: ERROR {e}", flush=True)
-
-                        ncw = len(waves_ids.coherent_wave)
-                        print(f"  coherent_wave count = {ncw}", flush=True)
-
-                        for i, cw in enumerate(waves_ids.coherent_wave):
-                            print(f"\n  --- coherent_wave[{i}] ---", flush=True)
-
-                            # identifier
-                            try:
-                                print(f"    identifier.type.index = {cw.identifier.type.index}", flush=True)
-                                print(f"    identifier.type.name = '{cw.identifier.type.name}'", flush=True)
-                                print(f"    identifier.type.description = '{cw.identifier.type.description}'", flush=True)
-                            except Exception as e:
-                                print(f"    identifier: ERROR {e}", flush=True)
-
-                            # global_quantities
-                            try:
-                                ngq = len(cw.global_quantities)
-                                print(f"    global_quantities count = {ngq}", flush=True)
-                                for gi, gq in enumerate(cw.global_quantities):
-                                    print(f"      [{gi}] frequency = {gq.frequency}", flush=True)
-                                    print(f"      [{gi}] power = {gq.power}", flush=True)
-                                    try:
-                                        print(f"      [{gi}] power_launched.time = {gq.power_launched.time} (len={len(gq.power_launched.time) if hasattr(gq.power_launched.time, '__len__') else 'N/A'})", flush=True)
-                                    except:
-                                        pass
-                            except Exception as e:
-                                print(f"    global_quantities: ERROR {e}", flush=True)
-
-                            # profiles_1d - THIS IS THE CRITICAL SECTION
-                            try:
-                                np1d = len(cw.profiles_1d)
-                                print(f"    profiles_1d count = {np1d}", flush=True)
-                                for pi, p1d in enumerate(cw.profiles_1d):
-                                    print(f"      --- profiles_1d[{pi}] ---", flush=True)
-
-                                    # grid
-                                    try:
-                                        rho = p1d.grid.rho_tor_norm
-                                        print(f"        grid.rho_tor_norm: len={len(rho)}, min={np.min(rho):.6f}, max={np.max(rho):.6f}" if len(rho) > 0 else "        grid.rho_tor_norm: EMPTY", flush=True)
-                                    except Exception as e:
-                                        print(f"        grid.rho_tor_norm: ERROR {e}", flush=True)
-                                    try:
-                                        rho = p1d.grid.rho_tor
-                                        print(f"        grid.rho_tor: len={len(rho)}, min={np.min(rho):.6f}, max={np.max(rho):.6f}" if len(rho) > 0 else "        grid.rho_tor: EMPTY", flush=True)
-                                    except Exception as e:
-                                        print(f"        grid.rho_tor: ERROR {e}", flush=True)
-
-                                    # electrons
-                                    try:
-                                        e = p1d.electrons
-                                        for attr in ['power_density', 'power_density_thermal', 'power_density_n_tor',
-                                                      'power_inside', 'power_inside_thermal']:
-                                            try:
-                                                val = getattr(e, attr)
-                                                if hasattr(val, '__len__'):
-                                                    if len(val) > 0:
-                                                        print(f"        electrons.{attr}: len={len(val)}, [0]={val[0]:.6e}, [-1]={val[-1]:.6e}", flush=True)
-                                                    else:
-                                                        print(f"        electrons.{attr}: EMPTY array", flush=True)
-                                                elif hasattr(val, 'has_value'):
-                                                    print(f"        electrons.{attr}: has_value={val.has_value}", flush=True)
-                                                else:
-                                                    print(f"        electrons.{attr}: {val}", flush=True)
-                                            except Exception as e2:
-                                                print(f"        electrons.{attr}: ERROR {e2}", flush=True)
-                                    except Exception as e:
-                                        print(f"        electrons: ERROR {e}", flush=True)
-
-                                    # ions
-                                    try:
-                                        nion = len(p1d.ion)
-                                        print(f"        ion count = {nion}", flush=True)
-                                        for ji, ion in enumerate(p1d.ion):
-                                            for attr in ['power_density_thermal', 'power_inside_thermal']:
-                                                try:
-                                                    val = getattr(ion, attr)
-                                                    if hasattr(val, '__len__') and len(val) > 0:
-                                                        print(f"          ion[{ji}].{attr}: len={len(val)}, [0]={val[0]:.6e}", flush=True)
-                                                    elif hasattr(val, '__len__'):
-                                                        print(f"          ion[{ji}].{attr}: EMPTY", flush=True)
-                                                    else:
-                                                        print(f"          ion[{ji}].{attr}: has_value={getattr(val, 'has_value', 'N/A')}", flush=True)
-                                                except Exception as e2:
-                                                    print(f"          ion[{ji}].{attr}: ERROR {e2}", flush=True)
-                                            # ion element info
-                                            try:
-                                                for ei, elem in enumerate(ion.element):
-                                                    print(f"          ion[{ji}].element[{ei}]: a={elem.a}, z_n={elem.z_n}", flush=True)
-                                            except:
-                                                pass
-                                    except Exception as e:
-                                        print(f"        ions: ERROR {e}", flush=True)
-
-                                    # e_field_n_phi (IC-specific, critical for stix_redist)
-                                    try:
-                                        nef = len(p1d.e_field_n_phi)
-                                        print(f"        e_field_n_phi count = {nef}", flush=True)
-                                        for ei, ef in enumerate(p1d.e_field_n_phi):
-                                            print(f"          [{ei}] n_tor = {ef.n_tor}", flush=True)
-                                            for comp_name in ['plus', 'minus', 'parallel']:
-                                                try:
-                                                    comp = getattr(ef, comp_name)
-                                                    amp = comp.amplitude
-                                                    if hasattr(amp, '__len__') and len(amp) > 0:
-                                                        print(f"          [{ei}].{comp_name}.amplitude: len={len(amp)}, max={np.max(np.abs(amp)):.6e}", flush=True)
-                                                    elif hasattr(amp, '__len__'):
-                                                        print(f"          [{ei}].{comp_name}.amplitude: EMPTY", flush=True)
-                                                    else:
-                                                        print(f"          [{ei}].{comp_name}.amplitude: has_value={getattr(amp, 'has_value', 'N/A')}", flush=True)
-                                                except Exception as e2:
-                                                    print(f"          [{ei}].{comp_name}: ERROR {e2}", flush=True)
-                                    except Exception as e:
-                                        print(f"        e_field_n_phi: ERROR {e}", flush=True)
-
-                            except Exception as e:
-                                print(f"    profiles_1d: ERROR {e}", flush=True)
-
-                            # profiles_2d
-                            try:
-                                np2d = len(cw.profiles_2d)
-                                print(f"    profiles_2d count = {np2d}", flush=True)
-                            except Exception as e:
-                                print(f"    profiles_2d: ERROR {e}", flush=True)
-
-                        # Serialize size check
-                        try:
-                            _ser = waves_ids.serialize()
-                            print(f"\n  serialize() bytes = {len(_ser)}", flush=True)
-                        except Exception as e:
-                            print(f"\n  serialize(): ERROR {e}", flush=True)
-
-                        print(f"{'=' * 70}\n", flush=True)
-
-                    # ---- INSPECT ALL INPUTS PRE-RESERIALIZE ----
-                    print("\n" + "=" * 70, flush=True)
-                    print("DEBUG [stix_redist]: ALL INPUT IDS KEYS:", flush=True)
-                    for _k, _v in self.process_bundle[process]["input"].items():
-                        print(f"  '{_k}': type={type(_v).__name__}", flush=True)
-                    print("=" * 70, flush=True)
-
-                    # Inspect waves BEFORE reserialize
-                    if "waves" in self.process_bundle[process]["input"]:
-                        _dbg_inspect_waves("PRE-RESERIALIZE", self.process_bundle[process]["input"]["waves"])
-
-                        # Dump PRE-reserialize waves to run 998
-                        try:
-                            _dbg_db = _dbg_imas.DBEntry(_dbg_imas.ids_defs.HDF5_BACKEND, 'ITER', 134173, 998, 'bianz')
-                            _dbg_db.create()
-                            _dbg_db.put(self.process_bundle[process]["input"]["waves"])
-                            _dbg_db.close()
-                            print("DEBUG [stix_redist]: PRE-reserialize waves dumped to run 998", flush=True)
-                        except Exception as e:
-                            print(f"DEBUG [stix_redist]: Could not dump PRE waves to 998: {e}", flush=True)
-
-                    # ---- RE-SERIALIZE ALL INPUT IDS ----
-                    for _fix_key in list(self.process_bundle[process]["input"].keys()):
-                        _fix_ids = self.process_bundle[process]["input"][_fix_key]
-                        if hasattr(_fix_ids, 'serialize'):
-                            try:
-                                _pre_ser = _fix_ids.serialize()
-                                _pre_len = len(_pre_ser)
-
-                                _fix_name = _fix_key
-                                _clean = getattr(_dbg_imas.IDSFactory(), _fix_name)()
-                                _clean.deserialize(_pre_ser)
-
-                                _post_ser = _clean.serialize()
-                                _post_len = len(_post_ser)
-
-                                _match = "MATCH" if _pre_len == _post_len else f"MISMATCH (delta={_post_len - _pre_len})"
-                                print(f"DEBUG [stix_redist]: Re-serialized {_fix_key}: {_pre_len} -> {_post_len} bytes [{_match}]", flush=True)
-
-                                # Check if round-trip changes the bytes
-                                if _pre_ser != _post_ser:
-                                    print(f"  WARNING: {_fix_key} serialize bytes differ after round-trip!", flush=True)
-
-                                self.process_bundle[process]["input"][_fix_key] = _clean
-                            except Exception as _fix_e:
-                                import traceback
-                                print(f"DEBUG [stix_redist]: FAILED to re-serialize {_fix_key}: {_fix_e}", flush=True)
-                                traceback.print_exc()
-
-                    # Inspect waves AFTER reserialize
-                    if "waves" in self.process_bundle[process]["input"]:
-                        _dbg_inspect_waves("POST-RESERIALIZE", self.process_bundle[process]["input"]["waves"])
-
-                        # Dump POST-reserialize waves to run 999
-                        try:
-                            _dbg_db = _dbg_imas.DBEntry(_dbg_imas.ids_defs.HDF5_BACKEND, 'ITER', 134173, 999, 'bianz')
-                            _dbg_db.create()
-                            _dbg_db.put(self.process_bundle[process]["input"]["waves"])
-                            _dbg_db.close()
-                            print("DEBUG [stix_redist]: POST-reserialize waves dumped to run 999", flush=True)
-                        except Exception as e:
-                            print(f"DEBUG [stix_redist]: Could not dump POST waves to 999: {e}", flush=True)
-
-                    # ---- ALSO INSPECT equilibrium and core_profiles sizes ----
-                    for _chk_name in ["equilibrium", "core_profiles", "ic_antennas"]:
-                        if _chk_name in self.process_bundle[process]["input"]:
-                            _chk_ids = self.process_bundle[process]["input"][_chk_name]
-                            try:
-                                _chk_ser = _chk_ids.serialize()
-                                print(f"DEBUG [stix_redist]: {_chk_name} post-reserialize size = {len(_chk_ser)} bytes", flush=True)
-                                # Quick sanity: time arrays
-                                if hasattr(_chk_ids, 'time'):
-                                    print(f"  {_chk_name}.time = {_chk_ids.time}", flush=True)
-                            except Exception as e:
-                                print(f"DEBUG [stix_redist]: {_chk_name} serialize check ERROR: {e}", flush=True)
-
-                    
-                    # ---- CLEAN WORKING DIRECTORY STATE ----
-                    import os, glob, shutil
-                    print(f"DEBUG [stix_redist]: cwd = {os.getcwd()}", flush=True)
-                    if os.path.isdir('Plot_data_stix'):
-                        _old_files = os.listdir('Plot_data_stix')
-                        print(f"DEBUG [stix_redist]: Cleaning Plot_data_stix/ ({_old_files})", flush=True)
-                        shutil.rmtree('Plot_data_stix')
-                    for _stale in glob.glob('fort.*'):
-                        print(f"DEBUG [stix_redist]: Removing stale {_stale}", flush=True)
-                        os.remove(_stale)
-
-                # =============================================================
-                # END DEBUG BLOCK
-                # =============================================================
-
                 if self.process_bundle[process]["status"] == 1:
                     output_ids_data = self.executeProcess(
                         process,
@@ -641,12 +398,11 @@ class WorkflowExecutor:
             return actor(bundle[0], bundle[1])
 
         # Get list of all codes in that category
-        codeslist = self.catdict[process]  # next(gen_dict_extract(process,maindict))
+        codeslist = self.catdict[process]
         codeinfo = codeslist[parameters[process]]
         code = codeinfo["name"]
 
         # Re-direct the logfile for this specific actor
-
         if code + "_log" in parameters.keys():
             stdout_redirect = parameters[code + "_log"]
             oldstrout, newstdout = redirect_stdout(stdout_redirect)
@@ -655,16 +411,34 @@ class WorkflowExecutor:
         for i in codeinfo["input"]:
             inputargs.append(bundle[i])
 
-        # TODO assign callbacks for status
-        # TODO initialize finalize methods
         results = actor(*inputargs)
 
         # Re-direct the logfile for this specific actor
         if code + "_log" in parameters.keys():
             stdout_back(oldstrout, newstdout)
 
-        # Ensure __name__ on returned IDS (IMAS-Python 2.0 compatibility)
+        # Normalize dict return type to ordered list.
+        # Some iWrap actors (e.g. FoPla) return a dict like
+        # {"distributions_out": ids, "core_sources_out": ids}
+        # instead of a tuple/list. The downstream storage logic in
+        # executeAlgorithm() uses integer indexing (output_ids_data[i])
+        # which fails on dict. Convert dict → ordered list here.
         output_ids_list = codeinfo["output"]
+        # if isinstance(results, dict):
+        #     ordered = []
+        #     for ids_name in output_ids_list:
+        #         matched = None
+        #         for k, v in results.items():
+        #             if k.replace("_out", "").replace("_in", "") == ids_name:
+        #                 matched = v
+        #                 break
+        #         if matched is None:
+        #             # Fallback: take by position if key matching fails
+        #             matched = list(results.values())[len(ordered)]
+        #         ordered.append(matched)
+        #     results = ordered if len(ordered) > 1 else ordered[0]
+
+        # Ensure __name__ on returned IDS (IMAS-Python 2.0 compatibility)
         if not hasattr(results, "__len__"):
             _ensure_ids_name(results, output_ids_list[0] if output_ids_list else "unknown")
         else:
@@ -672,5 +446,4 @@ class WorkflowExecutor:
                 if i < len(results):
                     _ensure_ids_name(results[i], ids_name)
 
-        # Call of the chosen code
         return results
