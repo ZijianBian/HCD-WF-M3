@@ -2,7 +2,7 @@
 
 [![Development Status](https://img.shields.io/badge/status-development-yellow.svg)](https://pypi.org/project/HCDWorkflow/)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-See%20LICENSE.md-blue.svg)](LICENSE.md)
+[![License](https://img.shields.io/badge/license-See%20LICENSE.md-blue.svg)](LICENSE.txt)
 
 Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulations,with MUSCLE3 integration for modular multi-scale coupling of physics actors.
 
@@ -399,36 +399,17 @@ hcd-wf-sandbox/
 
 ---
 
-## Contributing
+## Legal
 
-1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make your changes
-3. Run code quality checks: `black`, `flake8`, `pylint`
-4. Test your changes: `hcdslice_nogui -c tests/data/GRAYSCALE/`
-5. Commit: `git commit -am "Add feature"`
-6. Push: `git push origin feature/my-feature`
-7. Create a Pull Request
+See [LICENSE.txt](LICENSE.txt) for details.
 
----
+Copyright (c) 2019-2025, ITER Organization
 
-## License
-
-See [LICENSE.md](LICENSE.md) for details.
-
-## Authors
-
-ITER Organization
 
 ## Links
 
 - [Homepage](https://confluence.iter.org/pages/viewpage.action?pageId=252217231)
 - [Documentation](https://confluence.iter.org/pages/viewpage.action?pageId=252217231)
 
-## Support
-
-For support and questions:
-- Open an issue on the ITER JIRA
-- Contact the ITER HCD Workflow development team
-- Refer to the Confluence documentation
 
 ---

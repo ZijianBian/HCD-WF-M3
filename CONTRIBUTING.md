@@ -1,181 +1,40 @@
-# Contributing to HCD Workflow
+# Contributing guidelines
 
-Thank you for your interest in contributing to the HCD Workflow project! This guide summarizes the key steps and expectations for contributors. 
+We welcome any kind of contribution to `HCD-WF`, 
+from a simple comment, a question or even a full fledged pull 
+request. 
+Please first make sure you read and follow the 
+[Code of Conduct](CODE_OF_CONDUCT.md).
 
-## Code of Conduct
+## You think you found a bug in the code, or have a question in its use
+1. use the [issue search](https://github.com/iterorganization/HCD-WF/issues)
+to check if someone already created a similar issue;
+2. if not, make a **new issue** to describe your problem or question. 
+In the case of a bug suspiscion, please try to give all the relevant 
+information to allow reproducing the error or identifying 
+its root cause (version of the HCD-WF, OS and relevant 
+dependencies, snippet of code);
+3. apply relevant labels to the issue.
 
-- Be respectful and professional.
-- Provide constructive feedback.
-- Help maintain code quality.
-- Document your changes.
+## You want to make or ask some change to the code
+1. use the [issue search](https://github.com/iterorganization/HCD-WF/issues)
+to check if someone already proposed a similar idea/change;
+2. if not, create a **new issue** to describe what change you would like to see 
+implemented and specify it if you intend to work on it yourself or if some help 
+will be needed;
+3. wait until some kind of consensus is reached about your idea being relevant, 
+at which time the issue will be assigned (to you or someone else who can work on 
+this topic);
+4. if you do the development yourself, fork the repository to your own Github 
+profile and create your own feature branch off of the latest develop commit. 
+Make sure to regularly sync your branch with the latest commits from `develop` 
+(find instructions 
+[here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork));
+5. when your development is ready, create a pull request (find instructions 
+[here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)).
 
-## Getting Started
 
-1. Fork or clone the repository.
-2. Create a feature branch.
-3. Make your changes.
-4. Test thoroughly.
-5. Submit a pull request.
-
-## Development Process
-
-### Branching Strategy
-
-- `main` – production releases.
-- `develop` – active development branch.
-- `feature/*` – new features.
-- `bugfix/*` – bug fixes.
-- `release/*` – release preparation.
-
-### Creating a Feature Branch
-
-```bash
-git checkout develop
-git pull
-git checkout -b feature/my-feature-name
-```
-
-### Making Changes
-
-1. Write clear, concise code.
-2. Follow the existing code style.
-3. Add docstrings to functions and classes.
-4. Update relevant documentation.
-
-## Code Style
-
-We follow PEP 8 with a few project-specific rules:
-
-- Line length: 120 characters.
-- Use Black for formatting.
-- Use flake8 for linting.
-- Use pylint for code quality checks.
-
-### Formatting Code
-
-```bash
-# Format all code
-black --line-length 120 hcdworkflow/ gui/ tools/ workflow/
-
-# Check style
-flake8 --max-line-length=120 --ignore=E203,W503 hcdworkflow/
-
-# Run pylint
-pylint --max-line-length=120 hcdworkflow/
-```
-
-## Testing
-
-Run the workflow against bundled test data:
-
-```bash
-# Test single slice
-hcdslice_nogui -c tests/data/GRAYSCALE/
-
-# Test full workflow
-hcd_nogui -c tests/data/GRAYSCALE/
-
-# Test GUI (if applicable)
-hcd_gui
-```
-
-### Static Analysis
-
-```bash
-bash ci-sdcc/st05-staticanalysis.sh
-```
-
-## Commit Guidelines
-
-### Commit Message Format
-
-```
-<type>: <subject>
-
-<body>
-
-<footer>
-```
-
-**Types:**
-
-- `feat`: new feature  
-- `fix`: bug fix  
-- `docs`: documentation changes  
-- `style`: formatting changes  
-- `refactor`: refactoring  
-- `test`: adding/updating tests  
-- `chore`: maintenance tasks  
-
-**Example:**
-
-```
-feat: Add support for new ECRH actor
-
-- Integrate TORBEAM actor
-- Add configuration template
-- Update documentation
-
-Closes #123
-```
-
-## Pull Request Process
-
-1. Update documentation for new features.
-2. Ensure all tests pass.
-3. Update the changelog if applicable.
-4. Request review from maintainers.
-5. Address review comments promptly.
-
-### Pull Request Template
-
-```markdown
-## Description
-Brief description of changes
-
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Documentation update
-- [ ] Code refactoring
-
-## Testing
-- [ ] Tested with test data
-- [ ] Manual testing performed
-- [ ] Static analysis passed
-
-## Checklist
-- [ ] Code follows style guidelines
-- [ ] Documentation updated
-- [ ] No breaking changes
-- [ ] Commits are properly formatted
-```
-
-## Documentation
-
-### Updating Documentation
-
-Documentation lives in `docs/source/`.
-
-```bash
-# Edit .rst files
-vim docs/source/user/usage.rst
-
-# Build documentation
-cd docs
-make html
-
-# View locally
-xdg-open build/html/index.html
-```
-
-### Documentation Style
-
-- Use reStructuredText (`.rst`).
-- Include concise code examples.
-- Add cross-references where relevant.
-- Keep prose clear and focused.
-
----
-
-By following these guidelines, you help keep HCD Workflow stable and maintainable. Thanks again for contributing!
+While we will try to answer questions quickly and to address issues in a timely 
+manner, it can may sometimes take longer than expected. A friendly ping in the 
+discussion or the issue thread can help draw attention if you find that it was 
+stalled.
