@@ -91,8 +91,8 @@ class WorkflowActor:
         arguments = {}
 
 
-        if actorName == "stix_redist":
-            from stix_redist.common.runtime_settings import SandboxLifeTime, SandboxMode
+        if actorName == "stixredist":
+            from stixredist.common.runtime_settings import SandboxLifeTime, SandboxMode
             runtime_settings.sandbox.life_time = SandboxLifeTime.PERSISTENT
             runtime_settings.sandbox.mode = SandboxMode.MANUAL
             runtime_settings.sandbox.path = os.getcwd()
