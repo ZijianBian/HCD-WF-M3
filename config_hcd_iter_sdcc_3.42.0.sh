@@ -4,11 +4,13 @@ set -uo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: config_hcd_iter_sdcc.sh [dd_version]
+Usage: config_hcd_iter_sdcc_3.42.0.sh
 
-Arguments:
-  dd_version    Optional. Data Dictionary release to load (default: 3.42.0).
-                Supported values: 3.42.0.
+Sets up the HCD-WF environment with the legacy IMAS-AL-Python 5.x stack
+and DD 3.42.0 actor builds. Use this for backward-compatibility testing
+(e.g. JINTRAC coupling under tests/data/).
+
+For the default (latest DD) environment, use config_hcd_iter_sdcc.sh instead.
 
 Environment variables:
   ACTOR_FOLDER  Directory containing actors compiled locally with
@@ -16,9 +18,8 @@ Environment variables:
                 the folder is prepended to PYTHONPATH.
 
 Examples:
-  config_hcd_iter_sdcc.sh
-  config_hcd_iter_sdcc.sh 4.0.0
-  ACTOR_FOLDER=/path/to/local/actors config_hcd_iter_sdcc.sh
+  source config_hcd_iter_sdcc_3.42.0.sh
+  ACTOR_FOLDER=/path/to/local/actors source config_hcd_iter_sdcc_3.42.0.sh
 
 EOF
 }
@@ -28,9 +29,9 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     exit 0
 fi
 
-DD_VERSION="${1:-3.42.0}"
+DD_VERSION="3.42.0"
 ACTOR_FOLDER_ENV="${ACTOR_FOLDER:-}"
-VENV_DIR="devenv"
+VENV_DIR="devenv_3.42.0"
 
 
 echo "[setup_dev_env] Using DD data version: ${DD_VERSION}"
@@ -55,48 +56,36 @@ elif command -v module >/dev/null 2>&1; then
     echo "[setup_dev_env] Loading core modules"
     load_modules Python Tkinter matplotlib lxml Waveform-Cooker
 
-    CORE_MODULE=""
-    MANDATORY_MODULES=()
-    EC_MODULES=()
-    IC_MODULES=()
-    NBI_MODULES=()
-    OTHER_MODULES=()
-
-    case "${DD_VERSION}" in
-        3.42.0)
-            CORE_MODULE="IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0"
-            MANDATORY_MODULES=(
-                "HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0"
-                "HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0"
-                "HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0"
-            )
-            EC_MODULES=(
-                "GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0"
-                "GRAY/1.0.0-intel-2023b-DD-3.42.0"
-                "TORBEAM/3.8.0-intel-2023b-DD-3.42.0"
-                "TORAY/1.0.0-intel-2023b-DD-3.42.0"
-                "GENRAY/10.11.3-intel-2023b-DD-3.42.0"
-            )
-            IC_MODULES=(
-                "CYRANO/1.0.0-intel-2023b-DD-3.42.0"
-                "FoPla/2.1.0-intel-2023b-DD-3.42.0"
-                "StixReDist/2.1.0-intel-2023b-DD-3.42.0"
-                "TOMCAT/1.0.0-intel-2023b-DD-3.42.0"
-            )
-            NBI_MODULES=(
-                "NEMO/2.2.0-intel-2023b-DD-3.42.0"
-                "NBISIM/1.3.0-intel-2023b-DD-3.42.0"
-                "RISK/2.2.0-intel-2023b-DD-3.42.0"
-                "SPOT/2.4.0-intel-2023b-DD-3.42.0"
-            )
-            OTHER_MODULES=(
-                "RELAX/1.0.0-intel-2023b-DD-3.42.0"
-                "SMART/0.1.0-intel-2023b-DD-3.42.0"
-                "FPSIM/1.0.0-intel-2023b-DD-3.42.0"
-            )
-            ;;
-        # Add case for 4.0.0
-    esac
+    CORE_MODULE="IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0"
+    MANDATORY_MODULES=(
+        "HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0"
+        "HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0"
+        "HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0"
+    )
+    EC_MODULES=(
+        "GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0"
+        "GRAY/1.0.0-intel-2023b-DD-3.42.0"
+        "TORBEAM/3.8.0-intel-2023b-DD-3.42.0"
+        "TORAY/1.0.0-intel-2023b-DD-3.42.0"
+        "GENRAY/10.11.3-intel-2023b-DD-3.42.0"
+    )
+    IC_MODULES=(
+        "CYRANO/1.0.0-intel-2023b-DD-3.42.0"
+        "FoPla/2.1.0-intel-2023b-DD-3.42.0"
+        "StixReDist/2.1.0-intel-2023b-DD-3.42.0"
+        "TOMCAT/1.0.0-intel-2023b-DD-3.42.0"
+    )
+    NBI_MODULES=(
+        "NEMO/2.2.0-intel-2023b-DD-3.42.0"
+        "NBISIM/1.3.0-intel-2023b-DD-3.42.0"
+        "RISK/2.2.0-intel-2023b-DD-3.42.0"
+        "SPOT/2.4.0-intel-2023b-DD-3.42.0"
+    )
+    OTHER_MODULES=(
+        "RELAX/1.0.0-intel-2023b-DD-3.42.0"
+        "SMART/0.1.0-intel-2023b-DD-3.42.0"
+        "FPSIM/1.0.0-intel-2023b-DD-3.42.0"
+    )
 
     echo "[setup_dev_env] Loading IMAS access layer"
     load_modules "${CORE_MODULE}"
@@ -120,10 +109,10 @@ else
 fi
 
 if [[ ! -d "${VENV_DIR}" ]]; then
-    echo "[setup_dev_env] Creating virtual environment"
+    echo "[setup_dev_env] Creating virtual environment: ${VENV_DIR}"
     python3 -m venv "${VENV_DIR}"
 else
-    echo "[setup_dev_env] Virtual environment already exists"
+    echo "[setup_dev_env] Virtual environment already exists: ${VENV_DIR}"
 fi
 
 export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
@@ -138,7 +127,7 @@ echo "[setup_dev_env] Installing project in editable mode with dev extras"
 
 cat <<EOF
 
-Development environment is ready.
+Development environment is ready (DD 3.42.0).
 
 To use it in the current shell run:
   source ${VENV_DIR}/bin/activate
@@ -147,6 +136,9 @@ Common workflow entry points:
   hcd_gui                          # Launch interactive GUI
   hcd_nogui -c data/GRAYSCALE/     # Run full workflow headless
   hcdslice_nogui -c data/GRAYSCALE/  # Run single time-slice headless
+
+For the default (latest DD = 4.1.0) environment with MUSCLE3 support, use:
+  source config_hcd_iter_sdcc.sh
 
 EOF
 
@@ -158,10 +150,3 @@ Local actor folder has been added to PYTHONPATH:
 
 EOF
 fi
-
-cat <<EOF
-
-To target another DD release:
-  config_hcd_iter_sdcc.sh 4.0.0
-
-EOF

@@ -70,7 +70,7 @@ ulimit -Ss unlimited 2>/dev/null
 # ------------------------------------------------
 # 9. Python virtual environment
 # ------------------------------------------------
-VENV_DIR="devenv_m3"
+VENV_DIR="devenv"
 
 if [[ ! -d "$VENV_DIR" ]]; then
     python3 -m venv "$VENV_DIR" --system-site-packages

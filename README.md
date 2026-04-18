@@ -13,8 +13,8 @@ Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulatio
 Audience     Setup                          Command
 ──────────── ────────────────────────────── ──────────────────────────────────────
 User         EasyBuild module (SDCC)        module load HCD-WF
-User         SDCC Helper Script             ./config_hcd_iter_sdcc.sh
-Developer    SDCC + MUSCLE3                 source config_hcd_iter_sdcc_m3.sh
+User         Default helper (DD 4.1.0)      source config_hcd_iter_sdcc.sh
+Developer    Legacy helper (DD 3.42.0)      source config_hcd_iter_sdcc_3.42.0.sh
 Developer    Manual Setup (any system)      See "Developer Setup" below
 
 ---
@@ -75,11 +75,13 @@ hcd_gui                       # Launch the GUI
 ### 2. On ITER SDCC: Use the Helper Script (Alternative)
 
 ```bash
-./config_hcd_iter_sdcc.sh           # Uses default DD version (3.42.0)
-./config_hcd_iter_sdcc.sh 4.0.0     # Use a different DD version if supported
+source config_hcd_iter_sdcc.sh           # Default: latest DD (4.1.0) + MUSCLE3
+source config_hcd_iter_sdcc_3.42.0.sh    # Legacy DD 3.42.0 stack (no MUSCLE3)
 # Optionally set ACTOR_FOLDER for local actors:
-ACTOR_FOLDER=~/public/PYTHON_ACTORS ./config_hcd_iter_sdcc.sh
+ACTOR_FOLDER=~/public/PYTHON_ACTORS source config_hcd_iter_sdcc.sh
 ```
+
+The default script loads the IMAS-Python 2.x stack with DD 4.1.0, sets up MUSCLE3, iWrap, the Waveform Cooker, and creates a devenv virtual environment. The _3.42.0 variant loads the legacy IMAS-AL-Python 5.x stack with DD 3.42.0 for compatibility with older test cases and JINTRAC coupling.
 
 This script will:
 - Load all required modules (unless `ACTOR_FOLDER` is set)
@@ -106,14 +108,28 @@ hcdslice_nogui -c my_config/
 
 ## For Developers
 
-### 1. On ITER SDCC: Use the Helper Script (Recommended)
+### SDCC Setup (DD 4.1.0, default)
 
 ```bash
-./config_hcd_iter_sdcc.sh
+source config_hcd_iter_sdcc.sh
 ```
-- Loads modules, sets up Python venv, installs all dependencies (including dev tools)
 
-### 2. Manual Setup (Any System)
+This script loads the latest IMAS stack and sets up MUSCLE3:
+1. Loads `IMAS-Python`, `IMAS-Fortran`, `IDStools`, `MUSCLE3`, `XMLlib`, `INTERPOS`
+2. Sets up iWrap (develop branch) and Waveform Cooker paths
+3. Configures `ACTOR_FOLDER` and `HCD_SANDBOX` in `PYTHONPATH`
+4. Creates a dedicated virtual environment (`devenv`) with `muscle3` installed
+5. Runs diagnostic checks (IMAS version, iWrap availability, actor folder)
+
+### SDCC Setup (DD 3.42.0, legacy)
+
+```bash
+source config_hcd_iter_sdcc_3.42.0.sh
+```
+
+For backward compatibility with the legacy IMAS-AL-Python 5.x stack and DD 3.42.0 actor builds (e.g. for JINTRAC coupling tests under `tests/data/`). Creates a separate `devenv_3.42.0` virtual environment so the two stacks do not interfere.
+
+### Manual Setup (SDCC, without helper script)
 
 ```bash
 git clone ssh://git@git.iter.org/wf/hcd-wf.git
@@ -139,27 +155,23 @@ export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
 export PYTHONPATH=$(pwd):$PYTHONPATH
 
 # Create virtual environment
-python3 -m venv devenv_m3 --system-site-packages
-source devenv_m3/bin/activate
+python3 -m venv devenv --system-site-packages
+source devenv/bin/activate
 pip install muscle3
 pip install -e .
 ```
 
-### 3. Code Quality & Testing
+### Code Quality & Testing
 
 ```bash
 # Format code
 black --line-length 120 hcdworkflow/ gui/ tools/ workflow/
-
 # Check style
 flake8 --max-line-length=120 --ignore=E203,W503 hcdworkflow/
-
 # Run linter
 pylint --max-line-length=120 hcdworkflow/
-
 # Run tests
 hcdslice_nogui -c tests/data/GRAYSCALE/
-
 # Or use the CI script
 bash ci-sdcc/st05-staticanalysis.sh
 ```
@@ -181,7 +193,7 @@ To run the workflow integration tests using pytest:
 
 These tests will execute the workflow commands for various configurations and check for successful completion.
 
-### 4. Installing Custom Actors (No-Muscle3)
+### Installing Custom Actors (No-Muscle3)
 
 ```bash
 cd actor_install
@@ -352,8 +364,8 @@ hcd-wf-sandbox/
 ├── tests/                         # Test data and configs
 │
 ├── test_hybrid_hcdwf.ymmsl        # MUSCLE3 hybrid mode configuration
-├── config_hcd_iter_sdcc.sh        # Environment setup (traditional)
-├── config_hcd_iter_sdcc_m3.sh     # Environment setup (MUSCLE3)
+├── config_hcd_iter_sdcc.sh        # Environment setup (default: DD 4.1.0 + MUSCLE3)
+├── config_hcd_iter_sdcc_3.42.0.sh # Environment setup (legacy: DD 3.42.0)
 ├── run_benchmark.sh               # Benchmark runner (all 3 modes)
 │
 ├── runs/                          # Auto-generated benchmark outputs
