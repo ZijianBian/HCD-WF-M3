@@ -30,14 +30,11 @@ def wf_wrapper(par_path):
 
     input_user_or_path = wf_parameters["input_user_or_path"][0]
     input_database = wf_parameters["input_database"][0]
-    input_backend = "MDSPLUS"
-    if "input_backend" in wf_parameters:
-        input_backend = wf_parameters["input_backend"][0]
+    input_backend = wf_parameters.get("input_backend", ["HDF5"])[0]
+    ddv_backend = wf_parameters.get("ddv_backend", ["3"])[0]
     output_user_or_path = wf_parameters["output_user_or_path"][0]
     output_database = wf_parameters["output_database"][0]
-    output_backend = "MDSPLUS"
-    if "output_backend" in wf_parameters:
-        output_backend = wf_parameters["output_backend"][0]
+    output_backend = wf_parameters.get("output_backend", ["HDF5"])[0]
     shot_nr = wf_parameters["shot_nr"][0]
     run_in = wf_parameters["run_in"][0]
     run_out = wf_parameters["run_out"][0]
@@ -46,6 +43,7 @@ def wf_wrapper(par_path):
         input_user_or_path,
         input_database,
         input_backend,
+        ddv_backend,
         output_user_or_path,
         output_database,
         output_backend,

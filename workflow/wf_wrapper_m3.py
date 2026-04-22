@@ -186,6 +186,20 @@ def _fixup_equilibrium(eq):
 
     ts = eq.time_slice[0]
 
+    # --- Fill psi_axis if missing (CHEASE/DINA workaround) ---
+    # Some scenarios (e.g. ITER 105102) leave global_quantities.psi_axis as the
+    # IMAS empty sentinel (-9e+40). Downstream code (including _compute_bax here
+    # and Cyrano's axis-side f-profile picker) compares it against
+    # profiles_1d.psi to decide which end is the axis; with the sentinel the
+    # comparison is numerical noise. profiles_1d.psi is ordered axis→boundary,
+    # so psi_axis = psi1d[0] is the correct recovery.
+    if not ts.global_quantities.psi_axis.has_value \
+       and len(ts.profiles_1d.psi) > 0:
+        psi1d_axis = float(np.asarray(ts.profiles_1d.psi)[0])
+        ts.global_quantities.psi_axis = psi1d_axis
+        print(f"  [equilibrium] Filled psi_axis from profiles_1d.psi[0] "
+              f"(= {psi1d_axis:.4g})", flush=True)
+
     # --- Complete b_field_r/z/phi only if missing ---
     if len(ts.profiles_2d) > 0 and not ts.profiles_2d[0].b_field_r.has_value:
         print("  [equilibrium] Completing b_field_r, b_field_z, b_field_phi from psi", flush=True)
@@ -243,6 +257,51 @@ def _fixup_equilibrium(eq):
             print("  [equilibrium] Copying triangularity_upper → triangularity_lower", flush=True)
             ts.profiles_1d.triangularity_lower = \
                 copy.deepcopy(ts.profiles_1d.triangularity_upper)
+
+
+    # --- Compute elongation and triangularity profiles if missing ---
+    # Required by Cyrano IC wave solver. Computed from boundary outline
+    # when profiles_1d arrays are empty.
+    if (
+        hasattr(ts, 'profiles_1d')
+        and len(ts.profiles_1d.psi) > 0
+        and len(ts.profiles_1d.elongation) == 0
+        and len(ts.boundary.outline.r) > 0
+    ):
+        try:
+            r_bnd = np.array(ts.boundary.outline.r)
+            z_bnd = np.array(ts.boundary.outline.z)
+            nrho = len(ts.profiles_1d.psi)
+
+            # Compute boundary elongation and triangularity from outline
+            a_minor = (r_bnd.max() - r_bnd.min()) / 2.0
+            R0 = (r_bnd.max() + r_bnd.min()) / 2.0
+            kappa_edge = (z_bnd.max() - z_bnd.min()) / (2.0 * a_minor)
+            delta_upper_edge = (R0 - r_bnd[np.argmax(z_bnd)]) / a_minor
+            delta_lower_edge = (R0 - r_bnd[np.argmin(z_bnd)]) / a_minor
+
+            # Build profiles: linear from axis (kappa=1, delta=0) to edge
+            rho_norm = np.linspace(0, 1, nrho)
+            elongation = 1.0 + (kappa_edge - 1.0) * rho_norm
+            triang_upper = delta_upper_edge * rho_norm
+            triang_lower = delta_lower_edge * rho_norm
+
+            ts.profiles_1d.elongation = elongation
+            ts.profiles_1d.triangularity_upper = triang_upper
+            ts.profiles_1d.triangularity_lower = triang_lower
+
+            # Also fix boundary triangularity if sentinel
+            if float(ts.boundary.triangularity_upper) < -1e30:
+                ts.boundary.triangularity_upper = delta_upper_edge
+            if float(ts.boundary.triangularity_lower) < -1e30:
+                ts.boundary.triangularity_lower = delta_lower_edge
+
+            print(f"  [equilibrium] Computed elongation/triangularity profiles "
+                  f"(kappa={kappa_edge:.3f}, delta_u={delta_upper_edge:.3f}, "
+                  f"delta_l={delta_lower_edge:.3f})", flush=True)
+        except Exception as e:
+            print(f"  [equilibrium] WARNING: Could not compute elongation/triangularity: {e}", flush=True)
+
 
     # --- Compute r_outboard / r_inboard from 2D psi if missing ---
     # Required by Cyrano IC wave solver. These are the major radius values
@@ -368,50 +427,39 @@ def _compute_b2d(eq):
     """Compute 2D magnetic field components from psi (DINA/profiles_2d case).
 
     Ported from add_bfield.py: UpdateEquilibriumB2d.
+    Vectorized with np.gradient (matches original edge scheme: forward/backward
+    at boundaries, central in interior).
     """
-    import math
-
     cocos_psi = 1.0  # 1 for DDV4 (cocos=17), -1 for DDV3 (cocos=11)
+    two_pi = 2.0 * np.pi
 
     for ts in eq.time_slice:
         if len(ts.profiles_2d) == 0:
             continue
 
-        psi2d = cocos_psi * ts.profiles_2d[0].psi
-        psi1d = cocos_psi * ts.profiles_1d.psi
-        f1d = ts.profiles_1d.f
+        psi2d = cocos_psi * np.asarray(ts.profiles_2d[0].psi)
+        psi1d = cocos_psi * np.asarray(ts.profiles_1d.psi)
+        f1d = np.asarray(ts.profiles_1d.f)
 
-        r = ts.profiles_2d[0].grid.dim1
-        z = ts.profiles_2d[0].grid.dim2
-
-        nr, nz = len(r), len(z)
-        br = np.zeros(psi2d.shape)
-        bz = np.zeros(psi2d.shape)
-        bt = np.zeros(psi2d.shape)
+        r = np.asarray(ts.profiles_2d[0].grid.dim1)
+        z = np.asarray(ts.profiles_2d[0].grid.dim2)
 
         dr = r[2] - r[1]
         dz = z[2] - z[1]
+        r_col = r[:, None]  # broadcast along R axis (axis=0)
 
-        for ir in range(nr):
-            for iz in range(nz):
-                # Br from -dpsi/dz / (2*pi*R)
-                if iz == 0:
-                    br[ir, iz] = -(psi2d[ir, iz+1] - psi2d[ir, iz]) / (2.0 * math.pi * r[ir] * dz)
-                elif iz == nz - 1:
-                    br[ir, iz] = -(psi2d[ir, iz] - psi2d[ir, iz-1]) / (2.0 * math.pi * r[ir] * dz)
-                else:
-                    br[ir, iz] = -0.5 * (psi2d[ir, iz+1] - psi2d[ir, iz-1]) / (2.0 * math.pi * r[ir] * dz)
+        dpsi_dr = np.gradient(psi2d, dr, axis=0)
+        dpsi_dz = np.gradient(psi2d, dz, axis=1)
 
-                # Bz from dpsi/dr / (2*pi*R)
-                if ir == 0:
-                    bz[ir, iz] = (psi2d[ir+1, iz] - psi2d[ir, iz]) / (2.0 * math.pi * r[ir] * dr)
-                elif ir == nr - 1:
-                    bz[ir, iz] = (psi2d[ir, iz] - psi2d[ir-1, iz]) / (2.0 * math.pi * r[ir] * dr)
-                else:
-                    bz[ir, iz] = 0.5 * (psi2d[ir+1, iz] - psi2d[ir-1, iz]) / (2.0 * math.pi * r[ir] * dr)
+        br = -dpsi_dz / (two_pi * r_col)
+        bz = dpsi_dr / (two_pi * r_col)
 
-                # Bt = F(psi) / R
-                bt[ir, iz] = np.interp(psi2d[ir, iz], psi1d, f1d) / r[ir]
+        # Bt = F(psi) / R — np.interp needs monotonic xp; flip if descending
+        if psi1d[0] > psi1d[-1]:
+            f_at_psi = np.interp(psi2d.ravel(), psi1d[::-1], f1d[::-1])
+        else:
+            f_at_psi = np.interp(psi2d.ravel(), psi1d, f1d)
+        bt = f_at_psi.reshape(psi2d.shape) / r_col
 
         ts.profiles_2d[0].b_field_r = br
         ts.profiles_2d[0].b_field_z = bz
@@ -547,7 +595,7 @@ def setup_databases(config_folder_path):
     input_user_or_path = wf_parameters["input_user_or_path"][0]
     input_database = wf_parameters["input_database"][0]
     input_backend = wf_parameters["input_backend"][0]
-    ddv_backend = wf_parameters["ddv_backend"][0]
+    ddv_backend = wf_parameters.get("ddv_backend", [_get_target_dd_version()])[0]
     output_user_or_path = wf_parameters["output_user_or_path"][0]
     output_database = wf_parameters["output_database"][0]
     output_backend = wf_parameters.get("output_backend", ["HDF5"])[0]
@@ -641,10 +689,19 @@ def get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow):
     return slices
 
 
+_OUTPUT_OWNED_IDS = {"core_profiles", "core_sources", "waves", "distributions"}
+
+
 def store_ids_slices(outputDb, inputMds, input_slices, output_ids, m3_flag=0):
-    """Write IDS slices to the output database."""
+    """Write IDS slices to the output database.
+
+    IDSes that the micro produces (core_profiles, core_sources, waves,
+    distributions) are written ONLY from output_ids — writing both the
+    input-side and output-side versions at the same time corrupts the HDF5
+    group index on subsequent put_slice calls.
+    """
     for ids_name, ids_data in input_slices.items():
-        if ids_name in inputMds:
+        if ids_name in inputMds or ids_name in _OUTPUT_OWNED_IDS:
             continue
         if hasattr(ids_data, 'ids_properties') and ids_data.ids_properties.homogeneous_time >= 0:
             if ids_data.ids_properties.homogeneous_time == 2:
