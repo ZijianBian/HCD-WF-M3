@@ -57,7 +57,7 @@ case "$MODE" in
         TEST_DIR="."
         MODE_DESC="Traditional (no MUSCLE3, all actors in-process)"
         RUN_PREFIX="run_traditional"
-        CONFIG_PATH="tests/105102"
+        CONFIG_PATH="tests/m3_hybrid"
         ;;
     "direct")
         TEST_DIR="."
@@ -136,8 +136,8 @@ echo "Starting workflow..."
 echo ""
 
 if [[ "$MODE" == "traditional" ]]; then
-    # Traditional mode: run wf_wrapper_m3.py directly with m3_flag=0
-    time python workflow/wf_wrapper_m3.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log" \
+    # Traditional mode: run wf_wrapper.py directly with m3_flag=0
+    time python workflow/wf_wrapper.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log" \
         || echo "Warning: Workflow exited with an error code."
 else
     # M3 modes: run via muscle_manager

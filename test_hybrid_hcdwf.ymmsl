@@ -73,7 +73,7 @@ implementations:
   wf_wrapper_impl:
     executable: python3
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/workflow/wf_wrapper_m3.py"
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/workflow/wf_wrapper.py"
       - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
       - "1"
   hcd_workflow_impl:
