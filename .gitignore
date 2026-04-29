@@ -49,3 +49,7 @@ MANIFEST
 
 # Generated version file
 hcdworkflow/_version.py
+
+# Python virtual environments
+devenv/
+devenv_*/
