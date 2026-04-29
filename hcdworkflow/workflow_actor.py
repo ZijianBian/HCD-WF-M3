@@ -64,7 +64,8 @@ class WorkflowActor:
 
         actor = eval(actorName)
         runtime_settings = actor.get_runtime_settings()
-        runtime_settings.ids_storage.backend = imas.imasdef.MEMORY_BACKEND  # pylint: disable=no-member # IMAS-4055
+        imasdef = imas.ids_defs if hasattr(imas, 'ids_defs') else imas.imasdef
+        runtime_settings.ids_storage.backend = imasdef.MEMORY_BACKEND
         code_parameters = actor.get_code_parameters()
         if xmlPath:
             code_parameters.parameters_path = xmlPath
@@ -88,6 +89,15 @@ class WorkflowActor:
                 os.getcwd()
             )  # To be fixed later on (pion fails if it does not know where to write)
         arguments = {}
+
+
+        if actorName == "stixredist":
+            from stixredist.common.runtime_settings import SandboxLifeTime, SandboxMode
+            runtime_settings.sandbox.life_time = SandboxLifeTime.PERSISTENT
+            runtime_settings.sandbox.mode = SandboxMode.MANUAL
+            runtime_settings.sandbox.path = os.getcwd()
+
+
         if code_parameters is not None:
             arguments["code_parameters"] = code_parameters
         if runtime_settings is not None:
@@ -114,9 +124,15 @@ class WorkflowActor:
         idsDict = {}
         if isinstance(idsData, list):
             for idsName in idsData:
-                idsDict[idsName] = eval(f"imas.{idsName}()")
+                if hasattr(imas, 'IDSFactory'):
+                    idsDict[idsName] = getattr(imas.IDSFactory(), idsName)()
+                else:
+                    idsDict[idsName] = eval(f"imas.{idsName}()")
         else:
-            idsDict[idsData] = eval(f"imas.{idsData}()")
+            if hasattr(imas, 'IDSFactory'):
+                idsDict[idsData] = getattr(imas.IDSFactory(), idsData)()
+            else:
+                idsDict[idsData] = eval(f"imas.{idsData}()")
         return idsDict
 
     def getIDSList(self, intentType="IN"):

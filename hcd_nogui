@@ -9,9 +9,12 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "-c", "--config_folder", help="input configuration folder", required=True
 )
+parser.add_argument(
+    "--m3_flag", type=int, default=0,
+    help="0=traditional in-process (default), 1=MUSCLE3 hybrid macro+micro"
+)
 
 args = vars(parser.parse_args())
 config_folder = args["config_folder"]
 
-
-wf_wrapper(config_folder)
+wf_wrapper(config_folder, m3_flag=args["m3_flag"])

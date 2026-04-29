@@ -6,6 +6,18 @@ from tools.hcd_tools import is_ec_on, is_ic_on, is_lh_on, is_nbi_on
 from tools.stdout_redirector import redirect_stdout, stdout_back
 
 
+def _ensure_ids_name(ids_obj, name):
+    """Ensure an IDS object has __name__ attribute (IMAS-Python 2.0 compatibility).
+
+    IMAS-Python 2.0 / DD 4.0 no longer provides __name__ on IDS objects.
+    The workflow executor relies on __name__ to identify IDS types.
+    This helper safely sets it using object.__setattr__ to bypass
+    IMAS's custom __setattr__ which rejects unknown attributes.
+    """
+    if not hasattr(ids_obj, '__name__'):
+        object.__setattr__(ids_obj, '__name__', name)
+
+
 class WorkflowExecutor:
     def __init__(
         self,
@@ -29,13 +41,11 @@ class WorkflowExecutor:
 
     def execute(self):
         print("Execute H&CD workflow for current time slice", file=sys.stdout)
-        self.validateAndUpdateProcessBundle()
+        err = self.validateAndUpdateProcessBundle()
+        if err is not None and err < 0:
+            print("  Skipping time slice due to validation error", file=sys.stderr)
+            return err
         final_algorithm, waiting_for, parallel_runs = self.decideAlgorithm()
-        # print("final_algo", final_algorithm)
-        # print(" ")
-        # print("waiting_for", waiting_for)
-        # print(" ")
-        # print("parallel_runs", parallel_runs)
 
         # EXECUTE THE CODES ACCORDING TO THE REQUESTED SEQUENCE
         self.executeAlgorithm(final_algorithm)
@@ -73,18 +83,24 @@ class WorkflowExecutor:
                 and "equilibrium" in self.process_bundle[process]["input"].keys()
             ):
                 time_array = self.process_bundle[process]["input"]["equilibrium"].time
+
+            # --- NBI waveform check ---
             if (
                 "nbi" in self.process_bundle[process]["input"]
                 and "nuclear" not in process
                 and self.process_bundle[process]["input"]["nbi"].ids_properties.homogeneous_time < 0
             ):
-                print("  NBI required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                if self.param_process.get("nbi_source", 0) != 0 or self.param_process.get("nbi_fp", 0) != 0:
+                    print("  NBI required but no waveform!!!", file=sys.stderr)
+                    print(
+                        "  --> Edit H&CD waveforms before executing the workflow.",
+                        file=sys.stderr,
+                    )
+                    print("  --> Abort.", file=sys.stderr)
+                    return -1
+                else:
+                    self.param_process["nbi_source"] = 0
+                    self.param_process["nbi_fp"] = 0
 
             if "nbi" in self.process_bundle[process]["input"] and not is_nbi_on(
                 self.process_bundle[process]["input"]["nbi"],
@@ -94,17 +110,27 @@ class WorkflowExecutor:
                 self.param_process["nbi_source"] = 0
                 self.param_process["nbi_fp"] = 0
 
+            # --- IC waveform check ---
             if (
                 "ic_antennas" in self.process_bundle[process]["input"]
                 and self.process_bundle[process]["input"]["ic_antennas"].ids_properties.homogeneous_time < 0
             ):
-                print("  ICRH required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                if (
+                    self.param_process.get("ic_wave_solver", 0) != 0
+                    or self.param_process.get("ic_coup", 0) != 0
+                    or self.param_process.get("ic_wave_fp", 0) != 0
+                ):
+                    print("  ICRH required but no waveform!!!", file=sys.stderr)
+                    print(
+                        "  --> Edit H&CD waveforms before executing the workflow.",
+                        file=sys.stderr,
+                    )
+                    print("  --> Abort.", file=sys.stderr)
+                    return -1
+                else:
+                    self.param_process["ic_coup"] = 0
+                    self.param_process["ic_wave_solver"] = 0
+                    self.param_process["ic_wave_fp"] = 0
 
             if "ic_antennas" in self.process_bundle[process]["input"] and not is_ic_on(
                 self.process_bundle[process]["input"]["ic_antennas"],
@@ -115,17 +141,22 @@ class WorkflowExecutor:
                 self.param_process["ic_wave_solver"] = 0
                 self.param_process["ic_wave_fp"] = 0
 
+            # --- EC waveform check ---
             if (
                 "ec_launchers" in self.process_bundle[process]["input"]
                 and self.process_bundle[process]["input"]["ec_launchers"].ids_properties.homogeneous_time < 0
             ):
-                print("  ECRH required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                if self.param_process.get("ec_wave_solver", 0) != 0 or self.param_process.get("ec_wave_fp", 0) != 0:
+                    print("  ECRH required but no waveform!!!", file=sys.stderr)
+                    print(
+                        "  --> Edit H&CD waveforms before executing the workflow.",
+                        file=sys.stderr,
+                    )
+                    print("  --> Abort.", file=sys.stderr)
+                    return -1
+                else:
+                    self.param_process["ec_wave_solver"] = 0
+                    self.param_process["ec_wave_fp"] = 0
 
             if "ec_launchers" in self.process_bundle[process]["input"] and not is_ec_on(
                 self.process_bundle[process]["input"]["ec_launchers"],
@@ -135,6 +166,7 @@ class WorkflowExecutor:
                 self.param_process["ec_wave_solver"] = 0
                 self.param_process["ec_wave_fp"] = 0
 
+            # --- LH power check ---
             if "lh_antennas" in self.process_bundle[process]["input"] and not is_lh_on(
                 self.process_bundle[process]["input"]["lh_antennas"],
                 time_array,
@@ -265,6 +297,7 @@ class WorkflowExecutor:
                         self.process_bundle[process]["input"][ids].time = self.process_bundle[process]["input"][
                             "core_profiles"
                         ].time
+
                 if self.process_bundle[process]["status"] == 1:
                     output_ids_data = self.executeProcess(
                         process,
@@ -283,15 +316,20 @@ class WorkflowExecutor:
                                 output_ids_data = self.process_bundle[process]["input"][ids]
                             else:
                                 output_ids_data = eval("imas." + ids + "()")
+                            _ensure_ids_name(output_ids_data, ids)
                         else:
                             if ids in self.process_bundle[process]["input"]:
-                                output_ids_data.append(self.process_bundle[process]["input"][ids])
+                                _tmp_ids = self.process_bundle[process]["input"][ids]
                             else:
-                                output_ids_data.append(eval("imas." + ids + "()"))
+                                _tmp_ids = eval("imas." + ids + "()")
+                            _ensure_ids_name(_tmp_ids, ids)
+                            output_ids_data.append(_tmp_ids)
             else:
                 # feature/repair_231017
                 actor = self.dictionary_of_actors[process]
                 kmerge = 0
+                _ensure_ids_name(self.process_bundle[process]["input"][0],
+                                 "unknown")
                 ids_to_be_merged = self.process_bundle[process]["input"][0].__name__
                 for each_proc in self.process_bundle.keys():  # merge only if at least one of involved codes is called
                     if (
@@ -311,10 +349,10 @@ class WorkflowExecutor:
 
             for iids in range(len(output_ids_list)):
                 if not hasattr(output_ids_data, "__len__"):
-                    # if hasattr(output_ids_data,'__len__'):
-                    #    for iids in range(len(output_ids_data)):
+                    _ensure_ids_name(output_ids_data, output_ids_list[iids])
                     self.process_bundle[process]["output"][output_ids_data.__name__] = output_ids_data
                 else:
+                    _ensure_ids_name(output_ids_data[iids], output_ids_list[iids])
                     self.process_bundle[process]["output"][output_ids_data[iids].__name__] = output_ids_data[iids]
 
                 if output_ids_list[iids] not in bundle_out.keys() or "merge_" in process:
@@ -332,6 +370,8 @@ class WorkflowExecutor:
                         tmp_output_ids_data = output_ids_data[iids]
                     else:
                         tmp_output_ids_data = output_ids_data
+                    _ensure_ids_name(bundle_out[output_ids_list[iids]], output_ids_list[iids])
+                    _ensure_ids_name(tmp_output_ids_data, output_ids_list[iids])
                     if bundle_out[output_ids_list[iids]].__name__ == tmp_output_ids_data.__name__:
                         self.process_bundle["merge_" + output_ids_list[iids]] = {}
                         self.process_bundle["merge_" + output_ids_list[iids]]["input"] = [
@@ -358,12 +398,11 @@ class WorkflowExecutor:
             return actor(bundle[0], bundle[1])
 
         # Get list of all codes in that category
-        codeslist = self.catdict[process]  # next(gen_dict_extract(process,maindict))
+        codeslist = self.catdict[process]
         codeinfo = codeslist[parameters[process]]
         code = codeinfo["name"]
 
         # Re-direct the logfile for this specific actor
-
         if code + "_log" in parameters.keys():
             stdout_redirect = parameters[code + "_log"]
             oldstrout, newstdout = redirect_stdout(stdout_redirect)
@@ -372,13 +411,39 @@ class WorkflowExecutor:
         for i in codeinfo["input"]:
             inputargs.append(bundle[i])
 
-        # TODO assign callbacks for status
-        # TODO initialize finalize methods
         results = actor(*inputargs)
 
         # Re-direct the logfile for this specific actor
         if code + "_log" in parameters.keys():
             stdout_back(oldstrout, newstdout)
 
-        # Call of the chosen code
+        # Normalize dict return type to ordered list.
+        # Some iWrap actors (e.g. FoPla) return a dict like
+        # {"distributions_out": ids, "core_sources_out": ids}
+        # instead of a tuple/list. The downstream storage logic in
+        # executeAlgorithm() uses integer indexing (output_ids_data[i])
+        # which fails on dict. Convert dict → ordered list here.
+        output_ids_list = codeinfo["output"]
+        # if isinstance(results, dict):
+        #     ordered = []
+        #     for ids_name in output_ids_list:
+        #         matched = None
+        #         for k, v in results.items():
+        #             if k.replace("_out", "").replace("_in", "") == ids_name:
+        #                 matched = v
+        #                 break
+        #         if matched is None:
+        #             # Fallback: take by position if key matching fails
+        #             matched = list(results.values())[len(ordered)]
+        #         ordered.append(matched)
+        #     results = ordered if len(ordered) > 1 else ordered[0]
+
+        # Ensure __name__ on returned IDS (IMAS-Python 2.0 compatibility)
+        if not hasattr(results, "__len__"):
+            _ensure_ids_name(results, output_ids_list[0] if output_ids_list else "unknown")
+        else:
+            for i, ids_name in enumerate(output_ids_list):
+                if i < len(results):
+                    _ensure_ids_name(results[i], ids_name)
+
         return results
