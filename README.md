@@ -4,19 +4,62 @@
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-See%20LICENSE.md-blue.svg)](LICENSE.md)
 
-Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulations.
+Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulations,with MUSCLE3 integration for modular multi-scale coupling of physics actors.
 
 ---
 
 ## 🚀 Quick Start
 
-| Audience   | Recommended Setup                | Command/Script                        |
-|------------|----------------------------------|---------------------------------------|
-| **User**   | EasyBuild module (SDCC)          | `module load HCD-WF`                  |
-| **User**   | SDCC Helper Script (SDCC)        | `./config_hcd_iter_sdcc.sh`           |
-| **Developer** | SDCC Helper Script (SDCC)     | `./config_hcd_iter_sdcc.sh`           |
-| **Developer** | Manual Setup (any system)     | See [Developer Setup](#developer-setup) |
+Audience     Setup                          Command
+──────────── ────────────────────────────── ──────────────────────────────────────
+User         EasyBuild module (SDCC)        module load HCD-WF
+User         Default helper (DD 4.1.0)      source config_hcd_iter_sdcc.sh
+Developer    Legacy helper (DD 3.42.0)      source config_hcd_iter_sdcc_3.42.0.sh
+Developer    Manual Setup (any system)      See "Developer Setup" below
 
+---
+
+## Execution Modes
+
+The workflow supports three execution modes via a unified entry point (`workflow/wf_wrapper.py`):
+
+```
+Mode            Flag / Command    Description
+─────────────── ───────────────── ──────────────────────────────────────────────────────
+Legacy          m3_flag=0         All iWrap actors execute in-process.
+                                  No MUSCLE3 involvement. Original behavior.
+
+Hybrid M3       m3_flag=1         Two-component MUSCLE3 coupling:
+                                  wf_wrapper.py (macro) handles DB I/O and the
+                                  time loop; hcd_workflow_m3.py (micro) runs
+                                  iWrap actors in a separate process.
+                                  IDS are exchanged via M3 conduits.
+
+Pure M3         (under            Each physics actor (Torbeam, Cyrano, …) runs
+                development)      as an independent M3 micro model, coupled
+                                  directly to a single macro driver.
+                                  Not yet runnable from this branch.
+```
+
+### MUSCLE3 Hybrid Architecture
+
+```
+wf_wrapper.py     (MACRO — one reuse_instance() containing the full time loop)
+    ├── Opens input / output / machine databases
+    ├── Reads IDS slices at each timestep
+    ├── Sends IDS to micro via O_I ports ────────────┐
+    ├── Receives updated IDS from micro via S ports  │
+    └── Writes results to output database            │
+                                                     │
+                    M3 conduits (serialized IDS)     │
+                                                     │
+hcd_workflow_m3.py  (MICRO — one reuse_instance() per timestep)
+    ├── Receives IDS from macro via F_INIT ports ◄───┘
+    ├── Calls HCDWorkflow.run()
+    │     └── iWrap actors (Torbeam, Cyrano, FoPla, hcd2core_sources, …)
+    │         execute internally — invisible to MUSCLE3
+    └── Sends output IDS back to macro via O_F ports
+```
 ---
 
 ## For Users
@@ -33,11 +76,13 @@ hcd_gui                       # Launch the GUI
 ### 2. On ITER SDCC: Use the Helper Script (Alternative)
 
 ```bash
-./config_hcd_iter_sdcc.sh           # Uses default DD version (3.42.0)
-./config_hcd_iter_sdcc.sh 4.0.0     # Use a different DD version if supported
+source config_hcd_iter_sdcc.sh           # Default: latest DD (4.1.0) + MUSCLE3
+source config_hcd_iter_sdcc_3.42.0.sh    # Legacy DD 3.42.0 stack (no MUSCLE3)
 # Optionally set ACTOR_FOLDER for local actors:
-ACTOR_FOLDER=~/public/PYTHON_ACTORS ./config_hcd_iter_sdcc.sh
+ACTOR_FOLDER=~/public/PYTHON_ACTORS source config_hcd_iter_sdcc.sh
 ```
+
+The default script loads the IMAS-Python 2.x stack with DD 4.1.0, sets up MUSCLE3, iWrap, the Waveform Cooker, and creates a devenv virtual environment. The _3.42.0 variant loads the legacy IMAS-AL-Python 5.x stack with DD 3.42.0 for compatibility with older test cases and JINTRAC coupling.
 
 This script will:
 - Load all required modules (unless `ACTOR_FOLDER` is set)
@@ -64,48 +109,70 @@ hcdslice_nogui -c my_config/
 
 ## For Developers
 
-### 1. On ITER SDCC: Use the Helper Script (Recommended)
+### SDCC Setup (DD 4.1.0, default)
 
 ```bash
-./config_hcd_iter_sdcc.sh
+source config_hcd_iter_sdcc.sh
 ```
-- Loads modules, sets up Python venv, installs all dependencies (including dev tools)
 
-### 2. Manual Setup (Any System)
+This script loads the latest IMAS stack and sets up MUSCLE3:
+1. Loads `IMAS-Python`, `IMAS-Fortran`, `IDStools`, `MUSCLE3`, `XMLlib`, `INTERPOS`
+2. Sets up iWrap (develop branch) and Waveform Cooker paths
+3. Configures `ACTOR_FOLDER` and `HCD_SANDBOX` in `PYTHONPATH`
+4. Creates a dedicated virtual environment (`devenv`) with `muscle3` installed
+5. Runs diagnostic checks (IMAS version, iWrap availability, actor folder)
+
+### SDCC Setup (DD 3.42.0, legacy)
 
 ```bash
-# Clone the repository
+source config_hcd_iter_sdcc_3.42.0.sh
+```
+
+For backward compatibility with the legacy IMAS-AL-Python 5.x stack and DD 3.42.0 actor builds (e.g. for JINTRAC coupling tests under `tests/data/`). Creates a separate `devenv_3.42.0` virtual environment so the two stacks do not interfere.
+
+### Manual Setup (SDCC, without helper script)
+
+```bash
 git clone ssh://git@git.iter.org/wf/hcd-wf.git
 cd hcd-wf
 
+# Load IMAS stack (must be first)
+module purge
+module load IMAS-Python IMAS-Fortran IDStools
+
+# Load MUSCLE3 and core tools
+module load MUSCLE3 XMLlib INTERPOS
+
+# Waveform Cooker
+module load Waveform-Cooker/1.6.0-GCCcore-13.2.0
+
+# iWrap (develop branch)
+export PATH=/home/ITER/schneim/public/git/iwrap/bin:$PATH
+export PYTHONPATH=/home/ITER/schneim/public/git/iwrap/python:$PYTHONPATH
+
+# Actor and sandbox paths
+export ACTOR_FOLDER=/home/ITER/<user>/public/PYTHON_ACTORS
+export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
+export PYTHONPATH=$(pwd):$PYTHONPATH
+
 # Create virtual environment
-python -m venv devenv
+python3 -m venv devenv --system-site-packages
 source devenv/bin/activate
-
-# Install in editable mode with dev dependencies
-pip install -e "[dev]"
-
-# Load required modules (SDCC only)
-module load Tkinter matplotlib IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
-module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
-module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
+pip install muscle3
+pip install -e .
 ```
 
-### 3. Code Quality & Testing
+### Code Quality & Testing
 
 ```bash
 # Format code
 black --line-length 120 hcdworkflow/ gui/ tools/ workflow/
-
 # Check style
 flake8 --max-line-length=120 --ignore=E203,W503 hcdworkflow/
-
 # Run linter
 pylint --max-line-length=120 hcdworkflow/
-
 # Run tests
 hcdslice_nogui -c tests/data/GRAYSCALE/
-
 # Or use the CI script
 bash ci-sdcc/st05-staticanalysis.sh
 ```
@@ -127,7 +194,7 @@ To run the workflow integration tests using pytest:
 
 These tests will execute the workflow commands for various configurations and check for successful completion.
 
-### 4. Installing Custom Actors
+### Installing Custom Actors (No-Muscle3)
 
 ```bash
 cd actor_install
@@ -139,36 +206,15 @@ python actor_install.py --skipModules grayscale.yml  # Install specific actor
 
 ## Features
 
-- **Multiple Execution Modes**: Console, GUI, batch, single time-slice
-- **Flexible Actor System**: Easy integration of new physics codes
-- **IMAS Integration**: Full compatibility with IMAS IDSes
+- **Multiple Execution Modes**: Console, GUI, batch, single time-slice, and MUSCLE3 hybrid
+- **MUSCLE3 Integration**: Modular multi-scale coupling via macro/micro architecture
+- **Flexible Actor System**: Easy integration of new physics codes (Torbeam, Cyrano, FoPla, …)
+- **IMAS Integration**: Full compatibility with IMAS IDSes, IMAS-Python 2.x, DD 4.0.0/4.1.0
+- **Smart DD Conversion**: Automatic Data Dictionary version handling with manual fix-ups
 - **Time-Loop Execution**: Automated multi-timepoint simulations
 - **HPC Support**: SLURM batch job submission
 - **Waveform Management**: Integration with Waveform Cooker
-- **Modular Design**: Clean separation of workflow logic and physics codes
-
----
-
-## Project Structure
-
-```
-hcd-wf/
-├── hcdworkflow/           # Main workflow package
-├── gui/                   # GUI components
-├── tools/                 # Utility tools
-├── workflow/              # Workflow wrapper
-├── actor_install/         # Actor installation scripts
-├── tests/                 # Test data
-├── ci-sdcc/               # CI/CD scripts
-├── hcd_gui                # GUI entry point
-├── hcd_nogui              # Console entry point
-├── hcdslice_nogui         # Single slice entry point
-├── hcd_batch              # Batch submission script
-├── pyproject.toml         # Project configuration
-├── setup.cfg              # Tool configurations
-└── README.md              # This file
-```
-
+- **Benchmark Runner**: Automated run management with numbered output directories
 ---
 
 ## Configuration
@@ -248,24 +294,122 @@ hcdslice_nogui -c tests/data/GRAY_PION
   make html
   # Open docs/build/html/index.html in browser
   ```
-
 ---
 
-## Troubleshooting
+## Running the Workflow
 
-- **Module import errors**: Load required IMAS modules: `module load IMAS-AL-Python`
+Prereq: `source config_hcd_iter_sdcc.sh` once per shell session.
+
+### Legacy Mode (No MUSCLE3)
+
+```bash
+./run.sh legacy
+```
+
+### Hybrid MUSCLE3 Mode
+
+```bash
+# Via MUSCLE3 manager:
+muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+
+# Via runner:
+./run.sh hybrid
+```
+
+### Pure MUSCLE3 Mode
+
+Pure mode (each physics actor as an independent M3 micro model) is under active
+development on a separate branch and is not runnable from this branch. The
+`./run.sh pure` stub will print a notice and exit.
+
+### Runner
+
+`run.sh` provides a convenient wrapper for all modes:
+
+```bash
+./run.sh [legacy|hybrid|pure]   # default: hybrid
+```
+
+It automatically:
+- Creates a numbered output directory under `runs/` (e.g., `runs/run_hybrid_001/`)
+- Captures stdout/stderr to `output.log`
+- Moves MUSCLE3 output into the run directory
+- Records run metadata (date, host, user, mode) in `run_config.txt`
+
+
+## File Structure
+
+hcd-wf-sandbox/
+│
+├── workflow/
+│   └── wf_wrapper.py              # Unified entry point (legacy + M3 macro)
+│                                  #   - Database setup & I/O
+│                                  #   - Time loop management
+│                                  #   - DD version conversion & fix-ups
+│                                  #   - IMAS compatibility layer
+│
+├── hcdworkflow/
+│   ├── hcd_workflow.py            # Original HCDWorkflow class (shared by all modes)
+│   ├── hcd_workflow_m3.py         # MUSCLE3 micro model
+│   │                              #   - Receives IDS via F_INIT ports
+│   │                              #   - Calls HCDWorkflow.run()
+│   │                              #   - Sends results via O_F ports
+│   ├── workflow_executor.py       # Actor execution
+│   ├── workflow_dbhelper.py       # Database connection helper
+│   ├── workflow_globals_reader.py # Global configuration reader
+│   └── ...
+│
+├── gui/                           # GUI components
+├── tools/                         # Utility tools
+├── actor_install/                 # Actor installation scripts
+│
+├── tests/                         # Test data and configs
+│
+├── test_hybrid_hcdwf.ymmsl        # MUSCLE3 hybrid mode configuration
+├── config_hcd_iter_sdcc.sh        # Environment setup (default: DD 4.1.0 + MUSCLE3)
+├── config_hcd_iter_sdcc_3.42.0.sh # Environment setup (legacy: DD 3.42.0)
+├── run.sh                         # Runner for legacy/hybrid (pure mode is WIP)
+│
+├── runs/                          # Auto-generated run outputs
+│   ├── run_legacy_001/
+│   ├── run_hybrid_001/
+│   │   ├── output.log
+│   │   ├── run_config.txt
+│   │   └── muscle3_output/
+│   └── ...
+│
+├── hcd_gui                        # GUI entry point
+├── hcd_nogui                      # Console entry point
+├── hcdslice_nogui                 # Single slice entry point
+├── hcd_batch                      # Batch submission script
+├── pyproject.toml                 # Project configuration
+├── setup.cfg                      # Tool configurations
+└── README.md                      # This file
 
 ---
+## M3 Port Mapping Reference
 
-## Contributing
+### Macro → Micro (O_I → F_INIT)
 
-1. Create a feature branch: `git checkout -b feature/my-feature`
-2. Make your changes
-3. Run code quality checks: `black`, `flake8`, `pylint`
-4. Test your changes: `hcdslice_nogui -c tests/data/GRAYSCALE/`
-5. Commit: `git commit -am "Add feature"`
-6. Push: `git push origin feature/my-feature`
-7. Create a Pull Request
+| Port | IDS | Description |
+|------|-----|-------------|
+| `equilibrium_out/in` | `equilibrium` | Plasma equilibrium (with b_field fix-ups) |
+| `core_profiles_out/in` | `core_profiles` | Plasma profiles (Te, ne, Ti, …) |
+| `workflow_out/in` | `workflow` | Workflow control parameters |
+| `ec_launchers_out/in` | `ec_launchers` | EC system configuration |
+| `ic_antennas_out/in` | `ic_antennas` | IC antenna configuration |
+| `core_sources_out/in` | `core_sources` | Heating sources (input from previous step) |
+| `distributions_out/in` | `distributions` | Particle distribution functions |
+| `distribution_sources_out/in` | `distribution_sources` | Distribution source terms |
+
+### Micro → Macro (O_F → S)
+
+| Port | IDS | Description |
+|------|-----|-------------|
+| `core_sources_out/in` | `core_sources` | Computed heating sources |
+| `waves_out/in` | `waves` | Wave propagation results |
+| `core_profiles_out/in` | `core_profiles` | Updated plasma profiles |
+| `distributions_out/in` | `distributions` | Updated distribution functions |
 
 ---
 
@@ -289,5 +433,6 @@ For support and questions:
 - Open an issue on the ITER JIRA
 - Contact the ITER HCD Workflow development team
 - Refer to the Confluence documentation
+
 
 ---

@@ -91,13 +91,6 @@ class WorkflowActor:
         arguments = {}
 
 
-        if actorName == "stixredist":
-            from stixredist.common.runtime_settings import SandboxLifeTime, SandboxMode
-            runtime_settings.sandbox.life_time = SandboxLifeTime.PERSISTENT
-            runtime_settings.sandbox.mode = SandboxMode.MANUAL
-            runtime_settings.sandbox.path = os.getcwd()
-
-
         if code_parameters is not None:
             arguments["code_parameters"] = code_parameters
         if runtime_settings is not None:
