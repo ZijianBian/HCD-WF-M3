@@ -721,8 +721,6 @@ def store_ids_slices(outputDb, inputMds, input_slices, output_ids, m3_flag=0):
                 if ids_name == "core_sources" and (not hasattr(ids_data, 'source') or len(ids_data.source) == 0):
                     continue
                 if m3_flag == 1:
-                    # Re-serialize through a fresh IDS to avoid C-level segfaults
-                    # observed when calling put_slice on directly-deserialized objects.
                     clean_ids = _create_ids(ids_name)
                     clean_ids.deserialize(ids_data.serialize())
                     outputDb.put_slice(clean_ids)
@@ -916,11 +914,8 @@ def run_m3_macro(config_folder_path, inputDb, outputDb, machineDb, inputIds, inp
                         if ids_obj.ids_properties.homogeneous_time == -1:
                             print(f"  <- {ids_name}: marked invalid (not produced this timestep)", flush=True)
                         else:
-                            # Only stamp authoritative time when the actor didn't provide one
-                            # (length 0 or sentinel -1.0). Otherwise preserve actor's truth.
-                            if hasattr(ids_obj, 'time') and (
-                                len(ids_obj.time) == 0 or float(ids_obj.time[0]) < 0
-                            ):
+                            # Stamp authoritative global time before writing to DB
+                            if hasattr(ids_obj, 'time'):
                                 ids_obj.time = np.array([timenow])
                     except Exception as e:
                         print(f"  <- WARNING: Could not deserialize {ids_name}: {e}", flush=True)

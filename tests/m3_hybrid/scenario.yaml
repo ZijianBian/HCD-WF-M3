@@ -1,0 +1,109 @@
+# ---------------------------------
+# PARAMETERS OF THE INPUT SCENARIO
+# ---------------------------------
+
+# ITER DT baseline (old baseline)
+shot:                134173
+run_in:              106
+input_user_or_path:  bianz
+input_database:      ITER
+time_slice:          200 #15
+scenario_backend:    HDF5
+input_ddv:           3
+
+# -----------------------------------
+# PARAMETERS TO SAVE THE OUTPUT DATA
+# -----------------------------------
+output_user_or_path: default
+output_database:     TORBEAM
+run_out:             1
+output_backend:      HDF5
+
+# -----------------------------------
+# PARAMETERS FOR OPTIONAL TIME LOOP
+# -----------------------------------
+
+# Time slice to simulate
+# - if <0: use IDS first time slice (with ntimes specified by the user)
+# - if =0: use IDS whole time vector (ntimes not used)
+# - if >0: use the specified time slice (with ntimes specified by the user)
+
+# Number of time steps to simulate (every dstep steps)
+# (effective only when time_slice is not equal to zero)
+# Time slice taken every dstep steps
+ntimes: 1
+dstep: 1
+
+# Time step in case a generic time array is defined
+dt_required: 0.2
+
+# ------------------------------------------
+# OPTION TO RUN EACH TIME SLICE IN PARALLEL
+# ------------------------------------------
+parallel: 0
+
+# --------------
+# MISCELLANEOUS
+# --------------
+
+# Tokamak name (useful for automatic adjustment of visualisation scripts)
+tokamak: 'ITER'
+
+# Cooking specific to iter ec system for adjustement of dynamic quantities w.r.t. geometry tables
+extra_cooking: 0
+
+# Optionally overwrite polarization (0 = input, 1 = forced to O-mode, -1 = forced to X-mode)
+force_pola: 0
+
+# With our without reflections
+ireflec: 0
+
+# At what fraction of original power do reflections ignore the beam?
+threshhold_frac: 0.1
+
+# Profile radial extension (default = not extended = 1.0)
+radial_extension: 1.0
+
+# Parameter to activate the scan on poloidal angle
+scanflag_steer: 0
+steering_array: [-1., -0.5, 0., 0.5, 1.]
+#steering_array: ['linspace',[-1.,1.,11]]
+
+# Parameter to activate the scan on toroidal angle
+# Careful: if scanflag_beta = 1, even if beta_shift is chosen = 0,
+# the TSM beta will be forced co-current, and tsm_shift will be applied
+scanflag_beta: 0
+beta_shift_array: [-10.,-9.,-8.,-7.,-6.,-5.,-4.,-3.,-2.,-1.,0.,1.,2.,3.]
+tsm_shift: 7.
+
+# Parameter to activate the scan on B-field (needs Chease to be activated)
+scanflag_bfield: 0
+bfield_array: [-2.8, -3.3, -4., -4.5]
+
+# Optionally run TORBEAM
+run_torbeam: 1
+
+# Optionally run GRAY
+run_gray: 0
+
+# Optionally re-run the equilibrium with CHEASE
+run_chease: 0
+
+# Optionally re-run the equilibrium with SpiderInverse
+run_spider: 0
+
+# Parameter to plot the configured EC power waveforms or not
+kplot: 0
+
+# Debug or not
+debug: 0
+
+# Sandbox manual settings
+sandbox_manual: 1
+
+# Optionally select a specific mirror (1) or not (0)
+select_mirror: 0
+#chosen_mirror: ['EL/TSM','EL/MSM','EL/BSM']
+chosen_mirror: ['EL/TSM']
+chosen_power: 0.83333333333e6
+full_mirror_list: ['EL/TSM','EL/MSM','EL/BSM','UL12/USM','UL12/LSM','UL13/USM','UL13/LSM','UL15/USM','UL15/LSM','UL16/USM','UL16/LSM']
