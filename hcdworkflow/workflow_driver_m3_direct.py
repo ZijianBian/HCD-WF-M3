@@ -1,0 +1,343 @@
+#!/usr/bin/env python
+"""
+workflow_driver_m3_direct.py — Pure M3 Macro Driver
+
+Pure M3 mode: this driver communicates directly with physics actor
+executables (torbeam_m3.exe, cyrano_m3.exe, …) as individual MUSCLE3
+micro models. No iWrap wrapper in between.
+
+Contrast with hybrid mode (wf_wrapper.py --m3_flag=1):
+    hybrid: driver ──► hcd_workflow_m3 (calls actors internally)
+    pure:   driver ──► torbeam_m3.exe  (M3 touches actor directly)
+            driver ──► cyrano_m3.exe
+            driver ──► fopla_m3.exe
+            ...
+
+Time control: 1 reuse = 1 timestep for all components.
+
+Actor protocol:
+    The driver sends to every wired actor at every timestep. Actors handle
+    zero-power inputs internally. This keeps each actor's reuse loop alive
+    across the full simulation.
+
+Usage (launched by MUSCLE3 Manager via ymmsl):
+    muscle_manager --start-all test_m3_pure_torbeam.ymmsl
+"""
+
+import os
+import sys
+import numpy as np
+
+sys.stdout.reconfigure(line_buffering=True)
+sys.stderr.reconfigure(line_buffering=True)
+
+from libmuscle import Instance, Message, KEEPS_NO_STATE_FOR_NEXT_USE
+from ymmsl import Operator
+
+# Reuse DB layer and IDS utilities from wf_wrapper
+from workflow.wf_wrapper import (
+    setup_databases,
+    get_ids_slices,
+    store_ids_slices,
+    resolve_time_range,
+    _create_ids,
+)
+
+
+# =============================================================================
+# Port registry — one entry per actor
+# Each actor has:
+#   send: ports driver sends on (O_I)
+#   recv: ports driver receives on (S)
+# =============================================================================
+
+ACTOR_PORTS = {
+    'torbeam': {
+        'send': ['equilibrium_out', 'core_profiles_out', 'ec_launchers_out'],
+        'recv': ['waves_in'],
+    },
+    'cyrano': {
+        'send': ['equilibrium_out_ic', 'core_profiles_out_ic', 'ic_antennas_out',
+                 'waves_out_to_cyrano', 'distributions_out_ic',
+                 'distribution_sources_out_ic', 'core_sources_out_ic',
+                 'nbi_out_ic'],
+        'recv': ['waves_ic_in'],
+    },
+    'fopla': {
+        'send': ['equilibrium_out_fp', 'core_profiles_out_fp', 'ic_antennas_out_fp',
+                 'waves_out_to_fopla', 'distributions_out_fp',
+                 'distribution_sources_out_fp', 'nbi_out_fp'],
+        'recv': ['distributions_in'],
+    },
+    'merge_waves': {
+        'send': ['waves_ec_out', 'waves_ic_out'],
+        'recv': ['waves_merged_in'],
+    },
+    'hcd2core_sources': {
+        'send': ['distributions_out_post', 'distribution_sources_out_post',
+                 'waves_out_post', 'core_profiles_out_post'],
+        'recv': ['core_sources_in'],
+    },
+}
+
+
+# =============================================================================
+# Power-gating helpers
+# =============================================================================
+
+def _ec_total_power(ec_launchers_ids) -> float:
+    """Sum launched EC power [W] across all beams."""
+    if ec_launchers_ids is None:
+        return 0.0
+    try:
+        total = 0.0
+        for beam in ec_launchers_ids.beam:
+            if hasattr(beam.power_launched, 'data') and len(beam.power_launched.data) > 0:
+                total += float(beam.power_launched.data[0])
+            elif hasattr(beam, 'power_launched') and beam.power_launched.has_value:
+                total += float(np.asarray(beam.power_launched)[0])
+        return total
+    except Exception:
+        return 0.0
+
+
+def _ic_total_power(ic_antennas_ids) -> float:
+    """Sum launched IC power [W] across all antennas."""
+    if ic_antennas_ids is None:
+        return 0.0
+    try:
+        total = 0.0
+        for antenna in ic_antennas_ids.antenna:
+            if hasattr(antenna.power, 'data') and len(antenna.power.data) > 0:
+                total += float(antenna.power.data[0])
+        return total
+    except Exception:
+        return 0.0
+
+
+# =============================================================================
+# M3 send / recv helpers
+# =============================================================================
+
+def _send(instance, port_name, ids_obj, timenow, t_next):
+    """Serialize and send an IDS on a port."""
+    try:
+        data = ids_obj.serialize()
+    except Exception as e:
+        print(f"  -> WARNING: {port_name} serialization failed ({e}), sending empty", flush=True)
+        empty = _create_ids(port_name.rsplit('_out', 1)[0].rsplit('_', 1)[0])
+        empty.ids_properties.homogeneous_time = 0
+        try:
+            data = empty.serialize()
+        except Exception:
+            data = b''
+    print(f"  -> {port_name} ({len(data)} bytes)", flush=True)
+    instance.send(port_name, Message(timenow, t_next, data=data))
+
+
+def _recv(instance, port_name, ids_name) -> object:
+    """Receive and deserialize an IDS from a port."""
+    print(f"  <- waiting {port_name}...", flush=True)
+    msg = instance.receive(port_name)
+    ids_obj = _create_ids(ids_name)
+    if msg.data and len(msg.data) > 0:
+        try:
+            ids_obj.deserialize(msg.data)
+            if hasattr(ids_obj, 'time'):
+                ids_obj.time = np.array([msg.timestamp])
+        except Exception as e:
+            print(f"  <- WARNING: {port_name} deserialize failed: {e}", flush=True)
+    print(f"  <- {port_name} received (t={msg.timestamp:.4f})", flush=True)
+    return ids_obj
+
+
+def _empty(ids_name) -> object:
+    """Create a serializable empty IDS placeholder."""
+    ids_obj = _create_ids(ids_name)
+    ids_obj.ids_properties.homogeneous_time = 0
+    return ids_obj
+
+
+# =============================================================================
+# Main driver
+# =============================================================================
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python workflow_driver_m3_direct.py <config_folder_path>")
+        sys.exit(1)
+
+    config_path = os.path.abspath(sys.argv[1])
+    print(f"[driver] Pure M3 driver starting", flush=True)
+    print(f"[driver] Config: {config_path}", flush=True)
+
+    # --- Create MUSCLE3 Instance ---
+    # Collect all send/recv ports from the registry.
+    # Only ports that are actually wired in the ymmsl will be connected;
+    # driver checks is_connected() before using each port.
+    all_send = []
+    all_recv = []
+    for actor_info in ACTOR_PORTS.values():
+        all_send.extend(actor_info['send'])
+        all_recv.extend(actor_info['recv'])
+
+    ports = {
+        Operator.O_I: all_send,
+        Operator.S:   all_recv,
+    }
+    instance = Instance(ports, KEEPS_NO_STATE_FOR_NEXT_USE)
+    print(f"[driver] M3 instance created", flush=True)
+
+    # --- Determine which actors are actually wired ---
+    connected_send = {p for p in all_send if instance.is_connected(p)}
+    connected_recv = {p for p in all_recv if instance.is_connected(p)}
+
+    active_actors = {
+        actor for actor, info in ACTOR_PORTS.items()
+        if any(p in connected_send for p in info['send'])
+    }
+    print(f"[driver] Active actors: {sorted(active_actors)}", flush=True)
+
+    # --- Database setup (reuse wf_wrapper layer) ---
+    inputDb, outputDb, machineDb, inputIds, inputMds, _ = \
+        setup_databases(config_path)
+
+    # --- Time range ---
+    # Read workflow parameters directly from XML — pure M3 mode does not need
+    # iWrap actors, so we bypass HCDWorkflow/WorkflowData to avoid importing them.
+    from hcdworkflow.workflow_config_reader import WorkflowConfigReader
+    wf_xml = os.path.join(config_path, "input_workflow.xml")
+    params = WorkflowConfigReader(wf_xml).getWorkflowParameters()
+
+    class _WFStub:
+        class workflowData:
+            pass
+    _stub = _WFStub()
+    _stub.workflowData.tbegin = float(params["tbegin"])
+    _stub.workflowData.tend = float(params["tend"])
+    _stub.workflowData.dt_required = float(params["dt_required"])
+    _stub.workflowData.one_time_slice = int(params["one_time_slice"])
+
+    tbegin, tend, dt, nsteps, one_time_slice = resolve_time_range(_stub, inputDb)
+    print(f"[driver] Time range: {tbegin} → {tend}, dt={dt}, steps={nsteps}", flush=True)
+
+    # --- Main loop ---
+    timenow = tbegin
+    step = 0
+
+    while instance.reuse_instance():
+        while timenow < tend:
+            step += 1
+            t_next = timenow + dt if timenow + dt < tend else None
+            print(f"\n{'='*60}", flush=True)
+            print(f"[driver] Step {step}/{nsteps}, t={timenow:.4f}", flush=True)
+
+            # --- Read IDS from DB ---
+            ids_slices = get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow)
+            if ids_slices is None:
+                print(f"[driver] ERROR: failed to read IDS at t={timenow}", flush=True)
+                timenow += dt
+                continue
+
+            eq  = ids_slices.get('equilibrium',  _empty('equilibrium'))
+            cp  = ids_slices.get('core_profiles', _empty('core_profiles'))
+            ec  = ids_slices.get('ec_launchers',  _empty('ec_launchers'))
+            ic  = ids_slices.get('ic_antennas',   _empty('ic_antennas'))
+            cs  = ids_slices.get('core_sources',  _empty('core_sources'))
+            dis = ids_slices.get('distributions', _empty('distributions'))
+            dsr = ids_slices.get('distribution_sources', _empty('distribution_sources'))
+            nbi = ids_slices.get('nbi',           _empty('nbi'))
+
+            output_ids = {}
+
+            # ----------------------------------------------------------------
+            # EC branch — torbeam
+            # ----------------------------------------------------------------
+            ec_power = _ec_total_power(ec)
+            print(f"[driver] EC power = {ec_power/1e6:.3f} MW", flush=True)
+
+            if 'torbeam' in active_actors:
+                _send(instance, 'equilibrium_out',   eq,  timenow, t_next)
+                _send(instance, 'core_profiles_out', cp,  timenow, t_next)
+                _send(instance, 'ec_launchers_out',  ec,  timenow, t_next)
+                waves_ec = _recv(instance, 'waves_in', 'waves')
+            else:
+                waves_ec = _empty('waves')
+
+            output_ids['waves'] = waves_ec
+
+            # ----------------------------------------------------------------
+            # IC branch — cyrano  (only if wired)
+            # ----------------------------------------------------------------
+            if 'cyrano' in active_actors:
+                ic_power = _ic_total_power(ic)
+                print(f"[driver] IC power = {ic_power/1e6:.3f} MW", flush=True)
+
+                _send(instance, 'equilibrium_out_ic',          eq,      timenow, t_next)
+                _send(instance, 'core_profiles_out_ic',        cp,      timenow, t_next)
+                _send(instance, 'ic_antennas_out',             ic,      timenow, t_next)
+                _send(instance, 'waves_out_to_cyrano',         waves_ec, timenow, t_next)
+                _send(instance, 'distributions_out_ic',        dis,     timenow, t_next)
+                _send(instance, 'distribution_sources_out_ic', dsr,     timenow, t_next)
+                _send(instance, 'core_sources_out_ic',         cs,      timenow, t_next)
+                _send(instance, 'nbi_out_ic',                  nbi,     timenow, t_next)
+                waves_ic = _recv(instance, 'waves_ic_in', 'waves')
+            else:
+                waves_ic = _empty('waves')
+
+            # ----------------------------------------------------------------
+            # Merge waves  (only if wired)
+            # ----------------------------------------------------------------
+            if 'merge_waves' in active_actors:
+                _send(instance, 'waves_ec_out', waves_ec, timenow, t_next)
+                _send(instance, 'waves_ic_out', waves_ic, timenow, t_next)
+                waves = _recv(instance, 'waves_merged_in', 'waves')
+            else:
+                waves = waves_ec
+
+            output_ids['waves'] = waves
+
+            # ----------------------------------------------------------------
+            # FP branch — fopla  (only if wired)
+            # ----------------------------------------------------------------
+            if 'fopla' in active_actors:
+                _send(instance, 'equilibrium_out_fp',           eq,  timenow, t_next)
+                _send(instance, 'core_profiles_out_fp',         cp,  timenow, t_next)
+                _send(instance, 'ic_antennas_out_fp',           ic,  timenow, t_next)
+                _send(instance, 'waves_out_to_fopla',           waves, timenow, t_next)
+                _send(instance, 'distributions_out_fp',         dis, timenow, t_next)
+                _send(instance, 'distribution_sources_out_fp',  dsr, timenow, t_next)
+                _send(instance, 'nbi_out_fp',                   nbi, timenow, t_next)
+                distributions = _recv(instance, 'distributions_in', 'distributions')
+                output_ids['distributions'] = distributions
+            else:
+                distributions = dis
+
+            # ----------------------------------------------------------------
+            # Post-processing — hcd2core_sources  (only if wired)
+            # ----------------------------------------------------------------
+            if 'hcd2core_sources' in active_actors:
+                _send(instance, 'distributions_out_post',         distributions, timenow, t_next)
+                _send(instance, 'distribution_sources_out_post',  dsr,           timenow, t_next)
+                _send(instance, 'waves_out_post',                 waves,         timenow, t_next)
+                _send(instance, 'core_profiles_out_post',         cp,            timenow, t_next)
+                core_sources = _recv(instance, 'core_sources_in', 'core_sources')
+                output_ids['core_sources'] = core_sources
+
+            # ----------------------------------------------------------------
+            # Write results to DB
+            # ----------------------------------------------------------------
+            store_ids_slices(outputDb, inputMds, ids_slices, output_ids, m3_flag=1)
+
+            timenow += dt
+
+    print(f"[driver] Finished after {step} steps", flush=True)
+
+    inputDb.close()
+    outputDb.close()
+    machineDb.close()
+    print(f"[driver] Databases closed", flush=True)
+
+
+if __name__ == "__main__":
+    main()

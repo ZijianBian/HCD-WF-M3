@@ -1,0 +1,77 @@
+ymmsl_version: v0.1
+
+# =============================================================================
+# Pure M3 mode — Torbeam only (minimal prototype)
+# =============================================================================
+#
+# Prereq: source config_hcd_iter_sdcc.sh once in the shell before running.
+#   MUSCLE3's native instantiator inherits os.environ from the manager
+#   process; the modules/venv loaded by the config script propagate to
+#   driver and torbeam subprocesses.
+#
+# Topology:
+#   driver (macro) ──► torbeam_m3.exe (micro)
+#
+#   driver reads DB, manages time loop, applies EC power-gating.
+#   torbeam is a direct M3 micro — no iWrap wrapper in between.
+#
+# Contrast with hybrid mode (test_hybrid_hcdwf.ymmsl):
+#   hybrid:  driver ──► hcd_workflow_m3 (which calls torbeam internally)
+#   pure:    driver ──► torbeam_m3.exe  (M3 touches actor directly)
+#
+# Time control: 1 reuse = 1 timestep (both driver and torbeam)
+# On/off switching: driver skips send when ec_power = 0 (Option C protocol)
+#
+# =============================================================================
+
+model:
+  name: hcd_pure_m3_torbeam
+
+  components:
+
+    driver:
+      implementation: driver_impl
+      ports:
+        o_i:
+          - equilibrium_out
+          - core_profiles_out
+          - ec_launchers_out
+        s:
+          - waves_in
+
+    torbeam:
+      implementation: torbeam_impl
+      ports:
+        f_init:
+          - equilibrium_in
+          - core_profiles_in
+          - ec_launchers_in
+        o_f:
+          - waves_out
+
+  conduits:
+    driver.equilibrium_out:    torbeam.equilibrium_in
+    driver.core_profiles_out:  torbeam.core_profiles_in
+    driver.ec_launchers_out:   torbeam.ec_launchers_in
+    torbeam.waves_out:         driver.waves_in
+
+settings:
+  config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+  extra_cooking: false
+  torbeam.code_parameters: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/ECRH/ec_wave_solver/input_torbeam.xml"
+
+resources:
+  driver:
+    threads: 1
+  torbeam:
+    threads: 1
+
+implementations:
+  driver_impl:
+    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/devenv/bin/python
+    args:
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/workflow_driver_m3_direct.py"
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+
+  torbeam_impl:
+    executable: /home/ITER/bianz/public/PYTHON_ACTORS/torbeam/torbeam_m3.exe

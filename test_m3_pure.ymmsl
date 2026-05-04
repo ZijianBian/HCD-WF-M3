@@ -1,0 +1,202 @@
+ymmsl_version: v0.1
+
+# =============================================================================
+# Pure M3 mode — Full chain
+# =============================================================================
+#
+# Prereq: source config_hcd_iter_sdcc.sh once in the shell before running.
+#
+# Topology:
+#         ┌─► torbeam ─────► waves_ec ─┐
+# driver ─┤                             ├─► merge_waves ─► waves_merged ──┐
+#         └─► cyrano  ─────► waves_ic ─┘                                   │
+#                                                                          │
+# driver (waves_merged, …) ────► fopla ────► distributions                 │
+#                                                                          │
+# driver (distributions, waves_merged, …) ────► hcd2core_sources ─► core_sources
+#
+# 1 reuse = 1 timestep. Option C power-gating on EC (torbeam) and IC (cyrano).
+#
+# =============================================================================
+
+model:
+  name: hcd_pure_m3_full
+
+  components:
+    driver:
+      implementation: driver_impl
+      ports:
+        o_i:
+          # torbeam
+          - equilibrium_out
+          - core_profiles_out
+          - ec_launchers_out
+          # cyrano
+          - equilibrium_out_ic
+          - core_profiles_out_ic
+          - ic_antennas_out
+          - waves_out_to_cyrano
+          - distributions_out_ic
+          - distribution_sources_out_ic
+          - core_sources_out_ic
+          - nbi_out_ic
+          # merge_waves
+          - waves_ec_out
+          - waves_ic_out
+          # fopla
+          - equilibrium_out_fp
+          - core_profiles_out_fp
+          - ic_antennas_out_fp
+          - waves_out_to_fopla
+          - distributions_out_fp
+          - distribution_sources_out_fp
+          - nbi_out_fp
+          # hcd2core_sources
+          - distributions_out_post
+          - distribution_sources_out_post
+          - waves_out_post
+          - core_profiles_out_post
+        s:
+          - waves_in           # ← torbeam
+          - waves_ic_in        # ← cyrano
+          - waves_merged_in    # ← merge_waves
+          - distributions_in   # ← fopla
+          - core_sources_in    # ← hcd2core_sources
+
+    torbeam:
+      implementation: torbeam_impl
+      ports:
+        f_init:
+          - equilibrium_in
+          - core_profiles_in
+          - ec_launchers_in
+        o_f:
+          - waves_out
+
+    cyrano:
+      implementation: cyrano_impl
+      ports:
+        f_init:
+          - equilibrium_in
+          - core_profiles_in
+          - ic_antennas_in
+          - waves_in
+          - distributions_in
+          - distribution_sources_in
+          - core_sources_in
+          - nbi_in
+        o_f:
+          - waves_out
+
+    merge_waves:
+      implementation: merge_waves_impl
+      ports:
+        f_init:
+          - waves_in1
+          - waves_in2
+        o_f:
+          - waves_out
+
+    fopla:
+      implementation: fopla_impl
+      ports:
+        f_init:
+          - equilibrium_in
+          - core_profiles_in
+          - ic_antennas_in
+          - waves_in
+          - distributions_in
+          - distribution_sources_in
+          - nbi_in
+        o_f:
+          - distributions_out
+
+    hcd2core_sources:
+      implementation: hcd2core_sources_impl
+      ports:
+        f_init:
+          - distributions_in
+          - distribution_sources_in
+          - waves_in
+          - core_profiles_in
+        o_f:
+          - core_sources_out
+
+  conduits:
+    # driver → torbeam
+    driver.equilibrium_out:    torbeam.equilibrium_in
+    driver.core_profiles_out:  torbeam.core_profiles_in
+    driver.ec_launchers_out:   torbeam.ec_launchers_in
+    torbeam.waves_out:         driver.waves_in
+
+    # driver → cyrano
+    driver.equilibrium_out_ic:          cyrano.equilibrium_in
+    driver.core_profiles_out_ic:        cyrano.core_profiles_in
+    driver.ic_antennas_out:             cyrano.ic_antennas_in
+    driver.waves_out_to_cyrano:         cyrano.waves_in
+    driver.distributions_out_ic:        cyrano.distributions_in
+    driver.distribution_sources_out_ic: cyrano.distribution_sources_in
+    driver.core_sources_out_ic:         cyrano.core_sources_in
+    driver.nbi_out_ic:                  cyrano.nbi_in
+    cyrano.waves_out:                   driver.waves_ic_in
+
+    # driver → merge_waves
+    driver.waves_ec_out:       merge_waves.waves_in1
+    driver.waves_ic_out:       merge_waves.waves_in2
+    merge_waves.waves_out:     driver.waves_merged_in
+
+    # driver → fopla
+    driver.equilibrium_out_fp:          fopla.equilibrium_in
+    driver.core_profiles_out_fp:        fopla.core_profiles_in
+    driver.ic_antennas_out_fp:          fopla.ic_antennas_in
+    driver.waves_out_to_fopla:          fopla.waves_in
+    driver.distributions_out_fp:        fopla.distributions_in
+    driver.distribution_sources_out_fp: fopla.distribution_sources_in
+    driver.nbi_out_fp:                  fopla.nbi_in
+    fopla.distributions_out:            driver.distributions_in
+
+    # driver → hcd2core_sources
+    driver.distributions_out_post:        hcd2core_sources.distributions_in
+    driver.distribution_sources_out_post: hcd2core_sources.distribution_sources_in
+    driver.waves_out_post:                hcd2core_sources.waves_in
+    driver.core_profiles_out_post:        hcd2core_sources.core_profiles_in
+    hcd2core_sources.core_sources_out:    driver.core_sources_in
+
+settings:
+  config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+  extra_cooking: false
+
+  torbeam.code_parameters:          "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/ECRH/ec_wave_solver/input_torbeam.xml"
+  cyrano.code_parameters:           "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/ICRH/ic_wave_solver/input_cyrano.xml"
+  fopla.code_parameters:            "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/ICRH/ic_wave_fp/input_fopla.xml"
+  hcd2core_sources.code_parameters: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/source/fill_core_sources/input_hcd2core_sources.xml"
+
+resources:
+  driver:           { threads: 1 }
+  torbeam:          { threads: 1 }
+  cyrano:           { threads: 1 }
+  merge_waves:      { threads: 1 }
+  fopla:            { threads: 1 }
+  hcd2core_sources: { threads: 1 }
+
+implementations:
+  driver_impl:
+    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/devenv/bin/python
+    args:
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/workflow_driver_m3_direct.py"
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+
+  torbeam_impl:
+    executable: /home/ITER/bianz/public/PYTHON_ACTORS/torbeam/torbeam_m3.exe
+
+  cyrano_impl:
+    executable: /home/ITER/bianz/public/PYTHON_ACTORS/cyrano/cyrano_m3.exe
+
+  merge_waves_impl:
+    executable: /home/ITER/bianz/public/PYTHON_ACTORS/merge_waves/merge_waves_m3.exe
+
+  fopla_impl:
+    executable: /home/ITER/bianz/public/PYTHON_ACTORS/fopla/fopla_m3.exe
+
+  hcd2core_sources_impl:
+    executable: /home/ITER/bianz/public/PYTHON_ACTORS/hcd2core_sources/hcd2core_sources_m3.exe
