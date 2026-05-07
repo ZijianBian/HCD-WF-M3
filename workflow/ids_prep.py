@@ -229,151 +229,144 @@ def _fixup_core_profiles(cp):
     return cp
 
 
-def _fixup_equilibrium(eq):
-    """Apply manual fix-ups for equilibrium IDS.
+def _eq_fill_psi_axis(ts):
+    """Fill psi_axis from profiles_1d.psi[0] when missing (CHEASE/DINA workaround).
 
-    This runs UNCONDITIONALLY (not only after DD conversion) because
-    these issues exist in the source data regardless of DD version:
-      - Missing b_field_r/z/phi computation from psi
-      - NaN values in 2D profiles
-      - b_field_tor → b_field_phi renaming (DD 3.42 legacy)
-      - Missing vacuum toroidal field quantities
-      - Missing triangularity_lower (needed by Cyrano)
-
-    Reference: Torbeam standalone run_torbeam script,
-               Cyrano standalone run_cyrano script.
+    Some scenarios (e.g. ITER 105102) leave global_quantities.psi_axis as the
+    IMAS empty sentinel (-9e+40). Downstream code (including _compute_bax and
+    Cyrano's axis-side f-profile picker) compares it against profiles_1d.psi
+    to decide which end is the axis; with the sentinel the comparison is
+    numerical noise. profiles_1d.psi is ordered axis→boundary, so psi_axis
+    = psi1d[0] is the correct recovery.
     """
-    if len(eq.time_slice) == 0:
-        return eq
+    if ts.global_quantities.psi_axis.has_value or len(ts.profiles_1d.psi) == 0:
+        return
+    psi1d_axis = float(np.asarray(ts.profiles_1d.psi)[0])
+    ts.global_quantities.psi_axis = psi1d_axis
+    print(f"  [equilibrium] Filled psi_axis from profiles_1d.psi[0] "
+          f"(= {psi1d_axis:.4g})", flush=True)
 
-    ts = eq.time_slice[0]
 
-    # --- Fill psi_axis if missing (CHEASE/DINA workaround) ---
-    # Some scenarios (e.g. ITER 105102) leave global_quantities.psi_axis as the
-    # IMAS empty sentinel (-9e+40). Downstream code (including _compute_bax here
-    # and Cyrano's axis-side f-profile picker) compares it against
-    # profiles_1d.psi to decide which end is the axis; with the sentinel the
-    # comparison is numerical noise. profiles_1d.psi is ordered axis→boundary,
-    # so psi_axis = psi1d[0] is the correct recovery.
-    if not ts.global_quantities.psi_axis.has_value \
-       and len(ts.profiles_1d.psi) > 0:
-        psi1d_axis = float(np.asarray(ts.profiles_1d.psi)[0])
-        ts.global_quantities.psi_axis = psi1d_axis
-        print(f"  [equilibrium] Filled psi_axis from profiles_1d.psi[0] "
-              f"(= {psi1d_axis:.4g})", flush=True)
+def _eq_complete_bfield(eq, ts):
+    """Compute b_field_r/z/phi from psi when missing."""
+    if len(ts.profiles_2d) == 0 or ts.profiles_2d[0].b_field_r.has_value:
+        return
+    print("  [equilibrium] Completing b_field_r, b_field_z, b_field_phi from psi", flush=True)
+    try:
+        _update_equilibrium_bfield(eq)
+    except Exception as e:
+        print(f"  [equilibrium] WARNING: Could not compute b_field: {e}", flush=True)
 
-    # --- Complete b_field_r/z/phi only if missing ---
-    if len(ts.profiles_2d) > 0 and not ts.profiles_2d[0].b_field_r.has_value:
-        print("  [equilibrium] Completing b_field_r, b_field_z, b_field_phi from psi", flush=True)
-        try:
-            _update_equilibrium_bfield(eq)
-        except Exception as e:
-            print(f"  [equilibrium] WARNING: Could not compute b_field: {e}", flush=True)
 
-    # --- NaN replacement in 2D profiles ---
-    if len(ts.profiles_2d) > 0 and ts.profiles_2d[0].b_field_r.has_value:
-        p2d = ts.profiles_2d[0]
-        if np.isnan(p2d.b_field_r).any():
-            print("  [equilibrium] Replacing NaN in 2D profiles", flush=True)
-            p2d.b_field_r[np.isnan(p2d.b_field_r)] = 0.0
-            p2d.b_field_z[np.isnan(p2d.b_field_z)] = 0.0
-            p2d.b_field_phi[np.isnan(p2d.b_field_phi)] = \
-                np.sign(float(eq.vacuum_toroidal_field.b0[0])) * 99.0
-            p2d.psi[np.isnan(p2d.psi)] = ts.global_quantities.psi_boundary
+def _eq_replace_nan_2d(eq, ts):
+    """Replace NaN in 2D profiles and lightly smooth to tame separatrix grid."""
+    if len(ts.profiles_2d) == 0 or not ts.profiles_2d[0].b_field_r.has_value:
+        return
+    p2d = ts.profiles_2d[0]
+    if not np.isnan(p2d.b_field_r).any():
+        return
+    print("  [equilibrium] Replacing NaN in 2D profiles", flush=True)
+    p2d.b_field_r[np.isnan(p2d.b_field_r)] = 0.0
+    p2d.b_field_z[np.isnan(p2d.b_field_z)] = 0.0
+    p2d.b_field_phi[np.isnan(p2d.b_field_phi)] = \
+        np.sign(float(eq.vacuum_toroidal_field.b0[0])) * 99.0
+    p2d.psi[np.isnan(p2d.psi)] = ts.global_quantities.psi_boundary
 
-            # Smooth to avoid grid irregularities near separatrix
-            if gaussian_filter is not None:
-                p2d.b_field_r = gaussian_filter(p2d.b_field_r, sigma=2)
-                p2d.b_field_z = gaussian_filter(p2d.b_field_z, sigma=2)
-                p2d.b_field_phi = gaussian_filter(p2d.b_field_phi, sigma=2)
-                p2d.psi = gaussian_filter(p2d.psi, sigma=2)
+    if gaussian_filter is not None:
+        p2d.b_field_r = gaussian_filter(p2d.b_field_r, sigma=2)
+        p2d.b_field_z = gaussian_filter(p2d.b_field_z, sigma=2)
+        p2d.b_field_phi = gaussian_filter(p2d.b_field_phi, sigma=2)
+        p2d.psi = gaussian_filter(p2d.psi, sigma=2)
 
-    # --- b_field_tor → b_field_phi (DD 3.42 had both) ---
-    if hasattr(ts.global_quantities.magnetic_axis, 'b_field_tor'):
-        if not ts.global_quantities.magnetic_axis.b_field_phi.has_value \
-           and ts.global_quantities.magnetic_axis.b_field_tor.has_value:
-            print("  [equilibrium] Copying b_field_tor → b_field_phi (magnetic_axis)", flush=True)
-            ts.global_quantities.magnetic_axis.b_field_phi = \
-                ts.global_quantities.magnetic_axis.b_field_tor
 
-    if len(ts.profiles_2d) > 0 and hasattr(ts.profiles_2d[0], 'b_field_tor'):
-        if not ts.profiles_2d[0].b_field_phi.has_value \
-           and ts.profiles_2d[0].b_field_tor.has_value:
-            print("  [equilibrium] Copying b_field_tor → b_field_phi (profiles_2d)", flush=True)
-            ts.profiles_2d[0].b_field_phi = ts.profiles_2d[0].b_field_tor
+def _eq_rename_b_field_tor(ts):
+    """DD 3.42 had b_field_tor; copy into b_field_phi when only the legacy
+    field is populated."""
+    mag = ts.global_quantities.magnetic_axis
+    if hasattr(mag, 'b_field_tor') \
+       and not mag.b_field_phi.has_value \
+       and mag.b_field_tor.has_value:
+        print("  [equilibrium] Copying b_field_tor → b_field_phi (magnetic_axis)", flush=True)
+        mag.b_field_phi = mag.b_field_tor
 
-    # --- Fill vacuum quantities from magnetic axis if missing ---
+    if len(ts.profiles_2d) > 0 and hasattr(ts.profiles_2d[0], 'b_field_tor') \
+       and not ts.profiles_2d[0].b_field_phi.has_value \
+       and ts.profiles_2d[0].b_field_tor.has_value:
+        print("  [equilibrium] Copying b_field_tor → b_field_phi (profiles_2d)", flush=True)
+        ts.profiles_2d[0].b_field_phi = ts.profiles_2d[0].b_field_tor
+
+
+def _eq_fill_vacuum_field(eq, ts):
+    """Fill vacuum_toroidal_field from magnetic_axis when missing."""
     if eq.vacuum_toroidal_field.b0.has_value:
-        pass  # already present
-    elif ts.global_quantities.magnetic_axis.b_field_phi.has_value:
-        print("  [equilibrium] Filling vacuum_toroidal_field from magnetic_axis", flush=True)
-        eq.vacuum_toroidal_field.b0.resize(1)
-        eq.vacuum_toroidal_field.b0[0] = ts.global_quantities.magnetic_axis.b_field_phi
-        eq.vacuum_toroidal_field.r0 = ts.global_quantities.magnetic_axis.r
+        return
+    if not ts.global_quantities.magnetic_axis.b_field_phi.has_value:
+        return
+    print("  [equilibrium] Filling vacuum_toroidal_field from magnetic_axis", flush=True)
+    eq.vacuum_toroidal_field.b0.resize(1)
+    eq.vacuum_toroidal_field.b0[0] = ts.global_quantities.magnetic_axis.b_field_phi
+    eq.vacuum_toroidal_field.r0 = ts.global_quantities.magnetic_axis.r
 
 
-    # --- triangularity_lower from triangularity_upper if missing ---
-    if hasattr(ts, 'profiles_1d'):
-        if not ts.profiles_1d.triangularity_lower.has_value \
-           and ts.profiles_1d.triangularity_upper.has_value:
-            print("  [equilibrium] Copying triangularity_upper → triangularity_lower", flush=True)
-            ts.profiles_1d.triangularity_lower = \
-                copy.deepcopy(ts.profiles_1d.triangularity_upper)
+def _eq_complete_triangularity(ts):
+    """Fill triangularity / elongation profiles for Cyrano.
 
+    Two-step recovery:
+      1. triangularity_lower from triangularity_upper if upper is populated
+         (takes priority);
+      2. otherwise, if both triangularity profiles and elongation are empty
+         but a boundary outline exists, derive linear axis-to-edge profiles
+         from the outline geometry.
+    """
+    if not hasattr(ts, 'profiles_1d'):
+        return
 
-    # --- Compute elongation and triangularity profiles if missing ---
-    # Required by Cyrano IC wave solver. Computed from boundary outline
-    # when profiles_1d arrays are empty.
-    # Only run if elongation is missing AND triangularity_lower has not already
-    # been filled by the copy-from-upper block above (which takes priority).
-    if (
-        hasattr(ts, 'profiles_1d')
-        and len(ts.profiles_1d.psi) > 0
+    if not ts.profiles_1d.triangularity_lower.has_value \
+       and ts.profiles_1d.triangularity_upper.has_value:
+        print("  [equilibrium] Copying triangularity_upper → triangularity_lower", flush=True)
+        ts.profiles_1d.triangularity_lower = \
+            copy.deepcopy(ts.profiles_1d.triangularity_upper)
+        return  # priority: don't also derive from outline
+
+    if not (
+        len(ts.profiles_1d.psi) > 0
         and len(ts.profiles_1d.elongation) == 0
         and not ts.profiles_1d.triangularity_lower.has_value
         and len(ts.boundary.outline.r) > 0
     ):
-        try:
-            r_bnd = np.array(ts.boundary.outline.r)
-            z_bnd = np.array(ts.boundary.outline.z)
-            nrho = len(ts.profiles_1d.psi)
+        return
 
-            # Compute boundary elongation and triangularity from outline
-            a_minor = (r_bnd.max() - r_bnd.min()) / 2.0
-            R0 = (r_bnd.max() + r_bnd.min()) / 2.0
-            kappa_edge = (z_bnd.max() - z_bnd.min()) / (2.0 * a_minor)
-            delta_upper_edge = (R0 - r_bnd[np.argmax(z_bnd)]) / a_minor
-            delta_lower_edge = (R0 - r_bnd[np.argmin(z_bnd)]) / a_minor
+    try:
+        r_bnd = np.array(ts.boundary.outline.r)
+        z_bnd = np.array(ts.boundary.outline.z)
+        nrho = len(ts.profiles_1d.psi)
 
-            # Build profiles: linear from axis (kappa=1, delta=0) to edge
-            rho_norm = np.linspace(0, 1, nrho)
-            elongation = 1.0 + (kappa_edge - 1.0) * rho_norm
-            triang_upper = delta_upper_edge * rho_norm
-            triang_lower = delta_lower_edge * rho_norm
+        a_minor = (r_bnd.max() - r_bnd.min()) / 2.0
+        R0 = (r_bnd.max() + r_bnd.min()) / 2.0
+        kappa_edge = (z_bnd.max() - z_bnd.min()) / (2.0 * a_minor)
+        delta_upper_edge = (R0 - r_bnd[np.argmax(z_bnd)]) / a_minor
+        delta_lower_edge = (R0 - r_bnd[np.argmin(z_bnd)]) / a_minor
 
-            ts.profiles_1d.elongation = elongation
-            ts.profiles_1d.triangularity_upper = triang_upper
-            ts.profiles_1d.triangularity_lower = triang_lower
+        rho_norm = np.linspace(0, 1, nrho)
+        ts.profiles_1d.elongation = 1.0 + (kappa_edge - 1.0) * rho_norm
+        ts.profiles_1d.triangularity_upper = delta_upper_edge * rho_norm
+        ts.profiles_1d.triangularity_lower = delta_lower_edge * rho_norm
 
-            # Also fix boundary triangularity if sentinel
-            if float(ts.boundary.triangularity_upper) < -1e30:
-                ts.boundary.triangularity_upper = delta_upper_edge
-            if float(ts.boundary.triangularity_lower) < -1e30:
-                ts.boundary.triangularity_lower = delta_lower_edge
+        if float(ts.boundary.triangularity_upper) < -1e30:
+            ts.boundary.triangularity_upper = delta_upper_edge
+        if float(ts.boundary.triangularity_lower) < -1e30:
+            ts.boundary.triangularity_lower = delta_lower_edge
 
-            print(f"  [equilibrium] Computed elongation/triangularity profiles "
-                  f"(kappa={kappa_edge:.3f}, delta_u={delta_upper_edge:.3f}, "
-                  f"delta_l={delta_lower_edge:.3f})", flush=True)
-        except Exception as e:
-            print(f"  [equilibrium] WARNING: Could not compute elongation/triangularity: {e}", flush=True)
+        print(f"  [equilibrium] Computed elongation/triangularity profiles "
+              f"(kappa={kappa_edge:.3f}, delta_u={delta_upper_edge:.3f}, "
+              f"delta_l={delta_lower_edge:.3f})", flush=True)
+    except Exception as e:
+        print(f"  [equilibrium] WARNING: Could not compute elongation/triangularity: {e}", flush=True)
 
 
-    # --- Compute r_outboard / r_inboard from 2D psi if missing ---
-    # Required by Cyrano IC wave solver. These are the major radius values
-    # at Z=Z_axis (midplane) on the outboard and inboard sides for each
-    # flux surface defined in profiles_1d.psi.
-    # Normally provided by CHEASE; computed here from 2D psi(R,Z) when missing.
-    if (
+def _eq_compute_r_outboard_inboard(ts):
+    """Compute r_outboard / r_inboard from 2D psi for Cyrano (CHEASE workaround)."""
+    if not (
         hasattr(ts, 'profiles_1d')
         and len(ts.profiles_1d.psi) > 0
         and len(ts.profiles_1d.r_outboard) == 0
@@ -381,55 +374,75 @@ def _fixup_equilibrium(eq):
         and ts.profiles_2d[0].psi.has_value
         and float(ts.global_quantities.magnetic_axis.r) > 0
     ):
-        try:
-            from scipy.interpolate import interp1d
+        return
 
-            R2d = np.array(ts.profiles_2d[0].r)
-            Z2d = np.array(ts.profiles_2d[0].z)
-            psi2d = np.array(ts.profiles_2d[0].psi)
-            psi1d = np.array(ts.profiles_1d.psi)
+    try:
+        from scipy.interpolate import interp1d
 
-            R1d = R2d[:, 0]   # R varies along axis 0
-            Z1d = Z2d[0, :]   # Z varies along axis 1
+        R2d = np.array(ts.profiles_2d[0].r)
+        Z2d = np.array(ts.profiles_2d[0].z)
+        psi2d = np.array(ts.profiles_2d[0].psi)
+        psi1d = np.array(ts.profiles_1d.psi)
 
-            r_axis = float(ts.global_quantities.magnetic_axis.r)
-            z_axis = float(ts.global_quantities.magnetic_axis.z)
+        R1d = R2d[:, 0]   # R varies along axis 0
+        Z1d = Z2d[0, :]   # Z varies along axis 1
 
-            # Extract psi(R) at midplane (Z = Z_axis)
-            iz_mid = np.argmin(np.abs(Z1d - z_axis))
-            psi_mid = psi2d[:, iz_mid]
+        r_axis = float(ts.global_quantities.magnetic_axis.r)
+        z_axis = float(ts.global_quantities.magnetic_axis.z)
 
-            # Split into outboard (R >= R_axis) and inboard (R <= R_axis)
-            ir_axis = np.argmin(np.abs(R1d - r_axis))
-            R_out = R1d[ir_axis:]
-            psi_out = psi_mid[ir_axis:]
-            R_in = R1d[:ir_axis + 1]
-            psi_in = psi_mid[:ir_axis + 1]
+        iz_mid = np.argmin(np.abs(Z1d - z_axis))
+        psi_mid = psi2d[:, iz_mid]
 
-            f_out = interp1d(psi_out, R_out, bounds_error=False, fill_value=np.nan)
-            f_in = interp1d(psi_in, R_in, bounds_error=False, fill_value=np.nan)
+        ir_axis = np.argmin(np.abs(R1d - r_axis))
+        f_out = interp1d(psi_mid[ir_axis:], R1d[ir_axis:],
+                         bounds_error=False, fill_value=np.nan)
+        f_in = interp1d(psi_mid[:ir_axis + 1], R1d[:ir_axis + 1],
+                        bounds_error=False, fill_value=np.nan)
 
-            r_outboard = f_out(psi1d)
-            r_inboard = f_in(psi1d)
+        r_outboard = f_out(psi1d)
+        r_inboard = f_in(psi1d)
+        r_outboard[np.isnan(r_outboard)] = r_axis
+        r_inboard[np.isnan(r_inboard)] = r_axis
 
-            # Fill NaN (near axis) with magnetic axis R
-            r_outboard[np.isnan(r_outboard)] = r_axis
-            r_inboard[np.isnan(r_inboard)] = r_axis
+        r_outboard, r_inboard, repaired_axis = \
+            _repair_axis_minor_radius(ts, r_outboard, r_inboard)
 
-            r_outboard, r_inboard, repaired_axis = \
-                _repair_axis_minor_radius(ts, r_outboard, r_inboard)
+        ts.profiles_1d.r_outboard = r_outboard
+        ts.profiles_1d.r_inboard = r_inboard
 
-            ts.profiles_1d.r_outboard = r_outboard
-            ts.profiles_1d.r_inboard = r_inboard
+        print(f"  [equilibrium] Computed r_outboard/r_inboard from 2D psi "
+              f"({len(psi1d)} points, R_axis={r_axis:.3f})", flush=True)
+        if repaired_axis:
+            rho1 = 0.5 * (r_outboard[1] - r_inboard[1])
+            print(f"  [equilibrium] Repaired first off-axis minor radius "
+                  f"for Cyrano (rho[1]={rho1:.4g} m)", flush=True)
+    except Exception as e:
+        print(f"  [equilibrium] WARNING: Could not compute r_outboard/r_inboard: {e}", flush=True)
 
-            print(f"  [equilibrium] Computed r_outboard/r_inboard from 2D psi "
-                  f"({len(psi1d)} points, R_axis={r_axis:.3f})", flush=True)
-            if repaired_axis:
-                rho1 = 0.5 * (r_outboard[1] - r_inboard[1])
-                print(f"  [equilibrium] Repaired first off-axis minor radius "
-                      f"for Cyrano (rho[1]={rho1:.4g} m)", flush=True)
-        except Exception as e:
-            print(f"  [equilibrium] WARNING: Could not compute r_outboard/r_inboard: {e}", flush=True)
+
+def _fixup_equilibrium(eq):
+    """Apply manual fix-ups for equilibrium IDS.
+
+    Runs UNCONDITIONALLY (not only after DD conversion) because these issues
+    exist in the source data regardless of DD version. Each helper is
+    independently triggerable and prints its own diagnostic; ordering matters
+    only where one helper depends on a previous one (e.g. b_field renaming
+    must run before vacuum-field fill, which then enables r_outboard from psi).
+
+    Reference: Torbeam standalone run_torbeam, Cyrano standalone run_cyrano.
+    """
+    if len(eq.time_slice) == 0:
+        return eq
+
+    ts = eq.time_slice[0]
+
+    _eq_fill_psi_axis(ts)
+    _eq_complete_bfield(eq, ts)
+    _eq_replace_nan_2d(eq, ts)
+    _eq_rename_b_field_tor(ts)
+    _eq_fill_vacuum_field(eq, ts)
+    _eq_complete_triangularity(ts)
+    _eq_compute_r_outboard_inboard(ts)
 
     return eq
 
@@ -809,27 +822,74 @@ def _ion_metadata(input_slices, ion_index):
     return name, z_ion, a, z_n
 
 
-def _fill_wave_ion_metadata(ion_obj, name, z_ion, a, z_n):
+def _has_imas_value(value):
     try:
-        ion_obj.name = name
+        return bool(value.has_value)
+    except Exception:
+        return False
+
+
+def _set_if_missing(obj, field_name, value):
+    """Assign `value` to `obj.field_name` only when the field is unset.
+
+    Use this for output stabilization where actor-written values must be
+    preserved. For unconditional zeroing of stale values, use
+    `_zero_field_like` instead.
+    """
+    try:
+        if not _has_imas_value(getattr(obj, field_name)):
+            setattr(obj, field_name, value)
+    except Exception:
+        pass
+
+
+def _set_zero_if_missing(obj, field_name):
+    """Assign scalar 0.0 to `obj.field_name` if the field is unset."""
+    _set_if_missing(obj, field_name, 0.0)
+
+
+def _force_zero_if_negative_int(obj, field_name):
+    """Force-zero an int field if it reads as negative (IMAS sentinel) or
+    raises during int() coercion. Used for flag/index fields where the IDS
+    default is the EMPTY_INT sentinel rather than has_value=False."""
+    try:
+        if int(getattr(obj, field_name)) >= 0:
+            return
     except Exception:
         pass
     try:
-        ion_obj.z_ion = z_ion
+        setattr(obj, field_name, 0)
     except Exception:
         pass
+
+
+def _fill_ion_metadata(ion_obj, name, z_ion, a, z_n, flavor):
+    """Fill ion metadata for either wave (`flavor="wave"`) or core_sources
+    (`flavor="source"`).
+
+    Both flavors use has_value/sentinel guards so a non-empty ion is never
+    clobbered. Wave-specific fields (`name`, `distribution_assumption`) are
+    set only for `flavor="wave"`; core_sources-specific fields
+    (`neutral_index`, `element[0].atoms_n`) only for `flavor="source"`.
+    """
+    if flavor == "wave":
+        _set_if_missing(ion_obj, "name", name)
+        _set_if_missing(ion_obj, "distribution_assumption", 0)
+
+    _set_if_missing(ion_obj, "z_ion", z_ion)
+    _force_zero_if_negative_int(ion_obj, "multiple_states_flag")
+
+    if flavor == "source":
+        _force_zero_if_negative_int(ion_obj, "neutral_index")
+
     try:
-        ion_obj.multiple_states_flag = 0
-    except Exception:
-        pass
-    try:
-        ion_obj.distribution_assumption = 0
-    except Exception:
-        pass
-    try:
-        ion_obj.element.resize(1)
-        ion_obj.element[0].a = a
-        ion_obj.element[0].z_n = z_n
+        if _safe_len(ion_obj.element) == 0:
+            ion_obj.element.resize(1)
+        elem = ion_obj.element[0]
+        _set_if_missing(elem, "a", a)
+        _set_if_missing(elem, "z_n", z_n)
+        if flavor == "source":
+            _set_if_missing(elem, "atoms_n", 1)
     except Exception:
         pass
 
@@ -873,7 +933,7 @@ def _fill_zero_ic_wave_payload(coherent_wave, input_slices, source_index, timeno
     gq.ion.resize(n_ion)
     for idx, ion in enumerate(gq.ion):
         name, z_ion, a, z_n = _ion_metadata(input_slices, idx)
-        _fill_wave_ion_metadata(ion, name, z_ion, a, z_n)
+        _fill_ion_metadata(ion, name, z_ion, a, z_n, flavor="wave")
         ion.power_thermal = 0.0
         ion.power_thermal_n_phi = np.zeros(n_phi_count)
 
@@ -909,7 +969,7 @@ def _fill_zero_ic_wave_payload(coherent_wave, input_slices, source_index, timeno
     p1d.ion.resize(n_ion)
     for idx, ion in enumerate(p1d.ion):
         name, z_ion, a, z_n = _ion_metadata(input_slices, idx)
-        _fill_wave_ion_metadata(ion, name, z_ion, a, z_n)
+        _fill_ion_metadata(ion, name, z_ion, a, z_n, flavor="wave")
         ion.power_density_thermal = np.zeros(n_rad)
         ion.power_density_thermal_n_phi = np.zeros((n_rad, n_phi_count))
         ion.power_inside_thermal = np.zeros(n_rad)
@@ -938,7 +998,7 @@ def _fill_zero_ic_wave_payload(coherent_wave, input_slices, source_index, timeno
     p2d.ion.resize(n_ion)
     for idx, ion in enumerate(p2d.ion):
         name, z_ion, a, z_n = _ion_metadata(input_slices, idx)
-        _fill_wave_ion_metadata(ion, name, z_ion, a, z_n)
+        _fill_ion_metadata(ion, name, z_ion, a, z_n, flavor="wave")
         ion.power_density_thermal = np.zeros(shape_2d)
         ion.power_density_thermal_n_phi = np.zeros((n_rad, n_pol, n_phi_count))
 
@@ -1162,21 +1222,6 @@ def _source_name(source):
         return ""
 
 
-def _has_imas_value(value):
-    try:
-        return bool(value.has_value)
-    except Exception:
-        return False
-
-
-def _set_zero_if_missing(obj, field_name):
-    try:
-        if not _has_imas_value(getattr(obj, field_name)):
-            setattr(obj, field_name, 0.0)
-    except Exception:
-        pass
-
-
 def _ensure_source_global_quantities(source, timenow):
     try:
         if _safe_len(source.global_quantities) == 0:
@@ -1199,7 +1244,122 @@ def _ensure_source_global_quantities(source, timenow):
         pass
 
 
-def _fill_zero_source_slot(source, source_kind, timenow):
+def _existing_source_radial_size(source):
+    """Return nrho from a source's existing profiles_1d, or 0 if absent."""
+    try:
+        existing = source.profiles_1d[0].electrons.energy
+        if getattr(existing, 'has_value', False):
+            shape = np.asarray(existing).shape
+            if shape and shape[0] > 0:
+                return int(shape[0])
+    except Exception:
+        pass
+    return 0
+
+
+def _source_radial_size(source, sibling_sources, input_slices, config_folder_path):
+    """Pick nrho for an IC core_sources placeholder.
+
+    Priority: this source's own profiles_1d > any sibling source's profiles_1d
+    (typically EC, written by hcd2core_sources at the same timestep) >
+    hcd2core_sources XML radial_resolution > core_profiles/equilibrium grid > 0.
+    """
+    own = _existing_source_radial_size(source)
+    if own > 0:
+        return own
+
+    for sibling in sibling_sources:
+        if sibling is source:
+            continue
+        sibling_nrho = _existing_source_radial_size(sibling)
+        if sibling_nrho > 0:
+            return sibling_nrho
+
+    nrho = _xml_int(
+        config_folder_path,
+        "source/fill_core_sources/input_hcd2core_sources.xml",
+        "radial_resolution",
+        None,
+    )
+    if nrho and nrho > 0:
+        return int(nrho)
+
+    return _radial_size(input_slices, waves=None)
+
+
+def _ensure_source_profiles_1d(source, sibling_sources, input_slices, timenow,
+                               config_folder_path):
+    """Ensure profiles_1d[0] has the schema CYRANO writes.
+
+    Only used for IC sources: avoids creating empty profiles_1d for EC where
+    torbeam/hcd2core_sources establishes the schema with the real nrho.
+    Without this, CYRANO's first IC-on slice would be the first time
+    ion[].energy is written and HDF5 only allocates that field for
+    IC-active timesteps (causing readback errors at IC-off times).
+
+    Never overwrites CYRANO-written values: every field write is gated by
+    `has_value` checks, and AoS resizes use keep=True.
+    """
+    nrho = _source_radial_size(source, sibling_sources, input_slices,
+                               config_folder_path)
+    if nrho <= 0:
+        return
+
+    try:
+        if _safe_len(source.profiles_1d) == 0:
+            source.profiles_1d.resize(1)
+        p1d = source.profiles_1d[0]
+    except Exception:
+        return
+
+    try:
+        p1d.time = timenow
+    except Exception:
+        pass
+
+    rho = np.linspace(0.0, 1.0, nrho)
+    zeros = np.zeros(nrho)
+
+    for field_name, value in (
+        ("rho_tor_norm", rho),
+        ("rho_tor", rho),
+        ("rho_pol_norm", rho.copy()),
+        ("psi", zeros.copy()),
+        ("area", zeros.copy()),
+        ("surface", zeros.copy()),
+        ("volume", zeros.copy()),
+    ):
+        _set_if_missing(p1d.grid, field_name, value)
+
+    _set_if_missing(p1d, "j_parallel", zeros.copy())
+    try:
+        _set_if_missing(p1d.electrons, "energy", zeros.copy())
+    except Exception:
+        pass
+
+    n_ion = _ion_count(input_slices)
+    if n_ion <= 0:
+        return
+
+    try:
+        if _safe_len(p1d.ion) < n_ion:
+            p1d.ion.resize(n_ion, keep=True)
+    except Exception:
+        return
+
+    for idx, ion in enumerate(p1d.ion):
+        name, z_ion, a, z_n = _ion_metadata(input_slices, idx)
+        _fill_ion_metadata(ion, name, z_ion, a, z_n, flavor="source")
+        try:
+            if not _has_imas_value(ion.energy):
+                ion.energy = zeros.copy()
+        except Exception:
+            pass
+
+
+def _fill_zero_source_slot(source, source_kind, timenow,
+                           sibling_sources=(), input_slices=None,
+                           config_folder_path=None):
     if source_kind == "ec":
         source.identifier.name = "ec"
         source.identifier.index = 3
@@ -1207,6 +1367,9 @@ def _fill_zero_source_slot(source, source_kind, timenow):
         source.identifier.name = "ic"
         source.identifier.index = 5
     _ensure_source_global_quantities(source, timenow)
+    if source_kind == "ic" and input_slices is not None:
+        _ensure_source_profiles_1d(
+            source, sibling_sources, input_slices, timenow, config_folder_path)
 
 
 def _expected_source_names(param_process):
@@ -1218,7 +1381,8 @@ def _expected_source_names(param_process):
     return expected
 
 
-def _ensure_core_sources_placeholders(output_ids, param_process, timenow):
+def _ensure_core_sources_placeholders(input_slices, output_ids, param_process,
+                                      timenow, config_folder_path=None):
     if not _process_is_selected(param_process, "fill_core_sources"):
         return
 
@@ -1239,11 +1403,20 @@ def _ensure_core_sources_placeholders(output_ids, param_process, timenow):
             idx = _safe_len(core_sources.source)
             core_sources.source.resize(idx + 1, keep=True)
             names.append("")
-        _fill_zero_source_slot(core_sources.source[idx], source_kind, timenow)
+        _fill_zero_source_slot(
+            core_sources.source[idx], source_kind, timenow,
+            sibling_sources=core_sources.source,
+            input_slices=input_slices,
+            config_folder_path=config_folder_path,
+        )
         names[idx] = source_kind
 
-    for source in core_sources.source:
+    for source, name in zip(core_sources.source, names):
         _ensure_source_global_quantities(source, timenow)
+        if name == "ic":
+            _ensure_source_profiles_1d(
+                source, core_sources.source, input_slices, timenow,
+                config_folder_path)
 
 
 def stabilize_selected_hcd_outputs(input_slices, output_ids, param_process,
@@ -1255,4 +1428,7 @@ def stabilize_selected_hcd_outputs(input_slices, output_ids, param_process,
         input_slices, output_ids, param_process, timenow,
         config_folder_path=config_folder_path,
     )
-    _ensure_core_sources_placeholders(output_ids, param_process, timenow)
+    _ensure_core_sources_placeholders(
+        input_slices, output_ids, param_process, timenow,
+        config_folder_path=config_folder_path,
+    )
