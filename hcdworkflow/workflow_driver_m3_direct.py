@@ -40,8 +40,8 @@ from workflow.wf_wrapper import (
     get_ids_slices,
     store_ids_slices,
     resolve_time_range,
-    _create_ids,
 )
+from workflow.ids_prep import _create_ids
 
 
 # =============================================================================
@@ -135,7 +135,7 @@ def _send(instance, port_name, ids_obj, timenow, t_next):
     instance.send(port_name, Message(timenow, t_next, data=data))
 
 
-def _recv(instance, port_name, ids_name) -> object:
+def _recv(instance, port_name, ids_name, timenow=None) -> object:
     """Receive and deserialize an IDS from a port."""
     print(f"  <- waiting {port_name}...", flush=True)
     msg = instance.receive(port_name)
@@ -144,10 +144,10 @@ def _recv(instance, port_name, ids_name) -> object:
         try:
             ids_obj.deserialize(msg.data)
             if hasattr(ids_obj, 'time'):
-                ids_obj.time = np.array([msg.timestamp])
+                ids_obj.time = np.array([timenow if timenow is not None else msg.timestamp])
         except Exception as e:
             print(f"  <- WARNING: {port_name} deserialize failed: {e}", flush=True)
-    print(f"  <- {port_name} received (t={msg.timestamp:.4f})", flush=True)
+    print(f"  <- {port_name} received (msg_t={msg.timestamp:.4f})", flush=True)
     return ids_obj
 
 
@@ -155,6 +155,27 @@ def _empty(ids_name) -> object:
     """Create a serializable empty IDS placeholder."""
     ids_obj = _create_ids(ids_name)
     ids_obj.ids_properties.homogeneous_time = 0
+    return ids_obj
+
+
+def _prepare_actor_input(ids_name, ids_obj, reference_ids, timenow):
+    """Match WorkflowExecutor's empty-IDS compatibility before actor calls."""
+    try:
+        object.__setattr__(ids_obj, '__name__', ids_name)
+    except Exception:
+        pass
+
+    try:
+        if ids_obj.ids_properties.homogeneous_time < 1:
+            ids_obj.ids_properties.homogeneous_time = 1
+            if hasattr(ids_obj, 'time'):
+                if hasattr(reference_ids, 'time') and len(reference_ids.time) > 0:
+                    ids_obj.time = np.array(reference_ids.time, copy=True)
+                else:
+                    ids_obj.time = np.array([timenow])
+    except Exception as e:
+        print(f"  -> WARNING: could not prepare {ids_name} for actor input ({e})", flush=True)
+
     return ids_obj
 
 
@@ -199,7 +220,7 @@ def main():
     print(f"[driver] Active actors: {sorted(active_actors)}", flush=True)
 
     # --- Database setup (reuse wf_wrapper layer) ---
-    inputDb, outputDb, machineDb, inputIds, inputMds, _ = \
+    inputDb, outputDb, machineDb, inputIds, inputMds, _, param_process = \
         setup_databases(config_path)
 
     # --- Time range ---
@@ -248,6 +269,18 @@ def main():
             dsr = ids_slices.get('distribution_sources', _empty('distribution_sources'))
             nbi = ids_slices.get('nbi',           _empty('nbi'))
 
+            for ids_name, ids_obj in (
+                ('equilibrium', eq),
+                ('core_profiles', cp),
+                ('ec_launchers', ec),
+                ('ic_antennas', ic),
+                ('core_sources', cs),
+                ('distributions', dis),
+                ('distribution_sources', dsr),
+                ('nbi', nbi),
+            ):
+                _prepare_actor_input(ids_name, ids_obj, cp, timenow)
+
             output_ids = {}
 
             # ----------------------------------------------------------------
@@ -260,7 +293,7 @@ def main():
                 _send(instance, 'equilibrium_out',   eq,  timenow, t_next)
                 _send(instance, 'core_profiles_out', cp,  timenow, t_next)
                 _send(instance, 'ec_launchers_out',  ec,  timenow, t_next)
-                waves_ec = _recv(instance, 'waves_in', 'waves')
+                waves_ec = _recv(instance, 'waves_in', 'waves', timenow)
             else:
                 waves_ec = _empty('waves')
 
@@ -281,7 +314,7 @@ def main():
                 _send(instance, 'distribution_sources_out_ic', dsr,     timenow, t_next)
                 _send(instance, 'core_sources_out_ic',         cs,      timenow, t_next)
                 _send(instance, 'nbi_out_ic',                  nbi,     timenow, t_next)
-                waves_ic = _recv(instance, 'waves_ic_in', 'waves')
+                waves_ic = _recv(instance, 'waves_ic_in', 'waves', timenow)
             else:
                 waves_ic = _empty('waves')
 
@@ -291,7 +324,7 @@ def main():
             if 'merge_waves' in active_actors:
                 _send(instance, 'waves_ec_out', waves_ec, timenow, t_next)
                 _send(instance, 'waves_ic_out', waves_ic, timenow, t_next)
-                waves = _recv(instance, 'waves_merged_in', 'waves')
+                waves = _recv(instance, 'waves_merged_in', 'waves', timenow)
             else:
                 waves = waves_ec
 
@@ -308,7 +341,7 @@ def main():
                 _send(instance, 'distributions_out_fp',         dis, timenow, t_next)
                 _send(instance, 'distribution_sources_out_fp',  dsr, timenow, t_next)
                 _send(instance, 'nbi_out_fp',                   nbi, timenow, t_next)
-                distributions = _recv(instance, 'distributions_in', 'distributions')
+                distributions = _recv(instance, 'distributions_in', 'distributions', timenow)
                 output_ids['distributions'] = distributions
             else:
                 distributions = dis
@@ -321,13 +354,17 @@ def main():
                 _send(instance, 'distribution_sources_out_post',  dsr,           timenow, t_next)
                 _send(instance, 'waves_out_post',                 waves,         timenow, t_next)
                 _send(instance, 'core_profiles_out_post',         cp,            timenow, t_next)
-                core_sources = _recv(instance, 'core_sources_in', 'core_sources')
+                core_sources = _recv(instance, 'core_sources_in', 'core_sources', timenow)
                 output_ids['core_sources'] = core_sources
 
             # ----------------------------------------------------------------
             # Write results to DB
             # ----------------------------------------------------------------
-            store_ids_slices(outputDb, inputMds, ids_slices, output_ids, m3_flag=1)
+            store_ids_slices(
+                outputDb, inputMds, ids_slices, output_ids, m3_flag=1,
+                param_process=param_process, timenow=timenow,
+                config_folder_path=config_path,
+            )
 
             timenow += dt
 
