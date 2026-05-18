@@ -669,6 +669,119 @@ def _ic_frequency(input_slices, antenna_index):
         return 0.0
 
 
+def _signal_value_at_time(signal, time=None, default=0.0):
+    """Value of a time-dependent IMAS signal node (`.data` / `.time`).
+
+    Picks the sample nearest `time` when both `time` and a matching time
+    base are available; otherwise falls back to the first value.
+    """
+    try:
+        data = np.asarray(signal.data, dtype=float).ravel()
+    except Exception:
+        return default
+    if data.size == 0:
+        return default
+    if time is None:
+        return float(data[0])
+    try:
+        tarr = np.asarray(getattr(signal, "time", []), dtype=float).ravel()
+        if tarr.size == data.size and tarr.size > 0:
+            return float(data[int(np.argmin(np.abs(tarr - time)))])
+    except Exception:
+        pass
+    return float(data[0])
+
+
+def _strap_phi(strap, default=0.0):
+    """Toroidal angle [rad] of a strap centre, from `outline.phi`."""
+    try:
+        phi = np.asarray(strap.outline.phi, dtype=float).ravel()
+        if phi.size > 0:
+            return float(np.mean(phi))
+    except Exception:
+        pass
+    return default
+
+
+def _ic_antenna_straps(ic_antennas, antenna_index=0, time=None):
+    """List of `(phase [rad], phi [rad])` for every strap of an IC antenna."""
+    straps = []
+    try:
+        antenna = ic_antennas.antenna[antenna_index]
+    except Exception:
+        return straps
+    try:
+        modules = list(antenna.module)
+    except Exception:
+        modules = []
+    for module in modules:
+        try:
+            module_straps = list(module.strap)
+        except Exception:
+            module_straps = []
+        for strap in module_straps:
+            phase = _signal_value_at_time(getattr(strap, "phase", None), time, 0.0)
+            straps.append((phase, _strap_phi(strap, 0.0)))
+    return straps
+
+
+def ic_antenna_n_phi_weights(ic_antennas, antenna_index=0, time=None,
+                             n_values=None, n_max=80):
+    """Toroidal-mode (`n_phi`) power-weight spectrum of an IC antenna.
+
+    Builds the array factor
+
+        w_n = |sum_j exp(i * phase_j - i * n * phi_j)|^2
+
+    from the strap phase and toroidal position stored in the `ic_antennas`
+    IDS, where `j` runs over all straps of all modules of the antenna.
+    `w_n` is the relative power launched into toroidal mode `n`; the net
+    current driven by a multi-mode run is the `w_n`-weighted sum of
+    single-mode CYRANO results.
+
+    This is a pure function: it neither runs CYRANO nor touches the
+    database. The multi-mode CYRANO loop belongs in the driver layer.
+
+    Note: this models only the strap-phase array factor. The finite strap
+    toroidal width (`width_tor`) and per-strap current amplitude are not
+    modelled here; add them before a final quantitative spectrum if the
+    width/amplitude data are needed.
+
+    Sign convention: the array factor uses `exp(i*phase_j - i*n*phi_j)`.
+    For symmetric (dipole) phasing this is harmless since `w(+n) == w(-n)`,
+    but for asymmetric current-drive phasing the +n/-n split depends on
+    this convention -- reconcile it with the CYRANO `Ntor` and IMAS
+    `waves.n_phi` sign conventions before wiring up the driver loop.
+
+    Returns `(n_phi, weight)` as numpy arrays; `weight` sums to 1 (or is
+    all-zero only if no strap data is available and `n=0` is not sampled).
+    """
+    straps = _ic_antenna_straps(ic_antennas, antenna_index, time)
+    if n_values is None:
+        n_values = np.arange(-int(n_max), int(n_max) + 1, dtype=np.int32)
+    else:
+        n_values = np.asarray(n_values, dtype=np.int32)
+
+    weight = np.zeros(len(n_values), dtype=float)
+    if not straps:
+        # No strap data: put all weight on n=0 if it is sampled.
+        zero_idx = np.where(n_values == 0)[0]
+        if zero_idx.size:
+            weight[zero_idx[0]] = 1.0
+        return n_values, weight
+
+    phases = np.array([p for p, _ in straps], dtype=float)
+    phis = np.array([f for _, f in straps], dtype=float)
+    for k, n in enumerate(n_values):
+        amp = np.sum(np.exp(1j * (phases - n * phis)))
+        weight[k] = float(np.abs(amp) ** 2)
+
+    total = weight.sum()
+    if total > 0:
+        weight = weight / total
+    return n_values, weight
+
+
 def _xml_int(config_folder_path, relative_path, tag_name, default=None):
     if not config_folder_path:
         return default
@@ -745,7 +858,9 @@ def _n_phi_values(waves=None, config_folder_path=None):
             return np.zeros(shape[0], dtype=np.int32)
 
     ntor = _xml_int(config_folder_path, "ICRH/ic_wave_solver/input_cyrano.xml", "Ntor", 0)
-    if ntor and ntor > 0:
+    if ntor:
+        # Accept any nonzero Ntor, including negative single toroidal modes
+        # (e.g. Ntor=-35) so symmetric/negative-n spectra are not lost.
         return np.array([ntor], dtype=np.int32)
     return np.zeros(1, dtype=np.int32)
 
