@@ -4,7 +4,7 @@
 # =============================================================================
 #
 # Three execution modes:
-#   legacy  : In-process iwrap, no MUSCLE3 (all actors run inside wf_wrapper)
+#   legacy  : In-process iwrap, no MUSCLE3 (all actors run inside workflow_driver)
 #   hybrid  : MUSCLE3 macro-micro, Python micro (driver ↔ hcd_workflow_m3)
 #   pure    : MUSCLE3 macro-micro, Fortran actor direct (driver ↔ *_m3.exe)
 #             [under development — not yet runnable from this branch]
@@ -42,7 +42,7 @@ case "$MODE" in
         CONFIG_PATH="tests/m3_hybrid"
         ;;
     "hybrid")
-        YMMSL_FILE="test_hybrid_hcdwf.ymmsl"
+        YMMSL_FILE="${HCD_HYBRID_YMMSL:-test_hybrid_hcdwf.ymmsl}"
         MODE_DESC="Hybrid MUSCLE3 (driver ↔ hcd_workflow_m3.py)"
         RUN_PREFIX="run_hybrid"
         ;;
@@ -93,7 +93,7 @@ User:        $(whoami)
 EOF
 
 if [[ "$MODE" == "legacy" ]]; then
-    time python workflow/wf_wrapper.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log" \
+    time python workflow/workflow_driver.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log" \
         || echo "Warning: Workflow exited with an error code."
 else
     time muscle_manager --start-all "$YMMSL_FILE" || echo "Warning: MUSCLE3 manager exited with an error code."

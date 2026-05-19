@@ -6,7 +6,7 @@ Pure M3 mode: this driver communicates directly with physics actor
 executables (torbeam_m3.exe, cyrano_m3.exe, …) as individual MUSCLE3
 micro models. No iWrap wrapper in between.
 
-Contrast with hybrid mode (wf_wrapper.py --m3_flag=1):
+Contrast with hybrid mode (workflow_driver.py --m3_flag=1):
     hybrid: driver ──► hcd_workflow_m3 (calls actors internally)
     pure:   driver ──► torbeam_m3.exe  (M3 touches actor directly)
             driver ──► cyrano_m3.exe
@@ -34,8 +34,8 @@ sys.stderr.reconfigure(line_buffering=True)
 from libmuscle import Instance, Message, KEEPS_NO_STATE_FOR_NEXT_USE
 from ymmsl import Operator
 
-# Reuse DB layer and IDS utilities from wf_wrapper
-from workflow.wf_wrapper import (
+# Reuse DB layer and IDS utilities from workflow_driver
+from workflow.workflow_driver import (
     setup_databases,
     get_ids_slices,
     store_ids_slices,
@@ -219,7 +219,7 @@ def main():
     }
     print(f"[driver] Active actors: {sorted(active_actors)}", flush=True)
 
-    # --- Database setup (reuse wf_wrapper layer) ---
+    # --- Database setup (reuse workflow_driver layer) ---
     inputDb, outputDb, machineDb, inputIds, inputMds, _, param_process = \
         setup_databases(config_path)
 

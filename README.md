@@ -21,7 +21,7 @@ Developer    Manual Setup (any system)      See "Developer Setup" below
 
 ## Execution Modes
 
-The workflow supports three execution modes via a unified entry point (`workflow/wf_wrapper.py`):
+The workflow supports three execution modes via a unified entry point (`workflow/workflow_driver.py`):
 
 ```
 Mode            Flag / Command    Description
@@ -30,7 +30,7 @@ Legacy          m3_flag=0         All iWrap actors execute in-process.
                                   No MUSCLE3 involvement. Original behavior.
 
 Hybrid M3       m3_flag=1         Two-component MUSCLE3 coupling:
-                                  wf_wrapper.py (macro) handles DB I/O and the
+                                  workflow_driver.py (macro) handles DB I/O and the
                                   time loop; hcd_workflow_m3.py (micro) runs
                                   iWrap actors in a separate process.
                                   IDS are exchanged via M3 conduits.
@@ -44,7 +44,7 @@ Pure M3         (under            Each physics actor (Torbeam, Cyrano, …) runs
 ### MUSCLE3 Hybrid Architecture
 
 ```
-wf_wrapper.py     (MACRO — one reuse_instance() containing the full time loop)
+workflow_driver.py     (MACRO — one reuse_instance() containing the full time loop)
     ├── Opens input / output / machine databases
     ├── Reads IDS slices at each timestep
     ├── Sends IDS to micro via O_I ports ────────────┐
@@ -342,7 +342,7 @@ It automatically:
 hcd-wf-sandbox/
 │
 ├── workflow/
-│   └── wf_wrapper.py              # Unified entry point (legacy + M3 macro)
+│   └── workflow_driver.py        # Unified entry point (legacy + M3 macro)
 │                                  #   - Database setup & I/O
 │                                  #   - Time loop management
 │                                  #   - DD version conversion & fix-ups

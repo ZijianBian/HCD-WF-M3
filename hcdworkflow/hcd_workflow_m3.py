@@ -3,7 +3,7 @@
 hcd_workflow_m3.py — MUSCLE3 Micro Model (HCD Workflow)
 
 Architecture:
-    wf_wrapper.py (macro, with --m3_flag=1)
+    workflow_driver.py (macro, with --m3_flag=1)
         ↕  M3 conduits (individual IDS ports)
     hcd_workflow_m3.py (this file, micro)
         └── HCDWorkflow.run() with iWrap actors (invisible to M3)
@@ -12,9 +12,9 @@ Responsibilities:
     - Initialize MUSCLE3 Instance with per-IDS ports
     - Initialize HCDWorkflow (for actor registry and execution logic)
     - Enter reuse loop (one iteration per timestep from macro)
-    - Receive IDS from wf_wrapper via M3
+    - Receive IDS from workflow_driver via M3
     - Call the original HCDWorkflow.run() — iWrap actors execute internally
-    - Send updated IDS back to wf_wrapper via M3
+    - Send updated IDS back to workflow_driver via M3
 
 The iWrap actors (Torbeam, hcd2core_sources, etc.) are called inside
 HCDWorkflow.run() and are completely invisible to MUSCLE3.
@@ -42,7 +42,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 # =============================================================================
-# Port Definitions (must match wf_wrapper and ymmsl)
+# Port Definitions (must match workflow_driver and ymmsl)
 # =============================================================================
 
 # Ports that receive IDS from macro (F_INIT)

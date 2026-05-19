@@ -2,10 +2,10 @@ ymmsl_version: v0.1
 model:
   name: hcd_workflow_hybrid
   components:
-    # === MACRO: Workflow Wrapper ===
+    # === MACRO: Workflow Driver ===
     # Time loop, database I/O, M3 send/receive.
-    wf_wrapper:
-      implementation: wf_wrapper_impl
+    workflow_driver:
+      implementation: workflow_driver_impl
       ports:
         o_i:
           - equilibrium_out
@@ -45,35 +45,35 @@ model:
 
   conduits:
     # macro O_I  →  micro F_INIT
-    wf_wrapper.equilibrium_out: hcd_workflow.equilibrium_in
-    wf_wrapper.core_profiles_out: hcd_workflow.core_profiles_in
-    wf_wrapper.workflow_out: hcd_workflow.workflow_in
-    wf_wrapper.ec_launchers_out: hcd_workflow.ec_launchers_in
-    wf_wrapper.ic_antennas_out: hcd_workflow.ic_antennas_in
-    wf_wrapper.core_sources_out: hcd_workflow.core_sources_in
-    wf_wrapper.distributions_out: hcd_workflow.distributions_in
-    wf_wrapper.distribution_sources_out: hcd_workflow.distribution_sources_in
+    workflow_driver.equilibrium_out: hcd_workflow.equilibrium_in
+    workflow_driver.core_profiles_out: hcd_workflow.core_profiles_in
+    workflow_driver.workflow_out: hcd_workflow.workflow_in
+    workflow_driver.ec_launchers_out: hcd_workflow.ec_launchers_in
+    workflow_driver.ic_antennas_out: hcd_workflow.ic_antennas_in
+    workflow_driver.core_sources_out: hcd_workflow.core_sources_in
+    workflow_driver.distributions_out: hcd_workflow.distributions_in
+    workflow_driver.distribution_sources_out: hcd_workflow.distribution_sources_in
 
     # micro O_F  →  macro S
-    hcd_workflow.core_sources_out: wf_wrapper.core_sources_in
-    hcd_workflow.waves_out: wf_wrapper.waves_in
-    hcd_workflow.core_profiles_out: wf_wrapper.core_profiles_in
-    hcd_workflow.distributions_out: wf_wrapper.distributions_in
+    hcd_workflow.core_sources_out: workflow_driver.core_sources_in
+    hcd_workflow.waves_out: workflow_driver.waves_in
+    hcd_workflow.core_profiles_out: workflow_driver.core_profiles_in
+    hcd_workflow.distributions_out: workflow_driver.distributions_in
 
 settings:
   config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
 
 resources:
-  wf_wrapper:
+  workflow_driver:
     threads: 1
   hcd_workflow:
     threads: 1
 
 implementations:
-  wf_wrapper_impl:
+  workflow_driver_impl:
     executable: python3
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/workflow/wf_wrapper.py"
+      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/workflow/workflow_driver.py"
       - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
       - "1"
   hcd_workflow_impl:
