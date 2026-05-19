@@ -69,6 +69,10 @@ class WorkflowExecutor:
     def validateAndUpdateProcessBundle(self):
         # IF AN H&CD SOURCE IS CONFIGURED BUT IT HAS NO POWER FOR THIS TIME SLICE,
         # DO NOT RUN THE CODE(S) FOR THIS SOURCE
+        nbi_selected = (
+            self.param_process.get("nbi_source", 0) != 0
+            or self.param_process.get("nbi_fp", 0) != 0
+        )
         for process in self.process_bundle.keys():
             time_array = None
             if (
@@ -84,6 +88,7 @@ class WorkflowExecutor:
             if (
                 "nbi" in self.process_bundle[process]["input"]
                 and "nuclear" not in process
+                and nbi_selected
                 and self.process_bundle[process]["input"]["nbi"].ids_properties.homogeneous_time < 0
             ):
                 print("  NBI required but no waveform!!!", file=sys.stderr)
@@ -94,7 +99,7 @@ class WorkflowExecutor:
                 print("  --> Abort.", file=sys.stderr)
                 return -1
 
-            if "nbi" in self.process_bundle[process]["input"] and not is_nbi_on(
+            if nbi_selected and "nbi" in self.process_bundle[process]["input"] and not is_nbi_on(
                 self.process_bundle[process]["input"]["nbi"],
                 time_array,
             ):
