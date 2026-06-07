@@ -13,12 +13,13 @@ Contrast with hybrid mode (workflow_driver.py --m3_flag=1):
             driver ──► fopla_m3.exe
             ...
 
-Time control: 1 reuse = 1 timestep for all components.
+Time control: one macro reuse contains the full time loop; each O_I/S
+exchange drives one micro actor reuse.
 
 Actor protocol:
-    The driver sends to every wired actor at every timestep. Actors handle
-    zero-power inputs internally. This keeps each actor's reuse loop alive
-    across the full simulation.
+    The driver sends to wired actors when their branch is active. Zero-power
+    IC slices bypass Cyrano/FoPla, because FoPla renormalizes to its XML
+    target power even when the IC launched waveform is off.
 
 Usage (launched by MUSCLE3 Manager via ymmsl):
     muscle_manager --start-all test_m3_pure_torbeam.ymmsl
@@ -31,7 +32,7 @@ import numpy as np
 sys.stdout.reconfigure(line_buffering=True)
 sys.stderr.reconfigure(line_buffering=True)
 
-from libmuscle import Instance, Message, KEEPS_NO_STATE_FOR_NEXT_USE
+from libmuscle import Instance, Message, InstanceFlags
 from ymmsl import Operator
 
 # Reuse DB layer and IDS utilities from workflow_driver
@@ -80,6 +81,8 @@ ACTOR_PORTS = {
     },
 }
 
+POWER_EPS_W = 1.0e-6
+
 
 # =============================================================================
 # Power-gating helpers
@@ -108,8 +111,9 @@ def _ic_total_power(ic_antennas_ids) -> float:
     try:
         total = 0.0
         for antenna in ic_antennas_ids.antenna:
-            if hasattr(antenna.power, 'data') and len(antenna.power.data) > 0:
-                total += float(antenna.power.data[0])
+            pl = antenna.power_launched
+            if hasattr(pl, 'data') and len(pl.data) > 0:
+                total += float(pl.data[0])
         return total
     except Exception:
         return 0.0
@@ -206,7 +210,7 @@ def main():
         Operator.O_I: all_send,
         Operator.S:   all_recv,
     }
-    instance = Instance(ports, KEEPS_NO_STATE_FOR_NEXT_USE)
+    instance = Instance(ports, InstanceFlags.SKIP_MMSF_SEQUENCE_CHECKS)
     print(f"[driver] M3 instance created", flush=True)
 
     # --- Determine which actors are actually wired ---
@@ -302,10 +306,11 @@ def main():
             # ----------------------------------------------------------------
             # IC branch — cyrano  (only if wired)
             # ----------------------------------------------------------------
-            if 'cyrano' in active_actors:
-                ic_power = _ic_total_power(ic)
-                print(f"[driver] IC power = {ic_power/1e6:.3f} MW", flush=True)
+            ic_power = _ic_total_power(ic)
+            ic_active = abs(ic_power) > POWER_EPS_W
+            print(f"[driver] IC power = {ic_power/1e6:.3f} MW", flush=True)
 
+            if 'cyrano' in active_actors and ic_active:
                 _send(instance, 'equilibrium_out_ic',          eq,      timenow, t_next)
                 _send(instance, 'core_profiles_out_ic',        cp,      timenow, t_next)
                 _send(instance, 'ic_antennas_out',             ic,      timenow, t_next)
@@ -316,6 +321,8 @@ def main():
                 _send(instance, 'nbi_out_ic',                  nbi,     timenow, t_next)
                 waves_ic = _recv(instance, 'waves_ic_in', 'waves', timenow)
             else:
+                if 'cyrano' in active_actors:
+                    print("[driver] Skipping Cyrano because IC launched power is zero", flush=True)
                 waves_ic = _empty('waves')
 
             # ----------------------------------------------------------------
@@ -333,17 +340,23 @@ def main():
             # ----------------------------------------------------------------
             # FP branch — fopla  (only if wired)
             # ----------------------------------------------------------------
-            if 'fopla' in active_actors:
+            if 'fopla' in active_actors and ic_active:
                 _send(instance, 'equilibrium_out_fp',           eq,  timenow, t_next)
                 _send(instance, 'core_profiles_out_fp',         cp,  timenow, t_next)
                 _send(instance, 'ic_antennas_out_fp',           ic,  timenow, t_next)
-                _send(instance, 'waves_out_to_fopla',           waves, timenow, t_next)
+                # FoPla is the IC Fokker-Planck actor; feeding merged EC+IC
+                # waves can make it pick the EC wave first and crash in its
+                # RF interpolation. Keep merged waves for downstream storage
+                # and hcd2core_sources, but feed FoPla the IC wave branch.
+                _send(instance, 'waves_out_to_fopla',           waves_ic, timenow, t_next)
                 _send(instance, 'distributions_out_fp',         dis, timenow, t_next)
                 _send(instance, 'distribution_sources_out_fp',  dsr, timenow, t_next)
                 _send(instance, 'nbi_out_fp',                   nbi, timenow, t_next)
                 distributions = _recv(instance, 'distributions_in', 'distributions', timenow)
                 output_ids['distributions'] = distributions
             else:
+                if 'fopla' in active_actors:
+                    print("[driver] Skipping FoPla because IC launched power is zero", flush=True)
                 distributions = dis
 
             # ----------------------------------------------------------------

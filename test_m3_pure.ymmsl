@@ -92,8 +92,8 @@ model:
       implementation: merge_waves_impl
       ports:
         f_init:
-          - waves_in1
-          - waves_in2
+          - waves1_in
+          - waves2_in
         o_f:
           - waves_out
 
@@ -141,8 +141,8 @@ model:
     cyrano.waves_out:                   driver.waves_ic_in
 
     # driver → merge_waves
-    driver.waves_ec_out:       merge_waves.waves_in1
-    driver.waves_ic_out:       merge_waves.waves_in2
+    driver.waves_ec_out:       merge_waves.waves1_in
+    driver.waves_ic_out:       merge_waves.waves2_in
     merge_waves.waves_out:     driver.waves_merged_in
 
     # driver → fopla
