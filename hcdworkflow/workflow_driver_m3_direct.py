@@ -328,11 +328,17 @@ def main():
             # ----------------------------------------------------------------
             # Merge waves  (only if wired)
             # ----------------------------------------------------------------
-            if 'merge_waves' in active_actors:
+            if 'merge_waves' in active_actors and ec_power > POWER_EPS_W and ic_active:
                 _send(instance, 'waves_ec_out', waves_ec, timenow, t_next)
                 _send(instance, 'waves_ic_out', waves_ic, timenow, t_next)
                 waves = _recv(instance, 'waves_merged_in', 'waves', timenow)
+            elif ic_active and ec_power <= POWER_EPS_W:
+                if 'merge_waves' in active_actors:
+                    print("[driver] Skipping merge_waves because EC launched power is zero", flush=True)
+                waves = waves_ic
             else:
+                if 'merge_waves' in active_actors and not ic_active:
+                    print("[driver] Skipping merge_waves because IC launched power is zero", flush=True)
                 waves = waves_ec
 
             output_ids['waves'] = waves
