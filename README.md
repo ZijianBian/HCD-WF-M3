@@ -149,6 +149,19 @@ source config_hcd_iter_sdcc_3.42.0.sh
 
 For backward compatibility with the legacy IMAS-AL-Python 5.x stack and DD 3.42.0 actor builds (e.g. for JINTRAC coupling tests under `tests/data/`). Creates a separate `devenv_3.42.0` virtual environment so the two stacks do not interfere.
 
+Use this environment only for legacy, non-MUSCLE3 runs. It is not intended for
+Hybrid M3 or Pure M3 yMMSL cases.
+
+```bash
+source config_hcd_iter_sdcc_3.42.0.sh
+
+# Console entry point:
+hcd_nogui -c tests/data/GRAYSCALE
+
+# Equivalent direct driver call:
+python workflow/workflow_driver.py tests/data/GRAYSCALE 0
+```
+
 ### Manual Setup (SDCC, without helper script)
 
 ```bash
@@ -285,14 +298,14 @@ The workflow is configured using a main XML file and optional YAML waveform file
 - Place these files in your configuration folder if your simulation requires time-dependent input.
 
 ### Example Configuration Folder
-A typical configuration folder (e.g., `tests/data/GRAY_PION`) contains:
+A typical configuration folder (e.g., `tests/data/GRAYSCALE`) contains:
 - `input_workflow.xml` (main workflow definition)
 - `ec_waveforms.yaml`, `ic_waveforms.yaml`, etc. (optional, for time-dependent scenarios)
 
 You can run the workflow using:
 ```bash
-hcd_nogui -c tests/data/GRAY_PION
-hcdslice_nogui -c tests/data/GRAY_PION
+hcd_nogui -c tests/data/GRAYSCALE
+hcdslice_nogui -c tests/data/GRAYSCALE
 ```
 
 ---
@@ -319,13 +332,36 @@ hcdslice_nogui -c tests/data/GRAY_PION
 
 ## Running the Workflow
 
-Prereq: `source config_hcd_iter_sdcc.sh` once per shell session.
+For current M3 development runs, source the DD 4.1.0 helper once per shell
+session:
 
-### Legacy Mode (No MUSCLE3)
+```bash
+source config_hcd_iter_sdcc.sh
+```
+
+### Legacy Mode, DD 4.1.0 Smoke Case
 
 ```bash
 ./run.sh legacy
 ```
+
+### Legacy Compatibility Mode, DD 3.42.0
+
+Use this path when you need the older IMAS-AL-Python 5.x / DD 3.42.0 stack,
+for example for legacy actor builds, old `tests/data/` cases, or JINTRAC
+coupling checks.
+
+```bash
+source config_hcd_iter_sdcc_3.42.0.sh
+hcd_nogui -c tests/data/GRAYSCALE
+
+# Or call the driver directly:
+python workflow/workflow_driver.py tests/data/GRAYSCALE 0
+```
+
+Do not use the DD 3.42.0 environment for `./run.sh hybrid`, `./run.sh pure`,
+or `muscle_manager --start-all ...`; those paths are for the DD 4.1.0/MUSCLE3
+environment.
 
 ### Hybrid MUSCLE3 Mode
 
