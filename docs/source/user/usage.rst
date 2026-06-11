@@ -25,6 +25,8 @@ Command Summary
      - Hybrid M3 macro component, normally launched by MUSCLE3.
    * - ``muscle_manager --start-all FILE.ymmsl``
      - Launch Hybrid or Pure M3 topology.
+   * - ``./run.sh pure``
+     - Launch the default Pure M3 no-FoPla topology.
 
 Legacy Mode
 -----------
@@ -55,17 +57,24 @@ actor executables.
 
 .. code-block:: bash
 
-   muscle_manager --start-all path/to/pure_case.ymmsl
+   ./run.sh pure
+   muscle_manager --start-all test_m3_pure_3actors.ymmsl
+
+Use ``HCD_PURE_YMMSL`` to select another Pure topology:
+
+.. code-block:: bash
+
+   HCD_PURE_YMMSL=test_m3_pure_torbeam.ymmsl ./run.sh pure
 
 Current validated Pure M3 actors:
 
 * ``torbeam_m3.exe``
 * ``cyrano_m3.exe``
-* ``merge_waves_m3.exe``
 * ``hcd2core_sources_m3.exe``
 
 FoPla direct coupling exists in the driver but is not part of the validated
-benchmark subset described in :doc:`validation`.
+benchmark subset described in :doc:`validation`. The full experimental
+topology including ``merge_waves`` and FoPla is kept in ``test_m3_pure.ymmsl``.
 
 Output
 ------

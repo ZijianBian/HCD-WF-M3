@@ -4,7 +4,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-See%20LICENSE.md-blue.svg)](LICENSE.md)
 
-Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulations,with MUSCLE3 integration for modular multi-scale coupling of physics actors.
+Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulations, with MUSCLE3 integration for modular multi-scale coupling of physics actors.
 
 ---
 
@@ -21,7 +21,10 @@ Developer    Manual Setup (any system)      See "Developer Setup" below
 
 ## Execution Modes
 
-The workflow supports three execution modes via a unified entry point (`workflow/workflow_driver.py`):
+The workflow supports three execution modes. Legacy and Hybrid use the shared
+entry point `workflow/workflow_driver.py`; Pure M3 uses
+`hcdworkflow/workflow_driver_m3_pure.py` because it wires the macro driver
+directly to individual M3 actor executables.
 
 ```
 Mode            Flag / Command    Description
@@ -35,10 +38,11 @@ Hybrid M3       m3_flag=1         Two-component MUSCLE3 coupling:
                                   iWrap actors in a separate process.
                                   IDS are exchanged via M3 conduits.
 
-Pure M3         (under            Each physics actor (Torbeam, Cyrano, …) runs
-                development)      as an independent M3 micro model, coupled
-                                  directly to a single macro driver.
-                                  Not yet runnable from this branch.
+Pure M3         yMMSL             Actor-level MUSCLE3 coupling:
+                                  workflow_driver_m3_pure.py talks directly to
+                                  M3 actor executables such as torbeam_m3.exe
+                                  and cyrano_m3.exe. The validated no-FoPla
+                                  subset is runnable from this branch.
 ```
 
 ### MUSCLE3 Hybrid Architecture
@@ -60,6 +64,21 @@ hcd_workflow_m3.py  (MICRO — one reuse_instance() per timestep)
     │         execute internally — invisible to MUSCLE3
     └── Sends output IDS back to macro via O_F ports
 ```
+
+### Pure M3 Architecture
+
+```
+workflow_driver_m3_pure.py  (MACRO — database I/O and time loop)
+    ├── torbeam_m3.exe
+    ├── cyrano_m3.exe
+    └── hcd2core_sources_m3.exe
+```
+
+Pure M3 is the direct actor-coupling path. The current runnable default is the
+no-FoPla actor-level subset in `test_m3_pure_3actors.ymmsl`. The full topology
+file `test_m3_pure.ymmsl` is present for development, but FoPla is not treated
+as part of the validated Pure full chain yet. The Pure driver skips Cyrano,
+FoPla, and IC wave merging on zero-IC-power time slices.
 ---
 
 ## For Users
@@ -207,8 +226,9 @@ python actor_install.py --skipModules grayscale.yml  # Install specific actor
 
 ## Features
 
-- **Multiple Execution Modes**: Console, GUI, batch, single time-slice, and MUSCLE3 hybrid
+- **Multiple Execution Modes**: Console, GUI, batch, single time-slice, Legacy, Hybrid M3, and Pure M3
 - **MUSCLE3 Integration**: Modular multi-scale coupling via macro/micro architecture
+- **Pure M3 Actor Coupling**: Direct macro-to-actor M3 execution for the validated no-FoPla subset
 - **Flexible Actor System**: Easy integration of new physics codes (Torbeam, Cyrano, FoPla, …)
 - **IMAS Integration**: Full compatibility with IMAS IDSes, IMAS-Python 2.x, DD 4.0.0/4.1.0
 - **Smart DD Conversion**: Automatic Data Dictionary version handling with manual fix-ups
@@ -319,9 +339,26 @@ muscle_manager --start-all test_hybrid_hcdwf.ymmsl
 
 ### Pure MUSCLE3 Mode
 
-Pure mode (each physics actor as an independent M3 micro model) is under active
-development on a separate branch and is not runnable from this branch. The
-`./run.sh pure` stub will print a notice and exit.
+Pure mode runs each selected physics actor as an independent M3 micro model.
+The default runner uses `test_m3_pure_3actors.ymmsl`, the current no-FoPla
+validated subset.
+
+```bash
+# Via MUSCLE3 manager:
+muscle_manager --start-all test_m3_pure_3actors.ymmsl
+
+# Via runner:
+./run.sh pure
+
+# Override the Pure topology:
+HCD_PURE_YMMSL=test_m3_pure_torbeam.ymmsl ./run.sh pure
+```
+
+Available Pure yMMSL files:
+- `test_m3_pure_torbeam.ymmsl`: minimal Torbeam-only smoke test
+- `test_m3_pure_2actors.ymmsl`: Torbeam + hcd2core_sources
+- `test_m3_pure_3actors.ymmsl`: Torbeam + Cyrano + hcd2core_sources, no FoPla
+- `test_m3_pure.ymmsl`: full experimental topology including merge_waves and FoPla
 
 ### Runner
 
@@ -343,11 +380,13 @@ It automatically:
 hcd-wf-sandbox/
 │
 ├── workflow/
-│   └── workflow_driver.py        # Unified entry point (legacy + M3 macro)
+│   ├── workflow_driver.py        # Unified entry point (legacy + Hybrid M3 macro)
 │                                  #   - Database setup & I/O
 │                                  #   - Time loop management
 │                                  #   - DD version conversion & fix-ups
 │                                  #   - IMAS compatibility layer
+│   ├── ids_prep.py               # IDS preparation and DD compatibility helpers
+│   └── wf_wrapper.py             # Backward-compatible shim; not the main driver
 │
 ├── hcdworkflow/
 │   ├── hcd_workflow.py            # Original HCDWorkflow class (shared by all modes)
@@ -355,6 +394,7 @@ hcd-wf-sandbox/
 │   │                              #   - Receives IDS via F_INIT ports
 │   │                              #   - Calls HCDWorkflow.run()
 │   │                              #   - Sends results via O_F ports
+│   ├── workflow_driver_m3_pure.py # Pure M3 macro driver for direct actor coupling
 │   ├── workflow_executor.py       # Actor execution
 │   ├── workflow_dbhelper.py       # Database connection helper
 │   ├── workflow_globals_reader.py # Global configuration reader
@@ -367,9 +407,10 @@ hcd-wf-sandbox/
 ├── tests/                         # Test data and configs
 │
 ├── test_hybrid_hcdwf.ymmsl        # MUSCLE3 hybrid mode configuration
+├── test_m3_pure_*.ymmsl           # Pure M3 actor-level configurations
 ├── config_hcd_iter_sdcc.sh        # Environment setup (default: DD 4.1.0 + MUSCLE3)
 ├── config_hcd_iter_sdcc_3.42.0.sh # Environment setup (legacy: DD 3.42.0)
-├── run.sh                         # Runner for legacy/hybrid (pure mode is WIP)
+├── run.sh                         # Runner for legacy/hybrid/pure
 │
 ├── runs/                          # Auto-generated run outputs
 │   ├── run_legacy_001/
@@ -390,7 +431,7 @@ hcd-wf-sandbox/
 ---
 ## M3 Port Mapping Reference
 
-### Macro → Micro (O_I → F_INIT)
+### Hybrid Macro → Micro (O_I → F_INIT)
 
 | Port | IDS | Description |
 |------|-----|-------------|
@@ -403,7 +444,7 @@ hcd-wf-sandbox/
 | `distributions_out/in` | `distributions` | Particle distribution functions |
 | `distribution_sources_out/in` | `distribution_sources` | Distribution source terms |
 
-### Micro → Macro (O_F → S)
+### Hybrid Micro → Macro (O_F → S)
 
 | Port | IDS | Description |
 |------|-----|-------------|
@@ -411,6 +452,10 @@ hcd-wf-sandbox/
 | `waves_out/in` | `waves` | Wave propagation results |
 | `core_profiles_out/in` | `core_profiles` | Updated plasma profiles |
 | `distributions_out/in` | `distributions` | Updated distribution functions |
+
+Pure M3 uses actor-specific ports defined in the Pure yMMSL files. See
+`test_m3_pure_3actors.ymmsl` for the validated no-FoPla topology and
+`test_m3_pure.ymmsl` for the full experimental topology.
 
 ---
 

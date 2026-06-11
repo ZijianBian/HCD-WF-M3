@@ -7,7 +7,7 @@
 #   legacy  : In-process iwrap, no MUSCLE3 (all actors run inside workflow_driver)
 #   hybrid  : MUSCLE3 macro-micro, Python micro (driver ↔ hcd_workflow_m3)
 #   pure    : MUSCLE3 macro-micro, Fortran actor direct (driver ↔ *_m3.exe)
-#             [under development — not yet runnable from this branch]
+#             Default topology is the validated no-FoPla actor-level subset.
 #
 # Prereq: source config_hcd_iter_sdcc.sh once per shell session.
 #
@@ -47,9 +47,9 @@ case "$MODE" in
         RUN_PREFIX="run_hybrid"
         ;;
     "pure")
-        echo "Pure MUSCLE3 mode is under active development on a separate branch."
-        echo "It is not runnable from this branch."
-        exit 0
+        YMMSL_FILE="${HCD_PURE_YMMSL:-test_m3_pure_3actors.ymmsl}"
+        MODE_DESC="Pure MUSCLE3 (driver ↔ direct M3 actor executables)"
+        RUN_PREFIX="run_pure"
         ;;
 esac
 
@@ -91,6 +91,10 @@ Output:      $DIR_NAME
 Host:        $(hostname)
 User:        $(whoami)
 EOF
+
+if [[ "$MODE" != "legacy" ]]; then
+    echo "YMMSL:       $YMMSL_FILE" >> "$DIR_NAME/run_config.txt"
+fi
 
 if [[ "$MODE" == "legacy" ]]; then
     time python workflow/workflow_driver.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log" \

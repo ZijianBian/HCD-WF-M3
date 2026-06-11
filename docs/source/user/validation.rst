@@ -4,8 +4,8 @@ Validation Status
 This page records the current M3 validation state. It is intentionally short
 and should be updated whenever a new reference case becomes the preferred one.
 
-Pure Direct Fixes
------------------
+Pure M3 Fixes
+-------------
 
 Two fixes made Pure mode pass the zero-IC transition cases:
 
@@ -26,7 +26,7 @@ Validated Pure Scenarios
      - Coverage
      - Result
    * - Pure no-FoPla multi-slice run
-     - EC Torbeam, IC Cyrano, wave merge, hcd2core_sources
+     - EC Torbeam, IC Cyrano, hcd2core_sources
      - Passed.
    * - Pure zero-IC transition run
      - Cyrano/FoPla power gating and inactive-branch wave merge

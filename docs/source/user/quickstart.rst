@@ -53,12 +53,19 @@ The topology is:
 Run a Pure M3 Case
 -------------------------------
 
-Pure mode is not launched by ``run.sh pure`` yet. Use a Pure yMMSL file and
-launch it directly:
+Pure mode can be launched either through ``run.sh pure`` or directly through
+MUSCLE3. The runner defaults to the validated no-FoPla actor-level topology:
 
 .. code-block:: bash
 
-   muscle_manager --start-all path/to/pure_case.ymmsl
+   ./run.sh pure
+
+To choose a different topology:
+
+.. code-block:: bash
+
+   HCD_PURE_YMMSL=test_m3_pure_torbeam.ymmsl ./run.sh pure
+   muscle_manager --start-all test_m3_pure_3actors.ymmsl
 
 The validated no-FoPla topology is:
 
@@ -66,7 +73,6 @@ The validated no-FoPla topology is:
 
    driver -> torbeam_m3.exe -> waves_ec
    driver -> cyrano_m3.exe  -> waves_ic
-   driver -> merge_waves_m3.exe -> waves
    driver -> hcd2core_sources_m3.exe -> core_sources
 
 Pure mode currently skips Cyrano, FoPla, and IC wave merging automatically when
