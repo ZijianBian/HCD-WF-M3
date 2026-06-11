@@ -23,7 +23,7 @@ Mode Table
      - The driver is a MUSCLE3 macro model. A single micro model receives IDS
        slices and then calls the same iWrap workflow internally.
    * - Pure M3
-     - ``hcdworkflow/workflow_driver_m3_direct.py``
+     - ``hcdworkflow/workflow_driver_m3_pure.py``
      - The driver talks directly to individual M3 actor executables. There is
        no iWrap workflow micro in the middle.
 
@@ -68,7 +68,7 @@ IMAS I/O and the time loop. Each actor is a separate MUSCLE3 component.
 Validated Pure Subset
 ---------------------
 
-As of 2026-06-10, the validated Pure direct subset is:
+As of 2026-06-10, the validated Pure M3 subset is:
 
 * Multi-time-slice run.
 * Single ``Ntor`` Cyrano path.
@@ -89,8 +89,8 @@ What Still Needs Care
 
 Treat these as validation targets, not routine production assumptions:
 
-* Pure direct FoPla full-chain runs.
-* Weighted toroidal mode spectrum in direct Pure mode.
+* Pure M3 FoPla full-chain runs.
+* Weighted toroidal mode spectrum in Pure M3 mode.
 * New direct actor combinations beyond the validated subset.
 * Performance comparisons where mode weighting, FoPla selection, or time ranges
   are not identical.

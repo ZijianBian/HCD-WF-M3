@@ -36,7 +36,7 @@ but it is not the first path for normal users.
 Pure M3 Actors
 --------------
 
-Pure direct mode needs actor executables such as:
+Pure M3 mode needs actor executables such as:
 
 .. code-block:: text
 

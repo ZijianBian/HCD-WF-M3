@@ -21,7 +21,7 @@ For Python-only changes:
 
 .. code-block:: bash
 
-   python3 -m py_compile workflow/wf_wrapper.py workflow/ids_prep.py hcdworkflow/workflow_driver_m3_direct.py
+   python3 -m py_compile workflow/wf_wrapper.py workflow/ids_prep.py hcdworkflow/workflow_driver_m3_pure.py
    pytest tests/test_ids_prep.py
 
 For workflow behavior, record:

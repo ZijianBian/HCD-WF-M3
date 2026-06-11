@@ -69,5 +69,5 @@ by ``config_hcd_iter_sdcc.sh``. Developers who need custom actors can set:
 
    ACTOR_FOLDER=/path/to/PYTHON_ACTORS source config_hcd_iter_sdcc.sh
 
-Pure M3 direct mode requires M3-capable actor executables such as
+Pure M3 mode requires M3-capable actor executables such as
 ``torbeam_m3.exe`` and ``cyrano_m3.exe``.

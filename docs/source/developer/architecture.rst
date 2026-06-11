@@ -50,7 +50,7 @@ Pure M3 Layout
 
 .. code-block:: text
 
-   workflow_driver_m3_direct.py
+   workflow_driver_m3_pure.py
      -> torbeam_m3.exe
      -> cyrano_m3.exe
      -> fopla_m3.exe             optional, not in validated benchmark subset
@@ -73,8 +73,8 @@ Important Modules
        Hybrid macro execution.
    * - ``hcdworkflow.hcd_workflow_m3``
      - Hybrid micro component.
-   * - ``hcdworkflow.workflow_driver_m3_direct``
-     - Pure direct actor driver.
+   * - ``hcdworkflow.workflow_driver_m3_pure``
+     - Pure M3 actor driver.
    * - ``workflow.ids_prep``
      - DD compatibility fix-ups, EC/IC waveform helpers, and toroidal mode
        utilities.

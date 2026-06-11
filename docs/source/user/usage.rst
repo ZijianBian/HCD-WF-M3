@@ -47,7 +47,7 @@ Hybrid mode sends IDS slices between ``workflow_driver.py`` and
 ``hcd_workflow_m3.py``. The physics actors still run inside
 ``HCDWorkflow.run()`` through iWrap.
 
-Pure M3 Direct Mode
+Pure M3 Mode
 -------------------
 
 Pure mode is launched from a yMMSL file that wires the macro driver directly to
@@ -57,7 +57,7 @@ actor executables.
 
    muscle_manager --start-all path/to/pure_case.ymmsl
 
-Current validated direct actors:
+Current validated Pure M3 actors:
 
 * ``torbeam_m3.exe``
 * ``cyrano_m3.exe``

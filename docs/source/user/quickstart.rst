@@ -50,7 +50,7 @@ The topology is:
 
    workflow_driver.py  <->  hcd_workflow_m3.py  ->  iWrap actors
 
-Run a Pure M3 Direct-Actor Case
+Run a Pure M3 Case
 -------------------------------
 
 Pure mode is not launched by ``run.sh pure`` yet. Use a Pure yMMSL file and

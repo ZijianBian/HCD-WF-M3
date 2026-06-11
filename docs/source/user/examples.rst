@@ -24,10 +24,10 @@ Use this to exercise the macro-to-workflow M3 boundary.
    source config_hcd_iter_sdcc.sh
    muscle_manager --start-all test_hybrid_hcdwf.ymmsl
 
-Pure M3 Direct, No FoPla
+Pure M3, No FoPla
 ------------------------
 
-Use this pattern for the validated direct-actor subset:
+Use this pattern for the validated Pure M3 subset:
 
 .. code-block:: text
 

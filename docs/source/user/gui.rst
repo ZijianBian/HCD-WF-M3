@@ -24,7 +24,7 @@ What the GUI Is Good For
 What It Does Not Replace
 ------------------------
 
-Pure M3 direct mode needs an explicit yMMSL topology. The GUI does not currently
+Pure M3 mode needs an explicit yMMSL topology. The GUI does not currently
 generate or validate those direct actor connections.
 
 For Pure M3 work, edit the configuration folder and yMMSL file in the IDE, then

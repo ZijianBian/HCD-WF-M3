@@ -72,7 +72,7 @@ Invalidated Benchmark
 ---------------------
 
 An earlier benchmark should not be used for runtime conclusions. Legacy and
-Hybrid ran weighted ``Ntor=-38/+38`` Cyrano work while Pure direct used a
+Hybrid ran weighted ``Ntor=-38/+38`` Cyrano work while Pure M3 used a
 single Cyrano path. That made the comparison unfair.
 
 Performance Interpretation

@@ -18,8 +18,8 @@ Workflow Drivers
      - Compatibility wrapper importing ``workflow_driver``.
    * - ``hcdworkflow.hcd_workflow_m3``
      - Hybrid M3 micro model.
-   * - ``hcdworkflow.workflow_driver_m3_direct``
-     - Pure M3 direct actor driver.
+   * - ``hcdworkflow.workflow_driver_m3_pure``
+     - Pure M3 actor driver.
 
 Core Workflow
 -------------
@@ -57,6 +57,6 @@ Where to Start
 
 For Pure M3 work, start with:
 
-* ``hcdworkflow/workflow_driver_m3_direct.py``
+* ``hcdworkflow/workflow_driver_m3_pure.py``
 * ``workflow/ids_prep.py``
 * The yMMSL file for the case under test.

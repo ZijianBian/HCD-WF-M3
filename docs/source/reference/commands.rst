@@ -47,11 +47,11 @@ Hybrid macro, normally launched by MUSCLE3:
 
    python workflow/workflow_driver.py CONFIG 1
 
-Pure direct driver, normally launched by MUSCLE3:
+Pure M3 driver, normally launched by MUSCLE3:
 
 .. code-block:: bash
 
-   python hcdworkflow/workflow_driver_m3_direct.py CONFIG
+   python hcdworkflow/workflow_driver_m3_pure.py CONFIG
 
 MUSCLE3
 -------

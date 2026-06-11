@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-workflow_driver_m3_direct.py — Pure M3 Macro Driver
+workflow_driver_m3_pure.py — Pure M3 Macro Driver
 
 Pure M3 mode: this driver communicates directly with physics actor
 executables (torbeam_m3.exe, cyrano_m3.exe, …) as individual MUSCLE3
@@ -189,7 +189,7 @@ def _prepare_actor_input(ids_name, ids_obj, reference_ids, timenow):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python workflow_driver_m3_direct.py <config_folder_path>")
+        print("Usage: python workflow_driver_m3_pure.py <config_folder_path>")
         sys.exit(1)
 
     config_path = os.path.abspath(sys.argv[1])

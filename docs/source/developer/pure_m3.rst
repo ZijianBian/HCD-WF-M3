@@ -1,11 +1,11 @@
-Pure M3 Direct Driver
+Pure M3 Driver
 =====================
 
 Pure M3 mode is implemented by:
 
 .. code-block:: text
 
-   hcdworkflow/workflow_driver_m3_direct.py
+   hcdworkflow/workflow_driver_m3_pure.py
 
 The driver is a MUSCLE3 macro component. It opens IMAS databases, owns the time
 loop, and sends IDS messages directly to actor executables.

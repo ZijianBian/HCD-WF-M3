@@ -37,8 +37,8 @@ HCD Workflow has three execution modes.
      - Stable two-component MUSCLE3 coupling. The micro component still runs
        iWrap actors internally.
    * - Pure M3
-     - ``hcdworkflow/workflow_driver_m3_direct.py``
-     - Experimental but runnable for the validated direct-actor subset:
+     - ``hcdworkflow/workflow_driver_m3_pure.py``
+     - Experimental but runnable for the validated Pure M3 subset:
        Torbeam, Cyrano, merge_waves, and hcd2core_sources without FoPla.
 
 .. toctree::

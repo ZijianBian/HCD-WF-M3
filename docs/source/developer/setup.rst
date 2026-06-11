@@ -36,7 +36,7 @@ Run Python Checks
 
 .. code-block:: bash
 
-   python3 -m py_compile workflow/wf_wrapper.py workflow/ids_prep.py hcdworkflow/workflow_driver_m3_direct.py
+   python3 -m py_compile workflow/wf_wrapper.py workflow/ids_prep.py hcdworkflow/workflow_driver_m3_pure.py
    pytest tests/test_ids_prep.py
 
 Full workflow runs require the SDCC actor environment and valid IMAS input
@@ -63,8 +63,8 @@ Code Map
      - Legacy driver and Hybrid M3 macro.
    * - ``hcdworkflow/hcd_workflow_m3.py``
      - Hybrid M3 micro that calls ``HCDWorkflow.run()``.
-   * - ``hcdworkflow/workflow_driver_m3_direct.py``
-     - Pure M3 direct actor macro driver.
+   * - ``hcdworkflow/workflow_driver_m3_pure.py``
+     - Pure M3 actor macro driver.
    * - ``workflow/ids_prep.py``
      - IDS fix-ups, waveform helpers, and IC toroidal mode helpers.
    * - ``hcdworkflow/hcd_workflow.py``

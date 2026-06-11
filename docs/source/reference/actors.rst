@@ -25,7 +25,7 @@ Core Actors in the Validated Benchmark
      - hcd2core_sources
      - Converts HCD outputs into ``core_sources``.
 
-Optional or Not Yet Fully Validated in Pure Direct Mode
+Optional or Not Yet Fully Validated in Pure Pure Mode
 -------------------------------------------------------
 
 .. list-table::
@@ -58,7 +58,7 @@ Example:
 Pure M3 Actor Requirements
 --------------------------
 
-Pure direct mode needs M3 actor executables, for example:
+Pure M3 mode needs M3 actor executables, for example:
 
 .. code-block:: text
 
