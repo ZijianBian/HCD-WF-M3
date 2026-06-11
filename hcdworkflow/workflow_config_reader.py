@@ -264,7 +264,7 @@ class WorkflowConfigReader(XmlReader):
 
 
 if __name__ == "__main__":
-    workflowConfig = WorkflowConfigReader(r"/home/ITER/sawantp1/git/hcd/data/DT_baseline_example/input_workflow.xml")
+    workflowConfig = WorkflowConfigReader("tests/m3_hybrid/input_workflow.xml")
     # workflowConfig.displayConfig()
     # print("getAllProcesses")
     # print(workflowConfig.getAllProcesses())

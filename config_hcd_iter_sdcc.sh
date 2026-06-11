@@ -1,167 +1,146 @@
 #!/usr/bin/env bash
-module purge >& /dev/null
-set -uo pipefail
+# ================================================================
+# Stable HCD-WF + MUSCLE3 + DD 4.1.0 environment (SDCC)
+# ================================================================
 
-usage() {
-    cat <<'EOF'
-Usage: config_hcd_iter_sdcc.sh [dd_version]
+# Note: do NOT use set -euo pipefail here — this file is sourced into an
+# interactive shell and those flags would leak, causing the terminal to exit
+# on any non-zero command return code (including tab completion failures).
+_hcd_setup_failed=0
 
-Arguments:
-  dd_version    Optional. Data Dictionary release to load (default: 3.42.0).
-                Supported values: 3.42.0.
+echo "=============================================="
+echo "Setting up HCD Environment (DD 4.1.0)"
+echo "=============================================="
 
-Environment variables:
-  ACTOR_FOLDER  Directory containing actors compiled locally with
-                actor_install.py. When set, module loading is skipped and
-                the folder is prepended to PYTHONPATH.
+# ------------------------------------------------
+# 1. Clean environment (ONLY ONCE)
+# ------------------------------------------------
+module purge
 
-Examples:
-  config_hcd_iter_sdcc.sh
-  config_hcd_iter_sdcc.sh 4.0.0
-  ACTOR_FOLDER=/path/to/local/actors config_hcd_iter_sdcc.sh
+# ------------------------------------------------
+# 2. IMAS stack — MUST BE FIRST
+# ------------------------------------------------
+module load IMAS-Python
+module load IMAS-Fortran
+module load IDStools
 
-EOF
-}
+# ------------------------------------------------
+# 3. MUSCLE3 and core tools
+# ------------------------------------------------
+module load MUSCLE3
+module load XMLlib INTERPOS
 
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
-    usage
-    exit 0
+# Optional — only if needed
+# module load MDSplus
+
+# ------------------------------------------------
+# 4. Waveform Cooker (safe)
+# ------------------------------------------------
+module load Waveform-Cooker/1.6.0-GCCcore-13.2.0
+
+# Optional local override. Leave unset to use the module-provided installation.
+if [[ -n "${HCDWF_WAVEFORM_COOKER:-}" ]]; then
+    export PYTHONPATH="${HCDWF_WAVEFORM_COOKER}:$PYTHONPATH"
+    export EBROOTWAVEFORMMINCOOKER="${HCDWF_WAVEFORM_COOKER}"
 fi
 
-DD_VERSION="${1:-3.42.0}"
-ACTOR_FOLDER_ENV="${ACTOR_FOLDER:-}"
+# ------------------------------------------------
+# 5. Local iWrap (develop branch)
+# ------------------------------------------------
+if [[ -n "${HCDWF_IWRAP_ROOT:-}" ]]; then
+    export PATH="${HCDWF_IWRAP_ROOT}/bin:$PATH"
+    export PYTHONPATH="${HCDWF_IWRAP_ROOT}/python:$PYTHONPATH"
+fi
+
+# ------------------------------------------------
+# 6. IMAS settings
+# ------------------------------------------------
+export IMAS_AL_DISABLE_VALIDATE=1
+
+# ------------------------------------------------
+# 7. Actor and sandbox paths
+# ------------------------------------------------
+if [[ -z "${HCD_SANDBOX:-}" ]]; then
+    HCD_SANDBOX="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+export HCD_SANDBOX
+
+export ACTOR_FOLDER="${ACTOR_FOLDER:-${HCD_SANDBOX}/PYTHON_ACTORS}"
+
+export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
+export PYTHONPATH=$HCD_SANDBOX:$PYTHONPATH
+
+# ------------------------------------------------
+# 8. System limits and optimizations
+#    (previously only in run_env_hybrid.sh)
+# ------------------------------------------------
+export PYTHONUNBUFFERED=1
+ulimit -Ss unlimited 2>/dev/null
+
+# ------------------------------------------------
+# 9. Python virtual environment
+# ------------------------------------------------
 VENV_DIR="devenv"
 
-
-echo "[setup_dev_env] Using DD data version: ${DD_VERSION}"
-if [[ -n "${ACTOR_FOLDER_ENV}" ]]; then
-    echo "[setup_dev_env] Using local actors from: ${ACTOR_FOLDER_ENV}"
+if [[ ! -d "$VENV_DIR" ]]; then
+    python3 -m venv "$VENV_DIR" --system-site-packages
 fi
 
-ulimit -Ss unlimited
-export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
+source "$VENV_DIR/bin/activate"
 
-if [[ -n "${ACTOR_FOLDER_ENV}" ]]; then
-    export PYTHONPATH="${ACTOR_FOLDER_ENV}:${PYTHONPATH}"
-    echo "[setup_dev_env] Skipping module loading; actors expected in ${ACTOR_FOLDER_ENV}"
-elif command -v module >/dev/null 2>&1; then
-    load_modules() {
-        local mod
-        for mod in "$@"; do
-            module load "$mod"
-        done
-    }
-
-    echo "[setup_dev_env] Loading core modules"
-    load_modules Python Tkinter matplotlib lxml Waveform-Cooker
-
-    CORE_MODULE=""
-    MANDATORY_MODULES=()
-    EC_MODULES=()
-    IC_MODULES=()
-    NBI_MODULES=()
-    OTHER_MODULES=()
-
-    case "${DD_VERSION}" in
-        3.42.0)
-            CORE_MODULE="IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0"
-            MANDATORY_MODULES=(
-                "HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0"
-                "HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0"
-                "HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0"
-            )
-            EC_MODULES=(
-                "GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0"
-                "GRAY/1.0.0-intel-2023b-DD-3.42.0"
-                "TORBEAM/3.8.0-intel-2023b-DD-3.42.0"
-                "TORAY/1.0.0-intel-2023b-DD-3.42.0"
-                "GENRAY/10.11.3-intel-2023b-DD-3.42.0"
-            )
-            IC_MODULES=(
-                "CYRANO/1.0.0-intel-2023b-DD-3.42.0"
-                "FoPla/2.1.0-intel-2023b-DD-3.42.0"
-                "StixReDist/2.1.0-intel-2023b-DD-3.42.0"
-                "TOMCAT/1.0.0-intel-2023b-DD-3.42.0"
-            )
-            NBI_MODULES=(
-                "NEMO/2.2.0-intel-2023b-DD-3.42.0"
-                "NBISIM/1.3.0-intel-2023b-DD-3.42.0"
-                "RISK/2.2.0-intel-2023b-DD-3.42.0"
-                "SPOT/2.4.0-intel-2023b-DD-3.42.0"
-            )
-            OTHER_MODULES=(
-                "RELAX/1.0.0-intel-2023b-DD-3.42.0"
-                "SMART/0.1.0-intel-2023b-DD-3.42.0"
-                "FPSIM/1.0.0-intel-2023b-DD-3.42.0"
-            )
-            ;;
-        # Add case for 4.0.0
-    esac
-
-    echo "[setup_dev_env] Loading IMAS access layer"
-    load_modules "${CORE_MODULE}"
-
-    echo "[setup_dev_env] Loading mandatory actor modules"
-    load_modules "${MANDATORY_MODULES[@]}"
-
-    echo "[setup_dev_env] Loading EC heating actors"
-    load_modules "${EC_MODULES[@]}"
-
-    echo "[setup_dev_env] Loading IC heating actors"
-    load_modules "${IC_MODULES[@]}"
-
-    echo "[setup_dev_env] Loading NBI actors"
-    load_modules "${NBI_MODULES[@]}"
-
-    echo "[setup_dev_env] Loading additional actors"
-    load_modules "${OTHER_MODULES[@]}"
+if [[ "${HCDWF_SKIP_PIP_INSTALL:-0}" == "1" ]]; then
+    echo "Skipping pip install steps (HCDWF_SKIP_PIP_INSTALL=1)"
 else
-    echo "[setup_dev_env] 'module' command not available, skipping module loads"
+    pip install --upgrade pip --quiet
+
+    # Install MUSCLE3 if missing
+    python3 -c "import libmuscle" 2>/dev/null || pip install muscle3 --quiet
+
+    # Install HCD workflow if in repo
+    if [[ -f "setup.py" || -f "pyproject.toml" ]]; then
+        pip install -e . --quiet
+    fi
 fi
 
-if [[ ! -d "${VENV_DIR}" ]]; then
-    echo "[setup_dev_env] Creating virtual environment"
-    python3 -m venv "${VENV_DIR}"
-else
-    echo "[setup_dev_env] Virtual environment already exists"
-fi
+# ------------------------------------------------
+# 10. Diagnostics
+# ------------------------------------------------
+echo ""
+echo "Loaded IMAS-related modules:"
+module list 2>&1 | grep -E "IMAS|DD|AL|IDS"
 
-export PYTHONPATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PYTHONPATH}))')"
+echo ""
+python3 << 'PYCHECK'
+import imas
+import libmuscle
+import shutil
 
-VENV_PYTHON="${VENV_DIR}/bin/python"
-echo "[setup_dev_env] Upgrading pip"
-"${VENV_PYTHON}" -m pip install --upgrade pip
+print("IMAS OK")
+print("IMAS version:", getattr(imas, "__version__", "unknown"))
 
-echo "[setup_dev_env] Installing project in editable mode with dev extras"
-"${VENV_PYTHON}" -m pip install -e .
-"${VENV_PYTHON}" -m pip install -e ".[dev]"
+if hasattr(imas, "ids_defs"):
+    print("IMASPy 2.x API detected (GOOD)")
+else:
+    print("WARNING: Not IMASPy 2.x")
 
-cat <<EOF
+iwrap = shutil.which("iwrap")
+print("iWrap:", iwrap if iwrap else "NOT FOUND")
 
-Development environment is ready.
+# Verify actor folder
+import os
+actor_folder = os.environ.get("ACTOR_FOLDER", "")
+if actor_folder and os.path.isdir(actor_folder):
+    actors = os.listdir(actor_folder)
+    print(f"ACTOR_FOLDER: {actor_folder} ({len(actors)} actors)")
+else:
+    print("WARNING: ACTOR_FOLDER not set or not found")
 
-To use it in the current shell run:
-  source ${VENV_DIR}/bin/activate
+print("All checks passed")
+PYCHECK
 
-Common workflow entry points:
-  hcd_gui                          # Launch interactive GUI
-  hcd_nogui -c data/GRAYSCALE/     # Run full workflow headless
-  hcdslice_nogui -c data/GRAYSCALE/  # Run single time-slice headless
-
-EOF
-
-if [[ -n "${ACTOR_FOLDER_ENV}" ]]; then
-    cat <<EOF
-
-Local actor folder has been added to PYTHONPATH:
-  export PYTHONPATH=${ACTOR_FOLDER}:\$PYTHONPATH
-
-EOF
-fi
-
-cat <<EOF
-
-To target another DD release:
-  config_hcd_iter_sdcc.sh 4.0.0
-
-EOF
+echo ""
+echo "=============================================="
+echo "SETUP COMPLETE (DD 4.1.0)"
+echo "Activate later with:"
+echo "  source ${VENV_DIR}/bin/activate"
+echo "=============================================="

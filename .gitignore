@@ -5,6 +5,8 @@ actor_install/RELEASE.yaml
 fort.*
 Plot_data*
 *.log
+runs/
+run_hcd_*/
 .vscode
 
 

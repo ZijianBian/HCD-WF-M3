@@ -1,118 +1,94 @@
-Quick Start
-===========
+Quickstart
+==========
 
-This guide will help you run your first HCD workflow simulation.
+This page is the shortest path to a useful run on ITER SDCC.
 
-For Users (EasyBuild Module)
------------------------------
+Prepare the Environment
+-----------------------
 
-Step 1: Load the Module
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: bash
-
-   module load HCD-WF
-   export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
-
-Step 2: Run a Test Case
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-The HCD Workflow comes with test data. Try running the GRAYSCALE test:
+From the repository root:
 
 .. code-block:: bash
 
-   hcd_nogui -c /path/to/HCD-WF/tests/data/GRAYSCALE/
+   source config_hcd_iter_sdcc.sh
 
-Step 3: View Results
-~~~~~~~~~~~~~~~~~~~~~
+This helper prepares the DD 4.1.0 development stack, MUSCLE3, iWrap paths,
+Waveform Cooker paths, and the local ``devenv`` environment used by the current
+M3 work.
 
-The workflow will process the simulation and output results to the specified database.
+Use ``config_hcd_iter_sdcc_3.42.0.sh`` only when you intentionally need the
+legacy DD 3.42.0 stack.
 
-For Developers (Python Environment)
-------------------------------------
+Run a Legacy Smoke Case
+-----------------------
 
-Step 1: Setup Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: bash
-
-   cd hcd-wf
-   source devenv/bin/activate
-   
-   # Load required modules
-   module load Tkinter
-   module load matplotlib
-   module load IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
-   module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
-   module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
-   
-   export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
-
-Step 2: Run Test Cases
-~~~~~~~~~~~~~~~~~~~~~~~
-
-**Console Mode (No GUI):**
+Legacy mode runs the full workflow in one Python process. It is the baseline
+for comparing M3 behavior.
 
 .. code-block:: bash
 
-   hcd_nogui -c tests/data/GRAYSCALE/
+   python workflow/workflow_driver.py tests/m3_hybrid 0
 
-**Single Time Slice:**
-
-.. code-block:: bash
-
-   hcdslice_nogui -c tests/data/GRAYSCALE/
-
-**Interactive GUI:**
-
-.. code-block:: bash
-
-   hcd_gui
-
-**Batch Submission:**
-
-.. code-block:: bash
-
-   hcd_batch -n 1 -t 1 -e your.email@iter.org -q all -c tests/data/GRAYSCALE/
-
-Understanding the Output
--------------------------
-
-Console Output
-~~~~~~~~~~~~~~
-
-During execution, you'll see:
-
-* Parameter loading messages
-* Algorithm selection
-* Process execution status
-* Time slice information
-* Completion messages
-
-Example output:
+The final line should include:
 
 .. code-block:: text
 
-   path of the input workflow tests/data/GRAYSCALE/input_workflow.xml
-   --- Default algorithm ---
-   Algorithm = ['ec_wave_solver', 'fill_core_sources']
-   ---------------------------------------------
-   ---- Enter time loop of the H&CD wrapper ----
-   Step = 1/1
-   Time = 320.00 s
-   dt   = 20.00 s
-   Execute H&CD workflow for current time slice
-   End of time slice
-   End of wf_wrapper
+   [workflow_driver] Workflow completed successfully
 
-Output Files
-~~~~~~~~~~~~
+Run a Hybrid M3 Case
+--------------------
 
-Results are stored in IMAS database format according to your configuration in ``input_workflow.xml``.
+Hybrid mode uses MUSCLE3 for the driver-to-workflow boundary:
 
-Next Steps
+.. code-block:: bash
+
+   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+
+The topology is:
+
+.. code-block:: text
+
+   workflow_driver.py  <->  hcd_workflow_m3.py  ->  iWrap actors
+
+Run a Pure M3 Case
+-------------------------------
+
+Pure mode can be launched either through ``run.sh pure`` or directly through
+MUSCLE3. The runner defaults to the maintained full actor-level topology:
+
+.. code-block:: bash
+
+   ./run.sh pure
+
+The equivalent direct MUSCLE3 command is:
+
+.. code-block:: bash
+
+   muscle_manager --start-all test_m3_pure.ymmsl
+
+The Pure topology is:
+
+.. code-block:: text
+
+   driver -> torbeam_m3.exe -> waves_ec
+   driver -> cyrano_m3.exe  -> waves_ic
+   driver -> merge_waves_m3.exe -> waves
+   driver -> fopla_m3.exe -> distributions
+   driver -> hcd2core_sources_m3.exe -> core_sources
+
+Pure mode currently skips Cyrano, FoPla, and IC wave merging automatically when
+the IC launched power is zero.
+
+Inspect Results
+---------------
+
+Output is written to the IMAS run specified by ``input_workflow.xml``. Use the
+configured database, backend, shot, and output run when inspecting results with
+IMAS-Python or SDCC tools such as IDStools.
+
+Next Pages
 ----------
 
-* Learn about :doc:`usage` for detailed command options
-* See :doc:`examples` for more complex workflows
-* Read :doc:`/reference/configuration` to customize your simulations
+* :doc:`execution_modes` explains what the three modes do.
+* :doc:`validation` records what has been tested.
+* :doc:`../developer/troubleshooting` lists common failure modes.

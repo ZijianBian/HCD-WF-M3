@@ -55,6 +55,7 @@ class HCDWorkflow(WorkflowBase):
             self.workflowData.algorithms,
             self.workflowData.parallel_dependency_list,
             self.workflowData.merge_actor_list,
+            config_folder_path=getattr(self.workflowData, "workflowConfigPath", None),
         )
         err = hcd_wf.execute()
         if err < 0:
@@ -116,23 +117,21 @@ class HCDWorkflow(WorkflowBase):
                 self.workflowData.process_bundle[process]["status"] = 1
 
     def _getIDSes(self):
-        # ------------------------------
-        # COMMON BUNDLE TO SAVE TO DISK
-        # ------------------------------
         idsOut = {}
-
-        # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
         for process in self.workflowData.process_bundle.keys():
             if "merge_" in process:
                 key, value = list(self.workflowData.process_bundle[process]["output"].items())[0]
+                # Skip empty dict placeholders from unexecuted mergers
+                if isinstance(value, dict):
+                    continue
                 idsOut[key] = value
-
-        # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
         for process in self.workflowData.process_bundle.keys():
             for key, value in self.workflowData.process_bundle[process]["output"].items():
                 if key not in idsOut.keys():
+                    # Skip empty dict placeholders
+                    if isinstance(value, dict):
+                        continue
                     idsOut[key] = value
-
         return idsOut
 
     def finalize(self):

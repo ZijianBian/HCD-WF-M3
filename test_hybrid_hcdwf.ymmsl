@@ -1,0 +1,83 @@
+ymmsl_version: v0.1
+model:
+  name: hcd_workflow_hybrid
+  components:
+    # === MACRO: Workflow Driver ===
+    # Time loop, database I/O, M3 send/receive.
+    workflow_driver:
+      implementation: workflow_driver_impl
+      ports:
+        o_i:
+          - equilibrium_out
+          - core_profiles_out
+          - workflow_out
+          - ec_launchers_out
+          - ic_antennas_out
+          - core_sources_out
+          - distributions_out
+          - distribution_sources_out
+        s:
+          - core_sources_in
+          - waves_in
+          - core_profiles_in
+          - distributions_in
+
+    # === MICRO: HCD Workflow ===
+    # Receives IDS, runs HCDWorkflow.run() with iWrap actors internally.
+    # Torbeam, hcd2core_sources, etc. are invisible to M3.
+    hcd_workflow:
+      implementation: hcd_workflow_impl
+      ports:
+        f_init:
+          - equilibrium_in
+          - core_profiles_in
+          - workflow_in
+          - ec_launchers_in
+          - ic_antennas_in
+          - core_sources_in
+          - distributions_in
+          - distribution_sources_in
+        o_f:
+          - core_sources_out
+          - waves_out
+          - core_profiles_out
+          - distributions_out
+
+  conduits:
+    # macro O_I  →  micro F_INIT
+    workflow_driver.equilibrium_out: hcd_workflow.equilibrium_in
+    workflow_driver.core_profiles_out: hcd_workflow.core_profiles_in
+    workflow_driver.workflow_out: hcd_workflow.workflow_in
+    workflow_driver.ec_launchers_out: hcd_workflow.ec_launchers_in
+    workflow_driver.ic_antennas_out: hcd_workflow.ic_antennas_in
+    workflow_driver.core_sources_out: hcd_workflow.core_sources_in
+    workflow_driver.distributions_out: hcd_workflow.distributions_in
+    workflow_driver.distribution_sources_out: hcd_workflow.distribution_sources_in
+
+    # micro O_F  →  macro S
+    hcd_workflow.core_sources_out: workflow_driver.core_sources_in
+    hcd_workflow.waves_out: workflow_driver.waves_in
+    hcd_workflow.core_profiles_out: workflow_driver.core_profiles_in
+    hcd_workflow.distributions_out: workflow_driver.distributions_in
+
+settings:
+  config_folder_path: "tests/m3_hybrid"
+
+resources:
+  workflow_driver:
+    threads: 1
+  hcd_workflow:
+    threads: 1
+
+implementations:
+  workflow_driver_impl:
+    executable: python3
+    args:
+      - "workflow/workflow_driver.py"
+      - "tests/m3_hybrid"
+      - "1"
+  hcd_workflow_impl:
+    executable: python3
+    args:
+      - "hcdworkflow/hcd_workflow_m3.py"
+      - "tests/m3_hybrid"
