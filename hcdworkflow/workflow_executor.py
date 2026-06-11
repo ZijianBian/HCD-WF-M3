@@ -1,14 +1,28 @@
 import collections
 import copy
+import os
 import sys
+
+import imas
 
 from tools.hcd_tools import is_ec_on, is_ic_on, is_lh_on, is_nbi_on
 from tools.stdout_redirector import redirect_stdout, stdout_back
+
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 
 def _ensure_ids_name(ids_obj, name):
     if not hasattr(ids_obj, "__name__"):
         object.__setattr__(ids_obj, "__name__", name)
+
+
+def _create_ids(ids_name):
+    if hasattr(imas, "IDSFactory"):
+        return getattr(imas.IDSFactory(), ids_name)()
+    return getattr(imas, ids_name)()
 
 
 class WorkflowExecutor:
@@ -22,6 +36,7 @@ class WorkflowExecutor:
         algorithm,
         parallel_dependency_list,
         merge_actor_list,
+        config_folder_path=None,
     ) -> None:
         self.process_bundle = process_bundle
         self.dictionary_of_actors = dictionary_of_actors
@@ -31,9 +46,112 @@ class WorkflowExecutor:
         self.algorithm = algorithm
         self.parallel_dependency_list = parallel_dependency_list
         self.merge_actor_list = merge_actor_list
+        self.config_folder_path = config_folder_path
+        self.ic_toroidal_modes = self._load_ic_toroidal_modes(config_folder_path)
+
+    def _reset_runtime_state(self):
+        """Drop IDS products and dynamic mergers left from the previous slice."""
+        for process in list(self.process_bundle):
+            if process.startswith("merge_"):
+                del self.process_bundle[process]
+
+        generated_inputs = {"waves"}
+        generated_outputs = {"waves", "distributions", "distribution_sources", "core_sources"}
+        for bundle in self.process_bundle.values():
+            inputs = bundle.get("input")
+            if isinstance(inputs, dict):
+                for ids_name in generated_inputs:
+                    if ids_name in inputs:
+                        inputs[ids_name] = _create_ids(ids_name)
+                        _ensure_ids_name(inputs[ids_name], ids_name)
+
+            outputs = bundle.get("output")
+            if isinstance(outputs, dict):
+                for ids_name in generated_outputs:
+                    if ids_name in outputs:
+                        outputs[ids_name] = _create_ids(ids_name)
+                        _ensure_ids_name(outputs[ids_name], ids_name)
+
+    def _load_ic_toroidal_modes(self, config_folder_path):
+        """Read optional per-mode CYRANO settings from ic_toroidal_modes.yaml."""
+        if yaml is None or not config_folder_path:
+            return []
+        path = os.path.join(config_folder_path, "ic_toroidal_modes.yaml")
+        if not os.path.exists(path):
+            return []
+        with open(path, "r", encoding="utf-8") as file_obj:
+            data = yaml.safe_load(file_obj) or {}
+        if data.get("enabled", True) is False:
+            return []
+
+        raw_modes = data.get("modes", [])
+        modes = []
+        for entry in raw_modes:
+            try:
+                n_phi = int(entry["n_phi"])
+                weight = float(entry.get("weight", 1.0))
+            except (TypeError, ValueError, KeyError):
+                continue
+            if weight > 0.0:
+                modes.append({"n_phi": n_phi, "weight": weight})
+
+        total_weight = sum(mode["weight"] for mode in modes)
+        if total_weight <= 0.0:
+            return []
+        for mode in modes:
+            mode["weight"] = mode["weight"] / total_weight
+        return modes
+
+    def _should_run_ic_toroidal_modes(self, process, actor):
+        if process != "ic_wave_solver" or len(self.ic_toroidal_modes) < 1:
+            return False
+        try:
+            code = self.catdict[process][self.param_process[process]]["name"]
+        except Exception:
+            return False
+        return code == "cyrano" and hasattr(actor, "get_code_parameters")
+
+    def _set_cyrano_ntor(self, actor, n_phi):
+        code_parameters = actor.get_code_parameters()
+        code_parameters.set_parameter(
+            "parameters/input_cyrano/overwrite_params/RF/Ntor",
+            str(int(n_phi)),
+        )
+
+    def _execute_ic_toroidal_modes(self, process, actor, bundle, parameters):
+        from workflow.ids_prep import merge_ic_wave_modes
+
+        mode_waves = []
+        mode_numbers = []
+        mode_weights = []
+        print(
+            "  CYRANO toroidal modes:",
+            [(mode["n_phi"], mode["weight"]) for mode in self.ic_toroidal_modes],
+            file=sys.stdout,
+        )
+        for mode in self.ic_toroidal_modes:
+            n_phi = int(mode["n_phi"])
+            self._set_cyrano_ntor(actor, n_phi)
+            print(f"  -> CYRANO Ntor={n_phi}", file=sys.stdout)
+            result = self.executeProcess(
+                process,
+                actor,
+                copy.deepcopy(bundle),
+                parameters,
+            )
+            if hasattr(result, "__len__") and not hasattr(result, "ids_properties"):
+                waves = result[0]
+            else:
+                waves = result
+            mode_waves.append(waves)
+            mode_numbers.append(n_phi)
+            mode_weights.append(float(mode["weight"]))
+
+        return merge_ic_wave_modes(mode_waves, mode_numbers, mode_weights)
 
     def execute(self):
         print("Execute H&CD workflow for current time slice", file=sys.stdout)
+        self._reset_runtime_state()
         err = self.validateAndUpdateProcessBundle()
         if err is not None and err < 0:
             print("  Skipping time slice due to validation error", file=sys.stderr)
@@ -279,12 +397,20 @@ class WorkflowExecutor:
                             "core_profiles"
                         ].time
                 if self.process_bundle[process]["status"] == 1:
-                    output_ids_data = self.executeProcess(
-                        process,
-                        actor,
-                        self.process_bundle[process]["input"],
-                        self.param_process,
-                    )
+                    if self._should_run_ic_toroidal_modes(process, actor):
+                        output_ids_data = self._execute_ic_toroidal_modes(
+                            process,
+                            actor,
+                            self.process_bundle[process]["input"],
+                            self.param_process,
+                        )
+                    else:
+                        output_ids_data = self.executeProcess(
+                            process,
+                            actor,
+                            self.process_bundle[process]["input"],
+                            self.param_process,
+                        )
                     if process == "equilibrium_solver":
                         for proc in self.process_bundle:
                             self.process_bundle[proc]["input"]["equilibrium"] = output_ids_data

@@ -55,6 +55,7 @@ class HCDWorkflow(WorkflowBase):
             self.workflowData.algorithms,
             self.workflowData.parallel_dependency_list,
             self.workflowData.merge_actor_list,
+            config_folder_path=getattr(self.workflowData, "workflowConfigPath", None),
         )
         err = hcd_wf.execute()
         if err < 0:

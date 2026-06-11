@@ -56,9 +56,9 @@ model:
     torbeam.waves_out:         driver.waves_in
 
 settings:
-  config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+  config_folder_path: "tests/m3_hybrid"
   extra_cooking: false
-  torbeam.code_parameters: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/ECRH/ec_wave_solver/input_torbeam.xml"
+  torbeam.code_parameters: "tests/m3_hybrid/ECRH/ec_wave_solver/input_torbeam.xml"
 
 resources:
   driver:
@@ -68,10 +68,13 @@ resources:
 
 implementations:
   driver_impl:
-    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/devenv/bin/python
+    executable: python3
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/workflow_driver_m3_direct.py"
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+      - "hcdworkflow/workflow_driver_m3_direct.py"
+      - "tests/m3_hybrid"
 
   torbeam_impl:
-    executable: /home/ITER/bianz/public/PYTHON_ACTORS/torbeam/torbeam_m3.exe
+    executable: bash
+    args:
+      - "-lc"
+      - 'exec "$ACTOR_FOLDER/torbeam/torbeam_m3.exe"'

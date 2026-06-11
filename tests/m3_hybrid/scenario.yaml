@@ -5,7 +5,7 @@
 # ITER DT baseline (old baseline)
 shot:                134173
 run_in:              106
-input_user_or_path:  bianz
+input_user_or_path:  public
 input_database:      ITER
 time_slice:          200 #15
 scenario_backend:    HDF5

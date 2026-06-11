@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
   <workflow_parameters display="Workflow parameters (standalone)">
-    <input_user_or_path display="Input user or path">sawantp1</input_user_or_path>
+    <input_user_or_path display="Input user or path">public</input_user_or_path>
     <input_database display="Input database">ITER</input_database>
     <input_backend  display="Input backend">MDSPLUS</input_backend>
     <shot_nr display="Input shot">114101</shot_nr>

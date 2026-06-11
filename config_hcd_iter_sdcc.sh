@@ -38,15 +38,19 @@ module load XMLlib INTERPOS
 # ------------------------------------------------
 module load Waveform-Cooker/1.6.0-GCCcore-13.2.0
 
-# Local override (recommended)
-export PYTHONPATH=/home/ITER/schneim/public/git/waveform-cooker:$PYTHONPATH
-export EBROOTWAVEFORMMINCOOKER=/home/ITER/schneim/public/git/waveform-cooker
+# Optional local override. Leave unset to use the module-provided installation.
+if [[ -n "${HCDWF_WAVEFORM_COOKER:-}" ]]; then
+    export PYTHONPATH="${HCDWF_WAVEFORM_COOKER}:$PYTHONPATH"
+    export EBROOTWAVEFORMMINCOOKER="${HCDWF_WAVEFORM_COOKER}"
+fi
 
 # ------------------------------------------------
 # 5. Local iWrap (develop branch)
 # ------------------------------------------------
-export PATH=/home/ITER/schneim/public/git/iwrap/bin:$PATH
-export PYTHONPATH=/home/ITER/schneim/public/git/iwrap/python:$PYTHONPATH
+if [[ -n "${HCDWF_IWRAP_ROOT:-}" ]]; then
+    export PATH="${HCDWF_IWRAP_ROOT}/bin:$PATH"
+    export PYTHONPATH="${HCDWF_IWRAP_ROOT}/python:$PYTHONPATH"
+fi
 
 # ------------------------------------------------
 # 6. IMAS settings
@@ -55,10 +59,13 @@ export IMAS_AL_DISABLE_VALIDATE=1
 
 # ------------------------------------------------
 # 7. Actor and sandbox paths
-#    (previously only in run_env_hybrid.sh)
 # ------------------------------------------------
-export ACTOR_FOLDER=/home/ITER/bianz/public/PYTHON_ACTORS
-export HCD_SANDBOX=/home/ITER/bianz/public/git/repository/hcd-wf-sandbox
+if [[ -z "${HCD_SANDBOX:-}" ]]; then
+    HCD_SANDBOX="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+export HCD_SANDBOX
+
+export ACTOR_FOLDER="${ACTOR_FOLDER:-${HCD_SANDBOX}/PYTHON_ACTORS}"
 
 export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
 export PYTHONPATH=$HCD_SANDBOX:$PYTHONPATH
@@ -81,14 +88,18 @@ fi
 
 source "$VENV_DIR/bin/activate"
 
-pip install --upgrade pip --quiet
+if [[ "${HCDWF_SKIP_PIP_INSTALL:-0}" == "1" ]]; then
+    echo "Skipping pip install steps (HCDWF_SKIP_PIP_INSTALL=1)"
+else
+    pip install --upgrade pip --quiet
 
-# Install MUSCLE3 if missing
-python3 -c "import libmuscle" 2>/dev/null || pip install muscle3 --quiet
+    # Install MUSCLE3 if missing
+    python3 -c "import libmuscle" 2>/dev/null || pip install muscle3 --quiet
 
-# Install HCD workflow if in repo
-if [[ -f "setup.py" || -f "pyproject.toml" ]]; then
-    pip install -e . --quiet
+    # Install HCD workflow if in repo
+    if [[ -f "setup.py" || -f "pyproject.toml" ]]; then
+        pip install -e . --quiet
+    fi
 fi
 
 # ------------------------------------------------

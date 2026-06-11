@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
   <workflow_parameters display="Workflow parameters (standalone)">
-    <input_user_or_path display="Input user or path">bianz</input_user_or_path>
+    <input_user_or_path display="Input user or path">public</input_user_or_path>
     <input_database display="Input database">ITER</input_database>
     <input_backend display="Input backend">HDF5</input_backend>
     <ddv_backend display="Input DD version (3 or 4)">4</ddv_backend>
@@ -11,8 +11,8 @@
     <output_database display="Output database">default</output_database>
     <output_backend display="Output backend">HDF5</output_backend>
     <run_out display="Output run">101</run_out>
-    <tbegin display="Start Time [s]">70.0</tbegin>
-    <tend display="End Time   [s]">150.0</tend>
+    <tbegin display="Start Time [s]">20.0</tbegin>
+    <tend display="End Time   [s]">120.0</tend>
     <dt_required display="Time Step  [s]">20</dt_required>
     <parallel_workflow display="Parallel workflow [0-1]">0</parallel_workflow> 
     <one_time_slice display="Single time slice [0-1]">0</one_time_slice>  
@@ -61,5 +61,3 @@
     </post_process>
 
   </actor_selection>
-
-</root>

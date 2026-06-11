@@ -26,6 +26,11 @@ import imas
 import numpy as np
 
 try:
+    import yaml
+except ImportError:
+    yaml = None
+
+try:
     from scipy.ndimage import gaussian_filter
 except ImportError:
     gaussian_filter = None
@@ -232,7 +237,7 @@ def _fixup_core_profiles(cp):
 def _eq_fill_psi_axis(ts):
     """Fill psi_axis from profiles_1d.psi[0] when missing (CHEASE/DINA workaround).
 
-    Some scenarios (e.g. ITER 105102) leave global_quantities.psi_axis as the
+    Some ITER scenarios leave global_quantities.psi_axis as the
     IMAS empty sentinel (-9e+40). Downstream code (including _compute_bax and
     Cyrano's axis-side f-profile picker) compares it against profiles_1d.psi
     to decide which end is the axis; with the sentinel the comparison is
@@ -420,6 +425,73 @@ def _eq_compute_r_outboard_inboard(ts):
         print(f"  [equilibrium] WARNING: Could not compute r_outboard/r_inboard: {e}", flush=True)
 
 
+def _eq_fill_rho_tor_from_flux(eq, ts):
+    """Fill profiles_1d.rho_tor from toroidal flux when only rho_norm exists.
+
+    FoPla's input writer expects the dimensional toroidal-flux radius. Some
+    Some ITER equilibrium slices provide rho_tor_norm and phi, but leave
+    rho_tor empty; the derived radius follows the IMAS toroidal-flux
+    definition and uses |B0| so the sign convention of phi/B0 is harmless.
+    """
+    if not hasattr(ts, 'profiles_1d'):
+        return
+
+    p1d = ts.profiles_1d
+    try:
+        if p1d.rho_tor.has_value and len(p1d.rho_tor) > 0:
+            return
+    except Exception:
+        try:
+            if len(p1d.rho_tor) > 0:
+                return
+        except Exception:
+            pass
+
+    if not (
+        getattr(p1d.rho_tor_norm, 'has_value', False)
+        and len(p1d.rho_tor_norm) > 0
+        and getattr(p1d.phi, 'has_value', False)
+        and len(p1d.phi) > 0
+        and getattr(eq.vacuum_toroidal_field.b0, 'has_value', False)
+        and len(eq.vacuum_toroidal_field.b0) > 0
+    ):
+        return
+
+    try:
+        rho_norm = np.asarray(p1d.rho_tor_norm, dtype=float)
+        phi = np.asarray(p1d.phi, dtype=float)
+        b0 = abs(float(np.asarray(eq.vacuum_toroidal_field.b0, dtype=float).ravel()[0]))
+
+        if rho_norm.size == 0 or phi.size != rho_norm.size or not np.isfinite(b0) or b0 <= 0:
+            return
+
+        finite_phi = np.isfinite(phi) & (np.abs(phi) < 1.e35)
+        if not np.any(finite_phi):
+            return
+
+        phi_axis = phi[0] if finite_phi[0] else phi[np.where(finite_phi)[0][0]]
+        delta_phi = np.abs(phi - phi_axis)
+        rho_tor = np.sqrt(np.maximum(delta_phi, 0.0) / (np.pi * b0))
+
+        if (
+            np.any(~np.isfinite(rho_tor))
+            or not np.isfinite(rho_tor[-1])
+            or rho_tor[-1] <= 0.0
+            or np.any(np.diff(rho_tor) < -1.e-8)
+        ):
+            edge_delta_phi = np.nanmax(delta_phi[finite_phi])
+            if not np.isfinite(edge_delta_phi) or edge_delta_phi <= 0.0:
+                return
+            rho_tor_edge = np.sqrt(edge_delta_phi / (np.pi * b0))
+            rho_tor = rho_norm * rho_tor_edge
+
+        p1d.rho_tor = rho_tor
+        print(f"  [equilibrium] Filled rho_tor from toroidal flux for FoPla "
+              f"({rho_tor.size} points, edge={rho_tor[-1]:.4g} m)", flush=True)
+    except Exception as e:
+        print(f"  [equilibrium] WARNING: Could not fill rho_tor from flux: {e}", flush=True)
+
+
 def _fixup_equilibrium(eq):
     """Apply manual fix-ups for equilibrium IDS.
 
@@ -443,6 +515,7 @@ def _fixup_equilibrium(eq):
     _eq_fill_vacuum_field(eq, ts)
     _eq_complete_triangularity(ts)
     _eq_compute_r_outboard_inboard(ts)
+    _eq_fill_rho_tor_from_flux(eq, ts)
 
     return eq
 
@@ -617,6 +690,319 @@ def _safe_len(value):
         return len(value)
     except Exception:
         return 0
+
+
+def _numeric_array_or_none(obj, field_name):
+    try:
+        value = getattr(obj, field_name)
+    except Exception:
+        return None
+    try:
+        if getattr(value, "has_value", True) is False:
+            return None
+    except Exception:
+        pass
+    try:
+        arr = np.asarray(value)
+        if arr.dtype.kind not in "biufc":
+            return None
+        return arr
+    except Exception:
+        try:
+            return np.asarray(float(value))
+        except Exception:
+            return None
+
+
+def _set_array_or_scalar(obj, field_name, value):
+    try:
+        arr = np.asarray(value)
+        if arr.shape == ():
+            setattr(obj, field_name, float(arr))
+        else:
+            setattr(obj, field_name, arr)
+    except Exception:
+        pass
+
+
+def _weighted_sum_field(target, sources, field_name, weights):
+    arrays = [_numeric_array_or_none(source, field_name) for source in sources]
+    if any(arr is None for arr in arrays):
+        return
+    result = np.zeros_like(arrays[0], dtype=float)
+    for weight, arr in zip(weights, arrays):
+        result = result + float(weight) * np.asarray(arr, dtype=float)
+    _set_array_or_scalar(target, field_name, result)
+
+
+def _mode_axis(arr):
+    arr = np.asarray(arr)
+    for axis, size in enumerate(arr.shape):
+        if size == 1:
+            return axis
+    return 0
+
+
+def _single_mode_slice(arr, axis):
+    arr = np.asarray(arr)
+    if arr.shape == ():
+        return arr
+    if arr.shape[axis] == 1:
+        return np.take(arr, 0, axis=axis)
+    return arr
+
+
+def _mode_stack_field(target, sources, field_name, weights, scale=True):
+    arrays = [_numeric_array_or_none(source, field_name) for source in sources]
+    if any(arr is None for arr in arrays):
+        return
+    first = np.asarray(arrays[0])
+    if first.shape == ():
+        values = [
+            (float(weight) if scale else 1.0) * float(np.asarray(arr))
+            for weight, arr in zip(weights, arrays)
+        ]
+        setattr(target, field_name, np.asarray(values, dtype=float))
+        return
+
+    axis = _mode_axis(first)
+    slices = []
+    for weight, arr in zip(weights, arrays):
+        mode_data = np.asarray(_single_mode_slice(arr, axis), dtype=float)
+        if scale:
+            mode_data = float(weight) * mode_data
+        slices.append(mode_data)
+    try:
+        setattr(target, field_name, np.stack(slices, axis=axis))
+    except Exception:
+        pass
+
+
+def _merge_particle_power(target, sources, weights):
+    for field_name in (
+        "power_thermal",
+        "power_density_thermal",
+        "power_inside_thermal",
+    ):
+        _weighted_sum_field(target, sources, field_name, weights)
+    for field_name in (
+        "power_thermal_n_phi",
+        "power_density_thermal_n_phi",
+        "power_inside_thermal_n_phi",
+    ):
+        _mode_stack_field(target, sources, field_name, weights, scale=True)
+
+
+def _merge_e_field_components(target_component, source_components, weight):
+    for field_name in ("amplitude", "phase"):
+        arr = _numeric_array_or_none(source_components, field_name)
+        if arr is None:
+            continue
+        if field_name == "amplitude":
+            arr = np.sqrt(float(weight)) * np.asarray(arr, dtype=float)
+        _set_array_or_scalar(target_component, field_name, arr)
+
+
+def _merge_e_field_n_phi(target_aos, source_aos_list, weights):
+    try:
+        target_aos.resize(len(source_aos_list))
+    except Exception:
+        return
+    for idx, (source_aos, weight) in enumerate(zip(source_aos_list, weights)):
+        if _safe_len(source_aos) == 0:
+            continue
+        source_field = source_aos[0]
+        target_field = target_aos[idx]
+        for component_name in ("plus", "minus", "parallel"):
+            try:
+                _merge_e_field_components(
+                    getattr(target_field, component_name),
+                    getattr(source_field, component_name),
+                    weight,
+                )
+            except Exception:
+                pass
+
+
+def _merge_wave_global_quantities(target_gq, source_gqs, n_phi, weights):
+    target_gq.n_phi = n_phi
+    for field_name in ("power", "current_phi"):
+        _weighted_sum_field(target_gq, source_gqs, field_name, weights)
+    _mode_stack_field(target_gq, source_gqs, "power_n_phi", weights, scale=True)
+    _mode_stack_field(target_gq, source_gqs, "current_phi_n_phi", weights, scale=True)
+
+    try:
+        _merge_particle_power(
+            target_gq.electrons,
+            [source.electrons for source in source_gqs],
+            weights,
+        )
+    except Exception:
+        pass
+
+    try:
+        n_ion = min(_safe_len(target_gq.ion), *[_safe_len(source.ion) for source in source_gqs])
+    except Exception:
+        n_ion = 0
+    for ion_index in range(n_ion):
+        _merge_particle_power(
+            target_gq.ion[ion_index],
+            [source.ion[ion_index] for source in source_gqs],
+            weights,
+        )
+
+
+def _merge_wave_profiles_1d(target_p1d, source_p1ds, n_phi, weights):
+    target_p1d.n_phi = n_phi
+    for field_name in (
+        "power_density",
+        "power_inside",
+        "current_parallel_density",
+        "current_phi_inside",
+    ):
+        _weighted_sum_field(target_p1d, source_p1ds, field_name, weights)
+    for field_name in (
+        "power_density_n_phi",
+        "power_inside_n_phi",
+        "current_parallel_density_n_phi",
+        "current_phi_inside_n_phi",
+    ):
+        _mode_stack_field(target_p1d, source_p1ds, field_name, weights, scale=True)
+    _mode_stack_field(target_p1d, source_p1ds, "k_perpendicular", weights, scale=False)
+
+    try:
+        _merge_particle_power(
+            target_p1d.electrons,
+            [source.electrons for source in source_p1ds],
+            weights,
+        )
+    except Exception:
+        pass
+
+    try:
+        n_ion = min(_safe_len(target_p1d.ion), *[_safe_len(source.ion) for source in source_p1ds])
+    except Exception:
+        n_ion = 0
+    for ion_index in range(n_ion):
+        _merge_particle_power(
+            target_p1d.ion[ion_index],
+            [source.ion[ion_index] for source in source_p1ds],
+            weights,
+        )
+
+    _merge_e_field_n_phi(
+        target_p1d.e_field_n_phi,
+        [source.e_field_n_phi for source in source_p1ds],
+        weights,
+    )
+
+
+def _merge_wave_profiles_2d(target_p2d, source_p2ds, n_phi, weights):
+    target_p2d.n_phi = n_phi
+    _weighted_sum_field(target_p2d, source_p2ds, "power_density", weights)
+    _mode_stack_field(target_p2d, source_p2ds, "power_density_n_phi", weights, scale=True)
+
+    try:
+        _weighted_sum_field(
+            target_p2d.electrons,
+            [source.electrons for source in source_p2ds],
+            "power_density_thermal",
+            weights,
+        )
+        _mode_stack_field(
+            target_p2d.electrons,
+            [source.electrons for source in source_p2ds],
+            "power_density_thermal_n_phi",
+            weights,
+            scale=True,
+        )
+    except Exception:
+        pass
+
+    try:
+        n_ion = min(_safe_len(target_p2d.ion), *[_safe_len(source.ion) for source in source_p2ds])
+    except Exception:
+        n_ion = 0
+    for ion_index in range(n_ion):
+        _weighted_sum_field(
+            target_p2d.ion[ion_index],
+            [source.ion[ion_index] for source in source_p2ds],
+            "power_density_thermal",
+            weights,
+        )
+        _mode_stack_field(
+            target_p2d.ion[ion_index],
+            [source.ion[ion_index] for source in source_p2ds],
+            "power_density_thermal_n_phi",
+            weights,
+            scale=True,
+        )
+
+    _merge_e_field_n_phi(
+        target_p2d.e_field_n_phi,
+        [source.e_field_n_phi for source in source_p2ds],
+        weights,
+    )
+
+
+def merge_ic_wave_modes(mode_waves, n_phi_values, weights):
+    """Merge single-mode CYRANO `waves` outputs into one IC coherent-wave slot.
+
+    CYRANO is run once per toroidal mode at the full slice power. This helper
+    performs the incoherent power/current sum by scaling each single-mode
+    output by its normalized weight, while preserving per-mode diagnostics on
+    the `n_phi` sub-axis.
+    """
+    if not mode_waves:
+        raise ValueError("mode_waves must contain at least one waves IDS")
+    if len(mode_waves) != len(n_phi_values) or len(mode_waves) != len(weights):
+        raise ValueError("mode_waves, n_phi_values and weights must have the same length")
+
+    weights = np.asarray(weights, dtype=float)
+    total_weight = float(weights.sum())
+    if total_weight <= 0.0:
+        raise ValueError("mode weights must sum to a positive value")
+    weights = weights / total_weight
+    n_phi = np.asarray(n_phi_values, dtype=np.int32)
+
+    merged = copy.deepcopy(mode_waves[0])
+    try:
+        merged.ids_properties.homogeneous_time = 1
+    except Exception:
+        pass
+
+    source_waves = [waves.coherent_wave[0] for waves in mode_waves]
+    try:
+        merged.coherent_wave.resize(1, keep=True)
+    except Exception:
+        pass
+    target_wave = merged.coherent_wave[0]
+
+    if _safe_len(target_wave.global_quantities) and all(_safe_len(w.global_quantities) for w in source_waves):
+        _merge_wave_global_quantities(
+            target_wave.global_quantities[0],
+            [wave.global_quantities[0] for wave in source_waves],
+            n_phi,
+            weights,
+        )
+
+    if _safe_len(target_wave.profiles_1d) and all(_safe_len(w.profiles_1d) for w in source_waves):
+        _merge_wave_profiles_1d(
+            target_wave.profiles_1d[0],
+            [wave.profiles_1d[0] for wave in source_waves],
+            n_phi,
+            weights,
+        )
+
+    if _safe_len(target_wave.profiles_2d) and all(_safe_len(w.profiles_2d) for w in source_waves):
+        _merge_wave_profiles_2d(
+            target_wave.profiles_2d[0],
+            [wave.profiles_2d[0] for wave in source_waves],
+            n_phi,
+            weights,
+        )
+
+    return merged
 
 
 def _set_code(code_obj, name=None, index=None):
@@ -857,12 +1243,44 @@ def _n_phi_values(waves=None, config_folder_path=None):
         if shape:
             return np.zeros(shape[0], dtype=np.int32)
 
+    configured_n_phi = _configured_toroidal_n_phi_values(config_folder_path)
+    if configured_n_phi is not None:
+        return configured_n_phi
+
     ntor = _xml_int(config_folder_path, "ICRH/ic_wave_solver/input_cyrano.xml", "Ntor", 0)
     if ntor:
         # Accept any nonzero Ntor, including negative single toroidal modes
         # (e.g. Ntor=-35) so symmetric/negative-n spectra are not lost.
         return np.array([ntor], dtype=np.int32)
     return np.zeros(1, dtype=np.int32)
+
+
+def _configured_toroidal_n_phi_values(config_folder_path):
+    if yaml is None or not config_folder_path:
+        return None
+    path = os.path.join(config_folder_path, "ic_toroidal_modes.yaml")
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as file_obj:
+            data = yaml.safe_load(file_obj) or {}
+    except Exception:
+        return None
+    if data.get("enabled", True) is False:
+        return None
+
+    values = []
+    for mode in data.get("modes", []):
+        try:
+            weight = float(mode.get("weight", 1.0))
+            n_phi = int(mode["n_phi"])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if weight > 0.0:
+            values.append(n_phi)
+    if not values:
+        return None
+    return np.asarray(values, dtype=np.int32)
 
 
 def _n_phi_values_for_wave(coherent_wave):

@@ -61,7 +61,7 @@ model:
     hcd_workflow.distributions_out: workflow_driver.distributions_in
 
 settings:
-  config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+  config_folder_path: "tests/m3_hybrid"
 
 resources:
   workflow_driver:
@@ -73,11 +73,11 @@ implementations:
   workflow_driver_impl:
     executable: python3
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/workflow/workflow_driver.py"
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+      - "workflow/workflow_driver.py"
+      - "tests/m3_hybrid"
       - "1"
   hcd_workflow_impl:
     executable: python3
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/hcd_workflow_m3.py"
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+      - "hcdworkflow/hcd_workflow_m3.py"
+      - "tests/m3_hybrid"

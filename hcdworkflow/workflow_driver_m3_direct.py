@@ -22,7 +22,7 @@ Actor protocol:
     target power even when the IC launched waveform is off.
 
 Usage (launched by MUSCLE3 Manager via ymmsl):
-    muscle_manager --start-all test_m3_pure_torbeam.ymmsl
+    muscle_manager --start-all path/to/pure_case.ymmsl
 """
 
 import os

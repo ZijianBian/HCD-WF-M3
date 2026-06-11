@@ -115,12 +115,12 @@ model:
     hcd2core_sources.core_sources_out:    driver.core_sources_in
 
 settings:
-  config_folder_path: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+  config_folder_path: "tests/m3_hybrid"
   extra_cooking: false
 
-  torbeam.code_parameters:          "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/ECRH/ec_wave_solver/input_torbeam.xml"
-  cyrano.code_parameters:           "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/ICRH/ic_wave_solver/input_cyrano.xml"
-  hcd2core_sources.code_parameters: "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid/source/fill_core_sources/input_hcd2core_sources.xml"
+  torbeam.code_parameters:          "tests/m3_hybrid/ECRH/ec_wave_solver/input_torbeam.xml"
+  cyrano.code_parameters:           "tests/m3_hybrid/ICRH/ic_wave_solver/input_cyrano.xml"
+  hcd2core_sources.code_parameters: "tests/m3_hybrid/source/fill_core_sources/input_hcd2core_sources.xml"
 
 resources:
   driver:           { threads: 1 }
@@ -130,16 +130,25 @@ resources:
 
 implementations:
   driver_impl:
-    executable: /home/ITER/bianz/public/git/repository/hcd-wf-sandbox/devenv/bin/python
+    executable: python3
     args:
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/hcdworkflow/workflow_driver_m3_direct.py"
-      - "/home/ITER/bianz/public/git/repository/hcd-wf-sandbox/tests/m3_hybrid"
+      - "hcdworkflow/workflow_driver_m3_direct.py"
+      - "tests/m3_hybrid"
 
   torbeam_impl:
-    executable: /home/ITER/bianz/public/PYTHON_ACTORS/torbeam/torbeam_m3.exe
+    executable: bash
+    args:
+      - "-lc"
+      - 'exec "$ACTOR_FOLDER/torbeam/torbeam_m3.exe"'
 
   cyrano_impl:
-    executable: /home/ITER/bianz/public/PYTHON_ACTORS/cyrano/cyrano_m3.exe
+    executable: bash
+    args:
+      - "-lc"
+      - 'exec "$ACTOR_FOLDER/cyrano/cyrano_m3.exe"'
 
   hcd2core_sources_impl:
-    executable: /home/ITER/bianz/public/PYTHON_ACTORS/hcd2core_sources/hcd2core_sources_m3.exe
+    executable: bash
+    args:
+      - "-lc"
+      - 'exec "$ACTOR_FOLDER/hcd2core_sources/hcd2core_sources_m3.exe"'

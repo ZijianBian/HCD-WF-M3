@@ -146,12 +146,13 @@ module load MUSCLE3 XMLlib INTERPOS
 # Waveform Cooker
 module load Waveform-Cooker/1.6.0-GCCcore-13.2.0
 
-# iWrap (develop branch)
-export PATH=/home/ITER/schneim/public/git/iwrap/bin:$PATH
-export PYTHONPATH=/home/ITER/schneim/public/git/iwrap/python:$PYTHONPATH
+# iWrap (optional local develop checkout)
+export HCDWF_IWRAP_ROOT=/path/to/iwrap
+export PATH=$HCDWF_IWRAP_ROOT/bin:$PATH
+export PYTHONPATH=$HCDWF_IWRAP_ROOT/python:$PYTHONPATH
 
 # Actor and sandbox paths
-export ACTOR_FOLDER=/home/ITER/<user>/public/PYTHON_ACTORS
+export ACTOR_FOLDER=/path/to/PYTHON_ACTORS
 export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
 export PYTHONPATH=$(pwd):$PYTHONPATH
 
