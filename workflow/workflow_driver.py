@@ -76,6 +76,32 @@ def _waveform_ids_name(file_path):
         return None
 
 
+def _waveform_config_paths(config_folder_path):
+    """Resolve local waveform YAMLs plus optional shared-case references."""
+    paths = [
+        os.path.join(config_folder_path, filename)
+        for filename in os.listdir(config_folder_path)
+        if filename.endswith("waveforms.yaml")
+    ]
+    manifest_path = os.path.join(config_folder_path, "waveform_files.yaml")
+    if not os.path.isfile(manifest_path):
+        return paths
+    try:
+        import yaml
+        with open(manifest_path, "r", encoding="utf-8") as file_obj:
+            manifest = yaml.safe_load(file_obj)
+        references = manifest.get("waveform_files", [])
+        for reference in references:
+            path = os.path.abspath(os.path.join(
+                config_folder_path, str(reference)))
+            if path not in paths:
+                paths.append(path)
+    except Exception as exc:
+        raise ValueError(
+            f"Invalid waveform manifest {manifest_path}: {exc}") from exc
+    return paths
+
+
 @contextmanager
 def _waveform_cooker_imas2_open_compat():
     """Adapt Waveform-Cooker's legacy DBEntry.open() contract for IMASPy 2."""
@@ -298,19 +324,17 @@ def setup_databases(config_folder_path):
 
     # Load waveform configurations
     print("[workflow_driver] Loading waveform configurations...")
-    for filename in os.listdir(config_folder_path):
-        filePath = os.path.join(config_folder_path, filename)
-        if filePath.endswith("waveforms.yaml"):
-            if isWaveformCookerPresent:
-                with _waveform_cooker_imas2_open_compat():
-                    idsObject = add_dynamic(filePath)
-            else:
-                idsObject = None
-            if idsObject is not None:
-                ids_name = _waveform_ids_name(filePath)
-                if ids_name:
-                    idsObject = _smart_convert(idsObject, ids_name)
-                machineDb.put(idsObject)
+    for filePath in _waveform_config_paths(config_folder_path):
+        if isWaveformCookerPresent:
+            with _waveform_cooker_imas2_open_compat():
+                idsObject = add_dynamic(filePath)
+        else:
+            idsObject = None
+        if idsObject is not None:
+            ids_name = _waveform_ids_name(filePath)
+            if ids_name:
+                idsObject = _smart_convert(idsObject, ids_name)
+            machineDb.put(idsObject)
 
     return inputDb, outputDb, machineDb, inputIds, inputMds, wf_parameters, param_process
 

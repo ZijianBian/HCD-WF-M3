@@ -70,6 +70,11 @@ ACTOR_PORTS = {
                  'distribution_sources_out_fp', 'nbi_out_fp'],
         'recv': ['distributions_in'],
     },
+    'rabbit': {
+        'send': ['core_profiles_out_rabbit', 'equilibrium_out_rabbit',
+                 'nbi_out_rabbit', 'wall_out_rabbit', 'workflow_out_rabbit'],
+        'recv': ['distribution_sources_rabbit_in', 'distributions_rabbit_in'],
+    },
     'merge_waves': {
         'send': ['waves_ec_out', 'waves_ic_out'],
         'recv': ['waves_merged_in'],
@@ -126,7 +131,7 @@ def _ic_total_power(ic_antennas_ids) -> float:
 _IDS_NAMES_BY_LENGTH = tuple(sorted((
     'distribution_sources', 'core_profiles', 'core_sources',
     'ec_launchers', 'ic_antennas', 'equilibrium', 'distributions',
-    'waves', 'nbi',
+    'workflow', 'waves', 'nbi', 'wall',
 ), key=len, reverse=True))
 
 
@@ -207,6 +212,66 @@ def _prepare_actor_input(ids_name, ids_obj, reference_ids, timenow):
     return ids_obj
 
 
+def _create_rabbit_workflow(timenow, dt):
+    """Build the minimal workflow IDS contract consumed by Rabbit."""
+    workflow = _empty('workflow')
+    workflow.ids_properties.homogeneous_time = 1
+    workflow.time = np.array([timenow])
+    workflow.time_loop.component.resize(1)
+    workflow.time_loop.component[0].name = 'RABBIT'
+    workflow.time_loop.workflow_cycle.resize(1)
+    workflow.time_loop.workflow_cycle[0].component.resize(1)
+    component = workflow.time_loop.workflow_cycle[0].component[0]
+    try:
+        component.time_interval_request = dt
+    except Exception:
+        component.time_interval = dt
+    return workflow
+
+
+def _validate_rabbit_configuration(active_actors, param_process):
+    """Require the static topology and nbi_fp=1 selection to agree."""
+    connected = 'rabbit' in active_actors
+    selected = param_process.get('nbi_fp', 0) == 1
+    if connected != selected:
+        raise RuntimeError(
+            "Pure M3 Rabbit requires both a connected rabbit component and "
+            "nbi_fp=1 in input_workflow.xml"
+        )
+    if connected and 'fopla' in active_actors:
+        raise RuntimeError(
+            "Pure M3 does not yet merge Rabbit and FoPla distributions; "
+            "use the no-FoPla topology"
+        )
+    return connected
+
+
+def _run_rabbit(instance, core_profiles, equilibrium, nbi, wall,
+                timenow, t_next, dt):
+    """Advance stateful Rabbit once, including zero-NBI-power slices."""
+    try:
+        n_units = len(nbi.unit)
+    except (AttributeError, TypeError) as exc:
+        raise ValueError("Rabbit requires a populated nbi IDS") from exc
+    if n_units == 0:
+        raise ValueError("Rabbit requires a populated nbi IDS; nbi.unit is empty")
+
+    rabbit_workflow = _create_rabbit_workflow(timenow, dt)
+    _send(instance, 'wall_out_rabbit',          wall,            timenow, t_next)
+    _send(instance, 'core_profiles_out_rabbit', core_profiles,   timenow, t_next)
+    _send(instance, 'equilibrium_out_rabbit',   equilibrium,     timenow, t_next)
+    _send(instance, 'nbi_out_rabbit',           nbi,             timenow, t_next)
+    _send(instance, 'workflow_out_rabbit',      rabbit_workflow, timenow, t_next)
+
+    # Rabbit sends distribution_sources before distributions.
+    distribution_sources = _recv(
+        instance, 'distribution_sources_rabbit_in',
+        'distribution_sources', timenow)
+    distributions = _recv(
+        instance, 'distributions_rabbit_in', 'distributions', timenow)
+    return distributions, distribution_sources
+
+
 # =============================================================================
 # Main driver
 # =============================================================================
@@ -250,6 +315,9 @@ def main():
     # --- Database setup (reuse workflow_driver layer) ---
     inputDb, outputDb, machineDb, inputIds, inputMds, _, param_process = \
         setup_databases(config_path)
+
+    rabbit_enabled = _validate_rabbit_configuration(
+        active_actors, param_process)
 
     # --- Time range ---
     # Read workflow parameters directly from XML — pure M3 mode does not need
@@ -296,6 +364,7 @@ def main():
             dis = ids_slices.get('distributions', _empty('distributions'))
             dsr = ids_slices.get('distribution_sources', _empty('distribution_sources'))
             nbi = ids_slices.get('nbi',           _empty('nbi'))
+            wall = ids_slices.get('wall',         _empty('wall'))
 
             for ids_name, ids_obj in (
                 ('equilibrium', eq),
@@ -306,6 +375,7 @@ def main():
                 ('distributions', dis),
                 ('distribution_sources', dsr),
                 ('nbi', nbi),
+                ('wall', wall),
             ):
                 _prepare_actor_input(ids_name, ids_obj, cp, timenow)
 
@@ -328,6 +398,17 @@ def main():
             output_ids['waves'] = waves_ec
 
             # ----------------------------------------------------------------
+            # NBI FP branch — Rabbit (stateful; advance on every time slice)
+            # ----------------------------------------------------------------
+            distributions = dis
+            distribution_sources = dsr
+            if rabbit_enabled:
+                distributions, distribution_sources = _run_rabbit(
+                    instance, cp, eq, nbi, wall, timenow, t_next, dt)
+                output_ids['distributions'] = distributions
+                output_ids['distribution_sources'] = distribution_sources
+
+            # ----------------------------------------------------------------
             # IC branch — cyrano  (only if wired)
             # ----------------------------------------------------------------
             ic_power = _ic_total_power(ic)
@@ -339,8 +420,10 @@ def main():
                 _send(instance, 'core_profiles_out_ic',        cp,      timenow, t_next)
                 _send(instance, 'ic_antennas_out',             ic,      timenow, t_next)
                 _send(instance, 'waves_out_to_cyrano',         waves_ec, timenow, t_next)
-                _send(instance, 'distributions_out_ic',        dis,     timenow, t_next)
-                _send(instance, 'distribution_sources_out_ic', dsr,     timenow, t_next)
+                _send(instance, 'distributions_out_ic',
+                      distributions, timenow, t_next)
+                _send(instance, 'distribution_sources_out_ic',
+                      distribution_sources, timenow, t_next)
                 _send(instance, 'core_sources_out_ic',         cs,      timenow, t_next)
                 _send(instance, 'nbi_out_ic',                  nbi,     timenow, t_next)
                 waves_ic = _recv(instance, 'waves_ic_in', 'waves', timenow)
@@ -379,22 +462,24 @@ def main():
                 # RF interpolation. Keep merged waves for downstream storage
                 # and hcd2core_sources, but feed FoPla the IC wave branch.
                 _send(instance, 'waves_out_to_fopla',           waves_ic, timenow, t_next)
-                _send(instance, 'distributions_out_fp',         dis, timenow, t_next)
-                _send(instance, 'distribution_sources_out_fp',  dsr, timenow, t_next)
+                _send(instance, 'distributions_out_fp',
+                      distributions, timenow, t_next)
+                _send(instance, 'distribution_sources_out_fp',
+                      distribution_sources, timenow, t_next)
                 _send(instance, 'nbi_out_fp',                   nbi, timenow, t_next)
                 distributions = _recv(instance, 'distributions_in', 'distributions', timenow)
                 output_ids['distributions'] = distributions
             else:
                 if 'fopla' in active_actors:
                     print("[driver] Skipping FoPla because IC launched power is zero", flush=True)
-                distributions = dis
 
             # ----------------------------------------------------------------
             # Post-processing — hcd2core_sources  (only if wired)
             # ----------------------------------------------------------------
             if 'hcd2core_sources' in active_actors:
                 _send(instance, 'distributions_out_post',         distributions, timenow, t_next)
-                _send(instance, 'distribution_sources_out_post',  dsr,           timenow, t_next)
+                _send(instance, 'distribution_sources_out_post',
+                      distribution_sources, timenow, t_next)
                 _send(instance, 'waves_out_post',                 waves,         timenow, t_next)
                 _send(instance, 'core_profiles_out_post',         cp,            timenow, t_next)
                 core_sources = _recv(instance, 'core_sources_in', 'core_sources', timenow)

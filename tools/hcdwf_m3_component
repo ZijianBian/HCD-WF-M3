@@ -18,8 +18,15 @@ case "${component}" in
     pure_driver)
         exec python3 hcdworkflow/workflow_driver_m3_pure.py tests/m3_hybrid
         ;;
+    pure_rabbit_driver)
+        exec python3 hcdworkflow/workflow_driver_m3_pure.py \
+            "${HCDWF_PURE_RABBIT_CONFIG:-tests/m3_pure_rabbit}"
+        ;;
     torbeam|cyrano|merge_waves|hcd2core_sources)
         exec "${ACTOR_FOLDER}/${component}/${component}_m3.exe"
+        ;;
+    rabbit)
+        exec "${HCD_SANDBOX}/tools/run_rabbit_m3_gcc_2023b.sh"
         ;;
     *)
         echo "Unknown HCDWF M3 component: ${component}" >&2

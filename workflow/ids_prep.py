@@ -2302,14 +2302,14 @@ def _source_name(source):
 
 
 def _retain_selected_hcd_sources(core_sources, selected_names):
-    """Drop only unselected EC/IC sources while preserving actor order."""
+    """Drop unselected H&CD sources while preserving actor order."""
     try:
         current_names = [_source_name(source) for source in core_sources.source]
     except Exception:
         return
     retained_indices = [
         index for index, name in enumerate(current_names)
-        if name not in {"ec", "ic"} or name in selected_names
+        if name not in {"ec", "ic", "nbi"} or name in selected_names
     ]
     if retained_indices == list(range(len(current_names))):
         return
@@ -2815,6 +2815,14 @@ def _fill_zero_source_slot(source, source_kind, timenow,
     elif source_kind == "ic":
         source.identifier.name = "ic"
         source.identifier.index = 5
+    elif source_kind == "nbi":
+        source.identifier.name = "nbi"
+        source.identifier.index = 2
+        try:
+            source.identifier.description = \
+                "Source from Neutral Beam Injection"
+        except Exception:
+            pass
     _ensure_source_global_quantities(source, timenow)
     if source_kind in {"ec", "ic"} and input_slices is not None:
         _ensure_source_profiles_1d(
@@ -2862,7 +2870,29 @@ def _zero_existing_core_source_payload(source, timenow):
 
 
 def _expected_source_names(param_process):
-    return _selected_wave_kinds(param_process)
+    process_kinds = {
+        "ec_wave_solver": "ec",
+        "ic_wave_solver": "ic",
+        "nbi_source": "nbi",
+        "nbi_fp": "nbi",
+    }
+    expected = []
+    try:
+        process_names = list(param_process)
+    except Exception:
+        process_names = []
+    for process_name in process_names:
+        source_name = process_kinds.get(str(process_name))
+        if (source_name is not None
+                and source_name not in expected
+                and _process_is_selected(param_process, process_name)):
+            expected.append(source_name)
+    if not process_names:
+        for process_name, source_name in process_kinds.items():
+            if (_process_is_selected(param_process, process_name)
+                    and source_name not in expected):
+                expected.append(source_name)
+    return expected
 
 
 def _ensure_core_sources_placeholders(input_slices, output_ids, param_process,
