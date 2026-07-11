@@ -22,7 +22,7 @@ Use this to exercise the macro-to-workflow M3 boundary.
 .. code-block:: bash
 
    source config_hcd_iter_sdcc.sh
-   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+   muscle_manager --start-all hcdwf_hybrid_m3.ymmsl
 
 Pure M3, No FoPla
 ------------------------
@@ -45,6 +45,16 @@ Pure benchmark yMMSL files follow the same structure:
    driver <-> cyrano
    driver <-> merge_waves
    driver <-> hcd2core_sources
+
+Pure M3 with Rabbit
+-------------------
+
+After providing the unversioned local case under ``tests/m3_pure_rabbit``:
+
+.. code-block:: bash
+
+   source config_hcd_iter_sdcc.sh
+   ./run.sh pure-rabbit
 
 Changing the Time Step
 ----------------------

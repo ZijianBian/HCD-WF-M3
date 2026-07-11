@@ -24,6 +24,10 @@ Core Actors in the Validated Benchmark
    * - Source filler
      - hcd2core_sources
      - Converts HCD outputs into ``core_sources``.
+   * - NBI fast-ion solver
+     - Rabbit
+     - Produces ``distributions`` and ``distribution_sources`` in the validated
+       Pure M3 Rabbit topology.
 
 Optional or Not Yet Fully Validated in Pure Mode
 ------------------------------------------------
@@ -34,11 +38,8 @@ Optional or Not Yet Fully Validated in Pure Mode
    * - Actor
      - Note
    * - FoPla
-     - IC Fokker-Planck branch wired in ``test_m3_pure.ymmsl``. It requires
-       the matching M3 actor executable and code-parameter XML.
-   * - NBI actors
-     - Classic workflow support exists. Direct Pure M3 coverage needs separate
-       validation.
+     - Supported by the Pure driver registry but not wired in the maintained
+       ``hcdwf_pure_m3.ymmsl`` baseline.
    * - Additional EC/IC solvers
      - Classic workflow support exists. Direct Pure M3 coverage depends on
        available actor executables and yMMSL wiring.
@@ -64,6 +65,10 @@ Pure M3 mode needs M3 actor executables, for example:
 
    /path/to/PYTHON_ACTORS/torbeam/torbeam_m3.exe
    /path/to/PYTHON_ACTORS/cyrano/cyrano_m3.exe
+   /path/to/PYTHON_ACTORS/rabbit/rabbit_m3.exe
 
 The yMMSL file must list each component, its ports, conduits, resources, and
 implementation executable.
+
+Rabbit uses the GCC runtime launcher ``tools/run_rabbit_m3_gcc_2023b.sh``.
+Its local NBI waveform and code-parameter files are not shipped with HCDWF.

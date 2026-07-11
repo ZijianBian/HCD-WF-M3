@@ -21,7 +21,7 @@ Developer    Manual Setup (any system)      See "Developer Setup" below
 
 ## Execution Modes
 
-The workflow supports three execution modes. Legacy and Hybrid use the shared
+The workflow supports four execution modes. Legacy and Hybrid use the shared
 entry point `workflow/workflow_driver.py`; Pure M3 uses
 `hcdworkflow/workflow_driver_m3_pure.py` because it wires the macro driver
 directly to individual M3 actor executables.
@@ -41,8 +41,12 @@ Hybrid M3       m3_flag=1         Two-component MUSCLE3 coupling:
 Pure M3         yMMSL             Actor-level MUSCLE3 coupling:
                                   workflow_driver_m3_pure.py talks directly to
                                   M3 actor executables such as torbeam_m3.exe
-                                  and cyrano_m3.exe. The maintained example
-                                  topology is `test_m3_pure.ymmsl`.
+                                  and cyrano_m3.exe. The maintained baseline is
+                                  `hcdwf_pure_m3.ymmsl`.
+
+Pure + Rabbit   yMMSL             Extends Pure M3 with the external GCC Rabbit
+                                  NBI actor. The topology is
+                                  `hcdwf_pure_rabbit_m3.ymmsl`.
 ```
 
 ### MUSCLE3 Hybrid Architecture
@@ -72,14 +76,15 @@ workflow_driver_m3_pure.py  (MACRO — database I/O and time loop)
     ├── torbeam_m3.exe
     ├── cyrano_m3.exe
     ├── merge_waves_m3.exe
-    ├── fopla_m3.exe
+    ├── rabbit_m3.exe  (optional GCC process)
     └── hcd2core_sources_m3.exe
 ```
 
-Pure M3 is the direct actor-coupling path. The repository keeps one Pure yMMSL
-example, `test_m3_pure.ymmsl`, which wires the driver to the full actor-level
-topology. The Pure driver skips Cyrano, FoPla, and IC wave merging on
-zero-IC-power time slices.
+Pure M3 is the direct actor-coupling path. ``hcdwf_pure_m3.ymmsl`` is the
+maintained no-Rabbit baseline. ``hcdwf_pure_rabbit_m3.ymmsl`` adds Rabbit, but
+its NBI waveform and Rabbit code parameters are deliberately local and must be
+provided under ``tests/m3_pure_rabbit``. The Pure driver supports EC-only,
+IC-only, and combined operation without imposing an EC/IC output order.
 ---
 
 ## For Users
@@ -361,14 +366,14 @@ python workflow/workflow_driver.py tests/data/GRAYSCALE 0
 ```
 
 Do not use the DD 3.42.0 environment for `./run.sh hybrid`, `./run.sh pure`,
-or `muscle_manager --start-all ...`; those paths are for the DD 4.1.0/MUSCLE3
-environment.
+`./run.sh pure-rabbit`, or `muscle_manager --start-all ...`; those paths are
+for the DD 4.1.0/MUSCLE3 environment.
 
 ### Hybrid MUSCLE3 Mode
 
 ```bash
 # Via MUSCLE3 manager:
-muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+muscle_manager --start-all hcdwf_hybrid_m3.ymmsl
 
 # Via runner:
 ./run.sh hybrid
@@ -377,27 +382,41 @@ muscle_manager --start-all test_hybrid_hcdwf.ymmsl
 ### Pure MUSCLE3 Mode
 
 Pure mode runs each selected physics actor as an independent M3 micro model.
-The default runner uses `test_m3_pure.ymmsl`, the maintained full actor-level
-topology.
+The default runner uses `hcdwf_pure_m3.ymmsl`, the maintained no-Rabbit
+actor-level topology.
 
 ```bash
 # Via MUSCLE3 manager:
-muscle_manager --start-all test_m3_pure.ymmsl
+muscle_manager --start-all hcdwf_pure_m3.ymmsl
 
 # Via runner:
 ./run.sh pure
 ```
 
-Pure yMMSL file:
-- `test_m3_pure.ymmsl`: full actor-level topology including Torbeam, Cyrano,
-  merge_waves, FoPla, and hcd2core_sources
+Pure yMMSL files:
+
+- `hcdwf_pure_m3.ymmsl`: Torbeam, Cyrano, merge_waves, and
+  hcd2core_sources baseline.
+- `hcdwf_pure_rabbit_m3.ymmsl`: adds Rabbit distributions and
+  distribution_sources. It requires a local `tests/m3_pure_rabbit` case and
+  `$ACTOR_FOLDER/rabbit/rabbit_m3.exe`.
+
+Rabbit is compiled with GCC and must not be loaded into the main Intel HCD
+shell. `tools/run_rabbit_m3_gcc_2023b.sh` switches the module stack inside the
+Rabbit child process while keeping the MUSCLE3 0.8/DD 4.1.0 wire contract.
+
+```bash
+./run.sh pure-rabbit
+# or, after providing the local Rabbit case:
+muscle_manager --start-all hcdwf_pure_rabbit_m3.ymmsl
+```
 
 ### Runner
 
 `run.sh` provides a convenient wrapper for all modes:
 
 ```bash
-./run.sh [legacy|hybrid|pure]   # default: hybrid
+./run.sh [legacy|hybrid|pure|pure-rabbit]   # default: hybrid
 ```
 
 It automatically:
@@ -438,11 +457,12 @@ hcd-wf-sandbox/
 │
 ├── tests/                         # Test data and configs
 │
-├── test_hybrid_hcdwf.ymmsl        # MUSCLE3 hybrid mode configuration
-├── test_m3_pure.ymmsl             # Pure M3 actor-level configuration
+├── hcdwf_hybrid_m3.ymmsl          # MUSCLE3 Hybrid configuration
+├── hcdwf_pure_m3.ymmsl            # Pure M3 baseline configuration
+├── hcdwf_pure_rabbit_m3.ymmsl     # Pure M3 + external Rabbit topology
 ├── config_hcd_iter_sdcc.sh        # Environment setup (default: DD 4.1.0 + MUSCLE3)
 ├── config_hcd_iter_sdcc_3.42.0.sh # Environment setup (legacy: DD 3.42.0)
-├── run.sh                         # Runner for legacy/hybrid/pure
+├── run.sh                         # Runner for all four execution modes
 │
 ├── runs/                          # Auto-generated run outputs
 │   ├── run_legacy_001/
@@ -485,7 +505,8 @@ hcd-wf-sandbox/
 | `core_profiles_out/in` | `core_profiles` | Updated plasma profiles |
 | `distributions_out/in` | `distributions` | Updated distribution functions |
 
-Pure M3 uses actor-specific ports defined in `test_m3_pure.ymmsl`.
+Pure M3 uses actor-specific ports defined in `hcdwf_pure_m3.ymmsl` and
+`hcdwf_pure_rabbit_m3.ymmsl`.
 
 ---
 

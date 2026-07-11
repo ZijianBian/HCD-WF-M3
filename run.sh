@@ -3,11 +3,13 @@
 # HCD-Workflow Runner
 # =============================================================================
 #
-# Three execution modes:
+# Four execution modes:
 #   legacy  : In-process iwrap, no MUSCLE3 (all actors run inside workflow_driver)
 #   hybrid  : MUSCLE3 macro-micro, Python micro (driver ↔ hcd_workflow_m3)
 #   pure    : MUSCLE3 macro-micro, Fortran actor direct (driver ↔ *_m3.exe)
 #             The maintained baseline omits FoPla.
+#   pure-rabbit: Pure M3 plus the external GCC Rabbit NBI actor. The local
+#                tests/m3_pure_rabbit case is intentionally not versioned.
 #
 # Prereq: source config_hcd_iter_sdcc.sh once per shell session.
 #
@@ -16,6 +18,7 @@
 #   ./run.sh legacy
 #   ./run.sh hybrid
 #   ./run.sh pure
+#   ./run.sh pure-rabbit
 #
 # =============================================================================
 
@@ -26,9 +29,10 @@ cd "$SCRIPT_DIR"
 
 MODE="${1:-hybrid}"
 
-if [[ "$MODE" != "legacy" && "$MODE" != "hybrid" && "$MODE" != "pure" ]]; then
+if [[ "$MODE" != "legacy" && "$MODE" != "hybrid" && "$MODE" != "pure" \
+      && "$MODE" != "pure-rabbit" ]]; then
     echo "ERROR: Invalid mode '$MODE'"
-    echo "Usage: $0 [legacy|hybrid|pure]"
+    echo "Usage: $0 [legacy|hybrid|pure|pure-rabbit]"
     exit 1
 fi
 
@@ -51,11 +55,31 @@ case "$MODE" in
         MODE_DESC="Pure MUSCLE3 (driver ↔ direct M3 actors; no FoPla)"
         RUN_PREFIX="run_pure"
         ;;
+    "pure-rabbit")
+        YMMSL_FILE="${HCD_PURE_RABBIT_YMMSL:-hcdwf_pure_rabbit_m3.ymmsl}"
+        MODE_DESC="Pure MUSCLE3 with external GCC Rabbit NBI actor"
+        RUN_PREFIX="run_pure_rabbit"
+        ;;
 esac
 
 if [[ "$MODE" != "legacy" && ! -f "$YMMSL_FILE" ]]; then
     echo "ERROR: YMMSL file not found: $YMMSL_FILE"
     exit 1
+fi
+
+if [[ "$MODE" == "pure-rabbit" ]]; then
+    RABBIT_CASE="tests/m3_pure_rabbit"
+    if [[ ! -f "$RABBIT_CASE/input_workflow.xml" \
+          || ! -f "$RABBIT_CASE/NBI/nbi_fp/input_rabbit.xml" ]]; then
+        echo "ERROR: Rabbit configuration is not versioned with HCDWF."
+        echo "Provide the local case under: $RABBIT_CASE"
+        exit 1
+    fi
+    if [[ ! -x "${ACTOR_FOLDER:-}/rabbit/rabbit_m3.exe" ]]; then
+        echo "ERROR: Rabbit executable not found under ACTOR_FOLDER."
+        echo "Expected: \$ACTOR_FOLDER/rabbit/rabbit_m3.exe"
+        exit 1
+    fi
 fi
 
 BASE_DIR="runs"

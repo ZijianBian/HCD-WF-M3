@@ -20,7 +20,7 @@ If you only read three pages, read these:
 Current Status
 --------------
 
-HCD Workflow has three execution modes.
+HCD Workflow has four supported launch modes.
 
 .. list-table::
    :header-rows: 1
@@ -40,6 +40,10 @@ HCD Workflow has three execution modes.
      - ``hcdworkflow/workflow_driver_m3_pure.py``
      - Experimental but runnable for the validated Pure M3 subset:
        Torbeam, Cyrano, merge_waves, and hcd2core_sources without FoPla.
+   * - Pure M3 + Rabbit
+     - ``hcdwf_pure_rabbit_m3.ymmsl``
+     - Validated with the external GCC Rabbit actor. The required NBI case is
+       supplied locally and is not bundled with HCDWF.
 
 .. toctree::
    :maxdepth: 2

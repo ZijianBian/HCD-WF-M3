@@ -16,6 +16,15 @@ This matters because FoPla can renormalize to its XML target power even when
 the IC waveform is off, and merging an empty branch can fail on transition
 slices.
 
+DD4 HCD Output Contract
+-----------------------
+
+The current Hybrid and Pure baselines were validated with EC-only, IC-only,
+combined EC+IC, IC-off, and fully inactive HCD slices. Source counts are read
+from ``ec_launchers`` and ``ic_antennas``; neither source requires the other.
+Inactive slices retain the actor-established schema and ``n_phi`` dimensions.
+Actor output order is preserved and is not part of the validation contract.
+
 Validated Pure Scenarios
 ------------------------
 
@@ -34,6 +43,15 @@ Validated Pure Scenarios
    * - Pure single-``Ntor`` timing run
      - Same physics options as the corrected Legacy and Hybrid timing runs
      - Passed.
+   * - Pure Rabbit NBI smoke, ``ITER/4/105102/268`` at ``100 s``
+     - Torbeam, Cyrano, Rabbit, merge_waves, and hcd2core_sources; Rabbit GCC
+       process with Intel HCD actors over MUSCLE3 0.8/DD 4.1.0
+     - Passed: 81 waves, 2 distributions, 2 distribution_sources, and an NBI
+       core source; all checked numeric fields were finite and sentinel-free.
+
+The Rabbit waveform and code-parameter files used for that smoke test are kept
+outside the versioned repository. The result demonstrates the integration but
+is not a bundled public reference case.
 
 Corrected Runtime Benchmark Snapshot
 ------------------------------------

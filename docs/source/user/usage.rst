@@ -27,6 +27,8 @@ Command Summary
      - Launch Hybrid or Pure M3 topology.
    * - ``./run.sh pure``
      - Launch the default Pure M3 topology.
+   * - ``./run.sh pure-rabbit``
+     - Launch Pure M3 with the external Rabbit NBI actor and a local case.
 
 Legacy Mode
 -----------
@@ -43,7 +45,7 @@ Hybrid M3 Mode
 
 .. code-block:: bash
 
-   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+   muscle_manager --start-all hcdwf_hybrid_m3.ymmsl
 
 Hybrid mode sends IDS slices between ``workflow_driver.py`` and
 ``hcd_workflow_m3.py``. The physics actors still run inside
@@ -58,7 +60,7 @@ actor executables.
 .. code-block:: bash
 
    ./run.sh pure
-   muscle_manager --start-all test_m3_pure.ymmsl
+   muscle_manager --start-all hcdwf_pure_m3.ymmsl
 
 Use ``HCD_PURE_YMMSL`` only when testing a local custom topology:
 
@@ -71,10 +73,26 @@ Current validated Pure M3 actors:
 * ``torbeam_m3.exe``
 * ``cyrano_m3.exe``
 * ``merge_waves_m3.exe``
-* ``fopla_m3.exe``
 * ``hcd2core_sources_m3.exe``
 
-The maintained Pure topology is kept in ``test_m3_pure.ymmsl``.
+The maintained Pure baseline is kept in ``hcdwf_pure_m3.ymmsl``.
+
+Pure M3 with Rabbit
+-------------------
+
+``hcdwf_pure_rabbit_m3.ymmsl`` adds the external Rabbit actor. The repository
+contains the coupling and GCC runtime launcher, but not the NBI reference case.
+Before running, provide ``tests/m3_pure_rabbit`` locally with
+``input_workflow.xml``, ``nbi_waveforms.yaml``, and Rabbit XML/namelist files.
+
+.. code-block:: bash
+
+   source config_hcd_iter_sdcc.sh
+   ./run.sh pure-rabbit
+
+The normal environment locates Rabbit through ``ACTOR_FOLDER``. Rabbit then
+loads its GCC/foss modules in its own process through
+``tools/run_rabbit_m3_gcc_2023b.sh``.
 
 Output
 ------

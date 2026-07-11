@@ -35,6 +35,9 @@ Current actors in the registry:
    * - ``fopla``
      - ``distributions_in``
      - Optional IC FP branch.
+   * - ``rabbit``
+     - ``distribution_sources_rabbit_in``, ``distributions_rabbit_in``
+     - Stateful NBI fast-ion branch in a separate GCC process.
    * - ``merge_waves``
      - ``waves_merged_in``
      - Runs only when both wave branches are active.
@@ -76,6 +79,27 @@ If IC launched power is zero:
 If EC power is zero and IC is active:
 
 * ``merge_waves`` is skipped and the IC waves are carried forward.
+
+EC and IC are independent selections. Wave and core-source counts come from
+the selected IDS configuration, and the driver preserves actor output order;
+it does not impose EC-before-IC ordering.
+
+Rabbit NBI Branch
+-----------------
+
+``hcdwf_pure_rabbit_m3.ymmsl`` adds Rabbit before Cyrano and post-processing.
+Rabbit receives ``core_profiles``, ``equilibrium``, ``nbi``, ``wall``, and a
+minimal ``workflow`` IDS. Its ``distributions`` and ``distribution_sources``
+are forwarded to downstream actors.
+
+The Rabbit topology and ``nbi_fp=1`` must be selected together. Rabbit is
+stateful and is advanced on every time slice, including zero-NBI-power slices.
+It cannot currently be connected together with FoPla because the Pure driver
+does not yet merge their distribution outputs.
+
+The reference NBI waveform and Rabbit code parameters are intentionally not
+versioned. Provide them locally under ``tests/m3_pure_rabbit`` before launching
+the Rabbit topology.
 
 FoPla Input Choice
 ------------------

@@ -1,7 +1,7 @@
 Execution Modes
 ===============
 
-HCD Workflow currently has three execution modes. They share the same IMAS
+HCD Workflow currently has four supported launch modes. They share the same IMAS
 input and output model but differ in where actor execution happens.
 
 Mode Table
@@ -26,6 +26,9 @@ Mode Table
      - ``hcdworkflow/workflow_driver_m3_pure.py``
      - The driver talks directly to individual M3 actor executables. There is
        no iWrap workflow micro in the middle.
+   * - Pure M3 + Rabbit
+     - ``hcdwf_pure_rabbit_m3.ymmsl``
+     - Extends Pure M3 with a stateful external GCC Rabbit NBI process.
 
 Legacy
 ------
@@ -65,6 +68,10 @@ Pure M3
 Pure mode is the target architecture for direct actor coupling. The driver owns
 IMAS I/O and the time loop. Each actor is a separate MUSCLE3 component.
 
+The Rabbit variant adds ``rabbit_m3.exe`` as a separate GCC/foss process. Its
+NBI waveform and code parameters are supplied locally rather than versioned
+with HCDWF.
+
 Validated Pure Subset
 ---------------------
 
@@ -77,6 +84,7 @@ As of 2026-06-10, the validated Pure M3 subset is:
 * ``merge_waves`` after EC and IC wave branches.
 * ``hcd2core_sources`` post-processing.
 * ``ic_wave_fp=0``: no FoPla in the benchmark chain.
+* Rabbit EC+IC+NBI single-slice smoke with external local configuration.
 
 The Pure driver also contains guards for zero-power slices:
 
