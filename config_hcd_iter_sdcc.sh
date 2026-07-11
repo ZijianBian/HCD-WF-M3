@@ -47,9 +47,16 @@ fi
 # ------------------------------------------------
 # 5. Local iWrap (develop branch)
 # ------------------------------------------------
+if [[ -z "${HCDWF_IWRAP_ROOT:-}" ]]; then
+    _hcd_iwrap_candidate="${HOME:-/home/ITER/bianz}/public/git/repository/iwrap"
+    if [[ -d "${_hcd_iwrap_candidate}" ]]; then
+        HCDWF_IWRAP_ROOT="${_hcd_iwrap_candidate}"
+    fi
+    unset _hcd_iwrap_candidate
+fi
 if [[ -n "${HCDWF_IWRAP_ROOT:-}" ]]; then
     export PATH="${HCDWF_IWRAP_ROOT}/bin:$PATH"
-    export PYTHONPATH="${HCDWF_IWRAP_ROOT}/python:$PYTHONPATH"
+    export PYTHONPATH="${HCDWF_IWRAP_ROOT}:${HCDWF_IWRAP_ROOT}/python:$PYTHONPATH"
 fi
 
 # ------------------------------------------------
@@ -65,10 +72,15 @@ if [[ -z "${HCD_SANDBOX:-}" ]]; then
 fi
 export HCD_SANDBOX
 
-export ACTOR_FOLDER="${ACTOR_FOLDER:-${HCD_SANDBOX}/PYTHON_ACTORS}"
+# Physics actors are installed centrally for this account, not inside the
+# source checkout. Keep ACTOR_FOLDER overridable for collaborators and CI.
+_hcd_default_actor_folder="${HOME:-/home/ITER/bianz}/public/PYTHON_ACTORS"
+export ACTOR_FOLDER="${ACTOR_FOLDER:-${_hcd_default_actor_folder}}"
+unset _hcd_default_actor_folder
 
 export PYTHONPATH=$ACTOR_FOLDER:$PYTHONPATH
 export PYTHONPATH=$HCD_SANDBOX:$PYTHONPATH
+export PATH=$HCD_SANDBOX/tools:$PATH
 
 # ------------------------------------------------
 # 8. System limits and optimizations
@@ -88,8 +100,11 @@ fi
 
 source "$VENV_DIR/bin/activate"
 
-if [[ "${HCDWF_SKIP_PIP_INSTALL:-0}" == "1" ]]; then
-    echo "Skipping pip install steps (HCDWF_SKIP_PIP_INSTALL=1)"
+# Sourcing an environment helper must be deterministic and network-free during
+# production runs. The module stack and --system-site-packages provide the
+# runtime dependencies; opt in explicitly when bootstrapping a developer venv.
+if [[ "${HCDWF_SKIP_PIP_INSTALL:-1}" == "1" ]]; then
+    echo "Skipping pip install steps (set HCDWF_SKIP_PIP_INSTALL=0 to bootstrap)"
 else
     pip install --upgrade pip --quiet
 

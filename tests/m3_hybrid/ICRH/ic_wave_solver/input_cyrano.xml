@@ -4,7 +4,7 @@
 
     <Npol>12</Npol>                       <!--Number of poloidal modes -->
     <Np_out>0</Np_out>                    <!--Number of OUTPUT radial points (0:equilibrium, >1:value) -->
-    <BC_axis>0</BC_axis>                  <!--Axis boundary conditions test (0:circular BC, 1:D-shape BC) -->
+    <BC_axis>1</BC_axis>                  <!--Axis boundary conditions test (0:circular BC, 1:D-shape BC) -->
     <fix_triang>true</fix_triang>        <!--true: Fixed triangularity (edge value); false: Use triangularity fprofile from equilibrium CPO -->
     <smooth>true</smooth>                <!--true: Smooth power deposition profiles in case of tangent resonances (e.g. for large Npol); false: Don't smooth -->
 
@@ -27,7 +27,7 @@
 
       <RF>
 	<total_power>10.0e6</total_power>       <!--Total RF Power [W] (0:waves, 1:antennas, 2:core_sources, >2:value) -->
-	<frequency>40.0e6</frequency>           <!--RF frequency (0:antennas, >0:value) -->
+	<frequency>42.0e6</frequency>           <!--RF frequency (0:antennas, >0:value) -->
 	<Ntor>35</Ntor>                     <!--Single toroidal mode number (0:waves, >0:value) -->
       </RF>
 

@@ -31,6 +31,7 @@ Usage:
 import inspect
 import os
 import sys
+from contextlib import contextmanager
 from pathlib import Path
 
 sys.stdout.reconfigure(line_buffering=True)
@@ -60,6 +61,85 @@ try:
     from waveform_cooker import add_dynamic
 except Exception as _:
     isWaveformCookerPresent = False
+
+
+def _waveform_ids_name(file_path):
+    try:
+        import yaml
+    except Exception:
+        return None
+    try:
+        with open(file_path, "r", encoding="utf-8") as file_obj:
+            data = yaml.safe_load(file_obj)
+        return data.get("ids") if isinstance(data, dict) else None
+    except Exception:
+        return None
+
+
+@contextmanager
+def _waveform_cooker_imas2_open_compat():
+    """Adapt Waveform-Cooker's legacy DBEntry.open() contract for IMASPy 2."""
+    original_dbentry = imas.DBEntry
+    original_open = original_dbentry.open
+    original_structure_setattr = None
+    ids_structure_cls = None
+    added_imasdef_alias = False
+
+    if not hasattr(imas, "imasdef") and hasattr(imas, "ids_defs"):
+        imas.imasdef = imas.ids_defs
+        added_imasdef_alias = True
+
+    def _dd_version_compat(data_version):
+        text = str(data_version)
+        if "." in text:
+            return text
+        if text == "3":
+            return "3.41.0"
+        if text == "4":
+            return _get_target_dd_version()
+        return text
+
+    def _dbentry_compat(*args, **kwargs):
+        data_version = kwargs.get("data_version")
+        if data_version is not None and "dd_version" not in kwargs:
+            kwargs["dd_version"] = _dd_version_compat(data_version)
+        return original_dbentry(*args, **kwargs)
+
+    def _open_with_status(db_entry, *args, **kwargs):
+        result = original_open(db_entry, *args, **kwargs)
+        if result is None:
+            return 0, None
+        return result
+
+    try:
+        from imas.ids_structure import IDSStructure
+
+        ids_structure_cls = IDSStructure
+        original_structure_setattr = IDSStructure.__setattr__
+
+        def _setattr_compat(self, key, value):
+            try:
+                return original_structure_setattr(self, key, value)
+            except AttributeError as exc:
+                if key == "time" and "has no attribute 'time'" in str(exc):
+                    return None
+                raise
+
+        IDSStructure.__setattr__ = _setattr_compat
+    except Exception:
+        pass
+
+    original_dbentry.open = _open_with_status
+    imas.DBEntry = _dbentry_compat
+    try:
+        yield
+    finally:
+        imas.DBEntry = original_dbentry
+        original_dbentry.open = original_open
+        if ids_structure_cls is not None and original_structure_setattr is not None:
+            ids_structure_cls.__setattr__ = original_structure_setattr
+        if added_imasdef_alias:
+            delattr(imas, "imasdef")
 
 
 # =============================================================================
@@ -221,8 +301,15 @@ def setup_databases(config_folder_path):
     for filename in os.listdir(config_folder_path):
         filePath = os.path.join(config_folder_path, filename)
         if filePath.endswith("waveforms.yaml"):
-            idsObject = add_dynamic(filePath) if isWaveformCookerPresent else None
+            if isWaveformCookerPresent:
+                with _waveform_cooker_imas2_open_compat():
+                    idsObject = add_dynamic(filePath)
+            else:
+                idsObject = None
             if idsObject is not None:
+                ids_name = _waveform_ids_name(filePath)
+                if ids_name:
+                    idsObject = _smart_convert(idsObject, ids_name)
                 machineDb.put(idsObject)
 
     return inputDb, outputDb, machineDb, inputIds, inputMds, wf_parameters, param_process
@@ -294,6 +381,21 @@ def store_ids_slices(outputDb, inputMds, input_slices, output_ids, m3_flag=0,
                 if m3_flag == 1:
                     clean_ids = _create_ids(ids_name)
                     clean_ids.deserialize(ids_data.serialize())
+                    if ids_name == "waves":
+                        clean_ids.ids_properties.homogeneous_time = 1
+                        clean_ids.time = np.asarray(ids_data.time, dtype=float)
+                        # In DD4 these waves parent fields are dynamic.  The
+                        # IMAS HDF5 backend does not extend the actor-provided
+                        # values on put_slice, leaving one-element datasets
+                        # beside a multi-element waves/time and making every
+                        # slice after the first unreadable.  Their authoritative
+                        # values remain available in equilibrium, so omit the
+                        # optional duplicates from waves consistently.
+                        clean_ids.vacuum_toroidal_field.b0 = np.empty(
+                            0, dtype=float)
+                        clean_ids.magnetic_axis.r = np.empty(0, dtype=float)
+                        clean_ids.magnetic_axis.z = np.empty(0, dtype=float)
+                        clean_ids.code.output_flag = np.empty(0, dtype=int)
                     outputDb.put_slice(clean_ids)
                 else:
                     outputDb.put_slice(ids_data)

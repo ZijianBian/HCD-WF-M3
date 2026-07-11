@@ -1,0 +1,37 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:annotation>
+    <xs:documentation>Code parameters for hcd2core_sources</xs:documentation>
+  </xs:annotation>
+
+  <xs:simpleType name="nonNegativeInteger">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:element name="parameters">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="tension" type="xs:float" minOccurs="1" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>Tension parameter to be used when splining curves. When the tension is 0.0 the passes through every node exactly, while for positive values the spline is smoothed. For more details, see https://crppwww.epfl.ch/~sauter/interpos/.
+	    </xs:documentation>
+	  </xs:annotation>
+	</xs:element>
+        <xs:element name="verbosity" type="nonNegativeInteger" minOccurs="1" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>Regulates the amount of standard output.
+            0 - quite
+            1 - only error messages and warnings;
+            2 - idenitify start and end of code;
+            3 - Main results;
+            4 - Detailed logging;
+            10 - Write input and output CPOs to ascii files out.nbisim.inputCPOs and out.nbisim.outputCPOs.
+           </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

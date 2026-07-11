@@ -714,6 +714,30 @@ def _numeric_array_or_none(obj, field_name):
             return None
 
 
+def _valid_profile_array(values, expected_size=None):
+    try:
+        array = np.asarray(values, dtype=float)
+    except Exception:
+        return None
+    if array.size == 0:
+        return None
+    if expected_size is not None and array.size != expected_size:
+        return None
+    return np.where(np.isfinite(array) & (np.abs(array) < 1.0e30), array, 0.0)
+
+
+def _add_profile_to_grid(total, source_grid, values, target_grid):
+    if values is None or source_grid is None:
+        return total
+    if total is None:
+        total = np.zeros_like(target_grid, dtype=float)
+    if len(source_grid) == len(target_grid) and np.allclose(source_grid, target_grid):
+        total += values
+    else:
+        total += np.interp(target_grid, source_grid, values, left=0.0, right=0.0)
+    return total
+
+
 def _set_array_or_scalar(obj, field_name, value):
     try:
         arr = np.asarray(value)
@@ -1196,6 +1220,22 @@ def _wave_array_shape(coherent_wave, path):
     return None
 
 
+def _wave_array_values(coherent_wave, path, dtype=None):
+    """Return a populated wave array, preserving its values and shape."""
+    try:
+        value = coherent_wave
+        for part in path:
+            value = value[part] if isinstance(part, int) else getattr(value, part)
+        if not getattr(value, "has_value", False):
+            return None
+        array = np.asarray(value, dtype=dtype)
+        if array.size == 0:
+            return None
+        return array.copy()
+    except Exception:
+        return None
+
+
 def _first_wave_array_shape(waves, path):
     try:
         for coherent_wave in waves.coherent_wave:
@@ -1234,18 +1274,30 @@ def _radial_size(input_slices, waves=None):
 
 
 def _n_phi_values(waves=None, config_folder_path=None):
+    # The configured spectrum is authoritative for inactive-IC placeholders.
+    # In particular, an EC-only output still contains a one-element EC n_phi
+    # axis; using that axis first would shrink a configured two-mode IC slot.
+    configured_n_phi = _configured_toroidal_n_phi_values(config_folder_path)
+    if configured_n_phi is not None:
+        return configured_n_phi
+
     for path in (
         ("global_quantities", 0, "n_phi"),
         ("profiles_1d", 0, "n_phi"),
         ("profiles_2d", 0, "n_phi"),
     ):
-        shape = _first_wave_array_shape(waves, path)
-        if shape:
-            return np.zeros(shape[0], dtype=np.int32)
-
-    configured_n_phi = _configured_toroidal_n_phi_values(config_folder_path)
-    if configured_n_phi is not None:
-        return configured_n_phi
+        try:
+            coherent_waves = list(waves.coherent_wave)
+        except Exception:
+            coherent_waves = []
+        # Prefer an existing IC slot, then fall back to any populated slot.
+        for coherent_wave in sorted(
+            coherent_waves,
+            key=lambda wave: 0 if _wave_is_ic(wave) else 1,
+        ):
+            values = _wave_array_values(coherent_wave, path, dtype=np.int32)
+            if values is not None:
+                return values.reshape(-1)
 
     ntor = _xml_int(config_folder_path, "ICRH/ic_wave_solver/input_cyrano.xml", "Ntor", 0)
     if ntor:
@@ -1289,9 +1341,9 @@ def _n_phi_values_for_wave(coherent_wave):
         ("profiles_1d", 0, "n_phi"),
         ("profiles_2d", 0, "n_phi"),
     ):
-        shape = _wave_array_shape(coherent_wave, path)
-        if shape:
-            return np.zeros(shape[0], dtype=np.int32)
+        values = _wave_array_values(coherent_wave, path, dtype=np.int32)
+        if values is not None:
+            return values.reshape(-1)
     return None
 
 
@@ -1480,8 +1532,10 @@ def _fill_zero_ic_wave_payload(coherent_wave, input_slices, source_index, timeno
     rho = np.linspace(0.0, 1.0, n_rad)
     p1d.grid.rho_tor_norm = rho
     p1d.grid.rho_tor = rho
+    p1d.grid.rho_pol_norm = rho
     p1d.grid.psi = np.zeros(n_rad)
     p1d.grid.area = np.zeros(n_rad)
+    p1d.grid.surface = np.zeros(n_rad)
     p1d.grid.volume = np.zeros(n_rad)
     p1d.power_density = np.zeros(n_rad)
     p1d.power_density_n_phi = np.zeros((n_rad, n_phi_count))
@@ -1571,6 +1625,24 @@ def _zero_e_field(e_field):
 
 
 def _zero_existing_wave_payload(coherent_wave, timenow):
+    # Keep Torbeam ray geometry so consecutive DD4 slices retain an identical
+    # HDF5 schema, but an inactive EC source must not carry power deposited by
+    # the last active slice.  Torbeam stores that power below beam_tracing in
+    # addition to global_quantities/profiles_1d.
+    for tracing in getattr(coherent_wave, "beam_tracing", []):
+        try:
+            tracing.time = timenow
+        except Exception:
+            pass
+        for beam in getattr(tracing, "beam", []):
+            _zero_field_like(beam, "power_initial")
+            try:
+                _zero_field_like(beam.electrons, "power")
+            except Exception:
+                pass
+            for ion in getattr(beam, "ion", []):
+                _zero_field_like(ion, "power")
+
     for gq in getattr(coherent_wave, "global_quantities", []):
         try:
             gq.time = timenow
@@ -1635,6 +1707,43 @@ def _zero_existing_wave_payload(coherent_wave, timenow):
             _zero_e_field(e_field)
 
 
+def _fill_zero_ec_wave_payload(coherent_wave, input_slices, timenow,
+                               waves=None, config_folder_path=None):
+    """Create the 1D Torbeam schema for an inactive EC beam."""
+    n_rad = _xml_int(
+        config_folder_path,
+        "ECRH/ec_wave_solver/input_torbeam.xml",
+        "nradial",
+        None,
+    )
+    if not n_rad or n_rad <= 0:
+        radial_shape = (
+            _wave_array_shape(coherent_wave, ("profiles_1d", 0, "power_density"))
+            or _first_wave_array_shape(waves, ("profiles_1d", 0, "power_density"))
+        )
+        n_rad = int(radial_shape[0]) if radial_shape else _radial_size(input_slices, waves)
+    if not n_rad or n_rad <= 0:
+        return
+
+    coherent_wave.profiles_1d.resize(1)
+    profile = coherent_wave.profiles_1d[0]
+    profile.time = timenow
+    rho = np.linspace(0.0, 1.0, int(n_rad))
+    zeros = np.zeros(int(n_rad))
+    profile.grid.rho_tor_norm = rho
+    profile.grid.rho_tor = rho
+    profile.grid.rho_pol_norm = rho
+    profile.grid.psi = zeros.copy()
+    profile.grid.volume = zeros.copy()
+    profile.grid.area = zeros.copy()
+    profile.grid.surface = zeros.copy()
+    profile.grid.psi_magnetic_axis = 0.0
+    profile.grid.psi_boundary = 0.0
+    profile.power_density = zeros.copy()
+    profile.current_parallel_density = zeros.copy()
+    profile.electrons.power_density_thermal = zeros.copy()
+
+
 def _fill_zero_wave_slot(coherent_wave, source_kind, source_index, input_slices,
                          timenow, waves=None, config_folder_path=None):
     if source_kind == "ic":
@@ -1649,9 +1758,8 @@ def _fill_zero_wave_slot(coherent_wave, source_kind, source_index, input_slices,
         )
         return
 
-    # EC (and any future source_kind): minimal global_quantities placeholder.
-    # profiles_1d/2d are intentionally left empty so the first real torbeam
-    # output establishes the HDF5 schema for those arrays.
+    # EC placeholder follows the Torbeam 1D output contract so inactive slices
+    # retain the actor-established radial shape.
     _set_code(coherent_wave.identifier.type, "EC", 1)
     _set_code(coherent_wave.wave_solver_type, None, 1)
     coherent_wave.identifier.antenna_name = _ec_beam_name(
@@ -1668,17 +1776,55 @@ def _fill_zero_wave_slot(coherent_wave, source_kind, source_index, input_slices,
         gq.current_phi_n_phi = np.zeros(1)
     except Exception:
         pass
+    _fill_zero_ec_wave_payload(
+        coherent_wave,
+        input_slices,
+        timenow,
+        waves=waves,
+        config_folder_path=config_folder_path,
+    )
 
 
-def _expected_wave_slots(input_slices, param_process):
-    expected = []
-    if _process_is_selected(param_process, "ec_wave_solver"):
-        n_ec = _safe_len(getattr(input_slices.get("ec_launchers"), "beam", []))
-        expected.extend(("ec", i) for i in range(n_ec))
-    if _process_is_selected(param_process, "ic_wave_solver"):
-        n_ic = _safe_len(getattr(input_slices.get("ic_antennas"), "antenna", []))
-        expected.extend(("ic", i) for i in range(n_ic))
-    return expected
+_WAVE_PROCESS_KINDS = {
+    "ec_wave_solver": "ec",
+    "ic_wave_solver": "ic",
+}
+
+
+def _selected_wave_kinds(param_process):
+    """Return selected source kinds in configuration order, without coupling."""
+    try:
+        process_names = list(param_process)
+    except Exception:
+        process_names = []
+
+    selected = []
+    for process_name in process_names:
+        kind = _WAVE_PROCESS_KINDS.get(str(process_name))
+        if (kind is not None
+                and kind not in selected
+                and _process_is_selected(param_process, process_name)):
+            selected.append(kind)
+
+    # Some mapping-like parameter containers do not expose iteration.  This
+    # fallback discovers selection only; actor output still determines layout.
+    if not process_names:
+        for process_name, kind in _WAVE_PROCESS_KINDS.items():
+            if _process_is_selected(param_process, process_name):
+                selected.append(kind)
+    return selected
+
+
+def _selected_wave_counts(input_slices, param_process):
+    counts = {}
+    for kind in _selected_wave_kinds(param_process):
+        if kind == "ec":
+            counts[kind] = _safe_len(
+                getattr(input_slices.get("ec_launchers"), "beam", []))
+        elif kind == "ic":
+            counts[kind] = _safe_len(
+                getattr(input_slices.get("ic_antennas"), "antenna", []))
+    return counts
 
 
 def _ec_total_power(ec_launchers_ids):
@@ -1717,26 +1863,426 @@ def _active_wave_sources(input_slices):
     }
 
 
+def _selected_active_wave_sources(input_slices, param_process):
+    active = _active_wave_sources(input_slices)
+    selected = set(_selected_wave_kinds(param_process))
+    return {kind: active.get(kind, False) for kind in selected}
+
+
+def _wave_source_kind(coherent_wave):
+    if _wave_is_ic(coherent_wave):
+        return "ic"
+    try:
+        type_name = _code_field_name(coherent_wave.identifier.type)
+        type_index = _code_field_index(coherent_wave.identifier.type)
+        solver_name = _code_field_name(coherent_wave.wave_solver_type)
+    except Exception:
+        return None
+    if "ec" in type_name or type_index == 1 or "ec" in solver_name:
+        return "ec"
+    return None
+
+
+# Actor-created wave subtrees (notably Torbeam beam_tracing/profiles_2d) are
+# much richer than a hand-built inactive placeholder.  Cache serialized, full
+# IDS snapshots instead of detached IMAS structures: deepcopying an AoS element
+# breaks its link to the parent IDS and can produce an incomplete HDF5 schema.
+_WAVE_SCHEMA_TEMPLATES = {}
+_CORE_SOURCES_SCHEMA_TEMPLATES = {}
+
+
+def _wave_template_key(config_folder_path):
+    if config_folder_path:
+        return os.path.abspath(config_folder_path)
+    return "__default__"
+
+
+def _serialize_ids_snapshot(ids_data):
+    """Return an immutable full-IDS snapshot, or ``None`` if unsupported."""
+    try:
+        payload = ids_data.serialize()
+    except Exception:
+        return None
+    return payload if isinstance(payload, bytes) else bytes(payload)
+
+
+def _deserialize_ids_snapshot(ids_name, payload):
+    """Build a fresh, parent-linked IDS from a serialized snapshot."""
+    if not payload:
+        return None
+    try:
+        restored = _create_ids(ids_name)
+        restored.deserialize(payload)
+        return restored
+    except Exception:
+        return None
+
+
+def _schema_richness(node, payload=None):
+    """Rank snapshots by populated schema, then data size.
+
+    Rich active actor output must never be replaced by a later sparse result.
+    Counting assigned leaves is more useful than payload size alone because it
+    rewards paths such as ``beam_tracing`` and top-level vacuum-field data.
+    """
+    leaves = 0
+    values = 0
+    try:
+        for leaf in _iter_nonempty_ids_leaves(node):
+            leaves += 1
+            try:
+                values += int(np.asarray(leaf.value).size)
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return leaves, values, len(payload) if payload is not None else 0
+
+
+def _valid_numeric_imas_value(value):
+    try:
+        values = np.asarray(value, dtype=float)
+        return (
+            values.size > 0
+            and np.all(np.isfinite(values))
+            and np.all(np.abs(values) < 1.0e30)
+        )
+    except Exception:
+        return False
+
+
+def _wave_parent_schema_present(waves):
+    try:
+        return _valid_numeric_imas_value(waves.vacuum_toroidal_field.b0)
+    except Exception:
+        return False
+
+
+def _capture_wave_schema_templates(waves, input_slices, param_process,
+                                   config_folder_path):
+    if waves is None:
+        return
+    active = _selected_active_wave_sources(input_slices, param_process)
+    if not any(active.values()):
+        return
+    counters = {"ec": 0, "ic": 0}
+    templates = _WAVE_SCHEMA_TEMPLATES.setdefault(
+        _wave_template_key(config_folder_path),
+        {"base": None, "parent": None, "slots": {}},
+    )
+    # Allow a process that imported an older in-memory cache layout to recover
+    # harmlessly (useful during interactive workflow development).
+    if "slots" not in templates:
+        templates.clear()
+        templates.update({"base": None, "parent": None, "slots": {}})
+    templates.setdefault("parent", None)
+    try:
+        coherent_waves = waves.coherent_wave
+    except Exception:
+        return
+
+    base_score = _schema_richness(waves)
+    current_base = templates.get("base")
+    base_is_richer = (
+        current_base is None
+        or base_score[:2] > current_base["score"][:2]
+    )
+    parent_candidate = (
+        templates.get("parent") is None
+        and _wave_parent_schema_present(waves)
+    )
+    slot_candidates = []
+    for wave_index, wave in enumerate(coherent_waves):
+        kind = _wave_source_kind(wave)
+        if kind not in counters:
+            continue
+        source_index = counters[kind]
+        counters[kind] += 1
+        if not active.get(kind, False):
+            continue
+        slot_key = (kind, source_index)
+        score = _schema_richness(wave)
+        current = templates["slots"].get(slot_key)
+        if current is None or score[:2] > current["score"][:2]:
+            slot_candidates.append((slot_key, wave_index, score))
+
+    # Actor schemas normally stabilize after their first populated output.
+    # Avoid serializing a potentially large 81-wave IDS at every time slice.
+    if not base_is_richer and not parent_candidate and not slot_candidates:
+        return
+    payload = _serialize_ids_snapshot(waves)
+    if payload is None:
+        return
+    if base_is_richer:
+        templates["base"] = {
+            "payload": payload,
+            "score": (*base_score[:2], len(payload)),
+        }
+    if parent_candidate:
+        templates["parent"] = {"payload": payload}
+        print("  [HCD outputs] Cached waves parent schema", flush=True)
+    for slot_key, wave_index, score in slot_candidates:
+        templates["slots"][slot_key] = {
+            "payload": payload,
+            "wave_index": wave_index,
+            "score": (*score[:2], len(payload)),
+        }
+
+
+def _restore_full_wave_schema_template(output_ids, input_slices, param_process,
+                                       timenow, config_folder_path):
+    """Restore the richest complete waves schema for a fully inactive slice."""
+    if any(_selected_active_wave_sources(
+            input_slices, param_process).values()):
+        return False
+    templates = _WAVE_SCHEMA_TEMPLATES.get(
+        _wave_template_key(config_folder_path), {})
+    base = templates.get("base") if isinstance(templates, dict) else None
+    if base is None:
+        return False
+    restored = _deserialize_ids_snapshot("waves", base.get("payload"))
+    if restored is None:
+        return False
+    _ensure_ids_time(restored, timenow)
+    output_ids["waves"] = restored
+    return True
+
+
+def _restore_wave_parent_schema_template(output_ids, config_folder_path):
+    """Restore stable waves-level fields that merge actors may omit."""
+    waves = output_ids.get("waves")
+    if waves is None:
+        return False
+    templates = _WAVE_SCHEMA_TEMPLATES.get(
+        _wave_template_key(config_folder_path), {})
+    parent = templates.get("parent") if isinstance(templates, dict) else None
+    if parent is None:
+        print("  [HCD outputs] WARNING: waves parent schema is unavailable",
+              flush=True)
+        return False
+    restored = _deserialize_ids_snapshot("waves", parent.get("payload"))
+    if restored is None:
+        return False
+
+    refreshed = False
+    target = waves.vacuum_toroidal_field
+    source = restored.vacuum_toroidal_field
+    for field_name in ("r0", "b0"):
+        try:
+            current = getattr(target, field_name)
+            template_value = getattr(source, field_name)
+            value = (
+                template_value
+                if _valid_numeric_imas_value(template_value)
+                else current
+            )
+            if _valid_numeric_imas_value(value):
+                # Reassignment is deliberate: put_slice only extends this
+                # time-dependent dataset when the node is materialized for
+                # the current slice, even if a merge result exposes a cached
+                # value through has_value.
+                _set_array_or_scalar(target, field_name, np.asarray(value))
+                refreshed = True
+        except Exception:
+            pass
+    if refreshed:
+        try:
+            b0 = np.asarray(target.b0, dtype=float)
+            print(
+                "  [HCD outputs] Materialized waves parent schema "
+                f"(b0_shape={b0.shape}, b0={b0.tolist()})",
+                flush=True,
+            )
+        except Exception:
+            print("  [HCD outputs] Materialized waves parent schema",
+                  flush=True)
+    return refreshed
+
+
+def _restore_wave_schema_template(coherent_waves, slot_index, source_kind,
+                                  source_index, config_folder_path,
+                                  snapshot_cache=None):
+    templates = _WAVE_SCHEMA_TEMPLATES.get(
+        _wave_template_key(config_folder_path), {})
+    slots = templates.get("slots", {}) if isinstance(templates, dict) else {}
+    template = slots.get((source_kind, source_index))
+    if template is None:
+        return False
+    payload = template.get("payload")
+    cache_key = id(payload)
+    restored = (snapshot_cache.get(cache_key)
+                if snapshot_cache is not None else None)
+    if restored is None:
+        restored = _deserialize_ids_snapshot("waves", payload)
+        if restored is not None and snapshot_cache is not None:
+            snapshot_cache[cache_key] = restored
+    if restored is None:
+        return False
+    try:
+        coherent_waves[slot_index] = restored.coherent_wave[
+            template["wave_index"]]
+        return True
+    except Exception:
+        return False
+
+
+def _capture_core_sources_schema_template(core_sources, input_slices,
+                                          param_process, config_folder_path):
+    if core_sources is None:
+        return
+    try:
+        if len(core_sources.source) == 0:
+            return
+    except Exception:
+        return
+    if not any(_selected_active_wave_sources(
+            input_slices, param_process).values()):
+        return
+    score = _schema_richness(core_sources)
+    key = _wave_template_key(config_folder_path)
+    current = _CORE_SOURCES_SCHEMA_TEMPLATES.get(key)
+    if current is not None and score[:2] <= current["score"][:2]:
+        return
+    payload = _serialize_ids_snapshot(core_sources)
+    if payload is None:
+        return
+    if current is None or score[:2] > current["score"][:2]:
+        _CORE_SOURCES_SCHEMA_TEMPLATES[key] = {
+            "payload": payload,
+            "score": (*score[:2], len(payload)),
+        }
+
+
+def _restore_core_sources_schema_template(output_ids, timenow,
+                                          config_folder_path):
+    current = output_ids.get("core_sources")
+    try:
+        if current is not None and len(current.source) > 0:
+            return False
+    except Exception:
+        pass
+    template = _CORE_SOURCES_SCHEMA_TEMPLATES.get(
+        _wave_template_key(config_folder_path))
+    if template is None:
+        return False
+    restored = _deserialize_ids_snapshot(
+        "core_sources", template.get("payload"))
+    if restored is None:
+        return False
+    _ensure_ids_time(restored, timenow)
+    for source in restored.source:
+        _zero_existing_core_source_payload(source, timenow)
+    output_ids["core_sources"] = restored
+    return True
+
+
+def _align_selected_wave_slots(waves, input_slices, param_process):
+    """Keep actor order and add only the independently selected source slots.
+
+    Recognized actor waves retain their relative order.  Missing slots are
+    appended in configuration order, while waves belonging to an unselected
+    EC/IC branch are removed.  This makes EC-only and IC-only first-class
+    configurations instead of treating either branch as a dependency of the
+    other.
+    """
+    selected_counts = _selected_wave_counts(input_slices, param_process)
+    if not selected_counts:
+        return waves, []
+    try:
+        current_kinds = [
+            _wave_source_kind(wave) for wave in waves.coherent_wave]
+    except Exception:
+        current_kinds = []
+
+    known_counts = {kind: 0 for kind in selected_counts}
+    for kind in current_kinds:
+        if (kind in selected_counts
+                and known_counts[kind] < selected_counts[kind]):
+            known_counts[kind] += 1
+    unknown_capacity = {
+        kind: selected_counts[kind] - known_counts[kind]
+        for kind in selected_counts
+    }
+    source_indices = {kind: 0 for kind in selected_counts}
+    plan = []
+
+    for wave_index, kind in enumerate(current_kinds):
+        assigned_kind = None
+        if (kind in selected_counts
+                and source_indices[kind] < selected_counts[kind]):
+            assigned_kind = kind
+        elif kind is None:
+            assigned_kind = next(
+                (candidate for candidate in selected_counts
+                 if unknown_capacity[candidate] > 0),
+                None,
+            )
+            if assigned_kind is not None:
+                unknown_capacity[assigned_kind] -= 1
+        if assigned_kind is None:
+            continue
+        source_index = source_indices[assigned_kind]
+        source_indices[assigned_kind] += 1
+        plan.append((assigned_kind, source_index, wave_index))
+
+    for kind, count in selected_counts.items():
+        while source_indices[kind] < count:
+            source_index = source_indices[kind]
+            source_indices[kind] += 1
+            plan.append((kind, source_index, None))
+
+    retained_indices = [wave_index for _, _, wave_index in plan
+                        if wave_index is not None]
+    identity_layout = (
+        retained_indices == list(range(len(current_kinds)))
+        and len(plan) == len(current_kinds)
+    )
+    if not identity_layout:
+        payload = _serialize_ids_snapshot(waves)
+        restored = _deserialize_ids_snapshot("waves", payload)
+        try:
+            waves.coherent_wave.resize(0)
+            waves.coherent_wave.resize(len(plan))
+            if restored is not None:
+                for slot_index, (_, _, wave_index) in enumerate(plan):
+                    if wave_index is not None:
+                        waves.coherent_wave[slot_index] = \
+                            restored.coherent_wave[wave_index]
+        except Exception:
+            pass
+    return waves, [(kind, source_index) for kind, source_index, _ in plan]
+
+
 def _ensure_waves_placeholders(input_slices, output_ids, param_process, timenow,
                                config_folder_path=None):
-    expected = _expected_wave_slots(input_slices, param_process)
-    if not expected:
+    if not _selected_wave_counts(input_slices, param_process):
         return
 
     waves = _ensure_output_slice(output_ids, "waves", timenow)
-    current_len = _safe_len(waves.coherent_wave)
+    waves, slots = _align_selected_wave_slots(
+        waves, input_slices, param_process)
+    output_ids["waves"] = waves
 
-    # keep=True preserves existing elements and only appends new empty slots.
-    if current_len < len(expected):
-        waves.coherent_wave.resize(len(expected), keep=True)
+    active_sources = _selected_active_wave_sources(
+        input_slices, param_process)
+    snapshot_cache = {}
 
-    active_sources = _active_wave_sources(input_slices)
-
-    for slot_index, (source_kind, source_index) in enumerate(expected):
-        slot_was_missing = slot_index >= current_len
+    for slot_index, (source_kind, source_index) in enumerate(slots):
+        slot_was_missing = (
+            _wave_source_kind(waves.coherent_wave[slot_index]) != source_kind
+        )
         source_is_inactive = not active_sources.get(source_kind, False)
         if not slot_was_missing and not source_is_inactive:
             continue
+        if slot_was_missing or source_is_inactive:
+            _restore_wave_schema_template(
+                waves.coherent_wave,
+                slot_index,
+                source_kind,
+                source_index,
+                config_folder_path,
+                snapshot_cache=snapshot_cache,
+            )
         _fill_zero_wave_slot(
             waves.coherent_wave[slot_index],
             source_kind,
@@ -1753,6 +2299,378 @@ def _source_name(source):
         return str(source.identifier.name).strip().lower()
     except Exception:
         return ""
+
+
+def _retain_selected_hcd_sources(core_sources, selected_names):
+    """Drop only unselected EC/IC sources while preserving actor order."""
+    try:
+        current_names = [_source_name(source) for source in core_sources.source]
+    except Exception:
+        return
+    retained_indices = [
+        index for index, name in enumerate(current_names)
+        if name not in {"ec", "ic"} or name in selected_names
+    ]
+    if retained_indices == list(range(len(current_names))):
+        return
+
+    payload = _serialize_ids_snapshot(core_sources)
+    restored = _deserialize_ids_snapshot("core_sources", payload)
+    if restored is None:
+        return
+    try:
+        core_sources.source.resize(0)
+        core_sources.source.resize(len(retained_indices))
+        for index, source_index in enumerate(retained_indices):
+            core_sources.source[index] = restored.source[source_index]
+    except Exception:
+        return
+
+
+def _code_field_name(code_obj):
+    try:
+        name = str(code_obj.name).strip().lower()
+        if name:
+            return name
+    except Exception:
+        pass
+    return ""
+
+
+def _code_field_index(code_obj):
+    try:
+        return int(code_obj.index)
+    except Exception:
+        return None
+
+
+def _wave_is_ic(coherent_wave):
+    """Best-effort guard to keep EC fallback from absorbing IC waves."""
+    try:
+        type_name = _code_field_name(coherent_wave.identifier.type)
+        type_index = _code_field_index(coherent_wave.identifier.type)
+        solver_name = _code_field_name(coherent_wave.wave_solver_type)
+    except Exception:
+        return False
+
+    if "ic" in type_name or type_index == 3 or "ic" in solver_name:
+        return True
+    return False
+
+
+def waves_summary_mw(waves):
+    if waves is None:
+        return 0, 0.0
+    count = 0
+    power = 0.0
+    try:
+        count = _safe_len(waves.coherent_wave)
+        for wave in waves.coherent_wave:
+            if _safe_len(wave.global_quantities) > 0:
+                value = float(wave.global_quantities[0].power)
+                if np.isfinite(value) and abs(value) < 1.0e30:
+                    power += value
+    except Exception:
+        pass
+    return count, power * 1.0e-6
+
+
+def core_source_has_electron_heating_signal(core_sources, source_name="ec"):
+    if core_sources is None:
+        return False
+    try:
+        for source in core_sources.source:
+            if _source_name(source) != source_name:
+                continue
+            for profile in source.profiles_1d:
+                energy = np.asarray(profile.electrons.energy, dtype=float)
+                finite = energy[
+                    np.isfinite(energy) & (np.abs(energy) < 1.0e30)]
+                if finite.size > 0 and np.any(np.abs(finite) > 0.0):
+                    return True
+    except Exception:
+        return False
+    return False
+
+
+def _ec_profiles_from_waves(waves):
+    if waves is None or _safe_len(waves.coherent_wave) == 0:
+        return None
+
+    target_grid = None
+    total_power_density = None
+    total_current_parallel = None
+    ec_power_w = 0.0
+
+    for coherent_wave in waves.coherent_wave:
+        if _wave_is_ic(coherent_wave) or _safe_len(coherent_wave.profiles_1d) == 0:
+            continue
+        try:
+            if _safe_len(coherent_wave.global_quantities) > 0:
+                value = float(coherent_wave.global_quantities[0].power)
+                if np.isfinite(value) and abs(value) < 1.0e30:
+                    ec_power_w += value
+        except Exception:
+            pass
+        profile = coherent_wave.profiles_1d[0]
+        rho = _valid_profile_array(profile.grid.rho_tor_norm)
+        if rho is None:
+            continue
+        power_density = _valid_profile_array(profile.power_density, expected_size=rho.size)
+        current_parallel = _valid_profile_array(
+            profile.current_parallel_density,
+            expected_size=rho.size,
+        )
+        if power_density is None and current_parallel is None:
+            continue
+        if target_grid is None:
+            target_grid = rho
+        total_power_density = _add_profile_to_grid(
+            total_power_density, rho, power_density, target_grid)
+        total_current_parallel = _add_profile_to_grid(
+            total_current_parallel, rho, current_parallel, target_grid)
+
+    if target_grid is None or total_power_density is None:
+        return None
+
+    if total_current_parallel is None:
+        total_current_parallel = np.zeros_like(total_power_density)
+
+    return target_grid, total_power_density, total_current_parallel, ec_power_w * 1.0e-6
+
+
+def _ensure_ids_time(ids_data, timenow):
+    try:
+        ids_data.ids_properties.homogeneous_time = 1
+    except Exception:
+        pass
+    if timenow is None or not hasattr(ids_data, "time"):
+        return
+    try:
+        ids_data.time = np.asarray([float(timenow)], dtype=float)
+    except Exception:
+        try:
+            ids_data.time.resize(1)
+            ids_data.time[0] = float(timenow)
+        except Exception:
+            pass
+
+
+def _find_or_append_source(core_sources, source_name):
+    blank_index = None
+    try:
+        for idx, source in enumerate(core_sources.source):
+            name = _source_name(source)
+            if name == source_name:
+                return source
+            if not name and blank_index is None:
+                blank_index = idx
+    except Exception:
+        pass
+
+    try:
+        if blank_index is None:
+            blank_index = _safe_len(core_sources.source)
+            core_sources.source.resize(blank_index + 1, keep=True)
+        return core_sources.source[blank_index]
+    except Exception:
+        return None
+
+
+def repair_ec_core_sources_from_waves(output_ids, timenow=None):
+    """Fill only the EC source from waves when hcd2core_sources returns empty EC.
+
+    This is an internal compatibility guard for DD4 H&CD coupling. It preserves
+    any existing non-EC sources instead of replacing the complete IDS.
+    """
+    waves = output_ids.get("waves") if output_ids else None
+    n_waves, p_waves_mw = waves_summary_mw(waves)
+    if n_waves == 0 or p_waves_mw <= 1.0e-9:
+        return False
+
+    core_sources = output_ids.get("core_sources")
+    if core_source_has_electron_heating_signal(core_sources, "ec"):
+        return False
+
+    profiles = _ec_profiles_from_waves(waves)
+    if profiles is None:
+        return False
+    rho, power_density, current_parallel, ec_power_mw = profiles
+
+    if _ids_needs_placeholder(core_sources):
+        core_sources = _create_ids("core_sources")
+        output_ids["core_sources"] = core_sources
+    _ensure_ids_time(core_sources, timenow)
+
+    source = _find_or_append_source(core_sources, "ec")
+    if source is None:
+        return False
+
+    source.identifier.name = "ec"
+    source.identifier.index = 3
+    _ensure_source_global_quantities(source, timenow)
+    try:
+        source.global_quantities[0].power = float(ec_power_mw) * 1.0e6
+        source.global_quantities[0].electrons.power = float(ec_power_mw) * 1.0e6
+    except Exception:
+        pass
+
+    try:
+        if _safe_len(source.profiles_1d) == 0:
+            source.profiles_1d.resize(1)
+        profile = source.profiles_1d[0]
+    except Exception:
+        return False
+
+    try:
+        profile.time = float(timenow) if timenow is not None else profile.time
+    except Exception:
+        pass
+
+    zeros = np.zeros_like(rho, dtype=float)
+    profile.grid.rho_tor_norm = rho
+    _set_if_missing(profile.grid, "rho_tor", rho.copy())
+    _set_if_missing(profile.grid, "rho_pol_norm", rho.copy())
+    _set_if_missing(profile.grid, "psi", zeros.copy())
+    _set_if_missing(profile.grid, "area", zeros.copy())
+    _set_if_missing(profile.grid, "surface", zeros.copy())
+    _set_if_missing(profile.grid, "volume", zeros.copy())
+    profile.electrons.energy = power_density
+    profile.j_parallel = current_parallel
+    return True
+
+
+def _iter_nonempty_ids_leaves(node):
+    """Recursively yield assigned IMAS leaf nodes without schema internals."""
+    if node is None:
+        return
+    if type(node).__name__ == "IDSStructArray":
+        for item in node:
+            yield from _iter_nonempty_ids_leaves(item)
+        return
+    iterator = getattr(node, "iter_nonempty_", None)
+    if callable(iterator):
+        for child in iterator():
+            yield from _iter_nonempty_ids_leaves(child)
+        return
+    yield node
+
+
+def sanitize_hcd_output_numerics(output_ids):
+    """Replace non-finite values and IMAS sentinels in assigned output leaves.
+
+    Real physics actors occasionally assign NaN to auxiliary DD fields (for
+    example Torbeam's per-beam ``grid.area`` outside its interpolation range).
+    Once assigned, those values are persisted by HDF5 and can poison later
+    readers even though the primary deposition profile is valid.  Sanitize all
+    generated HCD IDS objects at the shared Legacy/Hybrid/Pure write boundary.
+    """
+    if not isinstance(output_ids, dict):
+        return 0
+
+    replacements = 0
+    for ids_obj in output_ids.values():
+        for leaf in _iter_nonempty_ids_leaves(ids_obj):
+            try:
+                values = np.asarray(leaf.value)
+            except Exception:
+                continue
+            if values.dtype.kind in "fc":
+                invalid = ~np.isfinite(values) | (np.abs(values) >= 1.0e30)
+            elif values.dtype.kind in "iu":
+                invalid = values == -999_999_999
+            else:
+                continue
+            if not np.any(invalid):
+                continue
+
+            cleaned = values.copy()
+            cleaned[invalid] = 0
+            try:
+                leaf.value = cleaned.item() if cleaned.ndim == 0 else cleaned
+            except Exception:
+                continue
+            replacements += int(np.count_nonzero(invalid))
+    return replacements
+
+
+def _clean_numeric_field(parent, field_name):
+    try:
+        values = np.asarray(getattr(parent, field_name))
+    except Exception:
+        return 0
+    if values.dtype.kind in "fc":
+        invalid = ~np.isfinite(values) | (np.abs(values) >= 1.0e30)
+    elif values.dtype.kind in "iu":
+        invalid = values == -999_999_999
+    else:
+        return 0
+    if not np.any(invalid):
+        return 0
+
+    cleaned = values.copy()
+    cleaned[invalid] = 0
+    try:
+        setattr(
+            parent,
+            field_name,
+            cleaned.item() if cleaned.ndim == 0 else cleaned,
+        )
+    except Exception:
+        return 0
+    return int(np.count_nonzero(invalid))
+
+
+def sanitize_core_sources_numerics(core_sources):
+    """Apply the finite-value contract to known H&CD source fields."""
+    if core_sources is None:
+        return 0
+
+    replacements = 0
+    physical_fields = (
+        "power", "current_parallel", "total_ion_power", "j_parallel",
+        "energy", "particles", "momentum_phi", "momentum_tor",
+        "torque_phi", "torque_tor", "total_ion_energy",
+    )
+    try:
+        sources = core_sources.source
+    except Exception:
+        sources = ()
+
+    for source in sources:
+        for quantities in getattr(source, "global_quantities", []):
+            for field_name in physical_fields:
+                replacements += _clean_numeric_field(quantities, field_name)
+            try:
+                for field_name in physical_fields:
+                    replacements += _clean_numeric_field(
+                        quantities.electrons, field_name)
+            except Exception:
+                pass
+            for ion in getattr(quantities, "ion", []):
+                for field_name in physical_fields:
+                    replacements += _clean_numeric_field(ion, field_name)
+
+        for profile in getattr(source, "profiles_1d", []):
+            for field_name in physical_fields:
+                replacements += _clean_numeric_field(profile, field_name)
+            try:
+                for field_name in physical_fields:
+                    replacements += _clean_numeric_field(
+                        profile.electrons, field_name)
+            except Exception:
+                pass
+            for ion in getattr(profile, "ion", []):
+                for field_name in physical_fields:
+                    replacements += _clean_numeric_field(ion, field_name)
+
+    replacements += sanitize_hcd_output_numerics(
+        {"core_sources": core_sources})
+    return replacements
+
+
+# Compatibility for existing callers; no TORAX-specific reshaping is applied.
+sanitize_core_sources_for_torax = sanitize_core_sources_numerics
 
 
 def _ensure_source_global_quantities(source, timenow):
@@ -1822,13 +2740,11 @@ def _source_radial_size(source, sibling_sources, input_slices, config_folder_pat
 
 def _ensure_source_profiles_1d(source, sibling_sources, input_slices, timenow,
                                config_folder_path):
-    """Ensure profiles_1d[0] has the schema CYRANO writes.
+    """Ensure profiles_1d[0] has the stable DD4 source schema.
 
-    Only used for IC sources: avoids creating empty profiles_1d for EC where
-    torbeam/hcd2core_sources establishes the schema with the real nrho.
-    Without this, CYRANO's first IC-on slice would be the first time
-    ion[].energy is written and HDF5 only allocates that field for
-    IC-active timesteps (causing readback errors at IC-off times).
+    This is used for both EC and IC placeholders.  Without it, a later inactive
+    slice can shrink an actor-established 1D grid to zero; HDF5 then either
+    becomes unreadable or exposes different source shapes across the pulse.
 
     Never overwrites CYRANO-written values: every field write is gated by
     `has_value` checks, and AoS resizes use keep=True.
@@ -1900,18 +2816,53 @@ def _fill_zero_source_slot(source, source_kind, timenow,
         source.identifier.name = "ic"
         source.identifier.index = 5
     _ensure_source_global_quantities(source, timenow)
-    if source_kind == "ic" and input_slices is not None:
+    if source_kind in {"ec", "ic"} and input_slices is not None:
         _ensure_source_profiles_1d(
             source, sibling_sources, input_slices, timenow, config_folder_path)
 
 
+def _zero_existing_core_source_payload(source, timenow):
+    """Zero source/sink terms while retaining the actor-established schema."""
+    physical_fields = (
+        "power", "current_parallel", "total_ion_power", "j_parallel",
+        "energy", "particles", "momentum_phi", "momentum_tor",
+        "torque_phi", "torque_tor", "total_ion_energy",
+    )
+    for quantities in getattr(source, "global_quantities", []):
+        try:
+            quantities.time = timenow
+        except Exception:
+            pass
+        for field_name in physical_fields:
+            _zero_field_like(quantities, field_name)
+        try:
+            for field_name in physical_fields:
+                _zero_field_like(quantities.electrons, field_name)
+        except Exception:
+            pass
+        for ion in getattr(quantities, "ion", []):
+            for field_name in physical_fields:
+                _zero_field_like(ion, field_name)
+
+    for profile in getattr(source, "profiles_1d", []):
+        try:
+            profile.time = timenow
+        except Exception:
+            pass
+        for field_name in physical_fields:
+            _zero_field_like(profile, field_name)
+        try:
+            for field_name in physical_fields:
+                _zero_field_like(profile.electrons, field_name)
+        except Exception:
+            pass
+        for ion in getattr(profile, "ion", []):
+            for field_name in physical_fields:
+                _zero_field_like(ion, field_name)
+
+
 def _expected_source_names(param_process):
-    expected = []
-    if _process_is_selected(param_process, "ec_wave_solver"):
-        expected.append("ec")
-    if _process_is_selected(param_process, "ic_wave_solver"):
-        expected.append("ic")
-    return expected
+    return _selected_wave_kinds(param_process)
 
 
 def _ensure_core_sources_placeholders(input_slices, output_ids, param_process,
@@ -1924,6 +2875,7 @@ def _ensure_core_sources_placeholders(input_slices, output_ids, param_process,
         return
 
     core_sources = _ensure_output_slice(output_ids, "core_sources", timenow)
+    _retain_selected_hcd_sources(core_sources, set(expected))
     names = [_source_name(source) for source in core_sources.source]
     blank_indices = [idx for idx, name in enumerate(names) if not name]
 
@@ -1944,9 +2896,13 @@ def _ensure_core_sources_placeholders(input_slices, output_ids, param_process,
         )
         names[idx] = source_kind
 
+    active_sources = _selected_active_wave_sources(
+        input_slices, param_process)
     for source, name in zip(core_sources.source, names):
         _ensure_source_global_quantities(source, timenow)
-        if name == "ic":
+        if name in {"ec", "ic"}:
+            if not active_sources.get(name, False):
+                _zero_existing_core_source_payload(source, timenow)
             _ensure_source_profiles_1d(
                 source, core_sources.source, input_slices, timenow,
                 config_folder_path)
@@ -1954,14 +2910,45 @@ def _ensure_core_sources_placeholders(input_slices, output_ids, param_process,
 
 def stabilize_selected_hcd_outputs(input_slices, output_ids, param_process,
                                     timenow, config_folder_path=None):
-    """Fill placeholder slots for outputs the workflow is configured to produce."""
+    """Repair and stabilize selected H&CD outputs before database storage.
+
+    Keeping this at the shared write boundary gives legacy, Hybrid M3, and
+    Pure M3 the same DD4 contract.  The Hybrid executor also performs the
+    repair immediately after hcd2core_sources so downstream in-process users
+    see it early; all helpers here are deliberately idempotent.
+    """
     if param_process is None or timenow is None:
         return
+    _capture_wave_schema_templates(
+        output_ids.get("waves"), input_slices, param_process,
+        config_folder_path)
+    _capture_core_sources_schema_template(
+        output_ids.get("core_sources"), input_slices, param_process,
+        config_folder_path)
+    _restore_full_wave_schema_template(
+        output_ids, input_slices, param_process, timenow,
+        config_folder_path)
+    _restore_wave_parent_schema_template(output_ids, config_folder_path)
     _ensure_waves_placeholders(
         input_slices, output_ids, param_process, timenow,
         config_folder_path=config_folder_path,
     )
+    _restore_core_sources_schema_template(
+        output_ids, timenow, config_folder_path)
+    stabilization_disabled = os.environ.get(
+        "HCDWF_DISABLE_CORE_SOURCE_STABILIZATION", ""
+    ).lower() in {"1", "true", "yes", "on"}
+    if not stabilization_disabled:
+        repair_ec_core_sources_from_waves(output_ids, timenow=timenow)
     _ensure_core_sources_placeholders(
         input_slices, output_ids, param_process, timenow,
         config_folder_path=config_folder_path,
     )
+    sanitized = sanitize_core_sources_numerics(
+        output_ids.get("core_sources"))
+    sanitized += sanitize_hcd_output_numerics(output_ids)
+    if sanitized:
+        print(
+            f"  [HCD outputs] Replaced {sanitized} non-finite/sentinel values",
+            flush=True,
+        )

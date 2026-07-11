@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+component="${1:-}"
+: "${HCD_SANDBOX:?source config_hcd_iter_sdcc.sh before launching MUSCLE3}"
+: "${ACTOR_FOLDER:?source config_hcd_iter_sdcc.sh before launching MUSCLE3}"
+
+cd "${HCD_SANDBOX}"
+
+case "${component}" in
+    hybrid_driver)
+        exec python3 workflow/workflow_driver.py tests/m3_hybrid 1
+        ;;
+    hybrid_workflow)
+        exec python3 hcdworkflow/hcd_workflow_m3.py tests/m3_hybrid
+        ;;
+    pure_driver)
+        exec python3 hcdworkflow/workflow_driver_m3_pure.py tests/m3_hybrid
+        ;;
+    torbeam|cyrano|merge_waves|hcd2core_sources)
+        exec "${ACTOR_FOLDER}/${component}/${component}_m3.exe"
+        ;;
+    *)
+        echo "Unknown HCDWF M3 component: ${component}" >&2
+        exit 2
+        ;;
+esac

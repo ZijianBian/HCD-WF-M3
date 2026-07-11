@@ -134,9 +134,9 @@ settings:
   config_folder_path: "tests/m3_hybrid"
   extra_cooking: false
 
-  torbeam.code_parameters:          "tests/data/FOPLA_TEST/ECRH/ec_wave_solver/input_torbeam.xml"
-  cyrano.code_parameters:           "tests/data/FOPLA_TEST/ICRH/ic_wave_solver/input_cyrano.xml"
-  hcd2core_sources.code_parameters: "tests/data/FOPLA_TEST/source/fill_core_sources/input_hcd2core_sources.xml"
+  torbeam.code_parameters:          "tests/m3_hybrid/ECRH/ec_wave_solver/input_torbeam.xml"
+  cyrano.code_parameters:           "tests/m3_hybrid/ICRH/ic_wave_solver/input_cyrano.xml"
+  hcd2core_sources.code_parameters: "tests/m3_hybrid/source/fill_core_sources/input_hcd2core_sources.xml"
 
 resources:
   driver:           { threads: 1 }
@@ -147,31 +147,26 @@ resources:
 
 implementations:
   driver_impl:
-    executable: python3
+    executable: hcdwf_m3_component
     args:
-      - "hcdworkflow/workflow_driver_m3_pure.py"
-      - "tests/m3_hybrid"
+      - pure_driver
 
   torbeam_impl:
-    executable: bash
+    executable: hcdwf_m3_component
     args:
-      - "-lc"
-      - 'exec "$ACTOR_FOLDER/torbeam/torbeam_m3.exe"'
+      - torbeam
 
   cyrano_impl:
-    executable: bash
+    executable: hcdwf_m3_component
     args:
-      - "-lc"
-      - 'exec "$ACTOR_FOLDER/cyrano/cyrano_m3.exe"'
+      - cyrano
 
   merge_waves_impl:
-    executable: bash
+    executable: hcdwf_m3_component
     args:
-      - "-lc"
-      - 'exec "$ACTOR_FOLDER/merge_waves/merge_waves_m3.exe"'
+      - merge_waves
 
   hcd2core_sources_impl:
-    executable: bash
+    executable: hcdwf_m3_component
     args:
-      - "-lc"
-      - 'exec "$ACTOR_FOLDER/hcd2core_sources/hcd2core_sources_m3.exe"'
+      - hcd2core_sources

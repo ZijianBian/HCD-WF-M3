@@ -71,13 +71,10 @@ resources:
 
 implementations:
   workflow_driver_impl:
-    executable: python3
+    executable: hcdwf_m3_component
     args:
-      - "workflow/workflow_driver.py"
-      - "tests/m3_hybrid"
-      - "1"
+      - hybrid_driver
   hcd_workflow_impl:
-    executable: python3
+    executable: hcdwf_m3_component
     args:
-      - "hcdworkflow/hcd_workflow_m3.py"
-      - "tests/m3_hybrid"
+      - hybrid_workflow
