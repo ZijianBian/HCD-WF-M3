@@ -7,7 +7,7 @@
 #   legacy  : In-process iwrap, no MUSCLE3 (all actors run inside workflow_driver)
 #   hybrid  : MUSCLE3 macro-micro, Python micro (driver ↔ hcd_workflow_m3)
 #   pure    : MUSCLE3 macro-micro, Fortran actor direct (driver ↔ *_m3.exe)
-#             Default topology is the full maintained Pure yMMSL example.
+#             The maintained baseline omits FoPla.
 #
 # Prereq: source config_hcd_iter_sdcc.sh once per shell session.
 #
@@ -42,13 +42,13 @@ case "$MODE" in
         CONFIG_PATH="tests/m3_hybrid"
         ;;
     "hybrid")
-        YMMSL_FILE="${HCD_HYBRID_YMMSL:-test_hybrid_hcdwf.ymmsl}"
+        YMMSL_FILE="${HCD_HYBRID_YMMSL:-hcdwf_hybrid_m3.ymmsl}"
         MODE_DESC="Hybrid MUSCLE3 (driver ↔ hcd_workflow_m3.py)"
         RUN_PREFIX="run_hybrid"
         ;;
     "pure")
-        YMMSL_FILE="${HCD_PURE_YMMSL:-test_m3_pure.ymmsl}"
-        MODE_DESC="Pure MUSCLE3 (driver ↔ direct M3 actor executables)"
+        YMMSL_FILE="${HCD_PURE_YMMSL:-hcdwf_pure_m3.ymmsl}"
+        MODE_DESC="Pure MUSCLE3 (driver ↔ direct M3 actors; no FoPla)"
         RUN_PREFIX="run_pure"
         ;;
 esac
@@ -96,16 +96,39 @@ if [[ "$MODE" != "legacy" ]]; then
     echo "YMMSL:       $YMMSL_FILE" >> "$DIR_NAME/run_config.txt"
 fi
 
-if [[ "$MODE" == "legacy" ]]; then
-    time python workflow/workflow_driver.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log" \
-        || echo "Warning: Workflow exited with an error code."
-else
-    time muscle_manager --start-all "$YMMSL_FILE" || echo "Warning: MUSCLE3 manager exited with an error code."
+RUN_STATUS=0
 
-    MUSCLE_OUTPUT=$(ls -td run_* 2>/dev/null | head -1)
+if [[ "$MODE" == "legacy" ]]; then
+    # Keep the log while retaining the Python process' status rather than the
+    # status of tee. Disable errexit only around the command so diagnostics can
+    # still be collected below.
+    set +e
+    time python workflow/workflow_driver.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log"
+    RUN_STATUS=${PIPESTATUS[0]}
+    set -e
+else
+    # MUSCLE3 may leave useful run diagnostics even on failure. Capture its
+    # status, move only diagnostics created by this launch, and propagate the
+    # original status.
+    MANAGER_STARTED_MARKER="$DIR_NAME/muscle_manager.started"
+    touch "$MANAGER_STARTED_MARKER"
+    set +e
+    time muscle_manager --start-all "$YMMSL_FILE"
+    RUN_STATUS=$?
+    set -e
+
+    MUSCLE_OUTPUT=$(find . -maxdepth 1 -mindepth 1 -type d -name 'run_*' \
+        -newer "$MANAGER_STARTED_MARKER" -printf '%T@ %p\n' 2>/dev/null \
+        | sort -nr | head -1 | cut -d' ' -f2-)
+    MUSCLE_OUTPUT=${MUSCLE_OUTPUT#./}
     if [ -n "$MUSCLE_OUTPUT" ] && [ -d "$MUSCLE_OUTPUT" ]; then
         mv "$MUSCLE_OUTPUT" "$DIR_NAME/muscle3_output"
         echo ""
         echo "MUSCLE3 output moved to: $DIR_NAME/muscle3_output"
     fi
+fi
+
+if [[ "$RUN_STATUS" -ne 0 ]]; then
+    echo "ERROR: $MODE workflow exited with status $RUN_STATUS" >&2
+    exit "$RUN_STATUS"
 fi

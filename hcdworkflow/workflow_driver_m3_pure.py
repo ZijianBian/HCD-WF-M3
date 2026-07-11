@@ -123,13 +123,37 @@ def _ic_total_power(ic_antennas_ids) -> float:
 # M3 send / recv helpers
 # =============================================================================
 
+_IDS_NAMES_BY_LENGTH = tuple(sorted((
+    'distribution_sources', 'core_profiles', 'core_sources',
+    'ec_launchers', 'ic_antennas', 'equilibrium', 'distributions',
+    'waves', 'nbi',
+), key=len, reverse=True))
+
+
+def _ids_name_for_send(ids_obj, port_name):
+    """Resolve the IDS type without truncating names containing underscores."""
+    ids_name = getattr(ids_obj, '__name__', None)
+    if ids_name:
+        return str(ids_name)
+    try:
+        ids_name = ids_obj.metadata.name
+    except Exception:
+        ids_name = None
+    if ids_name:
+        return str(ids_name)
+    for candidate in _IDS_NAMES_BY_LENGTH:
+        if port_name == f'{candidate}_out' or port_name.startswith(f'{candidate}_'):
+            return candidate
+    raise ValueError(f"Cannot infer IDS type for send port '{port_name}'")
+
+
 def _send(instance, port_name, ids_obj, timenow, t_next):
     """Serialize and send an IDS on a port."""
     try:
         data = ids_obj.serialize()
     except Exception as e:
         print(f"  -> WARNING: {port_name} serialization failed ({e}), sending empty", flush=True)
-        empty = _create_ids(port_name.rsplit('_out', 1)[0].rsplit('_', 1)[0])
+        empty = _create_ids(_ids_name_for_send(ids_obj, port_name))
         empty.ids_properties.homogeneous_time = 0
         try:
             data = empty.serialize()

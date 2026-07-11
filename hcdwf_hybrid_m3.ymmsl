@@ -1,6 +1,6 @@
 ymmsl_version: v0.1
 model:
-  name: hcd_workflow_hybrid
+  name: hcdwf_hybrid_m3
   components:
     # === MACRO: Workflow Driver ===
     # Time loop, database I/O, M3 send/receive.

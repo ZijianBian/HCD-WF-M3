@@ -1,7 +1,7 @@
 ymmsl_version: v0.1
 
 # =============================================================================
-# Pure M3 mode — Full chain
+# Pure M3 mode — HCD baseline without FoPla
 # =============================================================================
 #
 # Prereq: source config_hcd_iter_sdcc.sh once in the shell before running.
@@ -9,18 +9,19 @@ ymmsl_version: v0.1
 # Topology:
 #         ┌─► torbeam ─────► waves_ec ─┐
 # driver ─┤                             ├─► merge_waves ─► waves_merged ──┐
-#         └─► cyrano  ─────► waves_ic ─┘                                   │
-#                                                                          │
-# driver (waves_merged, …) ────► fopla ────► distributions                 │
-#                                                                          │
-# driver (distributions, waves_merged, …) ────► hcd2core_sources ─► core_sources
+#         └─► cyrano  ─────► waves_ic ─┘                                  │
+#                                                                         │
+# driver (input distributions, waves_merged, …) ─► hcd2core_sources ─► core_sources
 #
-# 1 reuse = 1 timestep. Option C power-gating on EC (torbeam) and IC (cyrano).
+# EC and IC branches are power-gated by the macro driver. If either branch is
+# inactive, merge_waves is bypassed and the active wave branch is propagated.
+# One macro reuse contains the full time loop; each actor exchange drives one
+# micro reuse.
 #
 # =============================================================================
 
 model:
-  name: hcd_pure_m3_full
+  name: hcdwf_pure_m3
 
   components:
     driver:
@@ -43,14 +44,6 @@ model:
           # merge_waves
           - waves_ec_out
           - waves_ic_out
-          # fopla
-          - equilibrium_out_fp
-          - core_profiles_out_fp
-          - ic_antennas_out_fp
-          - waves_out_to_fopla
-          - distributions_out_fp
-          - distribution_sources_out_fp
-          - nbi_out_fp
           # hcd2core_sources
           - distributions_out_post
           - distribution_sources_out_post
@@ -60,7 +53,6 @@ model:
           - waves_in           # ← torbeam
           - waves_ic_in        # ← cyrano
           - waves_merged_in    # ← merge_waves
-          - distributions_in   # ← fopla
           - core_sources_in    # ← hcd2core_sources
 
     torbeam:
@@ -97,20 +89,6 @@ model:
         o_f:
           - waves_out
 
-    fopla:
-      implementation: fopla_impl
-      ports:
-        f_init:
-          - equilibrium_in
-          - core_profiles_in
-          - ic_antennas_in
-          - waves_in
-          - distributions_in
-          - distribution_sources_in
-          - nbi_in
-        o_f:
-          - distributions_out
-
     hcd2core_sources:
       implementation: hcd2core_sources_impl
       ports:
@@ -145,16 +123,6 @@ model:
     driver.waves_ic_out:       merge_waves.waves2_in
     merge_waves.waves_out:     driver.waves_merged_in
 
-    # driver → fopla
-    driver.equilibrium_out_fp:          fopla.equilibrium_in
-    driver.core_profiles_out_fp:        fopla.core_profiles_in
-    driver.ic_antennas_out_fp:          fopla.ic_antennas_in
-    driver.waves_out_to_fopla:          fopla.waves_in
-    driver.distributions_out_fp:        fopla.distributions_in
-    driver.distribution_sources_out_fp: fopla.distribution_sources_in
-    driver.nbi_out_fp:                  fopla.nbi_in
-    fopla.distributions_out:            driver.distributions_in
-
     # driver → hcd2core_sources
     driver.distributions_out_post:        hcd2core_sources.distributions_in
     driver.distribution_sources_out_post: hcd2core_sources.distribution_sources_in
@@ -168,7 +136,6 @@ settings:
 
   torbeam.code_parameters:          "tests/data/FOPLA_TEST/ECRH/ec_wave_solver/input_torbeam.xml"
   cyrano.code_parameters:           "tests/data/FOPLA_TEST/ICRH/ic_wave_solver/input_cyrano.xml"
-  fopla.code_parameters:            "tests/data/FOPLA_TEST/ICRH/ic_wave_fp/input_fopla.xml"
   hcd2core_sources.code_parameters: "tests/data/FOPLA_TEST/source/fill_core_sources/input_hcd2core_sources.xml"
 
 resources:
@@ -176,7 +143,6 @@ resources:
   torbeam:          { threads: 1 }
   cyrano:           { threads: 1 }
   merge_waves:      { threads: 1 }
-  fopla:            { threads: 1 }
   hcd2core_sources: { threads: 1 }
 
 implementations:
@@ -203,12 +169,6 @@ implementations:
     args:
       - "-lc"
       - 'exec "$ACTOR_FOLDER/merge_waves/merge_waves_m3.exe"'
-
-  fopla_impl:
-    executable: bash
-    args:
-      - "-lc"
-      - 'exec "$ACTOR_FOLDER/fopla/fopla_m3.exe"'
 
   hcd2core_sources_impl:
     executable: bash
