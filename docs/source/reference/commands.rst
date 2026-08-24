@@ -58,7 +58,7 @@ MUSCLE3
 
 .. code-block:: bash
 
-   muscle_manager --start-all FILE.ymmsl
+   muscle_manager --run-dir DIR --start-all FILE.ymmsl
 
 Inspecting IDS Data
 -------------------

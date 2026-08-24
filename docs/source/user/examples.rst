@@ -22,7 +22,9 @@ Use this to exercise the macro-to-workflow M3 boundary.
 .. code-block:: bash
 
    source config_hcd_iter_sdcc.sh
-   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+   RUN_DIR=runs/hybrid_$(date +%Y%m%d_%H%M%S)
+   mkdir -p "$RUN_DIR"
+   muscle_manager --run-dir "$RUN_DIR" --start-all test_hybrid_hcdwf.ymmsl
 
 Pure M3, No FoPla
 ------------------------

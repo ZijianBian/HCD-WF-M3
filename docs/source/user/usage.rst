@@ -23,7 +23,7 @@ Command Summary
      - Legacy in-process driver.
    * - ``python workflow/workflow_driver.py CONFIG 1``
      - Hybrid M3 macro component, normally launched by MUSCLE3.
-   * - ``muscle_manager --start-all FILE.ymmsl``
+   * - ``muscle_manager --run-dir DIR --start-all FILE.ymmsl``
      - Launch Hybrid or Pure M3 topology.
    * - ``./run.sh pure``
      - Launch the default Pure M3 topology.
@@ -41,9 +41,19 @@ input, actor behavior, or M3 coupling.
 Hybrid M3 Mode
 --------------
 
+.. note::
+
+   Always pass ``--run-dir`` when calling ``muscle_manager`` directly.  Without
+   it MUSCLE3 creates ``run_<model>_<timestamp>/`` in the current working
+   directory, which quickly clutters the repository root.  The directory must
+   already exist, so create it first.  ``./run.sh`` does this for you and keeps
+   each run under ``runs/``.
+
 .. code-block:: bash
 
-   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+   RUN_DIR=runs/hybrid_$(date +%Y%m%d_%H%M%S)
+   mkdir -p "$RUN_DIR"
+   muscle_manager --run-dir "$RUN_DIR" --start-all test_hybrid_hcdwf.ymmsl
 
 Hybrid mode sends IDS slices between ``workflow_driver.py`` and
 ``hcd_workflow_m3.py``. The physics actors still run inside
@@ -58,23 +68,30 @@ actor executables.
 .. code-block:: bash
 
    ./run.sh pure
-   muscle_manager --start-all test_m3_pure.ymmsl
 
-Use ``HCD_PURE_YMMSL`` only when testing a local custom topology:
+   # or, launching MUSCLE3 directly:
+   RUN_DIR=runs/pure_$(date +%Y%m%d_%H%M%S)
+   mkdir -p "$RUN_DIR"
+   muscle_manager --run-dir "$RUN_DIR" --start-all pure_m3_no_fopla.ymmsl
+
+Use ``HCD_PURE_YMMSL`` to select Rabbit, FoPla, or a local custom topology:
 
 .. code-block:: bash
 
    HCD_PURE_YMMSL=local_case.ymmsl ./run.sh pure
+   HCD_PURE_YMMSL=pure_m3_rabbit_no_fopla.ymmsl ./run.sh pure
 
 Current validated Pure M3 actors:
 
 * ``torbeam_m3.exe``
 * ``cyrano_m3.exe``
 * ``merge_waves_m3.exe``
-* ``fopla_m3.exe``
+* ``rabbit_m3.exe``
 * ``hcd2core_sources_m3.exe``
 
-The maintained Pure topology is kept in ``test_m3_pure.ymmsl``.
+The maintained default is ``pure_m3_no_fopla.ymmsl``. Rabbit is wired in
+``pure_m3_rabbit_no_fopla.ymmsl``; FoPla remains available through the optional
+``test_m3_pure.ymmsl`` topology.
 
 Output
 ------

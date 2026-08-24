@@ -41,8 +41,9 @@ Hybrid M3       m3_flag=1         Two-component MUSCLE3 coupling:
 Pure M3         yMMSL             Actor-level MUSCLE3 coupling:
                                   workflow_driver_m3_pure.py talks directly to
                                   M3 actor executables such as torbeam_m3.exe
-                                  and cyrano_m3.exe. The maintained example
-                                  topology is `test_m3_pure.ymmsl`.
+                                  and cyrano_m3.exe. The default topology is
+                                  `pure_m3_no_fopla.ymmsl`; the validated NBI
+                                  topology is `pure_m3_rabbit_no_fopla.ymmsl`.
 ```
 
 ### MUSCLE3 Hybrid Architecture
@@ -70,16 +71,18 @@ hcd_workflow_m3.py  (MICRO — one reuse_instance() per timestep)
 ```
 workflow_driver_m3_pure.py  (MACRO — database I/O and time loop)
     ├── torbeam_m3.exe
+    ├── rabbit_m3.exe              # optional GCC process, NBI fast ions
     ├── cyrano_m3.exe
     ├── merge_waves_m3.exe
     ├── fopla_m3.exe
     └── hcd2core_sources_m3.exe
 ```
 
-Pure M3 is the direct actor-coupling path. The repository keeps one Pure yMMSL
-example, `test_m3_pure.ymmsl`, which wires the driver to the full actor-level
-topology. The Pure driver skips Cyrano, FoPla, and IC wave merging on
-zero-IC-power time slices.
+Pure M3 is the direct actor-coupling path. `pure_m3_no_fopla.ymmsl` is the
+maintained default; `pure_m3_rabbit_no_fopla.ymmsl` adds Rabbit; and
+`test_m3_pure.ymmsl` remains the optional FoPla topology. The Pure driver skips
+Cyrano, FoPla, and IC wave merging on zero-IC-power time slices. Rabbit remains
+stateful and is called on every slice when `nbi_fp=1`.
 ---
 
 ## For Users
@@ -102,7 +105,7 @@ source config_hcd_iter_sdcc_3.42.0.sh    # Legacy DD 3.42.0 stack (no MUSCLE3)
 ACTOR_FOLDER=~/public/PYTHON_ACTORS source config_hcd_iter_sdcc.sh
 ```
 
-The default script loads the IMAS-Python 2.x stack with DD 4.1.0, sets up MUSCLE3, iWrap, the Waveform Cooker, and creates a devenv virtual environment. The _3.42.0 variant loads the legacy IMAS-AL-Python 5.x stack with DD 3.42.0 for compatibility with older test cases and JINTRAC coupling.
+The default script loads the IMAS-Python 2.x stack with DD 4.1.0, sets up MUSCLE3, iWrap, the Waveform Cooker, and creates a `devenv` virtual environment. It does not contact PyPI when sourced; set `HCDWF_SKIP_PIP_INSTALL=0` explicitly when bootstrapping Python packages. The _3.42.0 variant loads the legacy IMAS-AL-Python 5.x stack with DD 3.42.0 for compatibility with older test cases and JINTRAC coupling.
 
 This script will:
 - Load all required modules (unless `ACTOR_FOLDER` is set)
@@ -139,7 +142,7 @@ This script loads the latest IMAS stack and sets up MUSCLE3:
 1. Loads `IMAS-Python`, `IMAS-Fortran`, `IDStools`, `MUSCLE3`, `XMLlib`, `INTERPOS`
 2. Sets up iWrap (develop branch) and Waveform Cooker paths
 3. Configures `ACTOR_FOLDER` and `HCD_SANDBOX` in `PYTHONPATH`
-4. Creates a dedicated virtual environment (`devenv`) with `muscle3` installed
+4. Creates and activates a dedicated virtual environment (`devenv`); the SDCC module stack supplies MUSCLE3 by default
 5. Runs diagnostic checks (IMAS version, iWrap availability, actor folder)
 
 ### SDCC Setup (DD 3.42.0, legacy)
@@ -242,7 +245,7 @@ python actor_install.py --skipModules grayscale.yml  # Install specific actor
 
 - **Multiple Execution Modes**: Console, GUI, batch, single time-slice, Legacy, Hybrid M3, and Pure M3
 - **MUSCLE3 Integration**: Modular multi-scale coupling via macro/micro architecture
-- **Pure M3 Actor Coupling**: Direct macro-to-actor M3 execution through a single maintained Pure yMMSL topology
+- **Pure M3 Actor Coupling**: Direct macro-to-actor M3 execution through maintained baseline, Rabbit, and optional FoPla topologies
 - **Flexible Actor System**: Easy integration of new physics codes (Torbeam, Cyrano, FoPla, …)
 - **IMAS Integration**: Full compatibility with IMAS IDSes, IMAS-Python 2.x, DD 4.0.0/4.1.0
 - **Smart DD Conversion**: Automatic Data Dictionary version handling with manual fix-ups
@@ -368,7 +371,9 @@ environment.
 
 ```bash
 # Via MUSCLE3 manager:
-muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+RUN_DIR=runs/hybrid_$(date +%Y%m%d_%H%M%S)
+mkdir -p "$RUN_DIR"
+muscle_manager --run-dir "$RUN_DIR" --start-all test_hybrid_hcdwf.ymmsl
 
 # Via runner:
 ./run.sh hybrid
@@ -377,20 +382,41 @@ muscle_manager --start-all test_hybrid_hcdwf.ymmsl
 ### Pure MUSCLE3 Mode
 
 Pure mode runs each selected physics actor as an independent M3 micro model.
-The default runner uses `test_m3_pure.ymmsl`, the maintained full actor-level
-topology.
+The default runner uses `pure_m3_no_fopla.ymmsl`.
 
 ```bash
 # Via MUSCLE3 manager:
-muscle_manager --start-all test_m3_pure.ymmsl
+RUN_DIR=runs/pure_$(date +%Y%m%d_%H%M%S)
+mkdir -p "$RUN_DIR"
+muscle_manager --run-dir "$RUN_DIR" --start-all pure_m3_no_fopla.ymmsl
 
 # Via runner:
 ./run.sh pure
 ```
 
-Pure yMMSL file:
-- `test_m3_pure.ymmsl`: full actor-level topology including Torbeam, Cyrano,
-  merge_waves, FoPla, and hcd2core_sources
+Pure yMMSL files:
+
+- `pure_m3_no_fopla.ymmsl`: default direct-actor topology without FoPla
+- `pure_m3_rabbit_no_fopla.ymmsl`: validated Torbeam + Rabbit + Cyrano topology
+- `test_m3_pure.ymmsl`: optional full topology including FoPla
+
+The Rabbit launcher stages a portable case, sources the HCD environment,
+captures the Rabbit log, and runs the DD4 validator. It supports both the
+original one-slice interface and an optional long-pulse range:
+
+```bash
+# Accepted one-slice reference at 100 s.
+bash tools/run_pure_m3_rabbit_reference.sh 249
+
+# Accepted no-FoPla long pulse; tend is exclusive, storing 10..300 s.
+bash tools/run_pure_m3_rabbit_reference.sh 272 10 310 10 100
+```
+
+The accepted outputs are `105102/249@100 s` and the 30-slice long-pulse
+reference `105102/272@10..300 s`. Use an unused output run number when
+reproducing either case. See
+[the long-pulse capability case](tests/m3_pure_rabbit/LONG_PULSE.md) for
+validation and plotting commands.
 
 ### Runner
 
@@ -439,7 +465,9 @@ hcd-wf-sandbox/
 ├── tests/                         # Test data and configs
 │
 ├── test_hybrid_hcdwf.ymmsl        # MUSCLE3 hybrid mode configuration
-├── test_m3_pure.ymmsl             # Pure M3 actor-level configuration
+├── pure_m3_no_fopla.ymmsl         # Default Pure M3 topology
+├── pure_m3_rabbit_no_fopla.ymmsl  # Torbeam + Rabbit + Cyrano topology
+├── test_m3_pure.ymmsl             # Optional Pure M3 FoPla topology
 ├── config_hcd_iter_sdcc.sh        # Environment setup (default: DD 4.1.0 + MUSCLE3)
 ├── config_hcd_iter_sdcc_3.42.0.sh # Environment setup (legacy: DD 3.42.0)
 ├── run.sh                         # Runner for legacy/hybrid/pure
@@ -475,6 +503,8 @@ hcd-wf-sandbox/
 | `core_sources_out/in` | `core_sources` | Heating sources (input from previous step) |
 | `distributions_out/in` | `distributions` | Particle distribution functions |
 | `distribution_sources_out/in` | `distribution_sources` | Distribution source terms |
+| `nbi_out/in` | `nbi` | Neutral-beam geometry and injected power |
+| `wall_out/in` | `wall` | Static first-wall geometry required by NBI actors |
 
 ### Hybrid Micro → Macro (O_F → S)
 
@@ -484,8 +514,9 @@ hcd-wf-sandbox/
 | `waves_out/in` | `waves` | Wave propagation results |
 | `core_profiles_out/in` | `core_profiles` | Updated plasma profiles |
 | `distributions_out/in` | `distributions` | Updated distribution functions |
+| `distribution_sources_out/in` | `distribution_sources` | Updated NBI/FP source terms |
 
-Pure M3 uses actor-specific ports defined in `test_m3_pure.ymmsl`.
+Pure M3 uses actor-specific ports defined in the selected Pure yMMSL file.
 
 ---
 

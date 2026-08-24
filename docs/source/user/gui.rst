@@ -32,4 +32,6 @@ launch with:
 
 .. code-block:: bash
 
-   muscle_manager --start-all path/to/pure_case.ymmsl
+   RUN_DIR=runs/pure_$(date +%Y%m%d_%H%M%S)
+   mkdir -p "$RUN_DIR"
+   muscle_manager --run-dir "$RUN_DIR" --start-all path/to/pure_case.ymmsl

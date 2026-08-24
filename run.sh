@@ -7,7 +7,8 @@
 #   legacy  : In-process iwrap, no MUSCLE3 (all actors run inside workflow_driver)
 #   hybrid  : MUSCLE3 macro-micro, Python micro (driver ↔ hcd_workflow_m3)
 #   pure    : MUSCLE3 macro-micro, Fortran actor direct (driver ↔ *_m3.exe)
-#             Default topology is the full maintained Pure yMMSL example.
+#             Default topology omits FoPla so it works with the standard actor
+#             installation. Select test_m3_pure.ymmsl explicitly for FoPla.
 #
 # Prereq: source config_hcd_iter_sdcc.sh once per shell session.
 #
@@ -47,8 +48,8 @@ case "$MODE" in
         RUN_PREFIX="run_hybrid"
         ;;
     "pure")
-        YMMSL_FILE="${HCD_PURE_YMMSL:-test_m3_pure.ymmsl}"
-        MODE_DESC="Pure MUSCLE3 (driver ↔ direct M3 actor executables)"
+        YMMSL_FILE="${HCD_PURE_YMMSL:-pure_m3_no_fopla.ymmsl}"
+        MODE_DESC="Pure MUSCLE3 (driver ↔ direct M3 actors; no FoPla by default)"
         RUN_PREFIX="run_pure"
         ;;
 esac
@@ -96,16 +97,34 @@ if [[ "$MODE" != "legacy" ]]; then
     echo "YMMSL:       $YMMSL_FILE" >> "$DIR_NAME/run_config.txt"
 fi
 
-if [[ "$MODE" == "legacy" ]]; then
-    time python workflow/workflow_driver.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log" \
-        || echo "Warning: Workflow exited with an error code."
-else
-    time muscle_manager --start-all "$YMMSL_FILE" || echo "Warning: MUSCLE3 manager exited with an error code."
+RUN_STATUS=0
 
-    MUSCLE_OUTPUT=$(ls -td run_* 2>/dev/null | head -1)
-    if [ -n "$MUSCLE_OUTPUT" ] && [ -d "$MUSCLE_OUTPUT" ]; then
-        mv "$MUSCLE_OUTPUT" "$DIR_NAME/muscle3_output"
-        echo ""
-        echo "MUSCLE3 output moved to: $DIR_NAME/muscle3_output"
-    fi
+if [[ "$MODE" == "legacy" ]]; then
+    # Keep the log while retaining the Python process' status rather than the
+    # status of tee.  Disable errexit only around the command so diagnostics
+    # can still be collected below.
+    set +e
+    time python workflow/workflow_driver.py "$CONFIG_PATH" 0 2>&1 | tee "$DIR_NAME/output.log"
+    RUN_STATUS=${PIPESTATUS[0]}
+    set -e
+else
+    # Point MUSCLE3 at our per-run folder with --run-dir, so it writes logs,
+    # metadata and per-instance output there directly instead of creating
+    # run_<model>_<timestamp> in the repo root.  --run-dir requires the
+    # directory to exist already.  Diagnostics land there even on failure, so
+    # capture the status and propagate it after reporting the location.
+    MUSCLE_OUTPUT="$DIR_NAME/muscle3_output"
+    mkdir -p "$MUSCLE_OUTPUT"
+    set +e
+    time muscle_manager --run-dir "$MUSCLE_OUTPUT" --start-all "$YMMSL_FILE"
+    RUN_STATUS=$?
+    set -e
+
+    echo ""
+    echo "MUSCLE3 output: $MUSCLE_OUTPUT"
+fi
+
+if [[ "$RUN_STATUS" -ne 0 ]]; then
+    echo "ERROR: $MODE workflow exited with status $RUN_STATUS" >&2
+    exit "$RUN_STATUS"
 fi

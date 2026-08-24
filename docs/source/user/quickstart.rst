@@ -42,7 +42,9 @@ Hybrid mode uses MUSCLE3 for the driver-to-workflow boundary:
 
 .. code-block:: bash
 
-   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+   RUN_DIR=runs/hybrid_$(date +%Y%m%d_%H%M%S)
+   mkdir -p "$RUN_DIR"
+   muscle_manager --run-dir "$RUN_DIR" --start-all test_hybrid_hcdwf.ymmsl
 
 The topology is:
 
@@ -54,7 +56,7 @@ Run a Pure M3 Case
 -------------------------------
 
 Pure mode can be launched either through ``run.sh pure`` or directly through
-MUSCLE3. The runner defaults to the maintained full actor-level topology:
+MUSCLE3. The runner defaults to the maintained no-FoPla topology:
 
 .. code-block:: bash
 
@@ -64,7 +66,9 @@ The equivalent direct MUSCLE3 command is:
 
 .. code-block:: bash
 
-   muscle_manager --start-all test_m3_pure.ymmsl
+   RUN_DIR=runs/pure_$(date +%Y%m%d_%H%M%S)
+   mkdir -p "$RUN_DIR"
+   muscle_manager --run-dir "$RUN_DIR" --start-all pure_m3_no_fopla.ymmsl
 
 The Pure topology is:
 
@@ -73,8 +77,11 @@ The Pure topology is:
    driver -> torbeam_m3.exe -> waves_ec
    driver -> cyrano_m3.exe  -> waves_ic
    driver -> merge_waves_m3.exe -> waves
-   driver -> fopla_m3.exe -> distributions
    driver -> hcd2core_sources_m3.exe -> core_sources
+
+For the validated NBI branch, select
+``pure_m3_rabbit_no_fopla.ymmsl``; it inserts Rabbit before Cyrano and forwards
+its ``distributions`` and ``distribution_sources``.
 
 Pure mode currently skips Cyrano, FoPla, and IC wave merging automatically when
 the IC launched power is zero.
