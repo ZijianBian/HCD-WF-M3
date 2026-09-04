@@ -1,0 +1,12 @@
+enabled: true
+# ITER reference heating phasing [0, pi, pi, 0].
+# From the phasing note/Messiaen case 3: k_z ~= +/-4.6 m^-1.
+# Using the same ITER conversion as the existing cases gives n_phi ~= +/-38.
+# Digitized from the embedded Messiaen case-3 plot: negative-k_z peak
+# height ~= 0.326, positive-k_z peak height ~= 0.279, so weights ~= 0.54/0.46.
+modes:
+  - n_phi: -38
+    weight: 0.54
+  - n_phi: 38
+    weight: 0.46
+

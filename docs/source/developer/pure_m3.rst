@@ -32,6 +32,9 @@ Current actors in the registry:
    * - ``cyrano``
      - ``waves_ic_in``
      - IC wave branch.
+   * - ``rabbit``
+     - ``distribution_sources_rabbit_in``, ``distributions_rabbit_in``
+     - Stateful NBI fast-ion branch; enabled together with ``nbi_fp=1``.
    * - ``fopla``
      - ``distributions_in``
      - Optional IC FP branch.
@@ -76,6 +79,40 @@ If IC launched power is zero:
 If EC power is zero and IC is active:
 
 * ``merge_waves`` is skipped and the IC waves are carried forward.
+
+Rabbit is different from the wave solvers: when connected and selected with
+``nbi_fp=1``, it runs on every time slice so that its reuse/state protocol is
+not broken by a zero-power slice.
+
+Rabbit GCC Compatibility
+------------------------
+
+The validated SDCC build keeps Rabbit in a separate GCC process while matching
+the HCD workflow's wire/data contract:
+
+* GCC 13.2 / ``foss-2023b``.
+* IMAS-Fortran 5.5.0, DD 4.1.0.
+* MUSCLE3 0.8.0.
+* Executable: ``$ACTOR_FOLDER/rabbit/rabbit_m3.exe``.
+* Runtime launcher: ``tools/run_rabbit_m3_gcc_2023b.sh``.
+
+Do not mix this topology with the collaborator's DD 4.1.1/MUSCLE3 0.10 binary;
+the MUSCLE wire versions are not compatible. The reference topology is
+``pure_m3_rabbit_no_fopla.ymmsl`` and requires ``nbi_fp=1`` in
+``input_workflow.xml``.
+
+.. code-block:: bash
+
+   bash tools/run_pure_m3_rabbit_reference.sh 249
+
+The argument is a free output run number. The launcher stages the tracked
+reference fixture, resolves repository/actor paths, sources
+``config_hcd_iter_sdcc.sh``, captures the manager log, and invokes the DD4
+validator. The latest accepted result is ``105102/249@100 s``.
+
+Build and run logs are retained under
+``$ACTOR_FOLDER/rabbit/logs``. The accepted three-actor run is
+``pure_m3_torbeam_cyrano_rabbit_run249_20260711_042028.log``.
 
 FoPla Input Choice
 ------------------

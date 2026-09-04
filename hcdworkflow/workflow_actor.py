@@ -66,6 +66,10 @@ class WorkflowActor:
         runtime_settings = actor.get_runtime_settings()
         imasdef = imas.ids_defs if hasattr(imas, 'ids_defs') else imas.imasdef
         runtime_settings.ids_storage.backend = imasdef.MEMORY_BACKEND
+        if actorName == "rabbit":
+            # Rabbit uses the GCC IMAS stack whereas this workflow is Intel.
+            # iWrap isolates the two runtimes in separate processes.
+            runtime_settings.run_mode = "STANDALONE"
         code_parameters = actor.get_code_parameters()
         if xmlPath:
             code_parameters.parameters_path = xmlPath

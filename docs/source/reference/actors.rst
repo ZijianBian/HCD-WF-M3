@@ -18,6 +18,10 @@ Core Actors in the Validated Benchmark
    * - IC wave solver
      - Cyrano
      - Computes IC wave response for a selected toroidal mode.
+   * - NBI fast-ion solver
+     - Rabbit
+     - Computes NBI ``distributions`` and ``distribution_sources`` in the
+       validated GCC Pure M3 topology.
    * - Wave merger
      - merge_waves
      - Combines EC and IC waves when both branches are active.
@@ -36,9 +40,6 @@ Optional or Not Yet Fully Validated in Pure Mode
    * - FoPla
      - IC Fokker-Planck branch wired in ``test_m3_pure.ymmsl``. It requires
        the matching M3 actor executable and code-parameter XML.
-   * - NBI actors
-     - Classic workflow support exists. Direct Pure M3 coverage needs separate
-       validation.
    * - Additional EC/IC solvers
      - Classic workflow support exists. Direct Pure M3 coverage depends on
        available actor executables and yMMSL wiring.
@@ -64,6 +65,7 @@ Pure M3 mode needs M3 actor executables, for example:
 
    /path/to/PYTHON_ACTORS/torbeam/torbeam_m3.exe
    /path/to/PYTHON_ACTORS/cyrano/cyrano_m3.exe
+   /path/to/PYTHON_ACTORS/rabbit/rabbit_m3.exe
 
 The yMMSL file must list each component, its ports, conduits, resources, and
 implementation executable.

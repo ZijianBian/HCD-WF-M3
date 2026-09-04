@@ -1,0 +1,147 @@
+# Rabbit HCDWF compatibility patch
+#
+# Upstream: ssh://git@git.iter.org/heat/rabbit.git
+# Base: e99ad70a12d4bcd7be0b28422bfa2ca051c9c3ab (origin/master, 2026-07-31)
+# Branch: HCD-WF/PDS
+# Commits:
+#   c286ca69fe70e93f89b5cc43b30949455ee56ca0 Fix DD4 plasma species and radial-grid mapping
+#   903e0637e1c059c241e08c8ac26dba4daeeed46c Populate collision-ion species metadata
+#   8d9ce5bcbeea48d524d7defba125e49e570eeea1 Avoid GCC 13.2 ICE in Redl current calculation
+#
+# Apply from a Rabbit checkout at the base revision with:
+#   git apply --check /path/to/rabbit_master_e99ad70_hcdwf_minimal.patch
+#   git apply /path/to/rabbit_master_e99ad70_hcdwf_minimal.patch
+
+diff --git a/imas/src/rabbit_ids.f90 b/imas/src/rabbit_ids.f90
+index 8398bdb37dd1194aecc82ee296d389d9de4bc49a..6ad81e9e8dbaf8bdfc95503e8dba9bf1abec8a0c 100644
+--- a/imas/src/rabbit_ids.f90
++++ b/imas/src/rabbit_ids.f90
+@@ -250,7 +250,7 @@ contains
+     integer :: ids_iimp
+     integer :: nv_it
+     integer :: i, j, ib
+-    integer :: nsp_plasma
++    integer :: nsp_plasma, isp, iimp
+     real(rkind) :: nparticle
+     integer :: ntables_num
+     real(rkind), allocatable, dimension(:) :: nuclear_charge, atomic_mass
+@@ -267,18 +267,26 @@ contains
+     enddo
+     allocate(aplasma(nsp_plasma))
+     allocate(zplasma(nsp_plasma))
+-    do i = 1, nsp_plasma
+-      aplasma(i) = core_profiles_in%profiles_1d(1)%ion(i)%element(1)%a
+-      zplasma(i) = core_profiles_in%profiles_1d(1)%ion(i)%element(1)%z_n
++    ! Hydrogen isotopes are not necessarily contiguous in ion(:).
++    isp = 0
++    do i = 1, size(core_profiles_in%profiles_1d(1)%ion)
++      if (core_profiles_in%profiles_1d(1)%ion(i)%element(1)%z_n == 1) then
++        isp = isp + 1
++        aplasma(isp) = core_profiles_in%profiles_1d(1)%ion(i)%element(1)%a
++        zplasma(isp) = core_profiles_in%profiles_1d(1)%ion(i)%element(1)%z_n
++      endif
+     enddo
+ 
+     !find aimp that is the nearest to average:
+     allocate(nimp(size(core_profiles_in%profiles_1d(1)%ion)-nsp_plasma))
+     nimp_sum = 0.0d0
++    ! Use a compact impurity index for the same reason.
++    iimp = 0
+     do i = 1, size(core_profiles_in%profiles_1d(1)%ion)
+       if (core_profiles_in%profiles_1d(1)%ion(i)%element(1)%z_n /= 1) then
+-         nimp(i-nsp_plasma) = core_profiles_in%profiles_1d(1)%ion(i)%density(1)*&
+-                              core_profiles_in%profiles_1d(1)%ion(i)%element(1)%z_n
++         iimp = iimp + 1
++         nimp(iimp) = core_profiles_in%profiles_1d(1)%ion(i)%density(1)*&
++                      core_profiles_in%profiles_1d(1)%ion(i)%element(1)%z_n
+          nimp_sum = nimp_sum + core_profiles_in%profiles_1d(1)%ion(i)%density(1)
+       endif
+     enddo
+@@ -355,20 +363,23 @@ contains
+     do i = 1,p+1
+        rho_normp1(i) = 1.*(i-1)/p
+     enddo
+-    call interpos(core_profiles_in%profiles_1d(1)%grid%rho_tor/core_profiles_in%profiles_1d(1)%grid%rho_tor(p),&
+-                   core_profiles_in%profiles_1d(1)%grid%volume,p,p+1,xout=rho_normp1,yout=volp1)
++    call interpos(core_profiles_in%profiles_1d(1)%grid%rho_tor_norm, &
++                  core_profiles_in%profiles_1d(1)%grid%volume, &
++                  p,p+1,xout=rho_normp1,yout=volp1)
+     allocate(volume(p))
+     do i = 1, p
+        volume(i) = volp1(i+1) - volp1(i)
+     enddo
+     allocate(sp_plasma_ratio(nsp_plasma))
++    isp = 0
+     do i = 1, size(core_profiles_in%profiles_1d(1)%ion)
+        nparticle = 0.0d0
+        if ( core_profiles_in%profiles_1d(1)%ion(i)%element(1)%z_n == 1 ) then
++         isp = isp + 1
+          do j = 1, p
+             nparticle = nparticle + core_profiles_in%profiles_1d(1)%ion(i)%density(j)*volume(j)
+          enddo
+-         sp_plasma_ratio(i) = nparticle
++         sp_plasma_ratio(isp) = nparticle
+        endif
+     enddo
+     sp_plasma_ratio = sp_plasma_ratio / sum(sp_plasma_ratio)
+@@ -662,6 +673,7 @@ subroutine rabbit_ids_step(core_profiles_in,equilibrium_in,nbi_in,distributions_
+      allocate(distributions_out%distribution(ibeam)%profiles_1d(1)%collisions%ion(1)%power_thermal(nrhoout))
+      allocate(distributions_out%distribution(ibeam)%profiles_1d(1)%collisions%ion(1)%torque_thermal_phi(nrhoout))
+      allocate(distributions_out%distribution(ibeam)%profiles_1d(1)%collisions%ion(1)%name(1))
++     allocate(distributions_out%distribution(ibeam)%profiles_1d(1)%collisions%ion(1)%element(1))
+      allocate(distributions_out%distribution(ibeam)%profiles_1d(1)%collisions%electrons%torque_thermal_phi(nrhoout))
+      allocate(distributions_out%distribution(ibeam)%profiles_1d(1)%source(1))
+      allocate(distributions_out%distribution(ibeam)%profiles_1d(1)%source(1)%particles(nrhoout))
+@@ -671,6 +683,10 @@ subroutine rabbit_ids_step(core_profiles_in,equilibrium_in,nbi_in,distributions_
+      allocate(distributions_out%distribution(ibeam)%species%type%name(1))
+      distributions_out%distribution(ibeam)%species%type%name = 'ion'
+      distributions_out%distribution(ibeam)%profiles_1d(1)%collisions%ion(1)%z_ion = nbi_in%unit(ibeam)%species%z_n
++     distributions_out%distribution(ibeam)%profiles_1d(1)%collisions%ion(1)%element(1)%a = &
++          nbi_in%unit(ibeam)%species%a
++     distributions_out%distribution(ibeam)%profiles_1d(1)%collisions%ion(1)%element(1)%z_n = &
++          nbi_in%unit(ibeam)%species%z_n
+      allocate(distributions_out%distribution(ibeam)%species%ion%element(1))
+      distributions_out%distribution(ibeam)%species%ion%element(1)%a   = nbi_in%unit(ibeam)%species%a
+      distributions_out%distribution(ibeam)%species%ion%element(1)%z_n = nbi_in%unit(ibeam)%species%z_n
+diff --git a/src/mod_eq.F90 b/src/mod_eq.F90
+index f2bf9ae51b6d6b19f597dc22af2297b1910e721e..bcc808579b3e025fe1566c7a0744d83b65daa6e8 100644
+--- a/src/mod_eq.F90
++++ b/src/mod_eq.F90
+@@ -2735,28 +2735,23 @@ module mod_fnbcd
+ 
+       q=1._rkind/equ%interpol_1d(equ%rhotor1d, equ%iota, nbidepo%rho, spline=.false.)
+ 
+-      associate(Te => nbidepo%Te, &
+-                Zeff => nbidepo%Zeff, &
+-                ZZ => nbidepo%Zeff, &
+-                ne => nbidepo%ne &
+-           )
+-
+-        cloge = log(1.09d11*Te/(zeff*sqrt(ne/1d6)))  !TRANSP formula
+-        nuste = 6.921d-18 *abs(q)*rmaj*ne* Zeff * cloge / (te**2 * eps**1.5d0)
++        ! GCC 13.2 ICEs while resolving ASSOCIATE aliases in these array
++        ! expressions. Direct component references preserve the vector formula.
++        cloge = log(1.09d11*nbidepo%Te/(nbidepo%Zeff*sqrt(nbidepo%ne/1d6)))  !TRANSP formula
++        nuste = 6.921d-18 *abs(q)*rmaj*nbidepo%ne*nbidepo%Zeff*cloge / &
++                (nbidepo%Te**2 * eps**1.5d0)
+ 
+         do i=1, size(nbidepo%rho)
+-           sqrt_Zm1(i) = sqrt(max(ZZ(i) - 1.d0, 0.d0))
++           sqrt_Zm1(i) = sqrt(max(nbidepo%Zeff(i) - 1.d0, 0.d0))
+         enddo
+         
+-        X = ft / (1.d0 + 0.67d0*(1.d0-0.7d0*ft)*sqrt(nuste)/(0.56d0+0.44d0*ZZ) + &
++        X = ft / (1.d0 + 0.67d0*(1.d0-0.7d0*ft)*sqrt(nuste)/(0.56d0+0.44d0*nbidepo%Zeff) + &
+                   (0.52d0+0.086d0*sqrt(nuste))*(1.d0+0.87d0*ft)*nuste/(1.d0+1.13d0*sqrt_Zm1))
+ 
+-        Zp1 = ZZ**1.2d0 - 0.71d0
++        Zp1 = nbidepo%Zeff**1.2d0 - 0.71d0
+         L31 = X * ((1.d0 + 0.15d0/Zp1) - X * (0.22d0/Zp1 - X * (0.01d0/Zp1 + X * 0.06d0/Zp1)))
+ 
+-        fnbcd_redl = 1 - fpsol%Zbeam/Zeff * (1 - L31)
+-
+-      end associate
++        fnbcd_redl = 1 - fpsol%Zbeam/nbidepo%Zeff * (1 - L31)
+       
+     end function fnbcd_redl
+ 

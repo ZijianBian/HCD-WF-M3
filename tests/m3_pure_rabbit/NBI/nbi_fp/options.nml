@@ -1,0 +1,30 @@
+ &species
+ /
+&OUTPUT_SETTINGS
+ NRHOOUT=20         ,
+ OUTPUT_TIMING=  1.0000000000000000     ,
+ IT_ORBOUT=-1         ,
+ /
+&NUMERICS
+ NORBITS=40         ,
+ DISTFUN_NV=200        ,
+ NLEG=2          ,
+ ORBIT_DT_FAC=  1.5600000000000001     ,
+ DEPO_NXI=0          ,
+ VCHANGECOR=F,
+ FORCE_DT= -1.0000000000000000     ,
+ NLOSPTS=0          ,
+ DISTFUN_VMAX=  12233939.671254016     ,
+ /
+&PHYSICS
+ JUMPCOR=2          ,
+ ELIMITFAC=  0.0000000000000000     ,
+ TABLE_PATH='/work/imas/shared/heat/nemo/rabbit_tables/tables_ITERDEMO                                                                                                                                                                                                                                                   ',
+ CXLOSS=F,
+ FLAST=  10.000000000000000     ,
+ RMAX=  9.0000000000000000     ,
+ RMIN=  3.0000000000000000     ,
+ RLIM=  6.2660999999999998     ,
+ ZLIM= -3.0434000000000001     ,
+ NMAX=2          ,
+ /
