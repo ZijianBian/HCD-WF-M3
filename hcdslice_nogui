@@ -8,6 +8,7 @@ import imas
 from gui.gui_methods import create_workflow_param_from_file
 from hcdworkflow.hcd_workflow import HCDWorkflow
 from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
+from workflow.ids_prep import _get_target_dd_version
 
 isWaveformCookerPresent = True
 try:
@@ -42,6 +43,10 @@ input_database = wf_parameters["input_database"][0]
 input_backend="MDSPLUS"
 if "input_backend" in wf_parameters:
     input_backend = wf_parameters["input_backend"][0]
+if "ddv_backend" in wf_parameters:
+    ddv_backend = wf_parameters["ddv_backend"][0]
+else:
+    ddv_backend = _get_target_dd_version()
 output_user_or_path = wf_parameters["output_user_or_path"][0]
 output_database = wf_parameters["output_database"][0]
 
@@ -56,6 +61,7 @@ dbhelper = WorkflowDbHelper(
     input_user_or_path,
     input_database,
     input_backend,
+    ddv_backend,
     output_user_or_path,
     output_database,
     output_backend,

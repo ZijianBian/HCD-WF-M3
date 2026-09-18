@@ -1,298 +1,126 @@
-Configuration Reference
+Configuration reference
 =======================
 
-This page describes the configuration file formats used by HCD Workflow.
+The :doc:`../user/gui` saves a configuration directory with this layout:
 
-Workflow Configuration (XML)
+.. code-block:: text
+
+   my_config/
+   ├── input_workflow.xml
+   ├── ECRH/ec_wave_solver/input_torbeam.xml
+   ├── ICRH/ic_wave_solver/input_cyrano.xml
+   ├── source/fill_core_sources/input_hcd2core_sources.xml
+   └── *_waveforms.yaml                 # optional waveform overrides
+
+Only selected actors need parameter files. The GUI also copies their XSD
+schemas when available. Input and output IDS reside in IMAS database entries;
+they do not need to be copied into this directory.
+
+Workflow XML
+------------
+
+``input_workflow.xml`` has a ``root`` element whose first two children are
+``workflow_parameters`` and ``actor_selection``, in that order. The former holds
+the database and time fields directly; the latter groups actors under
+``main_process`` and ``post_process``. The shipped template is
+``hcdworkflow/global_configuration/input_workflow_default.xml``.
+
+Database fields in ``workflow_parameters``:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Field
+     - Meaning
+   * - ``input_user_or_path``, ``input_database``
+     - User or path, and database containing the input scenario
+   * - ``input_backend``
+     - IMAS backend name, such as ``HDF5`` or ``MDSPLUS``
+   * - ``shot_nr``, ``run_in``
+     - Input shot and run
+   * - ``output_user_or_path``
+     - Output user or path; ``default`` resolves to the current user
+   * - ``output_database``
+     - Output database; ``default`` uses the input database name
+   * - ``output_backend``
+     - Output IMAS backend; set it explicitly in saved configurations
+   * - ``run_out``
+     - Output run, under the same ``shot_nr``
+   * - ``ddv_backend``
+     - Optional DD value passed to the database helper. If omitted, the driver
+       uses ``IMAS_VERSION`` or the DD version reported by the IMAS installation
+
+Choose a separate output entry when retaining earlier results: the driver
+creates the configured output entry at startup. The DD 4.1.0 environment and
+the legacy DD 3.42.0 environment are described in :doc:`available_modules`.
+
+Time and scheduling
+-------------------
+
+``tbegin``, ``tend``, ``dt_required``
+   Start, end and step in seconds. Use a positive step. The time loop visits
+   ``tbegin + n * dt_required`` while the time is strictly less than ``tend``;
+   the end time is excluded. In a multi-slice run, a negative start or end uses
+   the first or last equilibrium time respectively.
+
+``one_time_slice``
+   ``1`` runs once at ``tbegin`` and ignores the configured ``tend``. ``0`` uses
+   the time range above. This applies to Legacy, Hybrid and Pure drivers.
+
+``parallel_workflow``
+   Retained in the XML template, but not read by the current runtime. It does
+   not select an execution mode or enable parallel execution. Pure scheduling
+   uses yMMSL settings; see :doc:`../user/execution_modes`.
+
+The GUI can append a third ``time_base`` section for per-process schedules.
+Legacy and Hybrid read those schedules; Pure does not use this section.
+
+Actor selection
+---------------
+
+Each process element has an integer value: ``0`` disables it; ``1`` selects the
+first actor in that element's ``list`` attribute, ``2`` the second, and so on.
+For example, this fragment selects Torbeam:
+
+.. code-block:: xml
+
+   <ECRH>
+     <ec_wave_solver list="genray gray grayscale torbeam toray">4</ec_wave_solver>
+     <ec_wave_fp list="relax">0</ec_wave_fp>
+   </ECRH>
+
+The XML ``list`` attribute determines the mapping. Preserve its order when
+editing a saved configuration. :doc:`actors` lists the shipped choices.
+The ``display`` attributes provide GUI labels.
+
+Actor parameters belong in
+``CATEGORY/PROCESS/input_ACTOR.xml``, for example
+``NBI/nbi_fp/input_rabbit.xml``. Their fields come from each actor's own XML/XSD;
+there is no shared ``<parameters><parameter name="...">`` format.
+
+Waveforms and shared settings
 -----------------------------
 
-The main workflow configuration is defined in ``input_workflow.xml``.
-
-File Structure
-~~~~~~~~~~~~~~
-
-.. code-block:: xml
-
-   <?xml version="1.0" encoding="UTF-8"?>
-   <workflow>
-       <workflow_parameters>
-           <!-- Workflow-level settings -->
-       </workflow_parameters>
-       
-       <actors>
-           <!-- Actor configurations -->
-       </actors>
-       
-       <time_evolution>
-           <!-- Time loop settings -->
-       </time_evolution>
-   </workflow>
-
-Workflow Parameters
-~~~~~~~~~~~~~~~~~~~
-
-Global workflow settings:
-
-.. code-block:: xml
-
-   <workflow_parameters>
-       <shot>123456</shot>
-       <run>1</run>
-       <user>username</user>
-       <database>iterdb</database>
-       <version>3</version>
-       <verbose>true</verbose>
-   </workflow_parameters>
-
-**Parameters:**
-
-* ``shot`` - Shot number for IDS
-* ``run`` - Run number for IDS
-* ``user`` - Username for IDS access
-* ``database`` - Database name (e.g., iterdb)
-* ``version`` - IDS version
-* ``verbose`` - Enable verbose logging (true/false)
-
-Actor Configuration
-~~~~~~~~~~~~~~~~~~~
-
-Each actor is configured with:
-
-.. code-block:: xml
-
-   <actor>
-       <code_name>grayscale</code_name>
-       <module>grayscale_actor</module>
-       <enabled>true</enabled>
-       
-       <parameters>
-           <parameter name="input_ids">equilibrium</parameter>
-           <parameter name="output_ids">waves</parameter>
-           <parameter name="power">1.0e6</parameter>
-           <parameter name="frequency">170.0e9</parameter>
-       </parameters>
-       
-       <inputs>
-           <input>equilibrium</input>
-           <input>core_profiles</input>
-       </inputs>
-       
-       <outputs>
-           <output>waves</output>
-       </outputs>
-   </actor>
-
-**Actor Elements:**
-
-* ``code_name`` - Actor identifier
-* ``module`` - Python module name
-* ``enabled`` - Whether to execute (true/false)
-* ``parameters`` - Actor-specific parameters
-* ``inputs`` - Required input IDS names
-* ``outputs`` - Generated output IDS names
-
-Time Evolution
-~~~~~~~~~~~~~~
-
-Configure time loop execution:
-
-.. code-block:: xml
-
-   <time_evolution>
-       <start_time>0.0</start_time>
-       <end_time>100.0</end_time>
-       <time_step>1.0</time_step>
-       <time_points>0.0,10.0,20.0,50.0,100.0</time_points>
-   </time_evolution>
-
-**Time Parameters:**
-
-* ``start_time`` - Start time (seconds)
-* ``end_time`` - End time (seconds)
-* ``time_step`` - Time step increment
-* ``time_points`` - Explicit time points (comma-separated)
-
-Global Lists (YAML)
---------------------
-
-Optional global parameters in ``global_lists.yaml``.
-
-File Structure
-~~~~~~~~~~~~~~
-
-.. code-block:: yaml
-
-   actors:
-     - grayscale
-     - nemo
-     - torbeam
-   
-   databases:
-     default: iterdb
-     test: test_db
-   
-   paths:
-     data_dir: /path/to/data
-     output_dir: /path/to/output
-
-Common Sections
-~~~~~~~~~~~~~~~
-
-**Actors List:**
-
-.. code-block:: yaml
-
-   actors:
-     - grayscale
-     - gray
-     - torbeam
-     - nemo
-
-**Database Configuration:**
-
-.. code-block:: yaml
-
-   databases:
-     production: iterdb
-     development: devdb
-     testing: testdb
-
-**Path Configuration:**
-
-.. code-block:: yaml
-
-   paths:
-     input_data: /work/imas/data/input
-     output_data: /work/imas/data/output
-     logs: /work/imas/logs
-
-Waveform Files (YAML)
-----------------------
-
-Waveform data for time-varying parameters.
-
-Structure
-~~~~~~~~~
-
-.. code-block:: yaml
-
-   waveform_name:
-     times: [0.0, 10.0, 20.0, 30.0]
-     values: [1.0e6, 1.5e6, 2.0e6, 1.8e6]
-     interpolation: linear
-
-**Fields:**
-
-* ``times`` - Time points (seconds)
-* ``values`` - Parameter values at each time
-* ``interpolation`` - Interpolation method (linear, cubic, step)
-
-Example Waveform
-~~~~~~~~~~~~~~~~
-
-.. code-block:: yaml
-
-   ec_power:
-     times: [0.0, 5.0, 10.0, 15.0, 20.0]
-     values: [0.0, 0.5e6, 1.0e6, 1.0e6, 0.5e6]
-     interpolation: linear
-     units: W
-     description: "EC heating power ramp-up"
-   
-   ic_frequency:
-     times: [0.0, 100.0]
-     values: [50.0e6, 50.0e6]
-     interpolation: step
-     units: Hz
-     description: "IC frequency (constant)"
-
-Actor-Specific Configuration
------------------------------
-
-GRAYSCALE
-~~~~~~~~~
-
-.. code-block:: xml
-
-   <parameters>
-       <parameter name="power">1.0e6</parameter>
-       <parameter name="frequency">170.0e9</parameter>
-       <parameter name="launch_angle_tor">20.0</parameter>
-       <parameter name="launch_angle_pol">0.0</parameter>
-   </parameters>
-
-NEMO
-~~~~
-
-.. code-block:: xml
-
-   <parameters>
-       <parameter name="beam_energy">1.0e6</parameter>
-       <parameter name="beam_power">33.0e6</parameter>
-       <parameter name="species">D</parameter>
-   </parameters>
-
-TORBEAM
-~~~~~~~
-
-.. code-block:: xml
-
-   <parameters>
-       <parameter name="frequency">170.0e9</parameter>
-       <parameter name="power">1.5e6</parameter>
-       <parameter name="mode">X</parameter>
-   </parameters>
-
-Validation
-----------
-
-Configuration Checks
-~~~~~~~~~~~~~~~~~~~~
-
-The workflow performs automatic validation:
-
-* XML schema compliance
-* Required parameters present
-* Valid parameter types and ranges
-* Actor dependencies satisfied
-* IDS availability
-
-Error Messages
-~~~~~~~~~~~~~~
-
-Common configuration errors:
-
-* ``Missing required parameter: <name>``
-* ``Invalid parameter value: <value>``
-* ``Actor not found: <actor_name>``
-* ``Circular dependency detected``
-* ``Input IDS not available: <ids_name>``
-
-Best Practices
---------------
-
-1. **Use Comments:** Document your configuration
-
-   .. code-block:: xml
-   
-      <!-- EC heating configuration for ramp-up phase -->
-
-2. **Validate Before Running:** Check configuration syntax
-
-3. **Version Control:** Keep configurations in git
-
-4. **Modular Design:** Use separate files for different scenarios
-
-5. **Descriptive Names:** Use clear parameter names
-
-Examples
---------
-
-See :doc:`../user/examples` for complete configuration examples.
-
-See Also
---------
-
-* :doc:`commands` - Command-line reference
-* :doc:`actors` - Available actors
-* :doc:`../user/usage` - Usage guide
+Files such as ``ec_waveforms.yaml``, ``ic_waveforms.yaml`` and
+``nbi_waveforms.yaml`` sit beside ``input_workflow.xml``. The driver passes them
+to Waveform-Cooker to replace the corresponding machine-description IDS.
+Use its presets or the GUI waveform editor for their format. Without an
+override, the driver uses machine descriptions from the input scenario.
+
+Legacy and Hybrid also read an optional ``ic_toroidal_modes.yaml`` beside the
+workflow XML for Cyrano. Its ``modes`` list contains ``n_phi`` integers and
+positive ``weight`` values (default ``1.0``); the workflow normalizes the
+weights and combines the per-mode wave outputs. Set ``enabled: false`` to
+disable it. The Pure driver does not read this file.
+
+``hcdworkflow/global_configuration/global_lists.yaml`` is a package resource,
+not an optional per-run configuration. It contains registered actors, execution
+orders, dependencies and waveform preset names.
+
+For MUSCLE3, yMMSL describes components and connections. ``run.sh`` and the GUI
+copy the chosen topology into ``.hcd_gui_runs/`` and bind it to the saved
+configuration and actor parameter files. Pure also keeps only the components
+and connections needed by ``actor_selection``.
+See :doc:`../user/execution_modes` for the two supplied templates and
+:doc:`commands` for output locations.

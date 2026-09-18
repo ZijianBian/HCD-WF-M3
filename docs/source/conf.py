@@ -51,10 +51,10 @@ html_static_path = ['_static']
 
 # Theme options 
 html_theme_options = {
-    "repo_url": "https://git.iter.org/projects/WF/repos/hcd-wf/browse",
+    "repo_url": "https://github.com/iterorganization/HCD-WF",
     "repo_name": "HCD Workflow",
     "icon": {
-        "repo": "fontawesome/brands/bitbucket",
+        "repo": "fontawesome/brands/github",
     },
     # "toc_title_is_page_title": True,
     # "globaltoc_collapse": True,
@@ -119,4 +119,3 @@ intersphinx_mapping = {
 
 # -- Options for todo extension ----------------------------------------------
 todo_include_todos = True
-

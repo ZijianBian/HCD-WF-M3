@@ -5,14 +5,22 @@ import sys
 
 import gui.colour_definitions.bluish as col
 import gui.time_base_edition as tbe
-from gui.gui_methods import (create_maindict, edit_codeparam, load,
-                             saved_folder_name, update_workflow_param)
+from gui.gui_methods import create_maindict, edit_codeparam, load, saved_folder_name, update_workflow_param
+from gui.launch_config import (
+    DEFAULT_EXECUTION_MODE,
+    EXECUTION_MODES,
+    LaunchConfigurationError,
+    default_ymmsl_path,
+    launch_muscle,
+    normalize_execution_mode,
+    requires_ymmsl,
+)
 from gui.tooltip import CreateToolTip
 from gui.waveform_edition import edit_waveforms
 from hcdworkflow.workflow_actor import WorkflowActor
 from hcdworkflow.workflow_config_reader import WorkflowConfigReader
 from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
-from workflow.wf_wrapper import wf_wrapper
+from workflow.workflow_driver import workflow_driver
 
 isWaveformCookerPresent = True
 try:
@@ -80,6 +88,10 @@ import inspect
 import hcdworkflow
 from pathlib import Path
 pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"
+# ``hcd_gui`` may be copied into ~/.local/bin while the packages are imported
+# from the configured HCD source tree.  Derive the project root from the
+# package rather than from this launcher script's location.
+pathHcdRoot = Path(inspect.getfile(hcdworkflow)).resolve().parent.parent
 
 # hcd_path = "/".join(os.path.realpath(__file__).split("/")[:-1])
 # default_wf_param_file = hcd_path + "/global_configuration/input_workflow_default.xml"
@@ -97,14 +109,43 @@ window.option_add("*font", "courier " + str(fontsize))
 window.title("HCD WORKFLOW")
 window.configure(bg=col.c1)
 
-def run(current_config_folder):
 
-    if current_config_folder != None:
+def run(current_config_folder, execution_mode=DEFAULT_EXECUTION_MODE, ymmsl_file=None):
+    """Run a saved GUI configuration through the selected execution layer."""
 
-        wf_wrapper(current_config_folder)
-    else:
+    if current_config_folder is None:
         print("Aborted.")
-        
+        return
+
+    try:
+        mode = normalize_execution_mode(execution_mode)
+        if mode == DEFAULT_EXECUTION_MODE:
+            workflow_driver(current_config_folder)
+            return
+
+        launch_plan, process = launch_muscle(
+            mode,
+            current_config_folder,
+            ymmsl_file,
+            repository_root_path=pathHcdRoot,
+        )
+    except (LaunchConfigurationError, OSError) as exc:
+        print("Launch aborted: " + str(exc), file=sys.stderr)
+        messagebox.showerror("Cannot launch workflow", str(exc))
+        return
+
+    print(
+        "Started {} MUSCLE3 run (PID {}) from {}".format(mode, process.pid, launch_plan.generated_topology),
+        file=sys.stdout,
+    )
+    messagebox.showinfo(
+        "Workflow started",
+        "{} MUSCLE3 run started (PID {}).\n\n"
+        "Generated topology:\n{}\n\n"
+        "Manager log:\n{}".format(mode.title(), process.pid, launch_plan.generated_topology, launch_plan.log_file),
+    )
+
+
 # --------------------------------------------------------------------------------------------
 def open_gui(wf_param_file):
     # CHECK THAT MANDATORY ACTORS ARE THERE
@@ -167,16 +208,14 @@ def open_gui(wf_param_file):
     # Setup
 
     fr_wfp = tkinter.Frame(window, width=300, height=500, background=col.c3)
-    fr_wfp.grid(row=0, column=0, rowspan=2, sticky="nwes", padx=3, pady=3)
+    fr_wfp.grid(row=0, column=1, rowspan=2, sticky="nwes", padx=3, pady=3)
 
     fr_as = tkinter.Frame(window, width=500, height=500, background=col.c1)
-    fr_as.grid(row=0, column=1, rowspan=2, sticky="nwes", padx=3, pady=3)
+    fr_as.grid(row=0, column=2, rowspan=2, sticky="nwes", padx=3, pady=3)
 
-    fr_fc = tkinter.Frame(window, width=500, height=500, background=col.c1)
-    fr_fc.grid(row=0, column=2, rowspan=2, sticky="nwes", padx=3, pady=3)
-
-    removed_by_close_button = [fr_fc]
-    fr_fc.grid_remove()
+    fr_launch = tkinter.Frame(window, width=350, height=500, background=col.c1)
+    fr_launch.grid(row=0, column=0, rowspan=2, sticky="nwes", padx=3, pady=3)
+    fr_launch.grid_columnconfigure(1, weight=1)
 
     ## LEFT - CONFIGURING THE WORKFLOW PARAMETERS
     tkinter.Label(
@@ -294,7 +333,133 @@ def open_gui(wf_param_file):
 
     # -------------------------------------------------------------------------------------
 
-    ## RIGHT - FLOWCHART
+    ## RIGHT - EXECUTION / LAUNCH
+    tkinter.Label(
+        fr_launch,
+        text="EXECUTION / LAUNCH",
+        bg=col.c1,
+        font=("Courier", fontsize, "bold"),
+        fg="darkcyan",
+    ).grid(row=0, column=0, columnspan=3, pady=10, padx=5, sticky="we")
+
+    tkinter.Label(fr_launch, text="Execution mode", bg=col.c1).grid(row=1, column=0, padx=5, pady=4, sticky="w")
+    execution_mode = tkinter.StringVar(value=DEFAULT_EXECUTION_MODE)
+    execution_mode_selector = tkinter.ttk.Combobox(
+        fr_launch,
+        textvariable=execution_mode,
+        values=EXECUTION_MODES,
+        state="readonly",
+        width=24,
+    )
+    execution_mode_selector.grid(row=1, column=1, columnspan=2, padx=5, pady=4, sticky="ew")
+    CreateToolTip(
+        execution_mode_selector,
+        "Legacy runs the classic iWrap workflow. Hybrid and Pure start MUSCLE3 " "with the selected yMMSL topology.",
+    )
+
+    tkinter.Label(fr_launch, text="yMMSL topology", bg=col.c1).grid(row=2, column=0, padx=5, pady=4, sticky="nw")
+    ymmsl_file = tkinter.StringVar()
+    ymmsl_entry = tkinter.Entry(fr_launch, textvariable=ymmsl_file, bg=col.c3)
+    ymmsl_entry.grid(row=2, column=1, padx=5, pady=4, sticky="ew")
+    button_browse_ymmsl = tkinter.Button(fr_launch, text="Browse…", bg=col.c2)
+    button_browse_ymmsl.grid(row=2, column=2, padx=5, pady=4, sticky="ew")
+    CreateToolTip(
+        button_browse_ymmsl,
+        "Choose the yMMSL topology to use for Hybrid or Pure mode. The source "
+        "file stays unchanged; a run-specific copy is generated.",
+    )
+
+    button_reset_ymmsl = tkinter.Button(fr_launch, text="Use recommended topology", bg=col.c2)
+    button_reset_ymmsl.grid(row=3, column=1, columnspan=2, padx=5, pady=3, sticky="e")
+
+    execution_hint = tkinter.StringVar()
+    tkinter.Label(
+        fr_launch,
+        textvariable=execution_hint,
+        bg=col.c1,
+        justify=tkinter.LEFT,
+        anchor="w",
+        wraplength=315,
+    ).grid(row=4, column=0, columnspan=3, padx=8, pady=10, sticky="we")
+
+    tkinter.ttk.Separator(fr_launch, orient="horizontal").grid(
+        row=5, column=0, columnspan=3, padx=5, pady=5, sticky="ew"
+    )
+    tkinter.Label(
+        fr_launch,
+        text="Save & Run saves this configuration, then launches the selected mode.",
+        bg=col.c1,
+        justify=tkinter.LEFT,
+        wraplength=315,
+    ).grid(row=6, column=0, columnspan=3, padx=8, pady=5, sticky="w")
+
+    topology_by_mode = {}
+    for supported_mode in EXECUTION_MODES:
+        recommended_topology = default_ymmsl_path(supported_mode, pathHcdRoot)
+        if recommended_topology is not None:
+            topology_by_mode[supported_mode] = str(recommended_topology)
+    active_execution_mode = [DEFAULT_EXECUTION_MODE]
+
+    def update_execution_controls(*_):
+        selected_mode = normalize_execution_mode(execution_mode.get())
+        previous_mode = active_execution_mode[0]
+        if previous_mode != selected_mode and requires_ymmsl(previous_mode):
+            topology_by_mode[previous_mode] = ymmsl_file.get()
+        active_execution_mode[0] = selected_mode
+
+        if requires_ymmsl(selected_mode):
+            ymmsl_file.set(topology_by_mode.get(selected_mode, ""))
+            ymmsl_entry.configure(state="normal")
+            button_browse_ymmsl.configure(state="normal")
+            button_reset_ymmsl.configure(state="normal")
+            if selected_mode == "hybrid":
+                execution_hint.set(
+                    "Hybrid runs the MUSCLE3 macro and Python micro workflow. "
+                    "The selected topology is copied and bound to this saved configuration."
+                )
+            else:
+                execution_hint.set(
+                    "Pure runs native M3 actors selected in the configuration. "
+                    "The launcher prepares their connections and checks parameter files."
+                )
+        else:
+            ymmsl_file.set("")
+            ymmsl_entry.configure(state="disabled")
+            button_browse_ymmsl.configure(state="disabled")
+            button_reset_ymmsl.configure(state="disabled")
+            execution_hint.set("Legacy runs the classic in-process iWrap workflow. No yMMSL " "topology is used.")
+
+    def browse_ymmsl():
+        selected_mode = normalize_execution_mode(execution_mode.get())
+        if not requires_ymmsl(selected_mode):
+            return
+        current_path = ymmsl_file.get()
+        initial_directory = pathHcdRoot
+        if current_path:
+            current_parent = Path(current_path).expanduser().parent
+            if current_parent.is_dir():
+                initial_directory = current_parent
+        selected_file = tkinter.filedialog.askopenfilename(
+            initialdir=str(initial_directory),
+            title="Select yMMSL topology",
+            filetypes=[("MUSCLE3 yMMSL", "*.ymmsl"), ("All files", "*")],
+        )
+        if selected_file:
+            ymmsl_file.set(selected_file)
+            topology_by_mode[selected_mode] = selected_file
+
+    def reset_ymmsl():
+        selected_mode = normalize_execution_mode(execution_mode.get())
+        recommended_topology = default_ymmsl_path(selected_mode, pathHcdRoot)
+        if recommended_topology is None:
+            return
+        topology_by_mode[selected_mode] = str(recommended_topology)
+        ymmsl_file.set(str(recommended_topology))
+
+    execution_mode.trace("w", update_execution_controls)
+    button_browse_ymmsl.configure(command=browse_ymmsl)
+    button_reset_ymmsl.configure(command=reset_ymmsl)
+    update_execution_controls()
 
     # Left panel
     button_loadconfig = tkinter.Button(fr_wfp, text="Load", bg=col.c2)
@@ -332,15 +497,6 @@ def open_gui(wf_param_file):
     button_loadlconfig.configure(command=lambda: load("latest", open_gui, process_list))
     CreateToolTip(button_loadlconfig, "Load the latest created configuration folder")
 
-    button_saveandrun = tkinter.Button(fr_wfp, text="Run", bg=col.c2, state="normal")
-    button_saveandrun.grid(row=53, column=1, padx=5, pady=5, sticky="ew")
-    button_saveandrun.configure(
-        command=lambda: run(saved_folder.Save(None, init_folder))
-    )
-    CreateToolTip(
-        button_saveandrun, "Run the H&CD workflow with the current configuration"
-    )
-
     button_restore_def = tkinter.Button(fr_wfp, text="Restore Default", bg=col.c2)
     button_restore_def.grid(row=54, column=1, padx=5, pady=5, sticky="ew")
     button_restore_def.configure(command=lambda: open_gui(default_wf_param_file))
@@ -352,6 +508,24 @@ def open_gui(wf_param_file):
     button_exit.grid(row=56, column=0, padx=5, pady=5, sticky="w")
     button_exit.configure(command=lambda: sys.exit())
     CreateToolTip(button_exit, "Exit the interface")
+
+    def save_and_run():
+        configuration_folder = saved_folder.Save(None, init_folder)
+        if not configuration_folder:
+            messagebox.showerror(
+                "Save failed",
+                "The configuration could not be saved. Check the console output and try again.",
+            )
+            return
+        run(configuration_folder, execution_mode.get(), ymmsl_file.get())
+
+    button_saveandrun = tkinter.Button(fr_launch, text="Save & Run", bg=col.c2, state="normal")
+    button_saveandrun.grid(row=7, column=0, columnspan=3, padx=8, pady=10, sticky="ew")
+    button_saveandrun.configure(command=save_and_run)
+    CreateToolTip(
+        button_saveandrun,
+        "Save the configuration, then run it through the selected execution mode.",
+    )
 
     # Middle panel
     button_edit_codeparameters = tkinter.Button(

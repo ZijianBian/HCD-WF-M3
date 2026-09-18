@@ -1,235 +1,87 @@
-Available Actor Modules
-========================
+Runtime modules
+===============
 
-This page lists all actor modules available via EasyBuild (on SDCC).
+The source checkout provides two SDCC setup scripts. Choose the one matching
+your actor build; :doc:`../user/installation` describes the setup procedure.
+The versions below record what those scripts load, rather than a live catalog
+of everything available on SDCC.
 
-All modules are built with: **intel-2023b-DD-3.42.0**
+Default: DD 4.1.0
+-----------------
 
-Loading Modules
----------------
+``config_hcd_iter_sdcc.sh`` loads these exact modules:
 
-To load a module:
+.. code-block:: text
 
-.. code-block:: bash
+   IMAS-Python/2.3.0-intel-2023b
+   IMAS-Fortran/5.5.0-intel-2023b-DD-4.1.0
+   MUSCLE3/0.8.0-intel-2023b
+   XMLlib/3.2.0-intel-compilers-2023.2.1
+   INTERPOS/9.2.0-iimkl-2023b
+   Tkinter/3.11.5-GCCcore-13.2.0
+   Waveform-Cooker/1.6.0-GCCcore-13.2.0
 
-   module load <MODULE_NAME>/<VERSION>-intel-2023b-DD-3.42.0
+Actors are taken from ``ACTOR_FOLDER`` (default: ``PYTHON_ACTORS`` under the
+source checkout). The script creates or activates ``devenv_dd410`` with access
+to the module-provided Python packages; it does not install the actors.
 
-Example:
+Rabbit runs in a separate GCC process. ``topologies/pure.ymmsl`` calls
+``scripts/run_rabbit_m3.sh``, which loads
+``IMAS-Fortran/5.5.0-foss-2023b-DD-4.1.0``, ``XMLlib/3.3.2-GCC-13.2.0``,
+``INTERPOS/9.2.0-gfbf-2023b`` and ``MUSCLE3/0.8.0-foss-2023b`` for that process.
 
-.. code-block:: bash
+Legacy: DD 3.42.0
+-----------------
 
-   module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
+``config_hcd_iter_sdcc_3.42.0.sh`` loads
+``IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0`` and the site's default Python,
+Tkinter, matplotlib, lxml and Waveform-Cooker modules. It uses ``devenv_3.42.0``.
 
-Mandatory Actors
-----------------
+When ``ACTOR_FOLDER`` is unset, it also loads the actor modules below. Each
+entry has the suffix ``-intel-2023b-DD-3.42.0``; for example,
+``TORBEAM/3.8.0-intel-2023b-DD-3.42.0``.
 
-These actors are required for most HCD workflows:
+.. csv-table::
+   :header: "Module", "Version"
 
-.. list-table::
-   :header-rows: 1
-   :widths: 30 20 50
+   HCD_MERGERS, 1.0.0
+   HCD2CORE_SOURCES, 1.2.0
+   HCD2CORE_PROFILES, 1.1.0
+   GRAYSCALE, 1.1.0
+   GRAY, 1.0.0
+   TORBEAM, 3.8.0
+   TORAY, 1.0.0
+   GENRAY, 10.11.3
+   CYRANO, 1.0.0
+   FoPla, 2.1.0
+   StixReDist, 2.1.0
+   TOMCAT, 1.0.0
+   NEMO, 2.2.0
+   NBISIM, 1.3.0
+   RISK, 2.2.0
+   SPOT, 2.4.0
+   RELAX, 1.0.0
+   SMART, 0.1.0
+   FPSIM, 1.0.0
 
-   * - Actor
-     - Version
-     - Description
-   * - HCD_MERGERS
-     - 1.0.0
-     - Merges heating and current drive sources
-   * - HCD2CORE_SOURCES
-     - 1.2.0
-     - Converts HCD outputs to core_sources IDS
-   * - HCD2CORE_PROFILES
-     - 1.1.0
-     - Converts HCD outputs to core_profiles IDS
+When ``ACTOR_FOLDER`` is set, the helper uses that directory instead of loading
+this actor module list. Use a fresh shell when changing stacks, or explicitly
+set the actor directory for the chosen DD version.
 
-Electron Cyclotron (EC) Heating Actors
----------------------------------------
-
-Ray tracing and EC heating/current drive codes:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 20 50
-
-   * - Actor
-     - Version
-     - Description
-   * - GRAYSCALE
-     - 1.1.0
-     - Advanced EC ray tracing (most commonly used)
-   * - GRAY
-     - 1.0.0
-     - EC ray tracing and absorption
-   * - TORBEAM
-     - 3.8.0
-     - EC beam tracing with wave effects
-   * - TORAY
-     - 1.0.0
-     - EC ray tracing code
-   * - GENRAY
-     - 10.11.3
-     - General ray tracing (EC and LH)
-
-Ion Cyclotron (IC) Heating Actors
-----------------------------------
-
-IC heating and wave propagation codes:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 20 50
-
-   * - Actor
-     - Version
-     - Description
-   * - CYRANO
-     - 1.0.0
-     - IC heating code
-   * - FoPla
-     - 2.1.0
-     - Fokker-Planck solver for IC
-   * - StixReDist
-     - 2.1.0
-     - Stix wave redistribution
-   * - TOMCAT
-     - 1.0.0
-     - IC wave code
-
-Neutral Beam Injection (NBI) Actors
-------------------------------------
-
-Neutral beam injection and fast ion codes:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 20 50
-
-   * - Actor
-     - Version
-     - Description
-   * - NEMO
-     - 2.2.0
-     - NBI modeling code (most commonly used)
-   * - NBISIM
-     - 1.3.0
-     - NBI simulation code
-   * - RISK
-     - 2.2.0
-     - Fast ion slowing down
-   * - SPOT
-     - 2.4.0
-     - NBI orbit following
-
-Other Actors
-------------
-
-Additional simulation and analysis actors:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 20 50
-
-   * - Actor
-     - Version
-     - Description
-   * - RELAX
-     - 1.0.0
-     - Fokker-Planck code
-   * - SMART
-     - 0.1.0
-     - Analysis tool
-   * - FPSIM
-     - 1.0.0
-     - Fokker-Planck simulation
-
-Complete Module List
---------------------
-
-For reference, here's the complete list of available modules:
-
-.. code-block:: bash
-
-   # Mandatory
-   module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
-   module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
-   module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
-   
-   # EC Heating
-   module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
-   module load GRAY/1.0.0-intel-2023b-DD-3.42.0
-   module load TORBEAM/3.8.0-intel-2023b-DD-3.42.0
-   module load TORAY/1.0.0-intel-2023b-DD-3.42.0
-   module load GENRAY/10.11.3-intel-2023b-DD-3.42.0
-   
-   # IC Heating
-   module load CYRANO/1.0.0-intel-2023b-DD-3.42.0
-   module load FoPla/2.1.0-intel-2023b-DD-3.42.0
-   module load StixReDist/2.1.0-intel-2023b-DD-3.42.0
-   module load TOMCAT/1.0.0-intel-2023b-DD-3.42.0
-   
-   # NBI
-   module load NEMO/2.2.0-intel-2023b-DD-3.42.0
-   module load NBISIM/1.3.0-intel-2023b-DD-3.42.0
-   module load RISK/2.2.0-intel-2023b-DD-3.42.0
-   module load SPOT/2.4.0-intel-2023b-DD-3.42.0
-   
-   # Other
-   module load RELAX/1.0.0-intel-2023b-DD-3.42.0
-   module load SMART/0.1.0-intel-2023b-DD-3.42.0
-   module load FPSIM/1.0.0-intel-2023b-DD-3.42.0
-
-Checking Available Modules
----------------------------
-
-To see all available modules on your system:
-
-.. code-block:: bash
-
-   module av HCD
-   module av GRAYSCALE
-   module av NEMO
-
-To see currently loaded modules:
+Checking the active environment
+-------------------------------
 
 .. code-block:: bash
 
    module list
+   module avail IMAS
+   module avail MUSCLE3
+   module avail TORBEAM
 
-Module Dependencies
--------------------
+Both SDCC helpers purge previously loaded modules. ``HCDWF_VENV_DIR`` overrides
+their virtual-environment path. Dependency installation is skipped by default;
+set ``HCDWF_SKIP_PIP_INSTALL=0`` before sourcing a helper to request an editable
+installation of the checkout.
 
-Most actor modules automatically load their dependencies, including:
-
-* IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
-* Required numerical libraries (Intel MKL, HDF5, etc.)
-* Python packages
-
-You typically don't need to manually load these dependencies.
-
-Usage Example
--------------
-
-Typical module loading sequence for an EC heating simulation:
-
-.. code-block:: bash
-
-   # Load workflow
-   module load HCD-WF
-   
-   # Load mandatory actors
-   module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
-   module load HCD2CORE_SOURCES/1.2.0-intel-2023b-DD-3.42.0
-   module load HCD2CORE_PROFILES/1.1.0-intel-2023b-DD-3.42.0
-   
-   # Load EC actor
-   module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
-   
-   # Run simulation
-   hcd_nogui -c my_simulation/
-
-See Also
---------
-
-* :doc:`../user/installation` - Installation guide
-* :doc:`../user/quickstart` - Quick start guide
-* :doc:`actors` - Complete actor reference with GIT repositories
+``config_hcd_iter_hpc.sh`` is an older, separate HPC setup based on the 2018
+module stack. It does not select the DD 4.1.0 environment described above.

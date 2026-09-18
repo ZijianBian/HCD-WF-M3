@@ -14,6 +14,7 @@ from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 # TODO Separate static and runtime part of the data
 class WorkflowData:
     def __init__(self, workflowConfig) -> None:
+        self.workflowConfigPath = workflowConfig
         workflowConfig = os.path.join(workflowConfig, "input_workflow.xml")
 
         pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"

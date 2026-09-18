@@ -1,118 +1,48 @@
-Quick Start
-===========
+Quickstart
+==========
 
-This guide will help you run your first HCD workflow simulation.
+For a first run, use a configuration and input database that you can already
+read. A configuration folder contains ``input_workflow.xml``, actor parameter
+files, and any waveform files. If you need to create one, follow :doc:`gui`.
+The workflow does not download a plasma scenario for you.
 
-For Users (EasyBuild Module)
------------------------------
+Prepare the environment
+-----------------------
 
-Step 1: Load the Module
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: bash
-
-   module load HCD-WF
-   export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
-
-Step 2: Run a Test Case
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-The HCD Workflow comes with test data. Try running the GRAYSCALE test:
+After the one-time :doc:`installation`, open a shell in the repository root:
 
 .. code-block:: bash
 
-   hcd_nogui -c /path/to/HCD-WF/tests/data/GRAYSCALE/
+   export ACTOR_FOLDER=/path/to/PYTHON_ACTORS
+   source config_hcd_iter_sdcc.sh
 
-Step 3: View Results
-~~~~~~~~~~~~~~~~~~~~~
+Replace the actor path with your installed DD 4.1.0 actors. The helper prepares
+the environment; it does not build the actors.
 
-The workflow will process the simulation and output results to the specified database.
+Check the case and run
+----------------------
 
-For Developers (Python Environment)
-------------------------------------
+In your saved ``input_workflow.xml``, check the input database, selected
+actors and time range. Choose an output location and ``run_out`` intended for
+this calculation: starting a run creates the configured output database.
 
-Step 1: Setup Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: bash
-
-   cd hcd-wf
-   source devenv/bin/activate
-   
-   # Load required modules
-   module load Tkinter
-   module load matplotlib
-   module load IMAS-AL-Python/5.4.0-intel-2023b-DD-3.42.0
-   module load GRAYSCALE/1.1.0-intel-2023b-DD-3.42.0
-   module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
-   
-   export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
-
-Step 2: Run Test Cases
-~~~~~~~~~~~~~~~~~~~~~~~
-
-**Console Mode (No GUI):**
+Start with Legacy mode if your case uses iWrap actors:
 
 .. code-block:: bash
 
-   hcd_nogui -c tests/data/GRAYSCALE/
+   ./run.sh legacy /path/to/config
 
-**Single Time Slice:**
+For MUSCLE3, choose a matching configuration and topology as described in
+:doc:`execution_modes`. Replacing ``legacy`` with ``pure`` also changes the
+actor executable requirements.
 
-.. code-block:: bash
+Read the result
+---------------
 
-   hcdslice_nogui -c tests/data/GRAYSCALE/
+The terminal shows the current time slice and actor messages. Physics results
+are written to the IMAS database selected by the configuration.
+For MUSCLE3 runs, the launcher also prints the run-directory path.
 
-**Interactive GUI:**
-
-.. code-block:: bash
-
-   hcd_gui
-
-**Batch Submission:**
-
-.. code-block:: bash
-
-   hcd_batch -n 1 -t 1 -e your.email@iter.org -q all -c tests/data/GRAYSCALE/
-
-Understanding the Output
--------------------------
-
-Console Output
-~~~~~~~~~~~~~~
-
-During execution, you'll see:
-
-* Parameter loading messages
-* Algorithm selection
-* Process execution status
-* Time slice information
-* Completion messages
-
-Example output:
-
-.. code-block:: text
-
-   path of the input workflow tests/data/GRAYSCALE/input_workflow.xml
-   --- Default algorithm ---
-   Algorithm = ['ec_wave_solver', 'fill_core_sources']
-   ---------------------------------------------
-   ---- Enter time loop of the H&CD wrapper ----
-   Step = 1/1
-   Time = 320.00 s
-   dt   = 20.00 s
-   Execute H&CD workflow for current time slice
-   End of time slice
-   End of wf_wrapper
-
-Output Files
-~~~~~~~~~~~~
-
-Results are stored in IMAS database format according to your configuration in ``input_workflow.xml``.
-
-Next Steps
-----------
-
-* Learn about :doc:`usage` for detailed command options
-* See :doc:`examples` for more complex workflows
-* Read :doc:`/reference/configuration` to customize your simulations
+Open the output with your IMAS reader and check that the expected times and
+heating sources are present. See :doc:`usage` for file locations and
+:doc:`validation` for the checks to make before interpreting a result.

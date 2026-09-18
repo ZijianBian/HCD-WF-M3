@@ -1,480 +1,135 @@
 Architecture
 ============
 
-This document describes the architecture and design of the HCD Workflow system.
+HCD-WF reads IMAS slices, prepares heating inputs, runs the selected physics
+actors and stores their outputs. The execution mode changes where those
+steps run. See :doc:`../user/execution_modes` for choosing and launching a
+mode.
 
-System Overview
----------------
+Drivers and data flow
+---------------------
 
-The HCD Workflow is built on a modular architecture that separates:
+.. code-block:: text
 
-1. **Workflow Management** - Orchestration logic
-2. **Actor System** - Physics code interfaces
-3. **Data Management** - IMAS database operations
-4. **User Interface** - GUI and CLI components
+   Legacy: workflow_driver -> HCDWorkflow -> iWrap actors
+   Hybrid: workflow_driver <-> hcd_workflow_m3 -> HCDWorkflow -> iWrap actors
+   Pure:   workflow_driver_m3_pure <-> native MUSCLE3 actors
 
-Component Diagram
------------------
+The two standalone drivers own database access and the time loop.
+``setup_databases()`` reads the workflow configuration, opens input/output
+databases and prepares a machine-description database from input IDSs and
+waveforms. ``get_ids_slices()`` reads each time slice;
+``store_ids_slices()`` writes the prepared inputs and available outputs.
+These functions live in ``workflow/workflow_driver.py`` and are shared
+with the Pure driver.
 
-::
+MUSCLE3 exchanges stop on IDS serialization or deserialization errors.
+Drivers reject returned message timestamps that differ from the requested
+slice by more than ``1e-9`` seconds or are not finite.
 
-    ┌─────────────────────────────────────────────────────┐
-    │          User Interface Layer                       │
-    │  ┌──────────┐  ┌──────────┐  ┌───────────────┐    │
-    │  │ hcd_gui  │  │hcd_nogui │  │  hcd_batch    │    │
-    │  └──────────┘  └──────────┘  └───────────────┘    │
-    └─────────────────────────────────────────────────────┘
-                           ↓
-    ┌─────────────────────────────────────────────────────┐
-    │        Workflow Driver Layer                        │
-    │  ┌─────────────────────────────────────┐           │
-    │  │   WorkflowDriver                    │           │
-    │  │   - executeTimeloop()               │           │
-    │  │   - getIDSSlices()                  │           │
-    │  │   - storeIDSSlices()                │           │
-    │  └─────────────────────────────────────┘           │
-    └─────────────────────────────────────────────────────┘
-                           ↓
-    ┌─────────────────────────────────────────────────────┐
-    │        Workflow Execution Layer                     │
-    │  ┌─────────────────────────────────────┐           │
-    │  │   WorkflowExecutor                  │           │
-    │  │   - decideAlgorithm()               │           │
-    │  │   - adjustAlgorithm()               │           │
-    │  │   - executeAlgorithm()              │           │
-    │  └─────────────────────────────────────┘           │
-    └─────────────────────────────────────────────────────┘
-                           ↓
-    ┌─────────────────────────────────────────────────────┐
-    │        Actor Layer                                  │
-    │  ┌──────────┐ ┌──────────┐ ┌──────────┐           │
-    │  │GRAYSCALE │ │  CYRANO  │ │   NEMO   │  ...      │
-    │  └──────────┘ └──────────┘ └──────────┘           │
-    └─────────────────────────────────────────────────────┘
-                           ↓
-    ┌─────────────────────────────────────────────────────┐
-    │        Data Layer                                   │
-    │  ┌─────────────────────────────────────┐           │
-    │  │   IMAS Database                     │           │
-    │  │   - Input DB                        │           │
-    │  │   - Output DB                       │           │
-    │  │   - Machine Description DB          │           │
-    │  └─────────────────────────────────────┘           │
-    └─────────────────────────────────────────────────────┘
+In Legacy and Hybrid, ``HCDWorkflow.initialize()`` creates ``WorkflowData``
+from the configuration directory. For each slice, ``setProcessStatus()``
+selects active processes and ``run()`` delegates to ``WorkflowExecutor``.
+The executor resolves the configured algorithm, actor inputs and mergers.
+``HCDWorkflow`` itself does not open the scenario databases.
 
-Core Components
----------------
+``workflow/ids_prep.py`` contains shared DD conversion, IDS preparation
+and output-shape handling. Configuration parsing belongs to
+``workflow_config_reader.py``; actor registrations and dependency lists
+come from ``hcdworkflow/global_configuration/global_lists.yaml``.
 
-hcdworkflow Package
-~~~~~~~~~~~~~~~~~~~
-
-The main workflow package contains:
-
-**hcd_workflow.py**
-  Main workflow orchestration class. Coordinates actor execution.
-
-**workflow_driver.py**
-  Implements time-loop execution, IDS slice management, and output storage.
-
-**workflow_executor.py**
-  Manages actor execution sequence, dependencies, and parallel execution.
-
-**workflow_data.py**
-  Handles workflow configuration data and validation.
-
-**workflow_config_reader.py**
-  Parses XML configuration files and extracts parameters.
-
-**workflow_dbhelper.py**
-  IMAS database operations and connections.
-
-**workflow_globals_reader.py**
-  Reads global configuration (algorithms, dependencies, presets).
-
-**workflow_actor.py**
-  Actor wrapper and interface definition.
-
-Workflow Execution Flow
-------------------------
-
-1. **Initialization**
-   
-   .. code-block:: python
-
-      # Load configuration
-      workflowConfig = WorkflowConfigReader(xml_file)
-      workflowData = WorkflowData(config_folder)
-      
-      # Setup databases
-      dbhelper = WorkflowDbHelper(...)
-      inputDb = dbhelper.getInputDatabase()
-      outputDb = dbhelper.getOutputDatabase()
-
-2. **Time Loop**
-   
-   .. code-block:: python
-
-      for time_slice in time_range:
-          # Get IDS slices at current time
-          idsSlices = getIDSSlices(timenow)
-          
-          # Execute workflow
-          idsData = workflow.run(**idsSlices)
-          
-          # Store results
-          storeIDSSlices(idsData)
-
-3. **Algorithm Decision**
-   
-   .. code-block:: python
-
-      # Choose algorithm based on configuration
-      if ic_wave_fp == "fopla":
-          algorithm = "nbi_ic_synergy"
-      else:
-          algorithm = "default"
-
-4. **Actor Execution**
-   
-   .. code-block:: python
-
-      for process in algorithm:
-          # Get selected actor
-          actor = dictionary_of_actors[process]
-          
-          # Execute
-          result = actor(*input_ids)
-          
-          # Handle mergers if needed
-          if multiple_outputs:
-              result = merge_actor(results)
-
-Data Flow
----------
-
-Input Data
-~~~~~~~~~~
-
-1. **Scenario Data** (equilibrium, core_profiles, workflow)
-   
-   * Read from input database
-   * Sliced at each time point
-
-2. **Machine Description** (NBI, IC antennas, EC launchers, wall)
-   
-   * Static or slowly varying
-   * Loaded from machine database
-
-3. **Configuration**
-   
-   * XML files for workflow parameters
-   * YAML files for waveforms
-   * Actor-specific parameter files
-
-Processing
-~~~~~~~~~~
-
-1. **Actor Execution**
-   
-   * Each actor receives required input IDSs
-   * Performs physics calculations
-   * Returns output IDSs
-
-2. **Merging**
-   
-   * Multiple actors may produce same IDS type
-   * Merger actors combine results
-   * Handle overlapping time ranges
-
-Output Data
-~~~~~~~~~~~
-
-1. **Process Outputs**
-   
-   * waves, distributions, distribution_sources
-   * Stored slice-by-slice
-
-2. **Derived Data**
-   
-   * core_sources (power deposition)
-   * core_profiles (updated)
-   * Stored to output database
-
-Actor System
-------------
-
-Actor Interface
-~~~~~~~~~~~~~~~
-
-All actors must implement:
-
-.. code-block:: python
-
-    def actor_function(*input_ids) -> output_ids:
-        """
-        Process input IDSs and return output.
-        
-        Args:
-            *input_ids: Variable number of IMAS IDS objects
-            
-        Returns:
-            output_ids: Single IDS or list of IDSs
-        """
-        pass
-
-Actor Categories
-~~~~~~~~~~~~~~~~
-
-**Wave Solvers**
-  * ec_wave_solver: GRAYSCALE, GRAY, TORBEAM, TORAY
-  * ic_wave_solver: CYRANO, TOMCAT, PION, LION
-  * lh_wave_solver: LHCD-METIS
-
-**Source Codes**
-  * nbi_source: NEMO, BBNBI
-  * nuclear_source: AFSI
-
-**Fokker-Planck**
-  * ec_wave_fp: RELAX
-  * ic_wave_fp: STIXREDIST, FOPLA
-  * nbi_fp: ASCOT, RISK, SPOT, NBISIM
-
-**Post-Processing**
-  * fill_core_sources: HCD2CORE_SOURCES
-  * fill_core_profiles: HCD2CORE_PROFILES
-
-**Mergers**
-  * merge_waves
-  * merge_distributions
-  * merge_distribution_sources
-  * merge_core_sources
-
-Actor Dependencies
-~~~~~~~~~~~~~~~~~~
-
-Defined in ``global_lists.yaml``:
-
-.. code-block:: yaml
-
-    prerequisites:
-      ec_wave_fp:
-        relax:
-          ec_wave_solver: any
-      ic_wave_fp:
-        fopla:
-          ic_wave_solver: any
-          nbi_source: any
-          nbi_fp: any
-
-Configuration System
---------------------
-
-Hierarchy
-~~~~~~~~~
-
-1. **Global Configuration** (``global_lists.yaml``)
-   
-   * Algorithms
-   * Actor lists
-   * Dependencies
-   * Parallel execution rules
-
-2. **Workflow Configuration** (``input_workflow.xml``)
-   
-   * Workflow parameters
-   * Actor selection
-   * Time range
-
-3. **Actor Configuration** (``input_<actor>.xml``)
-   
-   * Actor-specific parameters
-   * Per-process configuration
-
-4. **Waveforms** (``*_waveforms.yaml``)
-   
-   * Time-dependent parameters
-   * Power, position, etc.
-
-Configuration Loading
-~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-    # Global lists
-    globalListReader = WorkflowGlobalsReader(yaml_file)
-    algorithms = globalListReader.getAlgorithms()
-    
-    # Workflow config
-    workflowConfig = WorkflowConfigReader(xml_file)
-    param_process = workflowConfig.getParamProcess()
-    
-    # Waveforms
-    idsObject = add_dynamic(yaml_file)
-
-Parallel Execution
+Preparing a launch
 ------------------
 
-Dependency Graph
-~~~~~~~~~~~~~~~~
+``gui/launch_config.py`` serves both the GUI and ``run.sh``. It copies a
+topology template into a run directory, binds it to the saved configuration
+and resolves driver and actor-parameter paths. Pure launch keeps the actors
+selected in ``input_workflow.xml``. A custom topology must provide every
+selected actor. MUSCLE3 Manager starts the checked, generated yMMSL file.
 
-The workflow analyzes dependencies to enable parallel execution:
+The topology defines components, ports and connections; it does not by
+itself make independent actors run concurrently. The driver's send/receive
+order determines when each connected actor can start.
 
-.. code-block:: python
+.. _hybrid-clock-contract:
 
-    parallel_dependency:
-      ec_wave_solver: None  # Can run first
-      lh_wave_solver: None  # Can run in parallel with EC
-      ic_wave_solver: [ic_coup, nbi_source, nbi_fp]  # Depends on these
+Hybrid clock contract
+---------------------
 
-Execution Strategy
-~~~~~~~~~~~~~~~~~~
+The macro sends one serialized IDS per connected ``O_I`` port and receives
+outputs on ``S`` ports. The ``hcd_workflow_m3.py`` micro receives inputs on
+``F_INIT`` and returns outputs on ``O_F``. One macro reuse contains the
+standalone time loop; each exchange invokes one micro reuse.
 
-1. **Independent actors** run in parallel
-2. **Dependent actors** wait for prerequisites
-3. **Mergers** run after all contributing actors
+When the micro is embedded in a Plasma Discharge Simulator (PDS), the outer
+controller supplies its clock. The same rules apply to messages from the
+standalone macro:
 
-Example:
+* All connected input timestamps must agree within ``1e-9`` seconds, with
+  no relative tolerance, and the timestamp must be finite.
+* XML ``tbegin`` and ``tend`` must be finite. Nonnegative bounds constrain
+  the incoming time with the same tolerance. Negative bounds impose no
+  constraint in the micro, which has no database from which to infer them.
+* ``one_time_slice`` does not limit the micro's reuse loop. The controller
+  decides how many slices to send.
+* Outputs use the accepted input timestamp and preserve the first
+  connected input's ``next_timestamp``. The micro neither compares all
+  ``next_timestamp`` values nor imposes a future-time rule on that value.
 
-::
+A clock violation stops the micro through MUSCLE3 error shutdown. Process
+activation uses the accepted controller time; homogeneous single-slice
+output IDSs are stamped with that time before serialization.
 
-    Parallel Step 0: [ec_wave_solver, lh_wave_solver, nbi_source]
-    Parallel Step 1: [nbi_fp]
-    Parallel Step 2: [ic_coup]
-    Parallel Step 3: [ic_wave_solver]
-    Parallel Step 4: [merge_waves, fill_core_sources]
+.. _pure-m3-scheduling:
 
-Error Handling
---------------
+Pure actor scheduling
+---------------------
 
-Validation
-~~~~~~~~~~
+``hcdworkflow/workflow_driver_m3_pure.py`` maps actor ports in
+``ACTOR_PORTS`` and exchanges IDSs directly with the connected native
+executables. It does not call ``HCDWorkflow.run()``. The default order is
+Torbeam, Cyrano, wave merging, an optional fast-particle actor, then
+``hcd2core_sources``.
 
-* Configuration validation at startup
-* Actor prerequisite checking
-* IDS consistency checks
+Connected Torbeam runs on every slice. Cyrano and FoPla run only when the
+absolute IC launched power exceeds ``1e-6 W``. Wave merging requires both
+positive EC power above that threshold and active IC power; otherwise the
+driver carries forward the applicable wave branch. FoPla receives the IC
+waves, while post-processing receives the combined waves.
 
-Error Recovery
-~~~~~~~~~~~~~~
+Rabbit runs after the wave calculation and advances on every slice,
+including zero-NBI-power slices, to preserve its state. Its topology must
+agree with ``nbi_fp=1``. Rabbit and FoPla cannot be connected together:
+the driver does not implement merging their distribution outputs.
 
-* Continue execution if optional processes fail
-* Skip disabled processes gracefully
-* Detailed error logging
+Optional EC/IC concurrency
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GUI Architecture
-----------------
+The yMMSL setting ``pure_parallel_ec_ic: true`` makes the driver send both
+Torbeam and Cyrano inputs before receiving their results. Their native
+processes can then compute concurrently; all Python ``Instance`` calls
+remain on one thread. The setting defaults to ``false``.
 
-Component Structure
-~~~~~~~~~~~~~~~~~~~
+This requires Torbeam and Cyrano, with only ``merge_waves`` and
+``hcd2core_sources`` allowed as additional actors. Rabbit and FoPla are
+excluded. Cyrano must not depend on Torbeam's output: its XML must contain
+one finite value for each of the following parameters:
 
-**gui_methods.py**
-  Core GUI operations, XML handling, loading/saving
+* ``Ntor != 0`` and ``frequency > 0``;
+* ``total_power == 1`` (antenna power) or ``total_power > 2`` (explicit power);
+* ``include_nbi == include_fasticrh == include_alphas == 0``.
 
-**waveform_edition.py**
-  Waveform editor integration
+The driver checks these conditions before running. In this schedule,
+Cyrano receives an empty waves input, then the two wave outputs are merged
+after both actors finish. The serial schedule retains the EC-to-IC waves
+input.
 
-**time_base_edition.py**
-  Time parameter editing
+Extending the workflow
+----------------------
 
-**tooltip.py**
-  UI tooltip system
-
-GUI Integration
-~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-    # GUI creates configuration
-    workflow_param = create_workflow_param_from_file(xml)
-    
-    # Launches workflow
-    wf_wrapper(config_folder)
-
-Design Patterns
----------------
-
-Strategy Pattern
-~~~~~~~~~~~~~~~~
-
-Algorithm selection based on configuration:
-
-.. code-block:: python
-
-    if condition:
-        algorithm = self.algorithm["default"]
-    else:
-        algorithm = self.algorithm["nbi_ic_synergy"]
-
-Factory Pattern
-~~~~~~~~~~~~~~~
-
-Actor creation from configuration:
-
-.. code-block:: python
-
-    actor = WorkflowActor.getObject(actor_name)
-
-Observer Pattern
-~~~~~~~~~~~~~~~~
-
-Status updates and progress monitoring (in GUI)
-
-Extensibility
--------------
-
-Adding New Actors
-~~~~~~~~~~~~~~~~~
-
-1. Create actor wrapper following interface
-2. Add to ``global_lists.yaml``
-3. Add configuration template
-4. Define dependencies
-5. Test integration
-
-Adding New Algorithms
-~~~~~~~~~~~~~~~~~~~~~
-
-1. Define sequence in ``global_lists.yaml``
-2. Specify dependencies
-3. Test with various configurations
-
-Performance Considerations
---------------------------
-
-* **Lazy Loading**: IDSs loaded only when needed
-* **Parallel Execution**: Independent actors run concurrently
-* **Memory Management**: IDSs released after use
-* **Database Optimization**: Slice-based access
-
-Best Practices
---------------
-
-Code Organization
-~~~~~~~~~~~~~~~~~
-
-* Keep workflow logic separate from physics
-* Use type hints for clarity
-* Document complex algorithms
-* Follow PEP 8 style guide
-
-Testing
-~~~~~~~
-
-* Test with provided test data
-* Validate against known results
-* Check edge cases
-* Test parallel execution
-
-Documentation
-~~~~~~~~~~~~~
-
-* Document all public interfaces
-* Explain complex algorithms
-* Provide usage examples
-* Keep docs in sync with code
-
-See Also
---------
-
-* :doc:`contributing` - How to contribute
-* :doc:`api` - API reference
-* :doc:`setup` - Development setup
+For an iWrap actor, update the actor registration and dependencies used by
+``WorkflowData`` and ``WorkflowExecutor``. For a native Pure actor, update
+the port registry, topology, launch validation and driver schedule together.
+In both cases, verify the actor's IDS and time contract before comparing a
+single slice and then a multi-slice run. :doc:`api` identifies the relevant
+entry points; :doc:`actor_installation` covers the external builds.

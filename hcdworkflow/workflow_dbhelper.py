@@ -1,7 +1,24 @@
 import os
 import sys
+from contextlib import suppress
 
 import imas
+
+# IMAS API compatibility
+if not hasattr(imas, "imasdef") and hasattr(imas, "ids_defs"):
+    imas.imasdef = imas.ids_defs
+
+
+def _open_or_create(entry, operation, description):
+    """Accept legacy status tuples and IMAS-Python's exception-based API."""
+    try:
+        result = getattr(entry, operation)()
+        if isinstance(result, tuple) and result[0] != 0:
+            raise RuntimeError(f"IMAS returned status {result[0]}")
+    except Exception as error:
+        with suppress(Exception):
+            entry.close()
+        raise RuntimeError(f"Could not {operation} {description}: {error}") from error
 
 
 class WorkflowDbHelper:
@@ -10,6 +27,7 @@ class WorkflowDbHelper:
         input_user_or_path,
         input_database,
         input_backend,
+        ddv_backend,
         output_user_or_path,
         output_database,
         output_backend,
@@ -27,7 +45,7 @@ class WorkflowDbHelper:
 
         # IF THE OUTPUT DATABASE DOES NOT EXIST: CREATE IT
         if output_user_or_path == os.getenv("USER"):
-            output_folder = os.getenv("HOME") + "/public/imasdb/" + output_database + "/3/0"
+            output_folder = os.getenv("HOME") + "/public/imasdb/" + output_database + f"/{ddv_backend}/0"
         else:
             output_folder = f"{output_user_or_path}/{output_database}/3/0"
         if os.path.isdir(output_folder) is False:
@@ -40,7 +58,7 @@ class WorkflowDbHelper:
         self.input_user_or_path = input_user_or_path
         self.input_database = input_database
         self.input_backend = input_backend
-
+        self.ddv_backend = ddv_backend
         self.output_user_or_path = output_user_or_path
         self.output_database = output_database
         self.output_backend = output_backend
@@ -58,20 +76,7 @@ class WorkflowDbHelper:
             self.input_run,
             self.input_user_or_path,
         )
-        retstatus, idx_in = inputDb.open()
-        if retstatus != 0:
-            print(
-                "   ERROR while reading the inputDb shot="
-                + str(self.shot_number)
-                + " and run="
-                + str(self.input_run)
-                + "\n   for user_or_path = "
-                + self.input_user_or_path
-                + " and database = "
-                + self.input_database,
-                file=sys.stderr,
-            )
-            print("   Please check that the file exists.", file=sys.stderr)
+        _open_or_create(inputDb, "open", "input database")
         return inputDb
 
     def getOutputDatabase(self):
@@ -97,20 +102,7 @@ class WorkflowDbHelper:
         if os.path.isfile(h5_master_file):  # IMAS-5428 still not fixed!!!
             os.remove(h5_master_file)
 
-        retstatus, idx_out = outputDb.create()
-        if retstatus != 0:
-            print(
-                "   ERROR while creating the output shot="
-                + str(self.shot_number)
-                + " and run="
-                + str(self.output_run)
-                + "\n   for user_or_path = "
-                + self.output_user_or_path
-                + " and database = "
-                + self.output_database,
-                file=sys.stderr,
-            )
-            print("   --> Aborted.", file=sys.stderr)
+        _open_or_create(outputDb, "create", "output database")
         return outputDb
 
     def getMachineDatabase(self):
@@ -121,7 +113,7 @@ class WorkflowDbHelper:
             self.output_run,
             self.output_user_or_path,
         )
-        machineDb.create()
+        _open_or_create(machineDb, "create", "machine-description database")
         return machineDb
 
     def getTimeArray(self, inputDb):

@@ -49,3 +49,15 @@ MANIFEST
 
 # Generated version file
 hcdworkflow/_version.py
+
+# Local configurations, runtime output and environments
+/my_config/
+/runs/
+/run_hcd_*/
+.hcd_gui_runs/
+/devenv*/
+/.venv/
+/PYTHON_ACTORS/
+*.h5
+*.hdf5
+*.nc

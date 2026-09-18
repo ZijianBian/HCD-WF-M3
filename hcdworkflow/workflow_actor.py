@@ -64,7 +64,12 @@ class WorkflowActor:
 
         actor = eval(actorName)
         runtime_settings = actor.get_runtime_settings()
-        runtime_settings.ids_storage.backend = imas.imasdef.MEMORY_BACKEND  # pylint: disable=no-member # IMAS-4055
+        imasdef = imas.ids_defs if hasattr(imas, "ids_defs") else imas.imasdef
+        runtime_settings.ids_storage.backend = imasdef.MEMORY_BACKEND
+        if actorName == "rabbit":
+            # Rabbit uses the GCC IMAS stack whereas this workflow is Intel.
+            # iWrap isolates the two runtimes in separate processes.
+            runtime_settings.run_mode = "STANDALONE"
         code_parameters = actor.get_code_parameters()
         if xmlPath:
             code_parameters.parameters_path = xmlPath
@@ -88,6 +93,7 @@ class WorkflowActor:
                 os.getcwd()
             )  # To be fixed later on (pion fails if it does not know where to write)
         arguments = {}
+
         if code_parameters is not None:
             arguments["code_parameters"] = code_parameters
         if runtime_settings is not None:
@@ -111,13 +117,9 @@ class WorkflowActor:
     #     return self.getIDSDict("OUT")
 
     def getIDSDict(self, idsData):
-        idsDict = {}
-        if isinstance(idsData, list):
-            for idsName in idsData:
-                idsDict[idsName] = eval(f"imas.{idsName}()")
-        else:
-            idsDict[idsData] = eval(f"imas.{idsData}()")
-        return idsDict
+        factory = imas.IDSFactory() if hasattr(imas, "IDSFactory") else imas
+        ids_names = idsData if isinstance(idsData, list) else [idsData]
+        return {name: getattr(factory, name)() for name in ids_names}
 
     def getIDSList(self, intentType="IN"):
         idsList = []
