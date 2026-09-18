@@ -1,134 +1,124 @@
-Configuration Reference
+Configuration reference
 =======================
 
-The main case configuration is ``input_workflow.xml`` in the configuration
-folder. Optional YAML files provide waveforms and IC toroidal mode settings.
+The :doc:`../user/gui` saves a configuration directory with this layout:
 
-``input_workflow.xml``
-----------------------
+.. code-block:: text
 
-The real root element is ``<root>``. The important sections are
-``workflow_parameters`` and ``actor_selection``.
+   my_config/
+   ├── input_workflow.xml
+   ├── ECRH/ec_wave_solver/input_torbeam.xml
+   ├── ICRH/ic_wave_solver/input_cyrano.xml
+   ├── source/fill_core_sources/input_hcd2core_sources.xml
+   └── *_waveforms.yaml                 # optional waveform overrides
 
-Workflow Parameters
-~~~~~~~~~~~~~~~~~~~
+Only selected actors need parameter files. The GUI also copies their XSD
+schemas when available. Input and output IDS reside in IMAS database entries;
+they do not need to be copied into this directory.
 
-Example:
+Workflow XML
+------------
 
-.. code-block:: xml
+``input_workflow.xml`` has a ``root`` element whose first two children are
+``workflow_parameters`` and ``actor_selection``, in that order. The former holds
+the database and time fields directly; the latter groups actors under
+``main_process`` and ``post_process``. The shipped template is
+``hcdworkflow/global_configuration/input_workflow_default.xml``.
 
-   <workflow_parameters display="Workflow parameters (standalone)">
-     <input_user_or_path display="Input user or path">public</input_user_or_path>
-     <input_database display="Input database">ITER</input_database>
-     <input_backend display="Input backend">HDF5</input_backend>
-     <shot_nr display="Input shot">130012</shot_nr>
-     <run_in display="Input run">5</run_in>
-     <output_user_or_path display="Output user or path">public</output_user_or_path>
-     <output_database display="Output database">ITER</output_database>
-     <output_backend display="Output backend">HDF5</output_backend>
-     <run_out display="Output run">6</run_out>
-     <tbegin display="Start Time [s]">10.</tbegin>
-     <tend display="End Time   [s]">320.</tend>
-     <dt_required display="Time Step  [s]">5</dt_required>
-     <parallel_workflow display="Parallel workflow [0-1]">0</parallel_workflow>
-     <one_time_slice display="Single time slice [0-1]">0</one_time_slice>
-   </workflow_parameters>
-
-Common fields:
+Database fields in ``workflow_parameters``:
 
 .. list-table::
    :header-rows: 1
+   :widths: 40 60
 
    * - Field
      - Meaning
-   * - ``shot_nr``
-     - Input and output shot number.
-   * - ``run_in``
-     - Input scenario run.
+   * - ``input_user_or_path``, ``input_database``
+     - User or path, and database containing the input scenario
+   * - ``input_backend``
+     - IMAS backend name, such as ``HDF5`` or ``MDSPLUS``
+   * - ``shot_nr``, ``run_in``
+     - Input shot and run
+   * - ``output_user_or_path``
+     - Output user or path; ``default`` resolves to the current user
+   * - ``output_database``
+     - Output database; ``default`` uses the input database name
+   * - ``output_backend``
+     - Output IMAS backend; set it explicitly in saved configurations
    * - ``run_out``
-     - Output run to write.
-   * - ``tbegin`` / ``tend``
-     - Time interval for the workflow loop.
-   * - ``dt_required``
-     - Requested time step.
-   * - ``one_time_slice``
-     - ``1`` for a single-slice run, ``0`` for a loop.
+     - Output run, under the same ``shot_nr``
+   * - ``ddv_backend``
+     - Optional DD value passed to the database helper. If omitted, the driver
+       uses ``IMAS_VERSION`` or the DD version reported by the IMAS installation
 
-Actor Selection
-~~~~~~~~~~~~~~~
+Choose a separate output entry when retaining earlier results: the driver
+creates the configured output entry at startup. The DD 4.1.0 environment and
+the legacy DD 3.42.0 environment are described in :doc:`available_modules`.
 
-Actor values are integer selections from each ``list`` attribute. ``0`` means
-disabled.
+Time and scheduling
+-------------------
 
-Example:
+``tbegin``, ``tend``, ``dt_required``
+   Start, end and step in seconds. Use a positive step. The time loop visits
+   ``tbegin + n * dt_required`` while the time is strictly less than ``tend``;
+   the end time is excluded. In a multi-slice run, a negative start or end uses
+   the first or last equilibrium time respectively.
+
+``one_time_slice``
+   ``1`` runs once at ``tbegin`` and ignores the configured ``tend``. ``0`` uses
+   the time range above. This applies to Legacy, Hybrid and Pure drivers.
+
+``parallel_workflow``
+   Retained in the XML template, but not read by the current runtime. It does
+   not select an execution mode or enable parallel execution. Pure scheduling
+   uses yMMSL settings; see :doc:`../user/execution_modes`.
+
+The GUI can append a third ``time_base`` section for per-process schedules.
+Legacy and Hybrid read those schedules; Pure does not use this section.
+
+Actor selection
+---------------
+
+Each process element has an integer value: ``0`` disables it; ``1`` selects the
+first actor in that element's ``list`` attribute, ``2`` the second, and so on.
+For example, this fragment selects Torbeam:
 
 .. code-block:: xml
 
-   <ECRH display="ECH">
-     <ec_wave_solver display="Wave solver" list="genray gray grayscale torbeam toray">4</ec_wave_solver>
+   <ECRH>
+     <ec_wave_solver list="genray gray grayscale torbeam toray">4</ec_wave_solver>
+     <ec_wave_fp list="relax">0</ec_wave_fp>
    </ECRH>
 
-   <ICRH display="ICRH">
-     <ic_wave_solver display="Wave solver" list="cyrano tomcat pion lion">1</ic_wave_solver>
-     <ic_wave_fp display="Ion Fokker-Planck" list="stixredist fopla">0</ic_wave_fp>
-   </ICRH>
+The XML ``list`` attribute determines the mapping. Preserve its order when
+editing a saved configuration. :doc:`actors` lists the shipped choices.
+The ``display`` attributes provide GUI labels.
 
-   <source display="Fill core_sources">
-     <fill_core_sources display="core_sources IDS" list="hcd2core_sources">1</fill_core_sources>
-   </source>
+Actor parameters belong in
+``CATEGORY/PROCESS/input_ACTOR.xml``, for example
+``NBI/nbi_fp/input_rabbit.xml``. Their fields come from each actor's own XML/XSD;
+there is no shared ``<parameters><parameter name="...">`` format.
 
-For the corrected benchmark:
+Waveforms and shared settings
+-----------------------------
 
-* ``ec_wave_solver=4`` selects Torbeam.
-* ``ic_wave_solver=1`` selects Cyrano.
-* ``ic_wave_fp=0`` disables FoPla.
-* ``fill_core_sources=1`` enables hcd2core_sources.
+Files such as ``ec_waveforms.yaml``, ``ic_waveforms.yaml`` and
+``nbi_waveforms.yaml`` sit beside ``input_workflow.xml``. The driver passes them
+to Waveform-Cooker to replace the corresponding machine-description IDS.
+Use its presets or the GUI waveform editor for their format. Without an
+override, the driver uses machine descriptions from the input scenario.
 
-``ic_toroidal_modes.yaml``
---------------------------
+Legacy and Hybrid also read an optional ``ic_toroidal_modes.yaml`` beside the
+workflow XML for Cyrano. Its ``modes`` list contains ``n_phi`` integers and
+positive ``weight`` values (default ``1.0``); the workflow normalizes the
+weights and combines the per-mode wave outputs. Set ``enabled: false`` to
+disable it. The Pure driver does not read this file.
 
-This file controls weighted multi-``Ntor`` Cyrano runs in the classic workflow
-path.
+``hcdworkflow/global_configuration/global_lists.yaml`` is a package resource,
+not an optional per-run configuration. It contains registered actors, execution
+orders, dependencies and waveform preset names.
 
-For single-``Ntor`` comparison:
-
-.. code-block:: yaml
-
-   enabled: false
-   modes: []
-
-For a weighted spectrum:
-
-.. code-block:: yaml
-
-   enabled: true
-   modes:
-     - n_phi: -38
-       weight: 0.5
-     - n_phi: 38
-       weight: 0.5
-
-Do not compare weighted and unweighted cases as mode-level performance results.
-
-yMMSL Files
------------
-
-Hybrid and Pure M3 runs need a yMMSL file.
-
-Hybrid yMMSL wires:
-
-.. code-block:: text
-
-   workflow_driver <-> hcd_workflow
-
-Pure yMMSL wires:
-
-.. code-block:: text
-
-   driver <-> torbeam
-   driver <-> cyrano
-   driver <-> merge_waves
-   driver <-> hcd2core_sources
-
-The ``settings.config_folder_path`` value must point to the configuration
-folder containing ``input_workflow.xml`` and actor parameter files.
+For MUSCLE3, yMMSL describes components and connections. ``run.sh`` and the GUI
+copy the chosen topology into ``.hcd_gui_runs/`` and bind it to the saved
+configuration and actor parameter files. See :doc:`../user/execution_modes`
+for the supplied topologies and :doc:`commands` for output locations.

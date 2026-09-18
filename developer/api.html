@@ -14,14 +14,12 @@
         <link rel="prev" href="contributing.html">
       
       
-        <link rel="next" href="../reference/configuration.html">
-      
       
       <link rel="icon" href="">
     
     
       
-        <title>API and Module Reference - HCD Workflow</title>
+        <title>Python entry points - HCD Workflow</title>
       
     
     
@@ -69,7 +67,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#workflow-drivers" class="md-skip">
+        <a href="#running-a-configured-workflow" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API and Module Reference
+              Python entry points
             
           </span>
         </div>
@@ -181,10 +179,10 @@
     
     
       <div class="md-header__source">
-        <a href="https://git.iter.org/projects/WF/repos/hcd-wf/browse" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/iterorganization/HCD-WF" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M22.2 32A16 16 0 0 0 6 47.8a26 26 0 0 0 .2 2.8l67.9 412.1a21.77 21.77 0 0 0 21.3 18.2h325.7a16 16 0 0 0 16-13.4L505 50.7a16 16 0 0 0-13.2-18.3 25 25 0 0 0-2.8-.2zm285.9 297.8h-104l-28.1-147h157.3z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
   </div>
   <div class="md-source__repository">
     HCD Workflow
@@ -228,10 +226,10 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://git.iter.org/projects/WF/repos/hcd-wf/browse" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/iterorganization/HCD-WF" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M22.2 32A16 16 0 0 0 6 47.8a26 26 0 0 0 .2 2.8l67.9 412.1a21.77 21.77 0 0 0 21.3 18.2h325.7a16 16 0 0 0 16-13.4L505 50.7a16 16 0 0 0-13.2-18.3 25 25 0 0 0-2.8-.2zm285.9 297.8h-104l-28.1-147h157.3z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
   </div>
   <div class="md-source__repository">
     HCD Workflow
@@ -267,7 +265,7 @@
   
   
   <span class="md-ellipsis">
-    <span>User Guide</span>
+    <span>Running a workflow</span>
     
   </span>
   
@@ -278,7 +276,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_1">
             <span class="md-nav__icon md-icon"></span>
-            <span>User Guide</span>
+            <span>Running a workflow</span>
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -319,7 +317,31 @@
   
   
   <span class="md-ellipsis">
-    <span>Execution Modes</span>
+    <span>Choosing an execution mode</span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user/gui.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span>Preparing a case in the GUI</span>
     
   </span>
   
@@ -343,7 +365,31 @@
   
   
   <span class="md-ellipsis">
-    <span>Usage</span>
+    <span>Running and finding results</span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user/examples.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span>Common case changes</span>
     
   </span>
   
@@ -367,31 +413,7 @@
   
   
   <span class="md-ellipsis">
-    <span>Validation Status</span>
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../user/inspecting_results.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    <span>Inspecting Results</span>
+    <span>Checking a result</span>
     
   </span>
   
@@ -426,6 +448,55 @@
 
               
             
+          </ul>
+        </nav>
+      
+    </li>
+  
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    <span>Reference</span>
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            <span>Reference</span>
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
                 
   
@@ -434,12 +505,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../user/gui.html" class="md-nav__link">
+      <a href="../reference/configuration.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    <span>GUI</span>
+    <span>Configuration reference</span>
     
   </span>
   
@@ -458,12 +529,60 @@
   
   
     <li class="md-nav__item">
-      <a href="../user/examples.html" class="md-nav__link">
+      <a href="../reference/commands.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    <span>Examples</span>
+    <span>Command reference</span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/actors.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span>Actor reference</span>
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/available_modules.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    <span>Runtime modules</span>
     
   </span>
   
@@ -502,15 +621,15 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
   <span class="md-ellipsis">
-    <span>Developer Guide</span>
+    <span>Development</span>
     
   </span>
   
@@ -518,10 +637,10 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
-            <span>Developer Guide</span>
+            <span>Development</span>
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -538,7 +657,7 @@
   
   
   <span class="md-ellipsis">
-    <span>Developer Setup</span>
+    <span>Developer setup</span>
     
   </span>
   
@@ -581,60 +700,12 @@
   
   
     <li class="md-nav__item">
-      <a href="pure_m3.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    <span>Pure M3 Driver</span>
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="troubleshooting.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    <span>Troubleshooting</span>
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="actor_installation.html" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    <span>Actor Installation</span>
+    <span>Building actors</span>
     
   </span>
   
@@ -689,7 +760,7 @@
   
   
   <span class="md-ellipsis">
-    <span>API and Module Reference</span>
+    <span>Python entry points</span>
     
   </span>
   
@@ -702,7 +773,7 @@
   
   
   <span class="md-ellipsis">
-    <span>API and Module Reference</span>
+    <span>Python entry points</span>
     
   </span>
   
@@ -724,40 +795,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#workflow-drivers" class="md-nav__link">
+  <a href="#running-a-configured-workflow" class="md-nav__link">
     
     <span class="md-ellipsis">
-      <span>Workflow Drivers</span>
+      <span>Running a configured workflow</span>
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#core-workflow" class="md-nav__link">
+  <a href="#computing-one-slice" class="md-nav__link">
     
     <span class="md-ellipsis">
-      <span>Core Workflow</span>
+      <span>Computing one slice</span>
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ids-utilities" class="md-nav__link">
+  <a href="#where-to-make-a-change" class="md-nav__link">
     
     <span class="md-ellipsis">
-      <span>IDS Utilities</span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-start" class="md-nav__link">
-    
-    <span class="md-ellipsis">
-      <span>Where to Start</span>
+      <span>Where to make a change</span>
     </span>
   </a>
   
@@ -767,151 +828,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    <span>Reference</span>
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            <span>Reference</span>
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reference/configuration.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    <span>Configuration Reference</span>
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reference/commands.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    <span>Command Reference</span>
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reference/actors.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    <span>Actors</span>
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reference/available_modules.html" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    <span>Available Modules</span>
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -949,40 +865,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#workflow-drivers" class="md-nav__link">
+  <a href="#running-a-configured-workflow" class="md-nav__link">
     
     <span class="md-ellipsis">
-      <span>Workflow Drivers</span>
+      <span>Running a configured workflow</span>
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#core-workflow" class="md-nav__link">
+  <a href="#computing-one-slice" class="md-nav__link">
     
     <span class="md-ellipsis">
-      <span>Core Workflow</span>
+      <span>Computing one slice</span>
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ids-utilities" class="md-nav__link">
+  <a href="#where-to-make-a-change" class="md-nav__link">
     
     <span class="md-ellipsis">
-      <span>IDS Utilities</span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-start" class="md-nav__link">
-    
-    <span class="md-ellipsis">
-      <span>Where to Start</span>
+      <span>Where to make a change</span>
     </span>
   </a>
   
@@ -1004,77 +910,84 @@
                   
 
 
-<h1 id="api-and-module-reference">API and Module Reference<a class="headerlink" href="#api-and-module-reference" title="Link to this heading">¶</a></h1>
-<p>This page lists the modules most relevant to current M3 development. It avoids
-autogenerated API dumps so the manual stays readable.</p>
-<h2 id="workflow-drivers">Workflow Drivers<a class="headerlink" href="#workflow-drivers" title="Link to this heading">¶</a></h2>
+<h1 id="python-entry-points">Python entry points<a class="headerlink" href="#python-entry-points" title="Link to this heading">¶</a></h1>
+<p>Most users should start with the <a class="reference internal" href="../reference/commands.html"><span class="doc">command-line tools</span></a>. This page identifies the Python entry points and
+modules useful when embedding or changing HCD-WF. The execution contracts
+are described in <a class="reference internal" href="architecture.html"><span class="doc">Architecture</span></a>.</p>
+<h2 id="running-a-configured-workflow">Running a configured workflow<a class="headerlink" href="#running-a-configured-workflow" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">workflow.workflow_driver.workflow_driver(par_path,</span> <span class="pre">m3_flag=0)</span></code> opens the
+databases, runs the configured time loop and closes the databases on exit.
+<code class="docutils literal notranslate"><span class="pre">par_path</span></code> is a directory containing <code class="docutils literal notranslate"><span class="pre">input_workflow.xml</span></code>. The default
+<code class="docutils literal notranslate"><span class="pre">m3_flag=0</span></code> runs Legacy in the current process. <code class="docutils literal notranslate"><span class="pre">m3_flag=1</span></code> starts the
+Hybrid macro and requires a MUSCLE3 Manager connection.</p>
+<p><code class="docutils literal notranslate"><span class="pre">workflow.wf_wrapper.wf_wrapper</span></code> remains an alias for this entry point
+for older callers. New integrations should use <code class="docutils literal notranslate"><span class="pre">workflow_driver</span></code>.
+The Hybrid micro and Pure driver expose <code class="docutils literal notranslate"><span class="pre">main()</span></code> in
+<code class="docutils literal notranslate"><span class="pre">hcdworkflow.hcd_workflow_m3</span></code> and
+<code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_driver_m3_pure</span></code> respectively; topology templates
+launch these as MUSCLE3 components.</p>
+<h2 id="computing-one-slice">Computing one slice<a class="headerlink" href="#computing-one-slice" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.hcd_workflow.HCDWorkflow</span></code> provides the in-process actor
+chain used by Legacy and Hybrid:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hcdworkflow.hcd_workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">HCDWorkflow</span>
+
+<span class="n">hcd</span> <span class="o">=</span> <span class="n">HCDWorkflow</span><span class="p">()</span>
+<span class="n">hcd</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">config_directory</span><span class="p">)</span>
+<span class="n">hcd</span><span class="o">.</span><span class="n">setProcessStatus</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">hcd</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">equilibrium</span><span class="o">=</span><span class="n">equilibrium</span><span class="p">,</span>
+    <span class="n">core_profiles</span><span class="o">=</span><span class="n">core_profiles</span><span class="p">,</span>
+    <span class="n">workflow</span><span class="o">=</span><span class="n">workflow_ids</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">other_input_ids</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+<p>The caller supplies prepared IMAS IDS objects and handles storage. The
+return value is a dictionary keyed by output IDS name; it can be <code class="docutils literal notranslate"><span class="pre">None</span></code>
+when actor execution reports an error. <code class="docutils literal notranslate"><span class="pre">finalize()</span></code>, <code class="docutils literal notranslate"><span class="pre">get_state()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">set_state()</span></code> and <code class="docutils literal notranslate"><span class="pre">get_timestamp()</span></code> are currently placeholders, so they
+do not provide checkpointing or actor cleanup.</p>
+<h2 id="where-to-make-a-change">Where to make a change<a class="headerlink" href="#where-to-make-a-change" title="Link to this heading">¶</a></h2>
 <table class="docutils data align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Module</p></th>
-<th class="head"><p>Main role</p></th>
+<th class="head"><p>Responsibility</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">workflow.workflow_driver</span></code></p></td>
-<td><p>Legacy driver and Hybrid M3 macro.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gui.launch_config</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">materialize_ymmsl()</span></code> binds and validates a topology;
+<code class="docutils literal notranslate"><span class="pre">prepare_muscle_launch()</span></code> creates its run directory;
+<code class="docutils literal notranslate"><span class="pre">launch_muscle()</span></code> starts Manager and returns the plan and process.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">workflow.wf_wrapper</span></code></p></td>
-<td><p>Compatibility wrapper importing <code class="docutils literal notranslate"><span class="pre">workflow_driver</span></code>.</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">workflow.workflow_driver</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">setup_databases()</span></code>, <code class="docutils literal notranslate"><span class="pre">resolve_time_range()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">get_ids_slices()</span></code> and <code class="docutils literal notranslate"><span class="pre">store_ids_slices()</span></code> support the drivers.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.hcd_workflow_m3</span></code></p></td>
-<td><p>Hybrid M3 micro model.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_driver_m3_pure</span></code></p></td>
-<td><p>Pure M3 actor driver.</p></td>
-</tr>
-</tbody>
-</table>
-<h2 id="core-workflow">Core Workflow<a class="headerlink" href="#core-workflow" title="Link to this heading">¶</a></h2>
-<table class="docutils data align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Module</p></th>
-<th class="head"><p>Main role</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.hcd_workflow</span></code></p></td>
-<td><p>Classic workflow orchestration.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_executor</span></code></p></td>
-<td><p>Actor dependency and execution logic.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_data</span></code></p></td>
-<td><p>Parsed workflow configuration and process state.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">workflow.ids_prep</span></code></p></td>
+<td><p>IDS conversion, waveform preparation and stable output structures.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_config_reader</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">input_workflow.xml</span></code> parser.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">WorkflowConfigReader</span></code> parses the workflow XML and actor selection.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_dbhelper</span></code></p></td>
-<td><p>IMAS database helper.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">WorkflowData</span></code> builds actor and process state from a configuration.</p></td>
 </tr>
-</tbody>
-</table>
-<h2 id="ids-utilities">IDS Utilities<a class="headerlink" href="#ids-utilities" title="Link to this heading">¶</a></h2>
-<table class="docutils data align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Module</p></th>
-<th class="head"><p>Main role</p></th>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_executor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">WorkflowExecutor</span></code> chooses and executes the in-process algorithm.</p></td>
 </tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">workflow.ids_prep</span></code></p></td>
-<td><p>DD fix-ups, waveform helpers, direct-driver IDS preparation, and
-toroidal mode utilities.</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_actor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">WorkflowActor</span></code> loads iWrap actors and their IDS interfaces.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow.workflow_dbhelper</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">WorkflowDbHelper</span></code> opens IMAS databases. Its <code class="docutils literal notranslate"><span class="pre">ddv_backend</span></code>
+argument is required; callers supply the intended DD version.</p></td>
 </tr>
 </tbody>
 </table>
-<h2 id="where-to-start">Where to Start<a class="headerlink" href="#where-to-start" title="Link to this heading">¶</a></h2>
-<p>For Pure M3 work, start with:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">hcdworkflow/workflow_driver_m3_pure.py</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">workflow/ids_prep.py</span></code></p></li>
-<li><p>The yMMSL file for the case under test.</p></li>
-</ul>
+<p>These modules are the implementation map, not a promise that every helper
+is a stable external API. Check the source signature when building an
+integration, particularly for functions whose names begin with <code class="docutils literal notranslate"><span class="pre">_</span></code>.</p>
 
 
 

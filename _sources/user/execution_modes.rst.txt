@@ -1,96 +1,80 @@
-Execution Modes
-===============
+Choosing an execution mode
+==========================
 
-HCD Workflow currently has three execution modes. They share the same IMAS
-input and output model but differ in where actor execution happens.
-
-Mode Table
-----------
+Choose a mode based on the actors you have installed and how you want to couple
+them. A mode change does not select the physics for you: the saved actor
+parameters and workflow configuration still define the calculation.
 
 .. list-table::
    :header-rows: 1
-   :widths: 16 28 56
+   :widths: 15 45 40
 
    * - Mode
-     - Main entry point
-     - What happens
+     - How it runs
+     - Use it when
    * - Legacy
-     - ``workflow/workflow_driver.py CONFIG 0``
-     - The driver opens IMAS, runs the time loop, calls ``HCDWorkflow.run()``,
-       and iWrap actors execute in the same Python process.
-   * - Hybrid M3
-     - ``workflow/workflow_driver.py CONFIG 1`` plus ``hcd_workflow_m3.py``
-     - The driver is a MUSCLE3 macro model. A single micro model receives IDS
-       slices and then calls the same iWrap workflow internally.
-   * - Pure M3
-     - ``hcdworkflow/workflow_driver_m3_pure.py``
-     - The driver talks directly to individual M3 actor executables. There is
-       no iWrap workflow micro in the middle.
+     - Calls the iWrap workflow directly.
+     - You want to run an existing standalone iWrap case.
+   * - Hybrid
+     - Exchanges IDS slices between a MUSCLE3 driver and the iWrap workflow.
+     - You need a MUSCLE3 interface around the existing workflow.
+   * - Pure
+     - Connects a MUSCLE3 driver to individual native actor executables.
+     - You have the native actors and a matching topology.
 
-Legacy
-------
+Launch from the repository root with your saved configuration:
 
-.. code-block:: text
+.. code-block:: bash
 
-   workflow_driver.py
-     -> HCDWorkflow.run()
-       -> iWrap actors
-     -> IMAS output
+   ./run.sh legacy /path/to/config
+   ./run.sh hybrid /path/to/config
+   ./run.sh pure /path/to/config
 
-Use Legacy mode as the baseline when debugging input data, actor parameters, or
-output storage.
+Hybrid uses ``topologies/hybrid.ymmsl``. Pure uses
+``topologies/pure.ymmsl``. The launcher makes a run-specific copy tied to
+your configuration folder; see :doc:`usage` for its location.
 
-Hybrid M3
----------
+Choose the Pure actors
+----------------------
 
-.. code-block:: text
+A yMMSL topology lists the actors and their connections. Its actor components
+must agree with the selections in ``input_workflow.xml``.
 
-   workflow_driver.py      hcd_workflow_m3.py
-   macro time loop  <----> micro workflow
-   IMAS I/O                HCDWorkflow.run() -> iWrap actors
+.. list-table::
+   :header-rows: 1
+   :widths: 45 55
 
-Hybrid mode validates the macro/micro MUSCLE3 boundary while keeping the actor
-execution path close to legacy behavior.
+   * - Template
+     - Calculation
+   * - ``topologies/pure.ymmsl``
+     - TORBEAM + CYRANO, wave merging and ``hcd2core_sources``.
+   * - ``topologies/pure_rabbit.ymmsl``
+     - The same chain, with Rabbit NBI.
+   * - ``topologies/pure_fopla.ymmsl``
+     - The same chain, with FoPla evolution of the ion distribution.
 
-Pure M3
--------
+For example, to select the Rabbit topology:
 
-.. code-block:: text
+.. code-block:: bash
 
-          -> torbeam_m3.exe -> waves_ec
-   driver -> cyrano_m3.exe  -> waves_ic
-          -> merge_waves_m3.exe -> waves
-          -> hcd2core_sources_m3.exe -> core_sources
+   ./run.sh pure /path/to/config topologies/pure_rabbit.ymmsl
 
-Pure mode is the target architecture for direct actor coupling. The driver owns
-IMAS I/O and the time loop. Each actor is a separate MUSCLE3 component.
+Rabbit needs its separate GCC actor build. FoPla needs an installed
+``fopla_m3.exe``. Rabbit and FoPla cannot currently be used together in a
+Pure topology. Native actor requirements are in
+:doc:`../developer/actor_installation`.
 
-Validated Pure Subset
----------------------
+If the actor selection does not match, the launcher stops before starting
+MUSCLE3. Choose a matching topology or edit a copy and its connections.
 
-As of 2026-06-10, the validated Pure M3 subset is:
+Parallel EC and IC
+------------------
 
-* Multi-time-slice run.
-* Single ``Ntor`` Cyrano path.
-* EC branch through Torbeam.
-* IC wave branch through Cyrano.
-* ``merge_waves`` after EC and IC wave branches.
-* ``hcd2core_sources`` post-processing.
-* ``ic_wave_fp=0``: no FoPla in the benchmark chain.
+Pure runs EC and IC serially by default. Independent TORBEAM and CYRANO
+calculations can overlap when ``pure_parallel_ec_ic: true`` is added to the
+topology's ``settings``.
 
-The Pure driver also contains guards for zero-power slices:
-
-* Skip Cyrano when IC launched power is zero.
-* Skip FoPla when IC launched power is zero.
-* Skip wave merging when one wave branch is inactive.
-
-What Still Needs Care
----------------------
-
-Treat these as validation targets, not routine production assumptions:
-
-* Pure M3 FoPla full-chain runs.
-* Weighted toroidal mode spectrum in Pure M3 mode.
-* New direct actor combinations beyond the validated subset.
-* Performance comparisons where mode weighting, FoPla selection, or time ranges
-  are not identical.
+This requires explicit CYRANO settings that do not depend on EC waves or
+fast-particle inputs, and excludes Rabbit and FoPla. Follow the parameter
+checks in :doc:`../developer/architecture` before enabling it. Time slices
+still run in sequence.

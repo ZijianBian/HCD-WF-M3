@@ -1,93 +1,48 @@
 Quickstart
 ==========
 
-This page is the shortest path to a useful run on ITER SDCC.
+For a first run, use a configuration and input database that you can already
+read. A configuration folder contains ``input_workflow.xml``, actor parameter
+files, and any waveform files. If you need to create one, follow :doc:`gui`.
+The workflow does not download a plasma scenario for you.
 
-Prepare the Environment
+Prepare the environment
 -----------------------
 
-From the repository root:
+After the one-time :doc:`installation`, open a shell in the repository root:
 
 .. code-block:: bash
 
+   export ACTOR_FOLDER=/path/to/PYTHON_ACTORS
    source config_hcd_iter_sdcc.sh
 
-This helper prepares the DD 4.1.0 development stack, MUSCLE3, iWrap paths,
-Waveform Cooker paths, and the local ``devenv`` environment used by the current
-M3 work.
+Replace the actor path with your installed DD 4.1.0 actors. The helper prepares
+the environment; it does not build the actors.
 
-Use ``config_hcd_iter_sdcc_3.42.0.sh`` only when you intentionally need the
-legacy DD 3.42.0 stack.
+Check the case and run
+----------------------
 
-Run a Legacy Smoke Case
------------------------
+In your saved ``input_workflow.xml``, check the input database, selected
+actors and time range. Choose an output location and ``run_out`` intended for
+this calculation: starting a run creates the configured output database.
 
-Legacy mode runs the full workflow in one Python process. It is the baseline
-for comparing M3 behavior.
-
-.. code-block:: bash
-
-   python workflow/workflow_driver.py tests/m3_hybrid 0
-
-The final line should include:
-
-.. code-block:: text
-
-   [workflow_driver] Workflow completed successfully
-
-Run a Hybrid M3 Case
---------------------
-
-Hybrid mode uses MUSCLE3 for the driver-to-workflow boundary:
+Start with Legacy mode if your case uses iWrap actors:
 
 .. code-block:: bash
 
-   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+   ./run.sh legacy /path/to/config
 
-The topology is:
+For MUSCLE3, choose a matching configuration and topology as described in
+:doc:`execution_modes`. Replacing ``legacy`` with ``pure`` also changes the
+actor executable requirements.
 
-.. code-block:: text
-
-   workflow_driver.py  <->  hcd_workflow_m3.py  ->  iWrap actors
-
-Run a Pure M3 Case
--------------------------------
-
-Pure mode can be launched either through ``run.sh pure`` or directly through
-MUSCLE3. The runner defaults to the validated no-FoPla actor-level topology:
-
-.. code-block:: bash
-
-   ./run.sh pure
-
-To choose a different topology:
-
-.. code-block:: bash
-
-   HCD_PURE_YMMSL=test_m3_pure_torbeam.ymmsl ./run.sh pure
-   muscle_manager --start-all test_m3_pure_3actors.ymmsl
-
-The validated no-FoPla topology is:
-
-.. code-block:: text
-
-   driver -> torbeam_m3.exe -> waves_ec
-   driver -> cyrano_m3.exe  -> waves_ic
-   driver -> hcd2core_sources_m3.exe -> core_sources
-
-Pure mode currently skips Cyrano, FoPla, and IC wave merging automatically when
-the IC launched power is zero.
-
-Inspect Results
+Read the result
 ---------------
 
-Output is written to the IMAS run specified by ``input_workflow.xml``. Use the
-configured database, backend, shot, and output run when inspecting results with
-IMAS-Python or SDCC tools such as IDStools.
+The terminal shows the current time slice and actor messages. Physics results
+are written to the IMAS database selected by the configuration.
+For MUSCLE3 runs, the launcher also prints the run-directory path.
 
-Next Pages
-----------
-
-* :doc:`execution_modes` explains what the three modes do.
-* :doc:`validation` records what has been tested.
-* :doc:`../developer/troubleshooting` lists common failure modes.
+Open the output with your IMAS reader and check that the expected times and
+heating sources are present. See :doc:`usage` for file locations and
+:doc:`validation` for the checks to make before interpreting a result.

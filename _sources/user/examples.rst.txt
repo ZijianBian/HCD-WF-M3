@@ -1,71 +1,49 @@
-Examples
-========
+Common case changes
+===================
 
-This page keeps only the examples that are useful for the current branch.
+Start from a saved case whose input database and actors are available in your
+environment. The examples below change that case; they are not complete
+physics input datasets.
 
-Legacy Baseline
----------------
+Run one time slice
+------------------
 
-Use this when you need to check that the input case and actors work before
-adding MUSCLE3 coupling.
-
-.. code-block:: bash
-
-   source config_hcd_iter_sdcc.sh
-   python workflow/workflow_driver.py tests/m3_hybrid 0
-
-Hybrid M3
----------
-
-Use this to exercise the macro-to-workflow M3 boundary.
+In ``workflow_parameters``, set ``tbegin`` to the required time,
+``one_time_slice`` to ``1``, and keep a positive ``dt_required``.
+Run the case through its usual launcher:
 
 .. code-block:: bash
 
-   source config_hcd_iter_sdcc.sh
-   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+   ./run.sh legacy /path/to/config
 
-Pure M3, No FoPla
-------------------------
+The standalone Legacy, Hybrid and Pure drivers use these settings. For an
+externally driven Hybrid component, the controller supplies the time.
 
-Use this pattern for the validated Pure M3 subset:
+Extend to a time loop
+---------------------
 
-.. code-block:: text
+Set ``one_time_slice=0``, then choose ``tbegin``, ``tend`` and
+``dt_required``. The end time is exclusive: for example, 10 to 40 s with
+a 10 s step evaluates 10, 20 and 30 s.
 
-   driver
-     -> torbeam
-     -> cyrano
-     -> merge_waves
-     -> hcd2core_sources
+Check that the input scenario and waveforms cover the interval, and choose a
+new output run before launching. See :doc:`../reference/configuration` for
+the time and output fields.
 
-Pure benchmark yMMSL files follow the same structure:
+Add Rabbit to a Pure case
+-------------------------
 
-.. code-block:: text
+For a case already using TORBEAM, CYRANO and source mapping, select Rabbit
+as ``nbi_fp``, supply its parameter files and NBI inputs, then launch:
 
-   driver <-> torbeam
-   driver <-> cyrano
-   driver <-> merge_waves
-   driver <-> hcd2core_sources
+.. code-block:: bash
 
-Changing the Time Step
-----------------------
+   ./run.sh pure /path/to/config topologies/pure_rabbit.ymmsl
 
-Edit ``dt_required`` in ``input_workflow.xml``:
+Rabbit needs the separate actor build described in
+:doc:`../developer/actor_installation`. It advances on every time slice,
+including intervals with zero launched NBI power.
 
-.. code-block:: xml
-
-   <dt_required display="Time Step  [s]">20</dt_required>
-
-For quick Pure validation, ``dt=20 s`` is useful. For runtime comparison, use
-the same ``dt`` and same physics options across all modes.
-
-Disabling Weighted Toroidal Modes
----------------------------------
-
-For an apples-to-apples single-Cyrano comparison, set:
-
-.. code-block:: yaml
-
-   enabled: false
-   modes: []
-
-in ``ic_toroidal_modes.yaml``.
+This topology provides Rabbit outputs to post-processing. Selecting it does
+not establish NBI-to-ICRH feedback: Pure schedules CYRANO before Rabbit, and
+does not support Rabbit and FoPla together.

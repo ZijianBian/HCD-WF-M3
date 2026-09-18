@@ -1,35 +1,58 @@
-GUI
-===
+Preparing a case in the GUI
+===========================
 
-The GUI is useful for classic HCD Workflow configuration and quick inspection
-of available workflow parameters. It is not the primary interface for current
-Pure M3 yMMSL topology development.
+Launch ``hcd_gui`` from the configured shell. It opens the default workflow;
+use **Load** to open a saved configuration.
 
-Launch
-------
+Set the workflow and actors
+---------------------------
 
-.. code-block:: bash
+In **Workflow parameters**, choose the input database, shot and run. Set the
+output location, time range and time step. The exact XML field names are in
+:doc:`../reference/configuration`.
 
-   source config_hcd_iter_sdcc.sh
-   hcd_gui
+In **Actor selection**, choose the codes for the heating systems you need,
+then select the source or profile post-processing. Only use actors installed
+for your current environment.
 
-What the GUI Is Good For
-------------------------
+Use **Save as** to create a configuration folder, or **Save** to update it.
+Keep this folder at a location you can reuse from the command line.
 
-* Editing classic ``input_workflow.xml`` parameters.
-* Selecting actors for the legacy iWrap workflow.
-* Editing actor code parameters in the existing folder layout.
-* Running or checking simple classic cases.
+Edit actor parameters and waveforms
+-----------------------------------
 
-What It Does Not Replace
-------------------------
+**Edit Code Parameters** opens the selected actors' parameter editors.
+Check and save each actor's settings before running the case.
 
-Pure M3 mode needs an explicit yMMSL topology. The GUI does not currently
-generate or validate those direct actor connections.
+.. figure:: /_static/gui_2.png
+   :alt: Actor parameter editor with Save and Restore default controls
+   :width: 75%
 
-For Pure M3 work, edit the configuration folder and yMMSL file in the IDE, then
-launch with:
+   The actor parameter editor. Its fields depend on the installed actor.
 
-.. code-block:: bash
+**Edit H&CD waveforms** opens Waveform Cooker for time-dependent inputs such
+as power, steering or beam energy. The scenario supplies the plasma state;
+the heating geometry and waveform settings supply the actuator inputs.
+Legacy and Hybrid also expose **Time Base** controls for individual process
+schedules. Pure uses its own scheduling rules; see
+:doc:`../developer/architecture`.
 
-   muscle_manager --start-all path/to/pure_case.ymmsl
+Choose how to launch
+--------------------
+
+The **Execution / Launch** panel offers Legacy, Hybrid and Pure.
+Legacy is selected whenever the GUI starts. For Hybrid or Pure, select the
+matching yMMSL template; **Use recommended topology** restores the mode's
+default template.
+
+Pure launch checks the topology against your actor selections and parameter
+files. For the available templates and their requirements, see
+:doc:`execution_modes`.
+
+Click **Save & Run** to save the case and start the selected mode. A MUSCLE3
+launch reports the generated topology and manager log path. Follow that log
+and open the output database to inspect the result; see :doc:`usage`.
+
+The GUI edits the configuration and starts the workflow. It does not provide
+a physics-results viewer. The launch mode and topology choice are separate
+from ``input_workflow.xml``, so select them again after reopening the GUI.

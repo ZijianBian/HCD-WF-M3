@@ -1,69 +1,73 @@
-Actors
-======
+Actor reference
+===============
 
-This page lists the actors most relevant to the current M3 work.
-
-Core Actors in the Validated Benchmark
---------------------------------------
+The table lists the choices in the shipped ``input_workflow_default.xml``.
+Each row starts at index ``1``; index ``0`` disables the process. A saved
+configuration's own ``list`` attribute remains authoritative.
 
 .. list-table::
    :header-rows: 1
+   :widths: 35 65
 
    * - Process
-     - Actor
-     - Role
-   * - EC wave solver
-     - Torbeam
-     - Computes EC wave deposition.
-   * - IC wave solver
-     - Cyrano
-     - Computes IC wave response for a selected toroidal mode.
-   * - Wave merger
-     - merge_waves
-     - Combines EC and IC waves when both branches are active.
-   * - Source filler
+     - Actor choices, in index order
+   * - ``equilibrium_solver``
+     - chease
+   * - ``ec_wave_solver``
+     - genray, gray, grayscale, torbeam, toray
+   * - ``ec_wave_fp``
+     - relax
+   * - ``lh_wave_solver``
+     - lhcd_metis
+   * - ``ic_coup``
+     - iccoup
+   * - ``ic_wave_solver``
+     - cyrano, tomcat, pion, lion
+   * - ``ic_wave_fp``
+     - stixredist, fopla
+   * - ``nbi_source``
+     - nemo, bbnbi_serial, bbnbi_parallel
+   * - ``nbi_fp``
+     - rabbit, risk, spot, ascot_serial, ascot_parallel, nbisim
+   * - ``nuclear_source``
+     - afsi
+   * - ``nuclear_fp``
+     - spot, ascot_serial, ascot_parallel
+   * - ``fill_core_sources``
      - hcd2core_sources
-     - Converts HCD outputs into ``core_sources``.
+   * - ``fill_core_profiles``
+     - hcd2core_profiles
 
-Optional or Not Yet Fully Validated in Pure Pure Mode
--------------------------------------------------------
+Selection does not install an actor. Legacy and Hybrid need the selected
+iWrap actors importable in the active Python environment, together with the
+merge actors. Pure needs the native MUSCLE3 executables required by its
+topology. See :doc:`../user/installation` and :doc:`available_modules` for setup.
 
-.. list-table::
-   :header-rows: 1
+Pure actor sets
+---------------
 
-   * - Actor
-     - Note
-   * - FoPla
-     - IC Fokker-Planck branch. Present in the Pure driver, but not part of the
-       corrected no-FoPla benchmark subset.
-   * - NBI actors
-     - Classic workflow support exists. Direct Pure M3 coverage needs separate
-       validation.
-   * - Additional EC/IC solvers
-     - Classic workflow support exists. Direct Pure M3 coverage depends on
-       available actor executables and yMMSL wiring.
+The supplied Pure topologies support Torbeam and Cyrano with ``merge_waves``
+and ``hcd2core_sources``. ``pure_rabbit.ymmsl`` adds Rabbit;
+``pure_fopla.ymmsl`` adds FoPla. Rabbit and FoPla cannot be selected together in
+a Pure topology. The launcher checks that the topology matches the XML actor
+selection before starting. See :doc:`../user/execution_modes` for the mapping.
 
-Classic Actor Selection
------------------------
+Parameters and dependencies
+---------------------------
 
-Classic ``input_workflow.xml`` actor values are integer selections from each
-``list`` attribute. ``0`` disables a process.
+Actor parameter files use ``CATEGORY/PROCESS/input_ACTOR.xml`` beneath the
+configuration directory. The GUI's code-parameter editor uses the actor's XSD
+when supplied, including its field descriptions and validation rules. Keep
+actor-specific physics settings with those files.
 
-Example:
+Legacy and Hybrid use the prerequisites and execution orders in
+``hcdworkflow/global_configuration/global_lists.yaml``. For example, the EC
+Fokker–Planck process requires an EC wave solver, and RISK requires an NBI
+source. FoPla's configured prerequisite is an IC wave solver; the NBI
+prerequisite lines are comments, not active requirements. Physical input
+requirements still depend on the selected actor and case.
 
-.. code-block:: xml
-
-   <ic_wave_solver display="Wave solver" list="cyrano tomcat pion lion">1</ic_wave_solver>
-
-Pure M3 Actor Requirements
---------------------------
-
-Pure M3 mode needs M3 actor executables, for example:
-
-.. code-block:: text
-
-   /path/to/PYTHON_ACTORS/torbeam/torbeam_m3.exe
-   /path/to/PYTHON_ACTORS/cyrano/cyrano_m3.exe
-
-The yMMSL file must list each component, its ports, conduits, resources, and
-implementation executable.
+The four registered merge actors are ``merge_waves``, ``merge_distributions``,
+``merge_distribution_sources`` and ``merge_core_sources``. They combine the
+corresponding IDS outputs; the user selects the physics actors and
+post-processing in the workflow XML.

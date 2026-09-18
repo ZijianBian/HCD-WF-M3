@@ -1,98 +1,61 @@
-Usage
-=====
+Running and finding results
+===========================
 
-The workflow can be run through classic command wrappers, the unified Python
-driver, or MUSCLE3 yMMSL files.
+Once a case is saved, the :doc:`quickstart` and :doc:`execution_modes` pages
+cover its launch. This page explains where the output goes and what to inspect
+if a run stops.
 
-Command Summary
----------------
-
-.. list-table::
-   :header-rows: 1
-   :widths: 28 72
-
-   * - Command
-     - Use
-   * - ``hcd_nogui -c CONFIG``
-     - Classic console workflow entry point.
-   * - ``hcdslice_nogui -c CONFIG``
-     - Single-slice classic run.
-   * - ``hcd_gui``
-     - GUI for classic configuration editing and execution.
-   * - ``python workflow/workflow_driver.py CONFIG 0``
-     - Legacy in-process driver.
-   * - ``python workflow/workflow_driver.py CONFIG 1``
-     - Hybrid M3 macro component, normally launched by MUSCLE3.
-   * - ``muscle_manager --start-all FILE.ymmsl``
-     - Launch Hybrid or Pure M3 topology.
-   * - ``./run.sh pure``
-     - Launch the default Pure M3 no-FoPla topology.
-
-Legacy Mode
------------
-
-.. code-block:: bash
-
-   python workflow/workflow_driver.py tests/m3_hybrid 0
-
-Legacy mode is useful when checking whether a problem is caused by physics
-input, actor behavior, or M3 coupling.
-
-Hybrid M3 Mode
+Physics output
 --------------
 
-.. code-block:: bash
+The output database is selected in ``input_workflow.xml`` by
+``output_user_or_path``, ``output_database``, ``output_backend``,
+``shot_nr`` and ``run_out``. Check these values before starting a new run.
 
-   muscle_manager --start-all test_hybrid_hcdwf.ymmsl
+The available output IDSs depend on the actors and post-processing selected.
+Typical products are ``waves``, ``distributions``,
+``distribution_sources`` and ``core_sources``. Open them with your IMAS
+reader and check the stored time range before examining the profiles.
+Use :doc:`validation` to distinguish successful execution from a result ready
+for physics interpretation.
 
-Hybrid mode sends IDS slices between ``workflow_driver.py`` and
-``hcd_workflow_m3.py``. The physics actors still run inside
-``HCDWorkflow.run()`` through iWrap.
+MUSCLE3 run files
+-----------------
 
-Pure M3 Mode
--------------------
+Hybrid and Pure launches create a directory under your configuration:
 
-Pure mode is launched from a yMMSL file that wires the macro driver directly to
-actor executables.
+.. code-block:: text
 
-.. code-block:: bash
+   CONFIG/.hcd_gui_runs/<mode>_<unique-id>/
+       configuration.ymmsl
+       topology_source.txt
+       ... MUSCLE3 instance logs and run files
 
-   ./run.sh pure
-   muscle_manager --start-all test_m3_pure_3actors.ymmsl
+``configuration.ymmsl`` records the paths actually used for that launch.
+The selected source template is unchanged. These run files are separate from
+the IMAS physics output.
 
-Use ``HCD_PURE_YMMSL`` to select another Pure topology:
+The GUI also captures manager output in ``manager.log`` in that directory.
+The command-line launcher prints manager output in the terminal.
+Legacy prints workflow progress in the terminal and does not create a
+MUSCLE3 run directory.
 
-.. code-block:: bash
-
-   HCD_PURE_YMMSL=test_m3_pure_torbeam.ymmsl ./run.sh pure
-
-Current validated Pure M3 actors:
-
-* ``torbeam_m3.exe``
-* ``cyrano_m3.exe``
-* ``hcd2core_sources_m3.exe``
-
-FoPla direct coupling exists in the driver but is not part of the validated
-benchmark subset described in :doc:`validation`. The full experimental
-topology including ``merge_waves`` and FoPla is kept in ``test_m3_pure.ymmsl``.
-
-Output
-------
-
-The output IMAS run is controlled by ``input_workflow.xml``:
-
-* ``output_user_or_path``
-* ``output_database``
-* ``output_backend``
-* ``shot_nr``
-* ``run_out``
-
-MUSCLE3 also creates a run directory named like ``run_*``. It contains logs,
-``configuration.ymmsl``, and the MUSCLE performance database when enabled.
-
-Benchmark Rule
+If a run stops
 --------------
 
-When comparing modes, keep the physics work identical. In particular, do not
-compare a weighted multi-``Ntor`` legacy or hybrid run against a single-``Ntor``
-Pure run.
+For a launch error, check the message first: a missing configuration file,
+actor parameter file or mismatched Pure actor selection must be fixed before
+MUSCLE3 starts.
+
+For a running calculation, locate the failing actor's first error in the
+terminal or instance log. Compare the generated topology with the saved
+configuration, and confirm the actor was built for the loaded DD and runtime.
+Repeated launches will not fix an input or actor-library mismatch.
+
+Batch jobs
+----------
+
+Use :doc:`../reference/commands` for the existing ``hcd_batch`` interface
+and its site-specific scheduler assumptions. For MUSCLE3 jobs, use a site
+job script that prepares the environment and invokes the same
+``run.sh MODE CONFIG`` command. The chosen topology controls actor resources.
