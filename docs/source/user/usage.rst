@@ -1,318 +1,61 @@
-Usage
-=====
+Running and finding results
+===========================
 
-HCD Workflow provides four main commands for different use cases.
+Once a case is saved, the :doc:`quickstart` and :doc:`execution_modes` pages
+cover its launch. This page explains where the output goes and what to inspect
+if a run stops.
 
-Commands Overview
------------------
-
-+-------------------+-----------------------------------------------------+
-| Command           | Purpose                                             |
-+===================+=====================================================+
-| ``hcd_gui``       | Interactive graphical interface                     |
-+-------------------+-----------------------------------------------------+
-| ``hcd_nogui``     | Console-based workflow execution                    |
-+-------------------+-----------------------------------------------------+
-| ``hcdslice_nogui``| Single time slice execution                         |
-+-------------------+-----------------------------------------------------+
-| ``hcd_batch``     | Batch job submission for HPC clusters               |
-+-------------------+-----------------------------------------------------+
-
-hcd_gui - Graphical Interface
-------------------------------
-
-Launch the interactive GUI for workflow configuration and execution.
-
-**Usage:**
-
-.. code-block:: bash
-
-   hcd_gui
-
-**Features:**
-
-* Visual workflow configuration
-* Waveform editing with Waveform Cooker
-* Real-time monitoring
-* Interactive result visualization
-* Machine description management
-
-**When to Use:**
-
-* Setting up new simulations
-* Exploring parameter spaces
-* Quick prototyping
-* Educational purposes
-
-hcd_nogui - Console Workflow
------------------------------
-
-Run the complete workflow from the command line without GUI.
-
-**Usage:**
-
-.. code-block:: bash
-
-   hcd_nogui -c <configuration_folder>
-
-**Arguments:**
-
-* ``-c``, ``--config_folder``: Path to configuration folder containing ``input_workflow.xml`` (required)
-
-**Example:**
-
-.. code-block:: bash
-
-   hcd_nogui -c tests/data/GRAYSCALE/
-
-**When to Use:**
-
-* Production runs
-* Automated workflows
-* Remote execution
-* Time-loop simulations
-
-**Output:**
-
-The workflow will:
-
-1. Load configuration from ``input_workflow.xml``
-2. Initialize all actors and databases
-3. Execute the time loop
-4. Store results in output database
-
-hcdslice_nogui - Single Time Slice
------------------------------------
-
-Execute the workflow for a single time slice.
-
-**Usage:**
-
-.. code-block:: bash
-
-   hcdslice_nogui -c <configuration_folder>
-
-**Arguments:**
-
-* ``-c``, ``--config_folder``: Path to configuration folder (required)
-
-**Example:**
-
-.. code-block:: bash
-
-   hcdslice_nogui -c tests/data/GRAYSCALE/
-
-**When to Use:**
-
-* Testing specific time points
-* Debugging
-* Quick validations
-* Snapshot analysis
-
-**Difference from hcd_nogui:**
-
-* Executes only one time slice (no time loop)
-* Faster for testing
-* Useful for development
-
-hcd_batch - Batch Execution
-----------------------------
-
-Submit workflow execution as a batch job to SLURM scheduler.
-
-**Usage:**
-
-.. code-block:: bash
-
-   hcd_batch -n <nproc> -t <time> -e <email> -q <queue> -c <config_folder>
-
-**Arguments:**
-
-* ``-n``, ``--nproc``: Number of processors (required)
-* ``-t``, ``--time``: Required CPU time in hours (required)
-* ``-e``, ``--email``: Email for job status notifications (required)
-* ``-q``, ``--queue``: SLURM partition/queue name (required)
-* ``-c``, ``--config_folder``: Path to configuration folder (required)
-
-**Example:**
-
-.. code-block:: bash
-
-   hcd_batch -n 1 -t 2 -e user@iter.org -q all -c tests/data/GRAYSCALE/
-
-**Available Queues:**
-
-Use ``sinfo`` to see available partitions on your cluster:
-
-.. code-block:: bash
-
-   sinfo
-
-**Monitoring Jobs:**
-
-Check job status:
-
-.. code-block:: bash
-
-   squeue -u $USER
-   squeue -j <job_id>
-
-View output:
-
-.. code-block:: bash
-
-   tail -f auto_batch_*.o<job_id>
-   cat auto_batch_*.e<job_id>  # Errors
-
-Cancel job:
-
-.. code-block:: bash
-
-   scancel <job_id>
-
-**When to Use:**
-
-* Long-running simulations
-* Production workflows
-* Resource-intensive calculations
-* Unattended execution
-
-Configuration Files
--------------------
-
-input_workflow.xml
-~~~~~~~~~~~~~~~~~~
-
-The main configuration file that defines:
-
-* Workflow parameters (shot, run, time range)
-* Actor selection for each physics process
-* Input/output database settings
-
-Example structure:
-
-.. code-block:: xml
-
-   <root>
-     <workflow_parameters>
-       <shot_nr>130012</shot_nr>
-       <run_in>5</run_in>
-       <run_out>5</run_out>
-       <tbegin>30.0</tbegin>
-       <tend>350.0</tend>
-       <dt_required>20</dt_required>
-     </workflow_parameters>
-     
-     <actor_selection>
-       <main_process>
-         <ECRH>
-           <ec_wave_solver list="genray gray grayscale torbeam toray">4</ec_wave_solver>
-         </ECRH>
-       </main_process>
-     </actor_selection>
-   </root>
-
-See :doc:`/reference/configuration` for detailed options.
-
-Waveform Files
-~~~~~~~~~~~~~~
-
-YAML files defining time-dependent heating parameters:
-
-* ``ec_waveforms.yaml`` - ECRH waveforms
-* ``ic_waveforms.yaml`` - ICRH waveforms
-* ``nbi_waveforms.yaml`` - NBI waveforms
-* ``lh_waveforms.yaml`` - LHCD waveforms
-
-Best Practices
+Physics output
 --------------
 
-1. **Start with GUI**: Use ``hcd_gui`` to set up and validate configurations
-2. **Test with Single Slice**: Use ``hcdslice_nogui`` for quick tests
-3. **Use Console for Production**: Run ``hcd_nogui`` for production workflows
-4. **Batch for Long Runs**: Use ``hcd_batch`` for multi-hour simulations
-5. **Version Control**: Keep your configuration folders in git
-6. **Document Settings**: Add comments to configuration files
+The output database is selected in ``input_workflow.xml`` by
+``output_user_or_path``, ``output_database``, ``output_backend``,
+``shot_nr`` and ``run_out``. Check these values before starting a new run.
 
-Common Workflows
-----------------
+The available output IDSs depend on the actors and post-processing selected.
+Typical products are ``waves``, ``distributions``,
+``distribution_sources`` and ``core_sources``. Open them with your IMAS
+reader and check the stored time range before examining the profiles.
+Use :doc:`validation` to distinguish successful execution from a result ready
+for physics interpretation.
 
-Interactive Development
-~~~~~~~~~~~~~~~~~~~~~~~
+MUSCLE3 run files
+-----------------
 
-.. code-block:: bash
+Hybrid and Pure launches create a directory under your configuration:
 
-   # Setup
-   module load HCD-WF
-   export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
-   
-   # Configure and test
-   hcd_gui
-   
-   # Run single slice to verify
-   hcdslice_nogui -c my_config/
-   
-   # Run full workflow
-   hcd_nogui -c my_config/
+.. code-block:: text
 
-Production Batch Run
-~~~~~~~~~~~~~~~~~~~~
+   CONFIG/.hcd_gui_runs/<mode>_<unique-id>/
+       configuration.ymmsl
+       topology_source.txt
+       ... MUSCLE3 instance logs and run files
 
-.. code-block:: bash
+``configuration.ymmsl`` records the paths actually used for that launch.
+The selected source template is unchanged. These run files are separate from
+the IMAS physics output.
 
-   # Setup
-   module load HCD-WF
-   export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
-   
-   # Submit batch job
-   hcd_batch -n 4 -t 8 -e user@iter.org -q all -c my_config/
-   
-   # Monitor
-   squeue -u $USER
-   watch -n 5 'squeue -u $USER'
+The GUI also captures manager output in ``manager.log`` in that directory.
+The command-line launcher prints manager output in the terminal.
+Legacy prints workflow progress in the terminal and does not create a
+MUSCLE3 run directory.
 
-Testing with Pytest
--------------------
+If a run stops
+--------------
 
-You can run integration tests for the workflow using pytest. These tests execute the main workflow commands for various example configurations and check for successful completion.
+For a launch error, check the message first: a missing configuration file,
+actor parameter file or mismatched Pure actor selection must be fixed before
+MUSCLE3 starts.
 
-**Install pytest (if not already installed):**
+For a running calculation, locate the failing actor's first error in the
+terminal or instance log. Compare the generated topology with the saved
+configuration, and confirm the actor was built for the loaded DD and runtime.
+Repeated launches will not fix an input or actor-library mismatch.
 
-.. code-block:: bash
+Batch jobs
+----------
 
-   pip install pytest
-
-**Run all workflow tests:**
-
-.. code-block:: bash
-
-   pytest tests/test_workflow.py
-
-Or run all tests in the directory:
-
-.. code-block:: bash
-
-   pytest tests/
-
-The test file `tests/test_workflow.py` will run the workflow for several configurations and assert that each completes successfully.
-
-Troubleshooting
----------------
-
-Module Import Errors
-~~~~~~~~~~~~~~~~~~~~~
-
-Ensure all required modules are loaded:
-
-.. code-block:: bash
-
-   module list
-   module load IMAS-AL-Python
-   module load <actor_modules>
-
-See Also
---------
-
-* :doc:`/reference/commands` - Complete command reference
-* :doc:`/reference/configuration` - Configuration file format
-* :doc:`examples` - Example workflows
+Use :doc:`../reference/commands` for the existing ``hcd_batch`` interface
+and its site-specific scheduler assumptions. For MUSCLE3 jobs, use a site
+job script that prepares the environment and invokes the same
+``run.sh MODE CONFIG`` command. The chosen topology controls actor resources.
