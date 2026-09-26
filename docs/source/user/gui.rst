@@ -1,171 +1,62 @@
-Hcd gui
-=======
+Preparing a case in the GUI
+===========================
 
-.. note::
-   These instructions show how to execute the Python H&CD workflow from the GUI, where the input scenario, the physics actors, and a time loop can be defined. When running the H&CD workflow from a transport solver, the GUI is replaced by the transport code itself.
+Launch ``hcd_gui`` from the configured shell. It opens the default workflow;
+use **Load** to open a saved configuration.
 
+The GUI needs the selected actors' iWrap Python packages to edit parameters
+and save a case, including for Pure launches. If you have only native MUSCLE3
+executables, use ``run.sh pure`` with an already prepared configuration.
 
-Open and Configure the H&CD Workflow
-------------------------------------
+Set the workflow and actors
+---------------------------
 
-To launch the GUI:
+In **Workflow parameters**, choose the input database, shot and run. Set the
+output location, time range and time step. The exact XML field names are in
+:doc:`../reference/configuration`.
 
-.. code-block:: bash
+In **Actor selection**, choose the codes for the heating systems you need,
+then select the source or profile post-processing. Only use actors installed
+for your current environment.
 
-   hcd_gui
+Use **Save as** to create a configuration folder, or **Save** to update it.
+Keep this folder at a location you can reuse from the command line.
 
-The main window appears with the default configuration.
+Edit actor parameters and waveforms
+-----------------------------------
 
-.. figure:: /_static/gui_1.png
-   :alt: HCD GUI main window
-   :align: center
-
-   HCD GUI main window after launch.
-
-Workflow Parameters
--------------------
-
-+----------------------------+------------------------------------------------+
-| **Parameter**              | **Description**                                |
-+----------------------------+------------------------------------------------+
-| input_user_or_path         | User or absolute path of the input database.   |
-|                            | `'public'` for the public database.            |
-+----------------------------+------------------------------------------------+
-| input_database             | Input database name (e.g., `'ITER'`).          |
-+----------------------------+------------------------------------------------+
-| input_shot / input_run     | Input shot and run numbers.                    |
-+----------------------------+------------------------------------------------+
-| output_user_or_path        | Output path or username (`$USER` if default).  |
-+----------------------------+------------------------------------------------+
-| output_database            | Output database (defaults to input database).  |
-+----------------------------+------------------------------------------------+
-| output_run                 | Output run number.                             |
-+----------------------------+------------------------------------------------+
-| start_time / end_time (s)  | Start and end time for H&CD calculation.       |
-+----------------------------+------------------------------------------------+
-| time_step (s)              | Time step for calculations (fixed currently).  |
-+----------------------------+------------------------------------------------+
-| parallel_workflow (0/1)    | Enable parallel execution (experimental).      |
-+----------------------------+------------------------------------------------+
-| single_time_slice (0/1)    | Run single time slice or full evolution.       |
-+----------------------------+------------------------------------------------+
-
-GUI Functions
--------------
-
-- **Load** — Load configuration from a previous simulation.
-- **Load Latest** — Load the most recent configuration.
-- **Save / Save As** — Save the current configuration.
-- **Run** — Save configuration and run the workflow.
-- **Restore Default** — Restore default workflow parameters.
-
-H&CD Processes
---------------
-
-The right-hand side of the GUI allows selecting H&CD calculations:
-
-- **ECRH** Select EC wave code for EC calculations.
-- **ICRH** Select IC coupling, wave, and Fokker Planck codes.
-- **NBI** Select beam deposition and Fokke Planck codes.
-- **Nuclear** Codes for nuclear source and Fokker Planck calculations.
-- **Sources / Profiles** Optionally fill `core_sources` and `core_profiles` IDS.
-
-
-Edit Code Parameters
---------------------
-
-Once H&CD actors are selected, click **Edit Code Parameters**.
-
-Each actor (e.g., GRAY, NEMO, SPOT) opens a configuration window.  
-Hover over a variable to see its definition. Invalid values highlight red.
-
-- **Save** — saves configuration.  
-- **Restore Default** — restores default input xsd definitions.
+**Edit Code Parameters** opens the selected actors' parameter editors.
+Check and save each actor's settings before running the case.
 
 .. figure:: /_static/gui_2.png
-   :alt: Edit Code Parameters window
-   :align: center
+   :alt: Actor parameter editor with Save and Restore default controls
+   :width: 75%
 
-   Edit Code Parameters window for an H&CD actor.
+   The actor parameter editor. Its fields depend on the installed actor.
 
-.. figure:: /_static/gui_3.png
-   :alt: Example of parameter editing
-   :align: center
+**Edit H&CD waveforms** opens Waveform Cooker for time-dependent inputs such
+as power, steering or beam energy. The scenario supplies the plasma state;
+the heating geometry and waveform settings supply the actuator inputs.
+Legacy and Hybrid also expose **Time Base** controls for individual process
+schedules. Pure uses its own scheduling rules; see
+:doc:`../developer/architecture`.
 
-   Example of editing parameters for a selected code.
+Choose how to launch
+--------------------
 
-Time Base
----------
+The **Execution / Launch** panel offers Legacy, Hybrid and Pure.
+Legacy is selected whenever the GUI starts. For Hybrid or Pure, select the
+matching yMMSL template; **Use recommended topology** restores the mode's
+default template.
 
-Each process (ECRH, ICRH, NBI, Nuclear, etc.) can have its own
-frequency of code calls per pulse phase.
+Pure includes only the selected actors in the generated run configuration.
+Launch checks their connections and parameter files. See :doc:`execution_modes`
+for supported actors and requirements.
 
-**Modes:**
+Click **Save & Run** to save the case and start the selected mode. A MUSCLE3
+launch reports the generated topology and manager log path. Follow that log
+and open the output database to inspect the result; see :doc:`usage`.
 
-- *Full interval* — on/off for the full range.
-- *Time step* — e.g., every 0.2 s.
-- *At time* — trigger at a specific time slice.
-- *Index step* — every N index steps.
-- *At index* — trigger at a specific time step.
-
-**Reset options:**
-
-- *Soft reset* — erase extra-defined intervals.
-- *Hard reset* — erase all intervals (used when workflow times are modified).
-
-.. figure:: /_static/gui_6.png
-   :alt: Example of waveform editing
-   :align: center
-
-   Example of editing H&CD waveforms in the GUI.
-
-Edit H&CD Waveforms
--------------------
-
-To simulate H&CD processes, you need:
-
-#. **Input Scenario** — from the `Scenario Database` (e.g., ``equilibrium``, ``core_profiles``).
-#. **Machine Geometry** — from the `Machine Description Database` (e.g., ``ec_launchers``, ``ic_antennas``, ``nbi``, ``lh_antennas``).
-#. **Dynamic Configuration** — via the *Waveform Cooker* GUI, adding parameters like power, steering angle, or beam energy.
-
-.. figure:: /_static/gui_4.png
-   :alt: Waveform Cooker main window
-   :align: center
-
-   Waveform Cooker main window for dynamic configuration of H&CD parameters.
-
-.. figure:: /_static/gui_5.jpg
-   :alt: Editing a waveform parameter
-   :align: center
-
-   Example of editing a specific waveform parameter (e.g., power or steering angle).
-
-Useful links:
-
-- `Scenario Database <https://confluence.iter.org/spaces/IMP/pages/151422626/Scenario+Database>`_
-- `Machine Description Database <https://confluence.iter.org/spaces/IMP/pages/302454631/Machine+Description+Database>`_
-
-
-Execution
----------
-
-Click **Run** in the GUI to start execution.  
-Logs will appear in the console.
-
-Example console output (truncated):
-
-.. code-block:: none
-
-  ---> Configuration saved in /home/ITER/schneim/public/git/hcd/data/nemo_spot_tuto
-  -- Open input and output file
-  ---- Enter time loop of the H&CD wrapper
-  Step = 1 / 3
-   Time = 300.00 s
-   Execute H&CD workflow for current time slice
-   -- Step 1: Source codes and Wave solvers
-   -- NEMO NORMAL MODE
-   START OF NEMO
-   ...
-   SPOT CPU consumption = 38.79 sec
-   END OF SPOT
-   End of H&CD workflow.
+The GUI edits the configuration and starts the workflow. It does not provide
+a physics-results viewer. The launch mode and topology choice are separate
+from ``input_workflow.xml``, so select them again after reopening the GUI.

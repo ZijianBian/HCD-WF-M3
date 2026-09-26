@@ -1,237 +1,79 @@
-Command Line Reference
-======================
+Command reference
+=================
 
-HCD Workflow provides four main commands for different use cases.
+Run these commands in the environment described in :doc:`../user/installation`.
+``CONFIG_DIRECTORY`` is a saved configuration containing ``input_workflow.xml``
+and the selected actors' parameter files.
 
-hcd_gui
--------
-
-Interactive graphical user interface for workflow configuration and execution.
-
-**Usage:**
+Source-checkout launcher
+------------------------
 
 .. code-block:: bash
 
-   hcd_gui [options]
-
-**Description:**
-
-Launches a GUI application that allows you to:
-
-* Configure workflow parameters interactively
-* Edit waveforms visually
-* Set up time evolution parameters
-* Select and configure actors
-* Run simulations with real-time monitoring
-* View results and logs
-
-**Options:**
-
-Currently accepts no command-line options. All configuration is done through the GUI.
-
-**Example:**
-
-.. code-block:: bash
-
-   # Launch GUI
-   hcd_gui
-
-hcd_nogui
----------
-
-Console-based workflow execution with time-loop support.
-
-**Usage:**
-
-.. code-block:: bash
-
-   hcd_nogui -c <configuration_folder> [options]
-
-**Description:**
-
-Executes the complete workflow in console mode, processing all time slices sequentially.
-
-**Required Arguments:**
-
-``-c``, ``--config <path>``
-   Path to the configuration folder containing workflow XML files and input data.
-
-**Optional Arguments:**
-
-``--verbose``
-   Enable verbose output for debugging.
-
-``--log <file>``
-   Write output to specified log file.
-
-**Examples:**
-
-.. code-block:: bash
-
-   # Basic execution
-   hcd_nogui -c tests/data/GRAYSCALE/
-   
-   # With verbose output
-   hcd_nogui -c my_simulation/ --verbose
-   
-   # Save logs to file
-   hcd_nogui -c my_simulation/ --log output.log
-
-hcdslice_nogui
---------------
-
-Execute workflow for a single time slice.
-
-**Usage:**
-
-.. code-block:: bash
-
-   hcdslice_nogui -c <configuration_folder> [options]
-
-**Description:**
-
-Runs the workflow for a single time point. Useful for:
-
-* Testing actor configurations
-* Debugging workflow issues
-* Quick validation of setup
-* Development and testing
-
-**Required Arguments:**
-
-``-c``, ``--config <path>``
-   Path to the configuration folder containing workflow XML files.
-
-**Optional Arguments:**
-
-``--time <value>``
-   Specific time point to execute (default: first time in configuration).
-
-``--verbose``
-   Enable verbose output.
-
-**Examples:**
-
-.. code-block:: bash
-
-   # Execute single slice
-   hcdslice_nogui -c tests/data/GRAYSCALE/
-   
-   # Specific time point
-   hcdslice_nogui -c my_simulation/ --time 50.0
-   
-   # Verbose mode
-   hcdslice_nogui -c my_simulation/ --verbose
-
-hcd_batch
----------
-
-Submit workflow as SLURM batch job.
-
-**Usage:**
-
-.. code-block:: bash
-
-   hcd_batch -c <configuration_folder> [options]
-
-**Description:**
-
-Submits the workflow to SLURM scheduler for execution on HPC cluster. Automatically generates batch script and submits job.
-
-**Required Arguments:**
-
-``-c``, ``--config <path>``
-   Path to the configuration folder.
-
-**Optional Arguments:**
-
-``--partition <name>``
-   SLURM partition to use (default: all).
-
-``--nodes <n>``
-   Number of nodes to request (default: 1).
-
-``--ntasks <n>``
-   Number of tasks (default: 1).
-
-``--time <hh:mm:ss>``
-   Wall time limit (default: 01:00:00).
-
-``--job-name <name>``
-   Job name for SLURM (default: hcd_workflow).
-
-``--mail-user <email>``
-   Email for job notifications.
-
-``--mail-type <types>``
-   When to send email (BEGIN,END,FAIL,ALL).
-
-**Examples:**
-
-.. code-block:: bash
-
-   # Basic batch submission
-   hcd_batch -c my_simulation/
-   
-   # Specify partition and time
-   hcd_batch -c my_simulation/ --partition sun --time 02:00:00
-   
-   # With email notifications
-   hcd_batch -c my_simulation/ --mail-user user@iter.org --mail-type END,FAIL
-   
-   # Custom job name
-   hcd_batch -c my_simulation/ --job-name my_hcd_run
-
-**Monitoring Jobs:**
-
-.. code-block:: bash
-
-   # Check job status
-   squeue -u $USER
-   
-   # View job details
-   scontrol show job <job_id>
-   
-   # Cancel job
-   scancel <job_id>
-
-Common Options
---------------
-
-Configuration Folder Structure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-All commands expect a configuration folder with:
-
-.. code-block:: text
-
-   configuration_folder/
-   ├── input_workflow.xml          # Main workflow configuration
-   ├── global_lists.yaml           # Global parameters (optional)
-   ├── waveforms/                  # Waveform files (if used)
-   └── input_data/                 # Input IDS files
-
-Environment Variables
-~~~~~~~~~~~~~~~~~~~~~
-
-``IMAS_AL_DISABLE_OBSOLESCENT_WARNING``
-   Set to ``1`` to suppress IMAS warning messages.
-
-.. code-block:: bash
-
-   export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
-
-Exit Codes
-~~~~~~~~~~
-
-* ``0`` - Success
-* ``1`` - Configuration error
-* ``2`` - Execution error
-* ``3`` - Actor error
-
-See Also
---------
-
-* :doc:`../user/usage` - Usage guide with examples
-* :doc:`../user/examples` - Example workflows
-* :doc:`configuration` - Configuration file format
+   ./run.sh legacy /path/to/config
+   ./run.sh hybrid /path/to/config [TOPOLOGY.ymmsl]
+   ./run.sh pure /path/to/config [TOPOLOGY.ymmsl]
+
+``./run.sh --help`` prints usage. Legacy takes no topology argument. Hybrid and
+Pure choose the topology in this order: the command-line argument,
+``HCD_HYBRID_YMMSL`` or ``HCD_PURE_YMMSL``, then ``topologies/hybrid.ymmsl`` or
+``topologies/pure.ymmsl``. See :doc:`../user/execution_modes` for actor choices.
+
+The launcher creates a run directory under ``CONFIG_DIRECTORY/.hcd_gui_runs/``
+and runs MUSCLE3 Manager in the foreground. Manager output appears in the
+terminal; component logs and the generated topology are in that run directory.
+Physics outputs go to the IMAS output entry specified in the configuration.
+
+Installed commands
+------------------
+
+``hcd_gui``
+   Opens the configuration editor. It takes no command-line options. Save & Run
+   launches the selected execution mode; MUSCLE3 runs also capture Manager
+   output in ``manager.log`` inside the displayed run directory.
+
+``hcd_nogui -c /path/to/config [--m3_flag 0|1]``
+   Runs the time-loop driver. ``-c`` and ``--config_folder`` are equivalent.
+   ``--m3_flag`` defaults to ``0`` (Legacy); ``1`` is the Hybrid macro component
+   and needs a running MUSCLE3 configuration. Use ``run.sh hybrid`` to launch
+   both Hybrid components together. This command does not select Pure mode.
+
+``hcdslice_nogui -c /path/to/config``
+   Older single-slice entry point; its only option is ``-c`` / ``--config_folder``.
+   It currently fixes the time at **320 s** and does not store the returned
+   workflow outputs. For a configurable slice with normal output storage, set
+   ``one_time_slice`` to ``1`` in the XML and use ``hcd_nogui`` or ``run.sh``.
+
+Batch wrapper
+-------------
+
+``hcd_batch`` requires all five arguments:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Argument
+     - Meaning
+   * - ``-n``, ``--nproc``
+     - Tasks per node
+   * - ``-t``, ``--time``
+     - Requested wall time in hours
+   * - ``-e``, ``--email``
+     - Address for the end-of-job notification
+   * - ``-q``, ``--queue``
+     - Queue / partition name
+   * - ``-c``, ``--config_folder``
+     - Saved configuration directory
+
+It writes ``auto_batch_<timestamp>`` in the current directory and submits a
+Legacy ``hcd_nogui`` run. The wrapper writes ``#SBATCH`` directives but calls
+``qsub``; it therefore depends on the site's submission setup. It is not a
+general SLURM or MUSCLE3 launcher.
+
+Python entry points
+-------------------
+
+``python3 workflow/workflow_driver.py /path/to/config [0|1]`` uses the same
+Legacy / Hybrid flag as ``hcd_nogui``. ``workflow/wf_wrapper.py`` remains a
+compatibility entry point with the same arguments. Pure runs use
+``hcdworkflow/workflow_driver_m3_pure.py`` through their yMMSL topology.
