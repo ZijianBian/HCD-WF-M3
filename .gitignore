@@ -54,3 +54,15 @@ hcdworkflow/_version.py
 ci_regression/
 actor_paths.env
 virtualenvdir/
+
+# Local configurations, runtime output and environments
+/my_config/
+/runs/
+/run_hcd_*/
+.hcd_gui_runs/
+/devenv*/
+/.venv/
+/PYTHON_ACTORS/
+*.h5
+*.hdf5
+*.nc
