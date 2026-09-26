@@ -1,0 +1,361 @@
+"""Database I/O and time loops for in-process HCD execution."""
+
+import inspect
+import os
+import sys
+import xml.etree.ElementTree as ET
+from contextlib import ExitStack
+from pathlib import Path
+
+import imas
+
+import hcdworkflow
+from gui.gui_methods import create_workflow_param_from_file
+from hcdworkflow.hcd_workflow import HCDWorkflow
+from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
+from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
+
+isWaveformCookerPresent = True
+try:
+    from waveform_cooker import add_dynamic
+except Exception:
+    isWaveformCookerPresent = False
+
+
+def safe_get_ids(db_entry, ids_name):
+    """Read an optional IDS while preserving unexpected database errors."""
+    try:
+        ids_object = db_entry.get(ids_name)
+        if hasattr(ids_object, "ids_properties"):
+            homogeneous_time = getattr(ids_object.ids_properties, "homogeneous_time", None)
+            if homogeneous_time is not None and homogeneous_time != imas.imasdef.EMPTY_INT:
+                return ids_object, True
+        return ids_object, False
+    except Exception as e:
+        error_msg = str(e).lower()
+        if "empty" in error_msg or "not found" in error_msg or "does not exist" in error_msg:
+            print(f"  IDS '{ids_name}' is empty or not found, skipping.")
+            return None, False
+        else:
+            raise
+
+
+# =============================================================================
+# Database Setup
+# =============================================================================
+
+
+def setup_databases(config_folder_path):
+    """Initialize all databases and load machine descriptions.
+
+    Return the input, output and machine database handles, input IDS names,
+    machine-description IDS names, workflow parameters and process selection.
+    """
+    pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"
+    globalListPath = str(pathGlobalConfiguration / "global_lists.yaml")
+
+    # Load workflow parameters from XML
+    inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
+    print(f"[workflow_driver] Loading config from: {inputworkflow_xml}")
+    wf_parameters = create_workflow_param_from_file(inputworkflow_xml)["workflow_parameters"][0]
+    param_process = {
+        node.tag: int(node.text) for node in ET.parse(inputworkflow_xml).findall("./actor_selection/*/*/*")
+    }
+
+    # Extract database parameters
+    input_user_or_path = wf_parameters["input_user_or_path"][0]
+    input_database = wf_parameters["input_database"][0]
+    input_backend = wf_parameters.get("input_backend", ["MDSPLUS"])[0]
+    output_user_or_path = wf_parameters["output_user_or_path"][0]
+    output_database = wf_parameters["output_database"][0]
+    output_backend = wf_parameters.get("output_backend", ["MDSPLUS"])[0]
+    shot_nr = wf_parameters["shot_nr"][0]
+    run_in = wf_parameters["run_in"][0]
+    run_out = wf_parameters["run_out"][0]
+
+    print("[workflow_driver] Opening input and output databases...")
+
+    dbhelper = WorkflowDbHelper(
+        input_user_or_path,
+        input_database,
+        input_backend,
+        output_user_or_path,
+        output_database,
+        output_backend,
+        shot_nr,
+        run_in,
+        run_out,
+    )
+    with ExitStack() as cleanup:
+        inputDb = dbhelper.getInputDatabase()
+        cleanup.callback(inputDb.close)
+        outputDb = dbhelper.getOutputDatabase()
+        cleanup.callback(outputDb.close)
+        machineDb = dbhelper.getMachineDatabase()
+        cleanup.callback(machineDb.close)
+
+        # Load global lists
+        globallistReader = WorkflowGlobalsReader(globalListPath)
+        inputIds = globallistReader.getIdsScenarioList()
+        inputIds.append("workflow")
+        inputMds = globallistReader.getIdsMdList()
+        wall_md = globallistReader.getWallMD()
+
+        # Load machine descriptions
+        print("[workflow_driver] Loading machine descriptions...")
+        for idsName in inputMds:
+            idsObject, is_valid = safe_get_ids(inputDb, idsName)
+
+            if is_valid and idsObject is not None:
+                machineDb.put(idsObject)
+            else:
+                if idsName == "wall":
+                    try:
+                        _backend = getattr(imas.imasdef, wall_md["backend"] + "_BACKEND")
+                        wall = imas.DBEntry(
+                            _backend,
+                            wall_md["database"],
+                            wall_md["shot"],
+                            wall_md["run"],
+                            wall_md["user_or_path"],
+                        )
+                        try:
+                            wall.open()
+                            wall_ids, wall_valid = safe_get_ids(wall, "wall")
+                            if wall_valid and wall_ids is not None:
+                                machineDb.put(wall_ids)
+                            else:
+                                print("  wall IDS is empty in MD database --> running without.")
+                        finally:
+                            wall.close()
+                    except Exception as e:
+                        print(f"  wall IDS not found --> running without. Error: {e}")
+                else:
+                    print(f"  {idsName} not present, can be provided via waveform cooker if needed.")
+
+        # Load waveform configurations
+        print("[workflow_driver] Loading waveform configurations...")
+        for filename in os.listdir(config_folder_path):
+            filePath = os.path.join(config_folder_path, filename)
+            if filePath.endswith("waveforms.yaml"):
+                idsObject = add_dynamic(filePath) if isWaveformCookerPresent else None
+                if idsObject is not None:
+                    machineDb.put(idsObject)
+
+        cleanup.pop_all()
+        return inputDb, outputDb, machineDb, inputIds, inputMds, wf_parameters, param_process
+
+
+# =============================================================================
+# Database I/O Helpers
+# =============================================================================
+
+
+def get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow):
+    """Read required scenario inputs and any available machine descriptions."""
+    slices = {}
+    for ids_name in inputIds:
+        try:
+            slices[ids_name] = inputDb.get_slice(ids_name, timenow, 1)
+            if (
+                ids_name in {"equilibrium", "core_profiles"}
+                and int(slices[ids_name].ids_properties.homogeneous_time) < 0
+            ):
+                raise ValueError(f"Required IDS {ids_name} is empty")
+        except Exception as e:
+            if ids_name not in {"equilibrium", "core_profiles"} and "empty" in str(e).lower():
+                slices[ids_name] = getattr(imas, ids_name)()
+            else:
+                raise RuntimeError(f"Could not read {ids_name} at t={timenow}: {e}") from e
+    for ids_name in inputMds:
+        try:
+            slices[ids_name] = machineDb.get_slice(ids_name, timenow, 1)
+        except Exception as e:
+            if not any(text in str(e).lower() for text in ("empty", "not found", "does not exist")):
+                raise RuntimeError(f"Could not read {ids_name} at t={timenow}: {e}") from e
+    return slices
+
+
+_OUTPUT_OWNED_IDS = {
+    "core_profiles",
+    "core_sources",
+    "waves",
+    "distributions",
+    "distribution_sources",
+}
+
+
+def _valid_output_slice(ids_data):
+    return (
+        ids_data is not None
+        and hasattr(ids_data, "ids_properties")
+        and int(ids_data.ids_properties.homogeneous_time) >= 0
+        and hasattr(ids_data, "time")
+        and len(ids_data.time) > 0
+        and ids_data.time[0] > 0
+    )
+
+
+def store_ids_slices(
+    outputDb, inputMds, input_slices, output_ids, param_process=None, timenow=None, config_folder_path=None
+):
+    """Write IDS slices to the output database.
+
+    Write each IDS once per slice. Preserve the input core_profiles when no
+    actor produces a valid replacement; writing both versions at the same time
+    corrupts the HDF5 group index on subsequent put_slice calls.
+    """
+    for ids_name, ids_data in input_slices.items():
+        if ids_name in inputMds:
+            continue
+        if ids_name in _OUTPUT_OWNED_IDS:
+            if ids_name != "core_profiles" or _valid_output_slice(output_ids.get(ids_name)):
+                continue
+        if hasattr(ids_data, "ids_properties") and ids_data.ids_properties.homogeneous_time >= 0:
+            if ids_data.ids_properties.homogeneous_time == 2:
+                outputDb.put(ids_data)
+            else:
+                outputDb.put_slice(ids_data)
+
+    for ids_name, ids_data in output_ids.items():
+        if _valid_output_slice(ids_data):
+            if ids_name != "equilibrium":
+                # Skip empty core_sources (no source data) to avoid HDF5 schema
+                # conflict: writing an empty core_sources first establishes an
+                # HDF5 schema without source arrays, causing subsequent put_slice
+                # with populated source data to segfault.
+                if ids_name == "core_sources" and (not hasattr(ids_data, "source") or len(ids_data.source) == 0):
+                    continue
+                print(f"  -> Storing output {ids_name} at t={ids_data.time[0]:.4f}", flush=True)
+                outputDb.put_slice(ids_data)
+                print(f"  -> Stored output {ids_name} at t={ids_data.time[0]:.4f}", flush=True)
+
+
+# =============================================================================
+# Time Range Resolution
+# =============================================================================
+
+
+def resolve_time_range(workflow, inputDb):
+    """
+    Resolve the time range from workflow config and database.
+    Returns: (tbegin, tend, dt, nsteps, one_time_slice)
+    """
+    tbegin = workflow.workflowData.tbegin
+    tend = workflow.workflowData.tend
+    dt = workflow.workflowData.dt_required
+    one_time_slice = workflow.workflowData.one_time_slice
+
+    if one_time_slice == 0:
+        time_array = inputDb.partial_get(ids_name="equilibrium", data_path="time")
+        if time_array is not None:
+            if tbegin < 0:
+                tbegin = time_array[0]
+            if tend < 0:
+                tend = time_array[-1]
+    else:
+        tend = tbegin + dt
+
+    nsteps = 1 if one_time_slice else int((tend - tbegin) / dt)
+    if dt * nsteps < (tend - tbegin):
+        nsteps += 1
+
+    return tbegin, tend, dt, nsteps, one_time_slice
+
+
+# =============================================================================
+# Traditional iwrap
+# =============================================================================
+
+
+def run_traditional(
+    config_folder_path, inputDb, outputDb, machineDb, inputIds, inputMds, param_process, *, workflow=None
+):
+    """
+    Run in traditional mode: time loop + HCDWorkflow.run() directly.
+    All iWrap actors execute in-process.
+    """
+    if workflow is None:
+        print("[workflow_driver] Initializing HCDWorkflow (traditional mode)...", flush=True)
+        workflow = HCDWorkflow()
+        workflow.initialize(config_folder_path)
+
+    tbegin, tend, dt, nsteps, one_time_slice = resolve_time_range(workflow, inputDb)
+    print(f"[workflow_driver] Time range: {tbegin} → {tend}, dt={dt}, steps={nsteps}", flush=True)
+
+    # --- Time loop ---
+    timenow = tbegin
+    step = 0
+
+    while timenow < tend:
+        step += 1
+        print("---------------------------------------------", flush=True)
+        print(f"[workflow_driver] Step {step}/{nsteps}, t={timenow:.4f}, dt={dt:.4f}", flush=True)
+
+        # Read IDS from database
+        ids_slices = get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow)
+        # Separate mandatory and optional IDS
+        nonmandatory = {k: v for k, v in ids_slices.items() if k not in ("equilibrium", "core_profiles", "workflow")}
+
+        # Set process status and run
+        workflow.setProcessStatus(timenow)
+        output_ids = workflow.run(
+            equilibrium=ids_slices["equilibrium"],
+            core_profiles=ids_slices["core_profiles"],
+            workflow=ids_slices["workflow"],
+            **nonmandatory,
+        )
+        if output_ids is None:
+            raise RuntimeError(f"HCD workflow failed at t={timenow}")
+
+        # Store results
+        store_ids_slices(
+            outputDb,
+            inputMds,
+            ids_slices,
+            output_ids,
+            param_process=param_process,
+            timenow=timenow,
+            config_folder_path=config_folder_path,
+        )
+
+        timenow += dt
+
+    print(f"[workflow_driver] Finished after {step} steps", flush=True)
+
+
+# =============================================================================
+# Entry Point
+# =============================================================================
+
+
+def workflow_driver(par_path):
+    """Run the in-process HCD workflow from a configuration folder."""
+    print("=" * 60, flush=True)
+    print("[workflow_driver] Starting HCD Workflow", flush=True)
+    print(f"[workflow_driver] Config path: {par_path}", flush=True)
+    print("=" * 60, flush=True)
+
+    config_folder_path = os.path.abspath(par_path)
+    inputDb, outputDb, machineDb, inputIds, inputMds, wf_parameters, param_process = setup_databases(config_folder_path)
+
+    with ExitStack() as cleanup:
+        for database in (inputDb, outputDb, machineDb):
+            cleanup.callback(database.close)
+        run_traditional(config_folder_path, inputDb, outputDb, machineDb, inputIds, inputMds, param_process)
+
+    print("=" * 60)
+    print("[workflow_driver] Workflow completed successfully")
+    print("=" * 60)
+
+
+wf_wrapper = workflow_driver
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python workflow_driver.py <config_path>")
+        print("  config_path: Path to configuration folder")
+        sys.exit(1)
+
+    workflow_driver(sys.argv[1])

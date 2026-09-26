@@ -2,8 +2,14 @@ import collections
 import copy
 import sys
 
+import imas
+
 from tools.hcd_tools import is_ec_on, is_ic_on, is_lh_on, is_nbi_on
 from tools.stdout_redirector import redirect_stdout, stdout_back
+
+
+def _create_ids(ids_name):
+    return getattr(imas, ids_name)()
 
 
 class WorkflowExecutor:
@@ -27,9 +33,34 @@ class WorkflowExecutor:
         self.parallel_dependency_list = parallel_dependency_list
         self.merge_actor_list = merge_actor_list
 
+    def _reset_runtime_state(self):
+        """Drop IDS products and dynamic mergers left from the previous slice."""
+        for process in list(self.process_bundle):
+            if process.startswith("merge_"):
+                del self.process_bundle[process]
+
+        generated_inputs = {"waves"}
+        generated_outputs = {"waves", "distributions", "distribution_sources", "core_sources"}
+        for bundle in self.process_bundle.values():
+            inputs = bundle.get("input")
+            if isinstance(inputs, dict):
+                for ids_name in generated_inputs:
+                    if ids_name in inputs:
+                        inputs[ids_name] = _create_ids(ids_name)
+
+            outputs = bundle.get("output")
+            if isinstance(outputs, dict):
+                for ids_name in generated_outputs:
+                    if ids_name in outputs:
+                        outputs[ids_name] = _create_ids(ids_name)
+
     def execute(self):
         print("Execute H&CD workflow for current time slice", file=sys.stdout)
-        self.validateAndUpdateProcessBundle()
+        self._reset_runtime_state()
+        err = self.validateAndUpdateProcessBundle()
+        if err is not None and err < 0:
+            print("  Skipping time slice due to validation error", file=sys.stderr)
+            return err
         final_algorithm, waiting_for, parallel_runs = self.decideAlgorithm()
         # print("final_algo", final_algorithm)
         # print(" ")
@@ -61,6 +92,7 @@ class WorkflowExecutor:
     def validateAndUpdateProcessBundle(self):
         # IF AN H&CD SOURCE IS CONFIGURED BUT IT HAS NO POWER FOR THIS TIME SLICE,
         # DO NOT RUN THE CODE(S) FOR THIS SOURCE
+        nbi_selected = self.param_process.get("nbi_source", 0) != 0 or self.param_process.get("nbi_fp", 0) != 0
         for process in self.process_bundle.keys():
             time_array = None
             if (
@@ -76,6 +108,7 @@ class WorkflowExecutor:
             if (
                 "nbi" in self.process_bundle[process]["input"]
                 and "nuclear" not in process
+                and nbi_selected
                 and self.process_bundle[process]["input"]["nbi"].ids_properties.homogeneous_time < 0
             ):
                 print("  NBI required but no waveform!!!", file=sys.stderr)
@@ -86,9 +119,13 @@ class WorkflowExecutor:
                 print("  --> Abort.", file=sys.stderr)
                 return -1
 
-            if "nbi" in self.process_bundle[process]["input"] and not is_nbi_on(
-                self.process_bundle[process]["input"]["nbi"],
-                time_array,
+            if (
+                nbi_selected
+                and "nbi" in self.process_bundle[process]["input"]
+                and not is_nbi_on(
+                    self.process_bundle[process]["input"]["nbi"],
+                    time_array,
+                )
             ):
                 print("  No NBI power for this time slice", file=sys.stdout)
                 self.param_process["nbi_source"] = 0
@@ -282,15 +319,18 @@ class WorkflowExecutor:
                             if ids in self.process_bundle[process]["input"]:
                                 output_ids_data = self.process_bundle[process]["input"][ids]
                             else:
-                                output_ids_data = eval("imas." + ids + "()")
+                                output_ids_data = _create_ids(ids)
                         else:
                             if ids in self.process_bundle[process]["input"]:
-                                output_ids_data.append(self.process_bundle[process]["input"][ids])
+                                tmp_ids = self.process_bundle[process]["input"][ids]
                             else:
-                                output_ids_data.append(eval("imas." + ids + "()"))
+                                tmp_ids = _create_ids(ids)
+                            output_ids_data.append(tmp_ids)
             else:
                 # feature/repair_231017
                 actor = self.dictionary_of_actors[process]
+                # Use the merger's outputs, not those of the previous actor.
+                output_ids_list = list(self.process_bundle[process]["output"])
                 kmerge = 0
                 ids_to_be_merged = self.process_bundle[process]["input"][0].__name__
                 for each_proc in self.process_bundle.keys():  # merge only if at least one of involved codes is called
@@ -309,37 +349,21 @@ class WorkflowExecutor:
                     )
                     del bundle_out[output_ids_list[0]]
 
-            for iids in range(len(output_ids_list)):
-                if not hasattr(output_ids_data, "__len__"):
-                    # if hasattr(output_ids_data,'__len__'):
-                    #    for iids in range(len(output_ids_data)):
-                    self.process_bundle[process]["output"][output_ids_data.__name__] = output_ids_data
-                else:
-                    self.process_bundle[process]["output"][output_ids_data[iids].__name__] = output_ids_data[iids]
+            for iids, ids_name in enumerate(output_ids_list):
+                ids_data = output_ids_data[iids] if hasattr(output_ids_data, "__len__") else output_ids_data
+                self.process_bundle[process]["output"][ids_name] = ids_data
 
-                if output_ids_list[iids] not in bundle_out.keys() or "merge_" in process:
-                    if not hasattr(output_ids_data, "__len__"):
-                        bundle_out[output_ids_list[iids]] = self.process_bundle[process]["output"][
-                            output_ids_data.__name__
-                        ]
-                    else:
-                        bundle_out[output_ids_list[iids]] = self.process_bundle[process]["output"][
-                            output_ids_data[iids].__name__
-                        ]
+                if ids_name not in bundle_out or "merge_" in process:
+                    bundle_out[ids_name] = ids_data
                 else:
                     # feature/repair_231017
-                    if hasattr(output_ids_data, "__len__"):
-                        tmp_output_ids_data = output_ids_data[iids]
-                    else:
-                        tmp_output_ids_data = output_ids_data
-                    if bundle_out[output_ids_list[iids]].__name__ == tmp_output_ids_data.__name__:
-                        self.process_bundle["merge_" + output_ids_list[iids]] = {}
-                        self.process_bundle["merge_" + output_ids_list[iids]]["input"] = [
-                            bundle_out[output_ids_list[iids]],
-                            tmp_output_ids_data,
+                    if bundle_out[ids_name].__name__ == ids_data.__name__:
+                        self.process_bundle["merge_" + ids_name] = {}
+                        self.process_bundle["merge_" + ids_name]["input"] = [
+                            bundle_out[ids_name],
+                            ids_data,
                         ]
-                        self.process_bundle["merge_" + output_ids_list[iids]]["output"] = {}
-                        self.process_bundle["merge_" + output_ids_list[iids]]["output"][output_ids_list[iids]] = {}
+                        self.process_bundle["merge_" + ids_name]["output"] = {ids_name: {}}
 
             # COPY THE OUTPUT IDS OF THE CURRENT PROCESS TO THE INPUT ONES
             # OF THE DOWNSTREAM DEPENDENT PROCESSES
@@ -380,5 +404,4 @@ class WorkflowExecutor:
         if code + "_log" in parameters.keys():
             stdout_back(oldstrout, newstdout)
 
-        # Call of the chosen code
         return results
