@@ -30,14 +30,6 @@ hcdworkflow.workflow_base
    :undoc-members:
    :show-inheritance:
 
-hcdworkflow.workflow_driver
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: hcdworkflow.workflow_driver
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 hcdworkflow.workflow_executor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -122,13 +114,16 @@ tools.hcd_tools
    :undoc-members:
    :show-inheritance:
 
-Workflow Wrapper
-----------------
+Shared Workflow Driver
+----------------------
 
-workflow.wf_wrapper
-~~~~~~~~~~~~~~~~~~~
+workflow.workflow_driver
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: workflow.wf_wrapper
+``workflow.workflow_driver.workflow_driver`` runs a saved configuration
+for both the GUI and CLI.
+
+.. automodule:: workflow.workflow_driver
    :members:
    :undoc-members:
    :show-inheritance:

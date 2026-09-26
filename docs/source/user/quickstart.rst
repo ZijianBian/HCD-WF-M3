@@ -97,13 +97,13 @@ Example output:
    --- Default algorithm ---
    Algorithm = ['ec_wave_solver', 'fill_core_sources']
    ---------------------------------------------
-   ---- Enter time loop of the H&CD wrapper ----
+   [workflow_driver] Initializing HCDWorkflow (traditional mode)...
    Step = 1/1
    Time = 320.00 s
    dt   = 20.00 s
    Execute H&CD workflow for current time slice
    End of time slice
-   End of wf_wrapper
+   [workflow_driver] Workflow completed successfully
 
 Output Files
 ~~~~~~~~~~~~

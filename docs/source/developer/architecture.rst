@@ -28,10 +28,10 @@ Component Diagram
     ┌─────────────────────────────────────────────────────┐
     │        Workflow Driver Layer                        │
     │  ┌─────────────────────────────────────┐           │
-    │  │   WorkflowDriver                    │           │
-    │  │   - executeTimeloop()               │           │
-    │  │   - getIDSSlices()                  │           │
-    │  │   - storeIDSSlices()                │           │
+    │  │   workflow_driver                   │           │
+    │  │   - run_traditional()               │           │
+    │  │   - get_ids_slices()                │           │
+    │  │   - store_ids_slices()              │           │
     │  └─────────────────────────────────────┘           │
     └─────────────────────────────────────────────────────┘
                            ↓
@@ -383,11 +383,13 @@ GUI Integration
 
 .. code-block:: python
 
+    from workflow.workflow_driver import workflow_driver
+
     # GUI creates configuration
     workflow_param = create_workflow_param_from_file(xml)
     
     # Launches workflow
-    wf_wrapper(config_folder)
+    workflow_driver(config_folder)
 
 Design Patterns
 ---------------
