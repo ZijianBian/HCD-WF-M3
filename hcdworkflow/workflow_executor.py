@@ -8,8 +8,18 @@ from tools.hcd_tools import is_ec_on, is_ic_on, is_lh_on, is_nbi_on
 from tools.stdout_redirector import redirect_stdout, stdout_back
 
 
+def _ensure_ids_name(ids_obj, name):
+    if not hasattr(ids_obj, "__name__"):
+        object.__setattr__(ids_obj, "__name__", name)
+
+
 def _create_ids(ids_name):
-    return getattr(imas, ids_name)()
+    if hasattr(imas, "IDSFactory"):
+        ids = getattr(imas.IDSFactory(), ids_name)()
+    else:
+        ids = getattr(imas, ids_name)()
+    _ensure_ids_name(ids, ids_name)
+    return ids
 
 
 class WorkflowExecutor:
@@ -351,6 +361,7 @@ class WorkflowExecutor:
 
             for iids, ids_name in enumerate(output_ids_list):
                 ids_data = output_ids_data[iids] if hasattr(output_ids_data, "__len__") else output_ids_data
+                _ensure_ids_name(ids_data, ids_name)
                 self.process_bundle[process]["output"][ids_name] = ids_data
 
                 if ids_name not in bundle_out or "merge_" in process:

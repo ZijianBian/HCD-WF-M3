@@ -4,7 +4,7 @@ import inspect
 import os
 import sys
 import xml.etree.ElementTree as ET
-from contextlib import ExitStack
+from contextlib import ExitStack, contextmanager
 from pathlib import Path
 
 import imas
@@ -15,6 +15,15 @@ from hcdworkflow.hcd_workflow import HCDWorkflow
 from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
 from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 
+from workflow.ids_prep import (
+    _create_ids,
+    _get_target_dd_version,
+    _smart_convert,
+    get_backend,
+    get_empty_int,
+    stabilize_selected_hcd_outputs,
+)
+
 isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
@@ -22,13 +31,117 @@ except Exception:
     isWaveformCookerPresent = False
 
 
-def safe_get_ids(db_entry, ids_name):
-    """Read an optional IDS while preserving unexpected database errors."""
+def _waveform_ids_name(file_path):
     try:
-        ids_object = db_entry.get(ids_name)
+        import yaml
+    except Exception:
+        return None
+    try:
+        with open(file_path, "r", encoding="utf-8") as file_obj:
+            data = yaml.safe_load(file_obj)
+        return data.get("ids") if isinstance(data, dict) else None
+    except Exception:
+        return None
+
+
+@contextmanager
+def _waveform_cooker_imas2_open_compat():
+    """Adapt Waveform-Cooker's legacy DBEntry.open() expectation for IMASPy 2."""
+    if not hasattr(imas, "IDSFactory"):
+        yield
+        return
+
+    original_dbentry = imas.DBEntry
+    original_open = original_dbentry.open
+    original_structure_setattr = None
+    ids_structure_cls = None
+    added_imasdef_alias = False
+
+    if not hasattr(imas, "imasdef") and hasattr(imas, "ids_defs"):
+        imas.imasdef = imas.ids_defs
+        added_imasdef_alias = True
+
+    def _dd_version_compat(data_version):
+        text = str(data_version)
+        if "." in text:
+            return text
+        if text == "3":
+            return "3.41.0"
+        if text == "4":
+            return _get_target_dd_version()
+        return text
+
+    def _dbentry_compat(*args, **kwargs):
+        data_version = kwargs.get("data_version")
+        if data_version is not None and "dd_version" not in kwargs:
+            kwargs["dd_version"] = _dd_version_compat(data_version)
+        return original_dbentry(*args, **kwargs)
+
+    def _open_with_status(db_entry, *args, **kwargs):
+        result = original_open(db_entry, *args, **kwargs)
+        if result is None:
+            return 0, None
+        return result
+
+    try:
+        from imas.ids_structure import IDSStructure
+
+        ids_structure_cls = IDSStructure
+        original_structure_setattr = IDSStructure.__setattr__
+
+        def _setattr_compat(self, key, value):
+            try:
+                return original_structure_setattr(self, key, value)
+            except AttributeError as exc:
+                if key == "time" and "has no attribute 'time'" in str(exc):
+                    return None
+                raise
+
+        IDSStructure.__setattr__ = _setattr_compat
+    except Exception:
+        pass
+
+    original_dbentry.open = _open_with_status
+    imas.DBEntry = _dbentry_compat
+    try:
+        yield
+    finally:
+        imas.DBEntry = original_dbentry
+        original_dbentry.open = original_open
+        if ids_structure_cls is not None and original_structure_setattr is not None:
+            ids_structure_cls.__setattr__ = original_structure_setattr
+        if added_imasdef_alias:
+            delattr(imas, "imasdef")
+
+
+# =============================================================================
+# DB Read Helpers (whole-IDS reads with smart DD conversion)
+# =============================================================================
+
+
+def _read_ids(db_entry, ids_name, *args):
+    """Keep DD3 database conversion; read raw DD4 inputs for manual fix-ups."""
+    options = {}
+    if hasattr(imas, "IDSFactory") and _get_target_dd_version().split(".", 1)[0] != "3":
+        options["autoconvert"] = False
+    return db_entry.get(ids_name, *args, **options)
+
+
+def _read_ids_slice(db_entry, ids_name, timenow):
+    options = {}
+    if hasattr(imas, "IDSFactory") and _get_target_dd_version().split(".", 1)[0] != "3":
+        options["autoconvert"] = False
+    return db_entry.get_slice(ids_name, timenow, 1, **options)
+
+
+def safe_get_ids(db_entry, ids_name):
+    """Safely get an IDS from database, with smart DD conversion."""
+    try:
+        ids_object = _read_ids(db_entry, ids_name)
+        ids_object = _smart_convert(ids_object, ids_name)
         if hasattr(ids_object, "ids_properties"):
             homogeneous_time = getattr(ids_object.ids_properties, "homogeneous_time", None)
-            if homogeneous_time is not None and homogeneous_time != imas.imasdef.EMPTY_INT:
+            if homogeneous_time is not None and homogeneous_time != get_empty_int():
                 return ids_object, True
         return ids_object, False
     except Exception as e:
@@ -38,6 +151,29 @@ def safe_get_ids(db_entry, ids_name):
             return None, False
         else:
             raise
+
+
+def _safe_partial_get(db_entry, ids_name: str, data_path: str, occurrence: int = 0):
+    """Safely get a partial IDS field from a database entry."""
+    try:
+        if hasattr(db_entry, "partial_get"):
+            return db_entry.partial_get(ids_name=ids_name, data_path=data_path, occurrence=occurrence)
+        else:
+            try:
+                ids_object = _read_ids(db_entry, ids_name, occurrence)
+                ids_object = _smart_convert(ids_object, ids_name)
+                result = ids_object
+                for part in data_path.split("/"):
+                    if part:
+                        result = getattr(result, part)
+                return result
+            except Exception as e:
+                if "empty" in str(e).lower():
+                    return None
+                raise
+    except Exception as e:
+        print(f"  ERROR in _safe_partial_get({ids_name}, {data_path}): {e}")
+        return None
 
 
 # =============================================================================
@@ -65,10 +201,11 @@ def setup_databases(config_folder_path):
     # Extract database parameters
     input_user_or_path = wf_parameters["input_user_or_path"][0]
     input_database = wf_parameters["input_database"][0]
-    input_backend = wf_parameters.get("input_backend", ["MDSPLUS"])[0]
+    input_backend = wf_parameters["input_backend"][0]
+    ddv_backend = wf_parameters["ddv_backend"][0] if "ddv_backend" in wf_parameters else _get_target_dd_version()
     output_user_or_path = wf_parameters["output_user_or_path"][0]
     output_database = wf_parameters["output_database"][0]
-    output_backend = wf_parameters.get("output_backend", ["MDSPLUS"])[0]
+    output_backend = wf_parameters.get("output_backend", ["HDF5"])[0]
     shot_nr = wf_parameters["shot_nr"][0]
     run_in = wf_parameters["run_in"][0]
     run_out = wf_parameters["run_out"][0]
@@ -79,6 +216,7 @@ def setup_databases(config_folder_path):
         input_user_or_path,
         input_database,
         input_backend,
+        ddv_backend,
         output_user_or_path,
         output_database,
         output_backend,
@@ -111,7 +249,7 @@ def setup_databases(config_folder_path):
             else:
                 if idsName == "wall":
                     try:
-                        _backend = getattr(imas.imasdef, wall_md["backend"] + "_BACKEND")
+                        _backend = get_backend(wall_md["backend"])
                         wall = imas.DBEntry(
                             _backend,
                             wall_md["database"],
@@ -138,8 +276,15 @@ def setup_databases(config_folder_path):
         for filename in os.listdir(config_folder_path):
             filePath = os.path.join(config_folder_path, filename)
             if filePath.endswith("waveforms.yaml"):
-                idsObject = add_dynamic(filePath) if isWaveformCookerPresent else None
+                if isWaveformCookerPresent:
+                    with _waveform_cooker_imas2_open_compat():
+                        idsObject = add_dynamic(filePath)
+                else:
+                    idsObject = None
                 if idsObject is not None:
+                    ids_name = _waveform_ids_name(filePath)
+                    if ids_name:
+                        idsObject = _smart_convert(idsObject, ids_name)
                     machineDb.put(idsObject)
 
         cleanup.pop_all()
@@ -152,11 +297,12 @@ def setup_databases(config_folder_path):
 
 
 def get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow):
-    """Read required scenario inputs and any available machine descriptions."""
+    """Read all IDS slices at the given time, with smart DD conversion."""
     slices = {}
     for ids_name in inputIds:
         try:
-            slices[ids_name] = inputDb.get_slice(ids_name, timenow, 1)
+            ids_obj = _read_ids_slice(inputDb, ids_name, timenow)
+            slices[ids_name] = _smart_convert(ids_obj, ids_name)
             if (
                 ids_name in {"equilibrium", "core_profiles"}
                 and int(slices[ids_name].ids_properties.homogeneous_time) < 0
@@ -164,12 +310,13 @@ def get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow):
                 raise ValueError(f"Required IDS {ids_name} is empty")
         except Exception as e:
             if ids_name not in {"equilibrium", "core_profiles"} and "empty" in str(e).lower():
-                slices[ids_name] = getattr(imas, ids_name)()
+                slices[ids_name] = _create_ids(ids_name)
             else:
                 raise RuntimeError(f"Could not read {ids_name} at t={timenow}: {e}") from e
     for ids_name in inputMds:
         try:
-            slices[ids_name] = machineDb.get_slice(ids_name, timenow, 1)
+            ids_obj = _read_ids_slice(machineDb, ids_name, timenow)
+            slices[ids_name] = _smart_convert(ids_obj, ids_name)
         except Exception as e:
             if not any(text in str(e).lower() for text in ("empty", "not found", "does not exist")):
                 raise RuntimeError(f"Could not read {ids_name} at t={timenow}: {e}") from e
@@ -205,6 +352,14 @@ def store_ids_slices(
     actor produces a valid replacement; writing both versions at the same time
     corrupts the HDF5 group index on subsequent put_slice calls.
     """
+    stabilize_selected_hcd_outputs(
+        input_slices,
+        output_ids,
+        param_process,
+        timenow,
+        config_folder_path=config_folder_path,
+    )
+
     for ids_name, ids_data in input_slices.items():
         if ids_name in inputMds:
             continue
@@ -247,7 +402,7 @@ def resolve_time_range(workflow, inputDb):
     one_time_slice = workflow.workflowData.one_time_slice
 
     if one_time_slice == 0:
-        time_array = inputDb.partial_get(ids_name="equilibrium", data_path="time")
+        time_array = _safe_partial_get(inputDb, "equilibrium", "time")
         if time_array is not None:
             if tbegin < 0:
                 tbegin = time_array[0]
