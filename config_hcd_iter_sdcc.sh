@@ -10,10 +10,12 @@ _hcd_setup_environment() {
         return 1
     fi
 
-    # The Python workflow and native iWrap actors must share the DD release.
+    # The actors must share the DD release and MUSCLE3 wire protocol. Rabbit's
+    # separate process selects the matching GCC stack in scripts/run_rabbit_m3.sh.
     module purge || return
     module load IMAS-Python/2.3.0-intel-2023b || return
     module load IMAS-Fortran/5.5.0-intel-2023b-DD-4.1.0 || return
+    module load MUSCLE3/0.8.0-intel-2023b || return
     module load XMLlib/3.2.0-intel-compilers-2023.2.1 || return
     module load INTERPOS/9.2.0-iimkl-2023b || return
     module load Tkinter/3.11.5-GCCcore-13.2.0 || return
@@ -44,8 +46,8 @@ _hcd_setup_environment() {
     if [[ "${HCDWF_SKIP_PIP_INSTALL:-1}" != "1" ]]; then
         python3 -m pip install -e "${source_root}" || return
     fi
-    python3 -c 'import imas, yaml' || return
-    echo "HCD-WF environment ready: DD 4.1.0."
+    python3 -c 'import imas, libmuscle, yaml' || return
+    echo "HCD-WF environment ready: DD 4.1.0, MUSCLE3 0.8.0."
     echo "Actor installation: ${ACTOR_FOLDER}"
 }
 

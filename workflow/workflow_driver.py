@@ -1,6 +1,12 @@
-"""Database I/O and time loops for in-process HCD execution."""
+"""Database I/O and time loops for Legacy and Hybrid execution.
+
+``hcd_nogui -c CONFIG`` runs iWrap actors directly. With ``--m3_flag=1``,
+MUSCLE3 launches this driver as the macro and ``hcd_workflow_m3`` as the micro.
+The Pure driver reuses the database and IDS helpers below.
+"""
 
 import inspect
+import math
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -8,6 +14,7 @@ from contextlib import ExitStack, contextmanager
 from pathlib import Path
 
 import imas
+import numpy as np
 
 import hcdworkflow
 from gui.gui_methods import create_workflow_param_from_file
@@ -177,7 +184,70 @@ def _safe_partial_get(db_entry, ids_name: str, data_path: str, occurrence: int =
 
 
 # =============================================================================
-# Database Setup
+# M3 Port Definitions (only used in m3_flag=1 mode)
+# =============================================================================
+
+# Ports that send IDS from macro to micro (O_I → F_INIT)
+SEND_PORTS = [
+    "equilibrium_out",
+    "core_profiles_out",
+    "workflow_out",
+    "ec_launchers_out",
+    "ic_antennas_out",
+    "core_sources_out",
+    "distributions_out",
+    "distribution_sources_out",
+    "nbi_out",
+    "wall_out",
+]
+
+# Ports that receive IDS from micro to macro (O_F → S)
+RECV_PORTS = [
+    "core_sources_in",
+    "waves_in",
+    "core_profiles_in",
+    "distributions_in",
+    "distribution_sources_in",
+]
+
+
+def _port_to_ids(port_name):
+    """Convert port name to IDS name: 'equilibrium_out' → 'equilibrium'."""
+    return port_name.rsplit("_", 1)[0]
+
+
+def _serialize_m3_input(ids_data, ids_name):
+    """Represent absent optional inputs explicitly; propagate corrupt payloads."""
+    if ids_data is None or int(ids_data.ids_properties.homogeneous_time) < 0:
+        ids_data = _create_ids(ids_name)
+        # The executor recognizes homogeneous_time=0 as an empty input and
+        # supplies the current time when the selected actor needs it.
+        ids_data.ids_properties.homogeneous_time = 0
+    try:
+        return ids_data.serialize()
+    except Exception as error:
+        raise RuntimeError(f"Could not serialize {ids_name}: {error}") from error
+
+
+def _deserialize_m3_output(message, ids_name, timenow):
+    """Accept only a decodable response for the current controller time."""
+    if not math.isfinite(message.timestamp) or not math.isclose(
+        message.timestamp, timenow, rel_tol=0.0, abs_tol=1.0e-9
+    ):
+        raise RuntimeError(f"Unexpected timestamp for {ids_name}: {message.timestamp}, expected {timenow}")
+    ids_obj = _create_ids(ids_name)
+    if message.data is not None and len(message.data) > 0:
+        try:
+            ids_obj.deserialize(message.data)
+        except Exception as error:
+            raise RuntimeError(f"Could not deserialize {ids_name}: {error}") from error
+        if int(ids_obj.ids_properties.homogeneous_time) >= 0 and hasattr(ids_obj, "time"):
+            ids_obj.time = np.array([timenow])
+    return ids_obj
+
+
+# =============================================================================
+# Database Setup (shared by both modes)
 # =============================================================================
 
 
@@ -344,7 +414,7 @@ def _valid_output_slice(ids_data):
 
 
 def store_ids_slices(
-    outputDb, inputMds, input_slices, output_ids, param_process=None, timenow=None, config_folder_path=None
+    outputDb, inputMds, input_slices, output_ids, m3_flag=0, param_process=None, timenow=None, config_folder_path=None
 ):
     """Write IDS slices to the output database.
 
@@ -382,12 +452,17 @@ def store_ids_slices(
                 if ids_name == "core_sources" and (not hasattr(ids_data, "source") or len(ids_data.source) == 0):
                     continue
                 print(f"  -> Storing output {ids_name} at t={ids_data.time[0]:.4f}", flush=True)
-                outputDb.put_slice(ids_data)
+                if m3_flag == 1:
+                    clean_ids = _create_ids(ids_name)
+                    clean_ids.deserialize(ids_data.serialize())
+                    outputDb.put_slice(clean_ids)
+                else:
+                    outputDb.put_slice(ids_data)
                 print(f"  -> Stored output {ids_name} at t={ids_data.time[0]:.4f}", flush=True)
 
 
 # =============================================================================
-# Time Range Resolution
+# Time Range Resolution (shared by both modes)
 # =============================================================================
 
 
@@ -419,7 +494,7 @@ def resolve_time_range(workflow, inputDb):
 
 
 # =============================================================================
-# Traditional iwrap
+# Mode 0: Traditional iwrap
 # =============================================================================
 
 
@@ -428,7 +503,7 @@ def run_traditional(
 ):
     """
     Run in traditional mode: time loop + HCDWorkflow.run() directly.
-    All iWrap actors execute in-process.
+    No MUSCLE3 involvement. All iWrap actors execute in-process.
     """
     if workflow is None:
         print("[workflow_driver] Initializing HCDWorkflow (traditional mode)...", flush=True)
@@ -469,6 +544,7 @@ def run_traditional(
             inputMds,
             ids_slices,
             output_ids,
+            m3_flag=0,
             param_process=param_process,
             timenow=timenow,
             config_folder_path=config_folder_path,
@@ -480,24 +556,133 @@ def run_traditional(
 
 
 # =============================================================================
+# Mode 1: MUSCLE3 Hybrid (Macro Model)
+# =============================================================================
+
+
+def run_m3_macro(config_folder_path, inputDb, outputDb, machineDb, inputIds, inputMds, param_process):
+    """
+    Run as MUSCLE3 macro model.
+    Manages: time loop, database I/O, M3 send/receive.
+    HCDWorkflow.run() happens in the micro model (hcd_workflow_m3.py).
+    """
+    from libmuscle import Instance, Message, InstanceFlags
+    from ymmsl import Operator
+
+    # --- Create MUSCLE3 Instance ---
+    ports = {
+        Operator.O_I: SEND_PORTS,
+        Operator.S: RECV_PORTS,
+    }
+    instance = Instance(ports, InstanceFlags.SKIP_MMSF_SEQUENCE_CHECKS)
+
+    print("[workflow_driver] M3 macro instance created", flush=True)
+    print(f"  O_I (send → micro): {SEND_PORTS}", flush=True)
+    print(f"  S   (recv ← micro): {RECV_PORTS}", flush=True)
+
+    # --- Resolve time range ---
+    wf_config = HCDWorkflow()
+    wf_config.initialize(config_folder_path)
+    tbegin, tend, dt, nsteps, one_time_slice = resolve_time_range(wf_config, inputDb)
+    print(f"[workflow_driver] Time range: {tbegin} → {tend}, dt={dt}, steps={nsteps}", flush=True)
+
+    # --- Determine connected ports ---
+    connected_send = [p for p in SEND_PORTS if instance.is_connected(p)]
+    connected_recv = [p for p in RECV_PORTS if instance.is_connected(p)]
+    print(f"[workflow_driver] Connected send ports: {connected_send}", flush=True)
+    print(f"[workflow_driver] Connected recv ports: {connected_recv}", flush=True)
+
+    # --- Time loop inside single reuse ---
+    # MMSF pattern: macro's ONE reuse contains the entire time loop.
+    # Each O_I/S pair inside the loop triggers one micro reuse_instance().
+    # When macro exits the loop, micro's reuse_instance() returns False.
+    timenow = tbegin
+    step = 0
+
+    while instance.reuse_instance():
+        # All timesteps run inside this single reuse
+        while timenow < tend:
+            step += 1
+            t_next = timenow + dt
+            if t_next > tend:
+                t_next = None  # last step
+
+            print("---------------------------------------------", flush=True)
+            print(f"[workflow_driver] Step {step}/{nsteps}, t={timenow:.4f}, dt={dt:.4f}", flush=True)
+
+            # --- Read IDS from database ---
+            ids_slices = get_ids_slices(inputDb, machineDb, inputIds, inputMds, timenow)
+            # --- O_I: Send IDS to hcd_workflow ---
+            for port_name in connected_send:
+                ids_name = _port_to_ids(port_name)
+                ids_data = ids_slices.get(ids_name)
+
+                serialized = _serialize_m3_input(ids_data, ids_name)
+
+                print(f"  -> Sending {ids_name} on {port_name} ({len(serialized)} bytes)", flush=True)
+                instance.send(port_name, Message(timenow, t_next, data=serialized))
+
+            # --- S: Receive updated IDS from hcd_workflow ---
+            output_ids = {}
+            for port_name in connected_recv:
+                ids_name = _port_to_ids(port_name)
+                print(f"  <- Waiting for {ids_name} on {port_name}...", flush=True)
+                msg = instance.receive(port_name)
+
+                output_ids[ids_name] = _deserialize_m3_output(msg, ids_name, timenow)
+                print(f"  <- Received {ids_name} (t={msg.timestamp:.4f})", flush=True)
+
+            # --- Store results to database ---
+            store_ids_slices(
+                outputDb,
+                inputMds,
+                ids_slices,
+                output_ids,
+                m3_flag=1,
+                param_process=param_process,
+                timenow=timenow,
+                config_folder_path=config_folder_path,
+            )
+
+            timenow += dt
+
+    print(f"[workflow_driver] Finished after {step} steps", flush=True)
+
+
+# =============================================================================
 # Entry Point
 # =============================================================================
 
 
-def workflow_driver(par_path):
-    """Run the in-process HCD workflow from a configuration folder."""
+def workflow_driver(par_path, m3_flag=0):
+    """
+    Main workflow driver function.
+
+    Args:
+        par_path: Path to the configuration folder containing input_workflow.xml
+        m3_flag: Execution mode
+            - 0: Traditional mode (HCDWorkflow.run() in-process)
+            - 1: MUSCLE3 macro (sends IDS to hcd_workflow micro via M3)
+    """
     print("=" * 60, flush=True)
     print("[workflow_driver] Starting HCD Workflow", flush=True)
+    print(f"[workflow_driver] Mode: {'MUSCLE3 Macro' if m3_flag == 1 else 'Traditional iwrap'}", flush=True)
     print(f"[workflow_driver] Config path: {par_path}", flush=True)
     print("=" * 60, flush=True)
 
     config_folder_path = os.path.abspath(par_path)
+
+    # Database setup is the same for both modes
     inputDb, outputDb, machineDb, inputIds, inputMds, wf_parameters, param_process = setup_databases(config_folder_path)
 
     with ExitStack() as cleanup:
         for database in (inputDb, outputDb, machineDb):
             cleanup.callback(database.close)
-        run_traditional(config_folder_path, inputDb, outputDb, machineDb, inputIds, inputMds, param_process)
+        # Dispatch based on mode
+        if m3_flag == 1:
+            run_m3_macro(config_folder_path, inputDb, outputDb, machineDb, inputIds, inputMds, param_process)
+        else:
+            run_traditional(config_folder_path, inputDb, outputDb, machineDb, inputIds, inputMds, param_process)
 
     print("=" * 60)
     print("[workflow_driver] Workflow completed successfully")
@@ -509,8 +694,12 @@ wf_wrapper = workflow_driver
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python workflow_driver.py <config_path>")
+        print("Usage: python workflow_driver.py <config_path> [m3_flag]")
         print("  config_path: Path to configuration folder")
+        print("  m3_flag: 0=traditional iwrap, 1=MUSCLE3 macro (default: 0)")
         sys.exit(1)
 
-    workflow_driver(sys.argv[1])
+    config_path = sys.argv[1]
+    m3_flag = int(sys.argv[2]) if len(sys.argv) > 2 else 0
+
+    workflow_driver(config_path, m3_flag=m3_flag)

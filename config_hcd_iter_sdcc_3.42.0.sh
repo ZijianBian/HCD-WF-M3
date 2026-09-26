@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Source this file for the legacy DD 3.42.0 iWrap actor installation on SDCC.
-# Use config_hcd_iter_sdcc.sh for the DD 4.1.0 runtime.
+# Use config_hcd_iter_sdcc.sh for the DD 4.1.0 MUSCLE3 runtime.
 
 _hcd_setup_legacy_environment() {
     local source_root venv_directory actor_module
