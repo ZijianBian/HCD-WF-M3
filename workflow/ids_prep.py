@@ -270,10 +270,12 @@ def _eq_fill_psi_axis(ts):
 
 
 def _eq_complete_bfield(eq, ts):
-    """Compute b_field_r/z/phi from psi when missing."""
-    if len(ts.profiles_2d) == 0 or ts.profiles_2d[0].b_field_r.has_value:
+    """Complete rectangular fields from GGD data or from psi when missing."""
+    if len(ts.profiles_2d) > 0 and ts.profiles_2d[0].b_field_r.has_value:
         return
-    print("  [equilibrium] Completing b_field_r, b_field_z, b_field_phi from psi", flush=True)
+    if len(ts.profiles_2d) == 0 and len(ts.ggd) == 0:
+        return
+    print("  [equilibrium] Completing rectangular b_field_r, b_field_z, b_field_phi", flush=True)
     try:
         _update_equilibrium_bfield(eq)
     except Exception as e:
