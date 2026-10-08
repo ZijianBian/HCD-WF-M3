@@ -29,6 +29,20 @@ def _create_ids(ids_name):
     return ids
 
 
+def _complete_cyrano_single_mode_metadata(results):
+    """Restore CYRANO's single-mode 2D coordinate from its global quantities."""
+    waves = results[0] if isinstance(results, (list, tuple)) else results
+    for wave in waves.coherent_wave:
+        if len(wave.global_quantities) == 0:
+            continue
+        n_phi = wave.global_quantities[0].n_phi
+        if len(n_phi) != 1:
+            continue
+        for profiles in wave.profiles_2d:
+            if len(profiles.n_phi) == 1:
+                profiles.n_phi[0] = n_phi[0]
+
+
 class WorkflowExecutor:
     def __init__(
         self,
@@ -513,5 +527,8 @@ class WorkflowExecutor:
         # Re-direct the logfile for this specific actor
         if code + "_log" in parameters.keys():
             stdout_back(oldstrout, newstdout)
+
+        if process == "ic_wave_solver" and code == "cyrano" and not self.ic_toroidal_modes:
+            _complete_cyrano_single_mode_metadata(results)
 
         return results
