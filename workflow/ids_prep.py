@@ -125,12 +125,16 @@ def _smart_convert(ids_object, ids_name):
 def _capture_ec_launchers_fields(ec):
     """Capture ec_launchers fields that are lost during DD conversion.
 
+    Preserve beam names: IMAS conversion from DD 3.42.0 to 4.1.0 can
+    drop them, leaving TORBEAM's Fortran name(1) access invalid.
     In DD 3.x: beam.mode (int) and beam.o_mode_fraction (1D array)
     In DD 4.1.0: beam.polarization.o_mode_fraction (1D array)
     """
     data = {}
     for i, beam in enumerate(ec.beam):
         beam_data = {}
+        if beam.name.has_value:
+            beam_data['name'] = str(beam.name)
         if hasattr(beam, 'o_mode_fraction') and beam.o_mode_fraction.has_value:
             beam_data['o_mode_fraction'] = np.array(beam.o_mode_fraction)
         elif hasattr(beam, 'mode'):
@@ -147,16 +151,23 @@ def _capture_ec_launchers_fields(ec):
 def _fixup_ec_launchers(ec, pre_convert_data):
     """Apply manual fix-ups for ec_launchers IDS after DD conversion.
 
-    Restores o_mode_fraction from pre-conversion data into the new
-    beam.polarization.o_mode_fraction location.
+    Restore missing beam names and o_mode_fraction from pre-conversion
+    data into the new beam.polarization.o_mode_fraction location.
     """
+    restored_names = 0
     for i, beam in enumerate(ec.beam):
+        beam_data = pre_convert_data.get(i, {})
+        if 'name' in beam_data and not beam.name.has_value:
+            beam.name = beam_data['name']
+            restored_names += 1
         if i in pre_convert_data and 'o_mode_fraction' in pre_convert_data[i]:
             if hasattr(beam, 'polarization'):
                 p = beam.polarization
                 if not p.o_mode_fraction.has_value:
                     old_val = pre_convert_data[i]['o_mode_fraction']
                     p.o_mode_fraction = old_val
+    if restored_names:
+        print(f"  [ec_launchers] Restored beam names for {restored_names} beams", flush=True)
     if pre_convert_data:
         print(f"  [ec_launchers] Restored o_mode_fraction for {len(pre_convert_data)} beams", flush=True)
     return ec
