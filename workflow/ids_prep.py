@@ -122,12 +122,16 @@ def _smart_convert(ids_object, ids_name):
 def _capture_ec_launchers_fields(ec):
     """Capture ec_launchers fields that are lost during DD conversion.
 
+    Preserve beam names: IMAS conversion from DD 3.42.0 to 4.1.0 can
+    drop them, leaving TORBEAM's Fortran name(1) access invalid.
     In DD 3.x: beam.mode (int) and beam.o_mode_fraction (1D array)
     In DD 4.1.0: beam.polarization.o_mode_fraction (1D array)
     """
     data = {}
     for i, beam in enumerate(ec.beam):
         beam_data = {}
+        if beam.name.has_value:
+            beam_data["name"] = str(beam.name)
         if hasattr(beam, "o_mode_fraction") and beam.o_mode_fraction.has_value:
             beam_data["o_mode_fraction"] = np.array(beam.o_mode_fraction)
         elif hasattr(beam, "mode"):
@@ -144,16 +148,23 @@ def _capture_ec_launchers_fields(ec):
 def _fixup_ec_launchers(ec, pre_convert_data):
     """Apply manual fix-ups for ec_launchers IDS after DD conversion.
 
-    Restores o_mode_fraction from pre-conversion data into the new
-    beam.polarization.o_mode_fraction location.
+    Restore missing beam names and o_mode_fraction from pre-conversion
+    data into the new beam.polarization.o_mode_fraction location.
     """
+    restored_names = 0
     for i, beam in enumerate(ec.beam):
+        beam_data = pre_convert_data.get(i, {})
+        if "name" in beam_data and not beam.name.has_value:
+            beam.name = beam_data["name"]
+            restored_names += 1
         if i in pre_convert_data and "o_mode_fraction" in pre_convert_data[i]:
             if hasattr(beam, "polarization"):
                 p = beam.polarization
                 if not p.o_mode_fraction.has_value:
                     old_val = pre_convert_data[i]["o_mode_fraction"]
                     p.o_mode_fraction = old_val
+    if restored_names:
+        print(f"  [ec_launchers] Restored beam names for {restored_names} beams", flush=True)
     if pre_convert_data:
         print(f"  [ec_launchers] Restored o_mode_fraction for {len(pre_convert_data)} beams", flush=True)
     return ec
@@ -250,7 +261,7 @@ def _eq_fill_psi_axis(ts):
         return
     psi1d_axis = float(np.asarray(ts.profiles_1d.psi)[0])
     ts.global_quantities.psi_axis = psi1d_axis
-    print(f"  [equilibrium] Filled psi_axis from profiles_1d.psi[0] " f"(= {psi1d_axis:.4g})", flush=True)
+    print(f"  [equilibrium] Filled psi_axis from profiles_1d.psi[0] (= {psi1d_axis:.4g})", flush=True)
 
 
 def _eq_complete_bfield(eq, ts):
@@ -416,14 +427,12 @@ def _eq_compute_r_outboard_inboard(ts):
         ts.profiles_1d.r_inboard = r_inboard
 
         print(
-            f"  [equilibrium] Computed r_outboard/r_inboard from 2D psi " f"({len(psi1d)} points, R_axis={r_axis:.3f})",
+            f"  [equilibrium] Computed r_outboard/r_inboard from 2D psi ({len(psi1d)} points, R_axis={r_axis:.3f})",
             flush=True,
         )
         if repaired_axis:
             rho1 = 0.5 * (r_outboard[1] - r_inboard[1])
-            print(
-                f"  [equilibrium] Repaired first off-axis minor radius " f"for Cyrano (rho[1]={rho1:.4g} m)", flush=True
-            )
+            print(f"  [equilibrium] Repaired first off-axis minor radius for Cyrano (rho[1]={rho1:.4g} m)", flush=True)
     except Exception as e:
         print(f"  [equilibrium] WARNING: Could not compute r_outboard/r_inboard: {e}", flush=True)
 

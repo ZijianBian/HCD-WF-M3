@@ -37,7 +37,7 @@ def _waveform_ids_name(file_path):
     except Exception:
         return None
     try:
-        with open(file_path, "r", encoding="utf-8") as file_obj:
+        with open(file_path, encoding="utf-8") as file_obj:
             data = yaml.safe_load(file_obj)
         return data.get("ids") if isinstance(data, dict) else None
     except Exception:
