@@ -96,7 +96,10 @@ def _smart_convert(ids_object, ids_name):
         return ids_object
 
     target_dd = _get_target_dd_version()
-    source_dd = getattr(ids_object.ids_properties.version_put, "data_dictionary", "")
+    # version_put records stored provenance, not necessarily this IDS's schema.
+    source_dd = getattr(ids_object, "_dd_version", None) or str(
+        getattr(ids_object.ids_properties.version_put, "data_dictionary", "")
+    )
 
     if source_dd and source_dd != target_dd:
         print(f"  [{ids_name}] Converting DD {source_dd} → {target_dd}", flush=True)
@@ -205,6 +208,8 @@ def _fixup_core_profiles(cp):
     n_fixed_temp = 0
     n_fixed_density = 0
     n_fixed_flag = 0
+    # Preserve unset DD3 flags while retaining DD4 ion preparation.
+    is_dd4 = (getattr(cp, "_dd_version", None) or _get_target_dd_version()).split(".", 1)[0] == "4"
 
     for ion in cp1.ion:
         if len(np.asarray(ion.temperature)) == 0:
@@ -221,7 +226,7 @@ def _fixup_core_profiles(cp):
             multiple_states_flag = int(ion.multiple_states_flag)
         except Exception:
             multiple_states_flag = get_empty_int()
-        if multiple_states_flag < 0 or multiple_states_flag > 10:
+        if is_dd4 and (multiple_states_flag < 0 or multiple_states_flag > 10):
             ion.multiple_states_flag = 0
             n_fixed_flag += 1
 
@@ -1875,8 +1880,11 @@ def _ensure_core_sources_placeholders(input_slices, output_ids, param_process, t
 
 
 def stabilize_selected_hcd_outputs(input_slices, output_ids, param_process, timenow, config_folder_path=None):
-    """Fill placeholder slots for outputs the workflow is configured to produce."""
+    """Fill DD4 placeholder slots for outputs the workflow is configured to produce."""
     if not hasattr(imas, "IDSFactory") or param_process is None or timenow is None:
+        return
+    # Preserve DD3 actor output layouts and timestamps.
+    if _get_target_dd_version().split(".", 1)[0] == "3":
         return
     _ensure_waves_placeholders(
         input_slices,

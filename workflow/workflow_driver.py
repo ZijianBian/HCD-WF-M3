@@ -127,13 +127,17 @@ def _waveform_cooker_imas2_open_compat():
 
 
 def _read_ids(db_entry, ids_name, *args):
-    """Disable automatic conversion only with the modern IMAS-Python API."""
-    options = {"autoconvert": False} if hasattr(imas, "IDSFactory") else {}
+    """Keep DD3 database conversion; read raw DD4 inputs for manual fix-ups."""
+    options = {}
+    if hasattr(imas, "IDSFactory") and _get_target_dd_version().split(".", 1)[0] != "3":
+        options["autoconvert"] = False
     return db_entry.get(ids_name, *args, **options)
 
 
 def _read_ids_slice(db_entry, ids_name, timenow):
-    options = {"autoconvert": False} if hasattr(imas, "IDSFactory") else {}
+    options = {}
+    if hasattr(imas, "IDSFactory") and _get_target_dd_version().split(".", 1)[0] != "3":
+        options["autoconvert"] = False
     return db_entry.get_slice(ids_name, timenow, 1, **options)
 
 

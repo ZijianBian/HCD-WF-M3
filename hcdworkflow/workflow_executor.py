@@ -438,6 +438,8 @@ class WorkflowExecutor:
             else:
                 # feature/repair_231017
                 actor = self.dictionary_of_actors[process]
+                # Use the merger's outputs, not those of the previous actor.
+                output_ids_list = list(self.process_bundle[process]["output"])
                 kmerge = 0
                 ids_to_be_merged = self.process_bundle[process]["input"][0].__name__
                 for each_proc in self.process_bundle.keys():  # merge only if at least one of involved codes is called
