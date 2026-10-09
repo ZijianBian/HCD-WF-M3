@@ -95,7 +95,6 @@ include-package-data = true
 where = ["."]
 include = ["hcdworkflow*", "gui*", "tools*", "workflow*"]
 exclude = [
-    "envs*",
     "ci-sdcc*",
     "tests*",
     "actor_install*",
