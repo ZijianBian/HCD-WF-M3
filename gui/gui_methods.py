@@ -4,7 +4,7 @@ import sys
 
 try:
     import tkinter as tk
-except Exception as _:  # noqa F841
+except Exception as _:  # noqa: F841
     pass
 from inspect import getmodule, stack
 from shutil import copy2
@@ -22,26 +22,24 @@ def string2num(string):
     newstring = string.replace(" ", "").replace("[", "").replace("]", "").split(",")
 
     if len(newstring) == 1:  # Scalars
-
         try:
             return int(string)  # Integer scalar
-        except Exception as _:  # noqa F841
+        except Exception as _:  # noqa: F841
             None
         try:
             return float(string)  # Float scalar
-        except Exception as _:  # noqa F841
+        except Exception as _:  # noqa: F841
             None
         return string  # String scalar
 
     else:  # Arrays
-
         try:
             return np.array([int(i) for i in newstring])  # Integer array
-        except Exception as _:  # noqa F841
+        except Exception as _:  # noqa: F841
             None
         try:
             return np.array([float(i) for i in newstring])  # Float array
-        except Exception as _:  # noqa F841
+        except Exception as _:  # noqa: F841
             None
         return string  # string array
 
@@ -124,8 +122,8 @@ def __syspath_import_actor(actor_name, verbose):
 
     # Import the module of the actor
     try:
-        _ = import_module(actor_name)  # noqa F841
-    except Exception as _:  # noqa F841
+        _ = import_module(actor_name)  # noqa: F841
+    except Exception as _:  # noqa: F841
         if verbose == 1:
             print("Actor " + actor_name.upper() + " not found.", file=sys.stderr)
         return [], 1
@@ -226,7 +224,6 @@ def codeparam_interface(
 
     for elem in root.iter():
         if elem.tag is not etree.Comment and len(elem) == 0:
-
             # Field for the name of the variable in the interface
             label_name = tk.Label(
                 frame,
@@ -247,8 +244,8 @@ def codeparam_interface(
             # Catch any update of the variable from the interface, and check xsd rules
             entrystring.trace(
                 "w",
-                lambda name, index, mode, elem=elem, entrystring=entrystring, entry1=entry1: update_codeparam_dict_check_xsd(  # noqa E501
-                    codeparam_dict, elem, entrystring.get(), root, xmlschema, entry1
+                lambda name, index, mode, elem=elem, entrystring=entrystring, entry1=entry1: (
+                    update_codeparam_dict_check_xsd(codeparam_dict, elem, entrystring.get(), root, xmlschema, entry1)
                 ),
             )
 
@@ -412,7 +409,7 @@ def read_and_save_codeparam(current_config_folder, previous_folder, category, pr
         try:
             codeparam_xml_path = glob.glob(actor.actor_dir + "/input/*.xml")[0]
             found_xml = True
-        except Exception as _:  # noqa F841
+        except Exception as _:  # noqa: F841
             codeparam_xml_path = None
 
         if codeparam_xml_path is not None:
@@ -437,7 +434,7 @@ def read_and_save_codeparam(current_config_folder, previous_folder, category, pr
     try:
         codeparam_xsd_path = glob.glob(actor.actor_dir + "/input/*.xsd")[0]
         found_xsd = True
-    except Exception as _:  # noqa F841
+    except Exception as _:  # noqa: F841
         codeparam_xsd_path = None
 
     # READ THE ADDITIONAL INFORMATION FROM THE XSD FILE
@@ -867,7 +864,6 @@ def read_actor_ids(name, verbose):
     actor = eval(name)
 
     if err == 0:
-
         # IMAS-4679
         for ilist in actor.code_description["implementation"]["subroutines"]["main"]["arguments"]:
             if ilist["intent"] == "IN":
@@ -878,7 +874,7 @@ def read_actor_ids(name, verbose):
     return (input_ids_list, output_ids_list, err)
 
 
-class saved_folder_name(object):
+class saved_folder_name:
     def __init__(
         self,
         default_wf_param_file,

@@ -6,7 +6,7 @@ This guide is for developers who want to contribute to or modify the HCD Workflo
 Prerequisites
 -------------
 
-* Python 3.8 or higher
+* Python 3.11 or higher
 * Git
 * Access to ITER git repository
 * Familiarity with Python development
@@ -107,9 +107,9 @@ This installs:
 
 * pytest >= 7.0
 * pytest-cov >= 4.0
-* pylint >= 2.0
-* black >= 22.0
-* flake8 >= 5.0
+* ruff >= 0.15
+* sphinx < 8.0 (for documentation)
+* sphinx-immaterial >= 0.13 (for documentation)
 
 Load Actor Modules
 ~~~~~~~~~~~~~~~~~~
@@ -275,9 +275,8 @@ Making Changes
 
    .. code-block:: bash
 
-      black hcdworkflow/
-      flake8 hcdworkflow/
-      pylint hcdworkflow/
+      ruff check
+      ruff format --check
 
 Running and Writing Tests with Pytest
 -------------------------------------
@@ -338,17 +337,11 @@ Or manually:
 
 .. code-block:: bash
 
-   # Format code
-   black --line-length 120 hcdworkflow/ gui/ tools/ workflow/
-   
-   # Check code style
-   flake8 --max-line-length=120 --ignore=E203,W503 hcdworkflow/
-   
-   # Run pylint
-   pylint --max-line-length=120 --disable=E0401 -E ./hcdworkflow/*.py
-   
-   # Check with ruff
-   ruff check hcdworkflow --select F401,E402
+   # Lint (pycodestyle, pyflakes, pylint errors)
+   ruff check
+
+   # Check formatting (use ``ruff format`` to apply it)
+   ruff format --check
 
 Reinstalling After Changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -373,22 +366,12 @@ Modern Python project configuration:
 * Project metadata
 * Dependencies
 * Build system
-* Tool configurations (black, pytest)
+* Tool configurations (ruff)
 
 setup.cfg
 ~~~~~~~~~
 
-Legacy configuration for:
-
-* flake8
-* pylint  
-* ruff
-* pytest
-
-.pylintrc
-~~~~~~~~~
-
-Detailed pylint configuration optimized for scientific code.
+Legacy configuration for pytest.
 
 .git-blame-ignore-revs
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -514,7 +497,7 @@ Best Practices
 
 1. **Use Editable Install**: Always use ``pip install -e .`` during development
 2. **Test Before Commit**: Run ``hcdslice_nogui`` on test cases
-3. **Follow Style Guide**: Run black and flake8 before committing
+3. **Follow Style Guide**: Run `ruff check` and `ruff format --check` before committing
 4. **Document Changes**: Update relevant ``.rst`` files
 5. **Use Feature Branches**: Never commit directly to ``develop`` or ``main``
 6. **Write Commit Messages**: Clear, descriptive commit messages

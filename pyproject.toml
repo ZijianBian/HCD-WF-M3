@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61", "setuptools_scm[toml]>=8", "wheel", "packaging>=24.2"]
+requires = ["setuptools>=77", "setuptools_scm[toml]>=8", "wheel", "packaging>=24.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,19 +8,17 @@ description = "Python H&CD Workflow for ITER plasma heating and current drive si
 authors = [{name = "ITER Organization"}]
 maintainers = [{name = "ITER Organization"}]
 readme = {file = "README.md", content-type = "text/markdown"}
-license = { file = "LICENSE.txt" }
-requires-python = ">=3.8"
+license-files = ["LICENSE.txt"]
+requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
@@ -70,9 +68,7 @@ test = [
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
-    "pylint>=2.0",
-    "black>=22.0",
-    "flake8>=5.0",
+    "ruff>=0.15",
     "sphinx<8.0",
     "sphinx-immaterial>=0.13",
 ]
@@ -90,7 +86,6 @@ waveform = [
 
 [tool.setuptools]
 include-package-data = true
-license-files = ["LICENSE.md"]
 
 [tool.setuptools.data-files]
 "bin" = ["hcd_batch", "hcd_gui", "hcd_nogui", "hcdslice_nogui"]
@@ -100,7 +95,6 @@ license-files = ["LICENSE.md"]
 where = ["."]
 include = ["hcdworkflow*", "gui*", "tools*", "workflow*"]
 exclude = [
-    "envs*",
     "ci-sdcc*",
     "tests*",
     "actor_install*",
@@ -123,16 +117,18 @@ hcdworkflow = [
 [tool.setuptools_scm]
 write_to = "hcdworkflow/_version.py"
 
-[tool.black]
+[tool.ruff]
 line-length = 120
-target-version = ['py38', 'py39', 'py310', 'py311']
-exclude = '''
-/(
-    \.git
-  | \.venv
-  | build
-  | dist
-  | \.eggs
-  | .*\.egg-info
-)/
-'''
+target-version = "py311"
+# Only lint the project's own packages and tests (generated files in .gitignore are skipped)
+include = [
+    "hcdworkflow/**/*.py",
+    "gui/**/*.py",
+    "tools/**/*.py",
+    "workflow/**/*.py",
+    "tests/**/*.py",
+]
+
+[tool.ruff.lint]
+# pycodestyle (E, W), pyflakes (F), pylint errors (PLE) and pyupgrade (UP) for Python >= 3.11 syntax
+select = ["E", "W", "F", "PLE", "UP"]

@@ -62,7 +62,7 @@ class WorkflowDriver:
                     "ERROR: tbegin out of range: "
                     + str(self.workflowObject.workflowData.tbegin)
                     + " s is less than first time in core_profiles =",
-                    "{:.2f}".format(time_array[0]),
+                    f"{time_array[0]:.2f}",
                     "s",
                     file=sys.stderr,
                 )
@@ -81,7 +81,7 @@ class WorkflowDriver:
                     "ERROR: tend out of range: "
                     + str(self.workflowObject.workflowData.tend)
                     + " s is greater than last time in core_profiles =",
-                    "{:.2f}".format(time_array[-1]),
+                    f"{time_array[-1]:.2f}",
                     "s",
                     file=sys.stderr,
                 )
@@ -123,9 +123,9 @@ class WorkflowDriver:
 
             print("---------------------------------------------", file=sys.stdout)
             print("Step = " + str(step) + "/" + str(nsteps), file=sys.stdout)
-            print("Time = %5.2f" % timenow, "s", file=sys.stdout)
+            print(f"Time = {timenow:5.2f}", "s", file=sys.stdout)
             print(
-                "dt   = %5.2f" % self.workflowObject.workflowData.dt_required,
+                f"dt   = {self.workflowObject.workflowData.dt_required:5.2f}",
                 "s",
                 file=sys.stdout,
             )

@@ -55,23 +55,20 @@ Code Style
 We follow PEP 8 with some modifications:
 
 * Line length: 120 characters
-* Use Black for formatting
-* Use flake8 for linting
-* Use pylint for code quality
+* Use ruff for linting and formatting (configured in ``pyproject.toml``)
+
+These are the same commands run by the GitHub Actions ``linting`` workflow.
 
 Formatting Code
 ~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
-   # Format all code
-   black --line-length 120 hcdworkflow/ gui/ tools/ workflow/
-   
-   # Check style
-   flake8 --max-line-length=120 --ignore=E203,W503 hcdworkflow/
-   
-   # Run pylint
-   pylint --max-line-length=120 hcdworkflow/
+   # Lint (pycodestyle, pyflakes, pylint errors)
+   ruff check
+
+   # Check formatting (use ``ruff format`` to apply it)
+   ruff format --check
 
 Testing
 -------

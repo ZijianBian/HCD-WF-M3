@@ -4,7 +4,7 @@ from shutil import copy2
 try:
     import tkinter as tk
     from tkinter import ttk
-except Exception as _:  # noqa F841
+except Exception as _:  # noqa: F841
     None
 
 from .colour_definitions import bluish as col
@@ -12,7 +12,7 @@ from .colour_definitions import bluish as col
 isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
-except ImportError as _:  # noqa F841
+except ImportError as _:  # noqa: F841
     isWaveformCookerPresent = False
 
 fontsize = 12
@@ -91,9 +91,7 @@ def fileDropDownHandeler(window, txt, myfile, action):
 
     # Exit
     elif action == "exit":
-
         if "NOT SAVED" in window.title():
-
             message = "Your modifications have not been saved. " + "Do you really wante to leave?"
             MsgBox = tk.messagebox.askquestion("Exit Application", message)
             if MsgBox == "yes":
@@ -128,7 +126,7 @@ def edit_yaml(myfile):
     combo.config(width=600, height=600)
     combo.txt.config(font=("consolas", 10, "bold"), undo=True, wrap="word")
     combo.txt.config(borderwidth=3, relief="sunken")
-    with open(myfile, "r") as f:
+    with open(myfile) as f:
         combo.txt.delete(1.0, tk.END)
         combo.txt.insert(tk.INSERT, f.read())
 
@@ -181,7 +179,6 @@ def preset_copy(waveform_folder, config_folder, process, preset_file, custom_fil
     def CopyWaveform(waveform_folder, preset_file, config_folder, custom_file):
 
         if os.path.isfile(waveform_folder + "/" + preset_file):
-
             copy2(
                 waveform_folder + "/" + preset_file,
                 config_folder + "/" + custom_file,
@@ -398,7 +395,6 @@ class edit_waveforms:
         irow = 2
         # iprocess = 1
         for process in waveform_presets.keys():
-
             # Labels for processes (1st column)
             add_label_process = tk.Label(
                 master=self.frame_array[irow * ncol],
@@ -417,8 +413,8 @@ class edit_waveforms:
             )
             add_button_custom.grid(padx=2, pady=2, sticky="we")
             add_button_custom.configure(
-                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: waveform_custom_configure(  # noqa E501
-                    config_folder, process, waveform_presets[process]["custom"][0]
+                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: (
+                    waveform_custom_configure(config_folder, process, waveform_presets[process]["custom"][0])
                 )
             )
 
@@ -431,8 +427,8 @@ class edit_waveforms:
             )
             add_button_reset.grid(padx=2, pady=2, sticky="we")
             add_button_reset.configure(
-                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: use_waveform_from_scenario(  # noqa E501
-                    config_folder, waveform_presets[process]["custom"][0]
+                command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: (
+                    use_waveform_from_scenario(config_folder, waveform_presets[process]["custom"][0])
                 )
             )
 
@@ -446,9 +442,11 @@ class edit_waveforms:
             add_button_plot.grid(padx=2, pady=2, sticky="we")
             if isWaveformCookerPresent:
                 add_button_plot.configure(
-                    command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: add_dynamic(  # noqa E501
-                        config_folder + "/" + waveform_presets[process]["custom"][0],
-                        kplot=1,
+                    command=lambda waveform_presets=waveform_presets, process=process, config_folder=config_folder: (
+                        add_dynamic(
+                            config_folder + "/" + waveform_presets[process]["custom"][0],
+                            kplot=1,
+                        )
                     )
                 )
 
@@ -463,12 +461,14 @@ class edit_waveforms:
                     )
                     add_button_preset.grid(padx=2, pady=2, sticky="we")
                     add_button_preset.configure(
-                        command=lambda waveform_presets=waveform_presets, waveform_folder=waveform_folder, preset_key=preset_key, process=process, config_folder=config_folder: preset_copy(  # noqa E501
-                            waveform_folder,
-                            config_folder,
-                            process,
-                            waveform_presets[process][preset_key][0],
-                            waveform_presets[process]["custom"][0],
+                        command=lambda waveform_presets=waveform_presets, waveform_folder=waveform_folder, preset_key=preset_key, process=process, config_folder=config_folder: (  # noqa: E501
+                            preset_copy(
+                                waveform_folder,
+                                config_folder,
+                                process,
+                                waveform_presets[process][preset_key][0],
+                                waveform_presets[process]["custom"][0],
+                            )
                         )
                     )
                     irow += 1

@@ -15,7 +15,7 @@ class WorkflowGlobalsReader:
             raise Exception(f"Global List Path doesn't exists : {globalListPath}")
         self.globalListPath = globalListPath
 
-        with open(globalListPath, "r") as fileObject:
+        with open(globalListPath) as fileObject:
             self.rawData = yamlload(fileObject, Loader=yamlLoader)
 
     def getList(self, listName: str):

@@ -1,7 +1,7 @@
 # HCD Workflow
 
 [![Development Status](https://img.shields.io/badge/status-development-yellow.svg)](https://pypi.org/project/HCDWorkflow/)
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-See%20LICENSE.md-blue.svg)](LICENSE.txt)
 
 Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulations.
@@ -94,14 +94,11 @@ module load HCD_MERGERS/1.0.0-intel-2023b-DD-3.42.0
 ### 3. Code Quality & Testing
 
 ```bash
-# Format code
-black --line-length 120 hcdworkflow/ gui/ tools/ workflow/
+# Lint (pycodestyle, pyflakes, pylint errors)
+ruff check
 
-# Check style
-flake8 --max-line-length=120 --ignore=E203,W503 hcdworkflow/
-
-# Run linter
-pylint --max-line-length=120 hcdworkflow/
+# Check formatting (use `ruff format` to apply it)
+ruff format --check
 
 # Run tests
 hcdslice_nogui -c tests/data/GRAYSCALE/
@@ -165,7 +162,7 @@ hcd-wf/
 ├── hcdslice_nogui         # Single slice entry point
 ├── hcd_batch              # Batch submission script
 ├── pyproject.toml         # Project configuration
-├── setup.cfg              # Tool configurations
+├── setup.cfg              # pytest configuration
 └── README.md              # This file
 ```
 

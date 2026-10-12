@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------------------------
 try:
     import tkinter as tk
-except Exception as _:  # noqa F841
+except Exception as _:  # noqa: F841
     pass
 import matplotlib
 import numpy as np
@@ -15,10 +15,10 @@ import numpy as np
 from .colour_definitions import bluish as colour
 
 matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # noqa E402
-from matplotlib.figure import Figure  # noqa E402
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # noqa: E402
+from matplotlib.figure import Figure  # noqa: E402
 
-from .gui_methods import CreateToolTip  # noqa E402
+from .gui_methods import CreateToolTip  # noqa: E402
 
 #######################################################################################
 
@@ -82,9 +82,9 @@ def add_interval(self, new_interval):
             li_tminmax = tk.Label(
                 master=self.frame_array[3],
                 text=" ["
-                + format("%.2f" % self.all_intervals[key]["tmin"])
+                + format(self.all_intervals[key]["tmin"], ".2f")
                 + "-"
-                + format("%.2f" % self.all_intervals[key]["tmax"])
+                + format(self.all_intervals[key]["tmax"], ".2f")
                 + "] s",
                 borderwidth=2,
                 relief="sunken",
@@ -134,7 +134,7 @@ def add_interval(self, new_interval):
     for key in ["tmin", "tmax"]:
         try:
             new_interval.object[key] = float(new_interval.object[key])
-        except Exception as _:  # noqa F841
+        except Exception as _:  # noqa: F841
             print("Bad value for " + key)
             add_to_gui(self)
             return self
@@ -148,7 +148,7 @@ def add_interval(self, new_interval):
         if new_interval.object["tmin"] < self.all_intervals["wf_interval"]["tmin"]:
             print(
                 "Tmin is lower than the workflow time interval which is "
-                + format("%.2f" % self.all_intervals["wf_interval"]["tmin"]),
+                + format(self.all_intervals["wf_interval"]["tmin"], ".2f"),
                 "s",
             )
             add_to_gui(self)
@@ -157,7 +157,7 @@ def add_interval(self, new_interval):
         if new_interval.object["tmax"] > self.all_intervals["wf_interval"]["tmax"]:
             print(
                 "Tmax is higher than the workflow time interval which is "
-                + format("%.2f" % self.all_intervals["wf_interval"]["tmax"]),
+                + format(self.all_intervals["wf_interval"]["tmax"], ".2f"),
                 "s",
             )
             add_to_gui(self)
@@ -294,11 +294,11 @@ def apply_pattern(self):
     self.all_intervals[key_select]["time_array"] = self.all_intervals["wf_interval"]["time_array"][it_min:it_max]
     self.all_intervals[key_select]["status"] = self.all_intervals["wf_interval"]["status"][it_min:it_max]
     print("Number of indices =", len(self.all_intervals[key_select]["time_array"]))
-    print("Actual tmin       =", format("%.2f" % tc_min), "s")
-    print("Actual tmax       =", format("%.2f" % tc_max), "s")
+    print("Actual tmin       =", f"{tc_min:.2f}", "s")
+    print("Actual tmax       =", f"{tc_max:.2f}", "s")
     if len(self.all_intervals[key_select]["time_array"]) > 1:
         dt = self.all_intervals[key_select]["time_array"][1] - self.all_intervals[key_select]["time_array"][0]
-        print("Time resolution   =", format("%.2f" % dt), "s")
+        print("Time resolution   =", f"{dt:.2f}", "s")
 
     if status == "On":
         status_index = 1
@@ -314,7 +314,7 @@ def apply_pattern(self):
         else:
             try:
                 index = int(value)
-            except Exception as _:  # noqa F841
+            except Exception as _:  # noqa: F841
                 print("The index must be an integer")
                 return
             if index > len(self.all_intervals[key_select]["time_array"]) - 1:
@@ -333,7 +333,7 @@ def apply_pattern(self):
         else:
             try:
                 time_slice = float(value)
-            except Exception as _:  # noqa F841
+            except Exception as _:  # noqa: F841
                 print("The time slice must be a number")
                 return
             if time_slice > tc_max or time_slice < tc_min:
@@ -341,7 +341,7 @@ def apply_pattern(self):
                 return
             else:
                 [tc, it] = find_nearest(self.all_intervals[key_select]["time_array"], time_slice)
-                print("Actual time slice =", format("%.2f" % tc), "s")
+                print("Actual time slice =", f"{tc:.2f}", "s")
                 self.all_intervals[key_select]["status"][it] = status_index
                 print("--> Time interval udpated")
 
@@ -354,7 +354,7 @@ def apply_pattern(self):
         else:
             try:
                 index_step = int(value)
-            except Exception as _:  # noqa F841
+            except Exception as _:  # noqa: F841
                 print("The index step must be an integer")
                 return
             if index_step > len(self.all_intervals[key_select]["time_array"]) - 1:
@@ -373,7 +373,7 @@ def apply_pattern(self):
         else:
             try:
                 time_step = float(value)
-            except Exception as _:  # noqa F841
+            except Exception as _:  # noqa: F841
                 print("The time step must be a number")
                 return
             if time_step > tc_max - tc_min:
@@ -387,7 +387,7 @@ def apply_pattern(self):
                     print("The time step is too small")
                     return
                 else:
-                    print("Actual time step =", format("%.2f" % (tc2 - tc1)), "s")
+                    print("Actual time step =", f"{tc2 - tc1:.2f}", "s")
                     self.all_intervals[key_select]["status"][0::index_step] = status_index
                     print("--> Time interval udpated")
 
@@ -474,7 +474,6 @@ def hard_reset_intervals(self):
 
 
 class time_base_edition:
-
     # Init
     def __init__(self, master, process={}, wf_param={}):
         self.master = tk.Toplevel(master)
@@ -709,7 +708,6 @@ class time_base_edition:
 # --------------------------
 
 if __name__ == "__main__":
-
     param = {}
     param["WORKFLOW PARAMETERS (STANDALONE)"] = {}
     param["WORKFLOW PARAMETERS (STANDALONE)"][0] = {}

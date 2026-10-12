@@ -110,7 +110,7 @@ Manual Developer Setup
 
 Prerequisites
 ^^^^^^^^^^^^^
-* Python 3.8 or higher
+* Python 3.11 or higher
 * Git
 * Access to ITER git repository
 
@@ -203,9 +203,7 @@ This installs additional tools:
 
 * pytest >= 7.0
 * pytest-cov >= 4.0
-* pylint >= 2.0
-* black >= 22.0
-* flake8 >= 5.0
+* ruff >= 0.15
 * sphinx < 8.0 (for documentation)
 * sphinx-immaterial >= 0.13 (for documentation)
 

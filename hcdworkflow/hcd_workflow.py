@@ -79,7 +79,7 @@ class HCDWorkflow(WorkflowBase):
                             workflow.time_loop.workflow_cycle[0].component[
                                 0
                             ].time_interval_request = self.workflowData.dt_required
-                        except Exception as _:  # noqa F841
+                        except Exception as _:  # noqa: F841
                             workflow.time_loop.workflow_cycle[0].component[
                                 0
                             ].time_interval = self.workflowData.dt_required

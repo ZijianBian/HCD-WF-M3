@@ -53,13 +53,13 @@ class WorkflowActor:
 
     def validate(self):
         if not self.name:
-            logger.critical(f"ERROR! Actor name {self.name } : Actor name is not provided")
+            logger.critical(f"ERROR! Actor name {self.name} : Actor name is not provided")
             return None
 
     def initializeActor(self, actorName: str, xmlPath: str, verbose=False):
         # TELL EACH ACTOR WHERE TO FIND ITS XML CODE PARAMETERS FILE AND INITIALIZE IT
         if WorkflowActor._import(actorName, verbose) != 0:
-            logger.critical(f"ERROR! Couldn't import actor {self.name }")
+            logger.critical(f"ERROR! Couldn't import actor {self.name}")
             return None
 
         actor = eval(actorName)
