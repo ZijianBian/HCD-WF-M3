@@ -110,6 +110,8 @@ html_show_copyright = True
 # -- Options for autodoc ----------------------------------------------------
 autodoc_member_order = 'bysource'
 autodoc_typehints = 'description'
+# Runtime/GUI dependencies not installed in the docs build environment
+autodoc_mock_imports = ['imas', 'matplotlib', 'tkinter', 'waveform_cooker']
 
 # -- Options for intersphinx extension ---------------------------------------
 intersphinx_mapping = {

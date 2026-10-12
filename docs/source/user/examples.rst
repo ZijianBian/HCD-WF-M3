@@ -229,12 +229,11 @@ Run Static Analysis
 
    cd hcd-wf
    source devenv/bin/activate
-   pip install pylint black flake8
-   
+   pip install ruff
+
    # Check code quality
-   pylint hcdworkflow/
-   black --check hcdworkflow/
-   flake8 hcdworkflow/
+   ruff check
+   ruff format --check
 
 Example 8: Reproducible Research
 ---------------------------------

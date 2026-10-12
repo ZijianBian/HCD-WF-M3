@@ -1,10 +1,10 @@
 try:
     import tkinter as tk
-except ImportError as _:  # noqa F841
+except ImportError as _:  # noqa: F841
     pass
 
 
-class ToolTip(object):
+class ToolTip:
     def __init__(self, widget):
         self.widget = widget
         self.tipwindow = None
@@ -21,7 +21,7 @@ class ToolTip(object):
         y = y + cy + self.widget.winfo_rooty() + 27
         self.tipwindow = tw = tk.Toplevel(self.widget)
         tw.wm_overrideredirect(1)
-        tw.wm_geometry("+%d+%d" % (x, y))
+        tw.wm_geometry(f"+{x}+{y}")
         label = tk.Label(
             tw,
             text=self.text,

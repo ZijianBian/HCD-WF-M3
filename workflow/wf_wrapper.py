@@ -13,7 +13,7 @@ from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 isWaveformCookerPresent = True
 try:
     from waveform_cooker import add_dynamic
-except Exception as _:  # noqa F841
+except Exception as _:  # noqa: F841
     isWaveformCookerPresent = False
 
 
@@ -82,7 +82,7 @@ def wf_wrapper(par_path):
                     )
                     wall.open()
                     machineDb.put(wall.get("wall"))
-                except Exception as _:  # noqa F841
+                except Exception as _:  # noqa: F841
                     print("The wall IDS is neither in senario data nor found in MD database --> try to run without.")
             else:
                 print(

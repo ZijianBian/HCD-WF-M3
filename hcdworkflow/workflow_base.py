@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Union
+from typing import Any
 
 
 class WorkflowBase(ABC):
-
     @abstractmethod
     def initialize(
         self,
@@ -11,7 +10,7 @@ class WorkflowBase(ABC):
         pass
 
     @abstractmethod
-    def run(self, *args) -> Union[List[Any], Any]:
+    def run(self, *args) -> list[Any] | Any:
         pass
 
     @abstractmethod
