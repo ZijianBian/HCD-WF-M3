@@ -6,17 +6,17 @@
   "coherent_wave[0]/wave_solver_type/index": 1,
   "coherent_wave[0]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[0]/global_quantities[0]/power": 0.0,
-  "coherent_wave[0]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[0]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[0]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[0]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[0]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[0]/global_quantities[1]/power": 0.0,
-  "coherent_wave[0]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[0]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[0]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[0]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[0]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[0]/global_quantities[2]/power": 0.0,
-  "coherent_wave[0]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[0]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[0]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[0]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[0]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -96,7 +96,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[0]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[0]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -217,7 +217,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[0]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[0]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -338,7 +338,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[0]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[0]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -482,10 +482,10 @@
     "rms": 0.7784401541940892
    }
   },
-  "coherent_wave[0]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[0]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[0]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[0]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[0]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -652,10 +652,10 @@
     "rms": 0.7783423656533666
    }
   },
-  "coherent_wave[0]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[0]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[0]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[0]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[0]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -822,10 +822,10 @@
     "rms": 0.7783423656533666
    }
   },
-  "coherent_wave[0]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[0]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[0]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[0]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[0]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -897,17 +897,17 @@
   "coherent_wave[1]/wave_solver_type/index": 1,
   "coherent_wave[1]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[1]/global_quantities[0]/power": 0.0,
-  "coherent_wave[1]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[1]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[1]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[1]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[1]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[1]/global_quantities[1]/power": 0.0,
-  "coherent_wave[1]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[1]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[1]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[1]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[1]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[1]/global_quantities[2]/power": 0.0,
-  "coherent_wave[1]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[1]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[1]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[1]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[1]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -987,7 +987,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[1]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[1]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -1108,7 +1108,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[1]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[1]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -1229,7 +1229,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[1]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[1]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -1373,10 +1373,10 @@
     "rms": 0.7679051980671847
    }
   },
-  "coherent_wave[1]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[1]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[1]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[1]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[1]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -1543,10 +1543,10 @@
     "rms": 0.7678014800403714
    }
   },
-  "coherent_wave[1]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[1]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[1]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[1]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[1]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -1713,10 +1713,10 @@
     "rms": 0.7678014800403714
    }
   },
-  "coherent_wave[1]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[1]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[1]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[1]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[1]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -1788,17 +1788,17 @@
   "coherent_wave[2]/wave_solver_type/index": 1,
   "coherent_wave[2]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[2]/global_quantities[0]/power": 0.0,
-  "coherent_wave[2]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[2]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[2]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[2]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[2]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[2]/global_quantities[1]/power": 0.0,
-  "coherent_wave[2]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[2]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[2]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[2]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[2]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[2]/global_quantities[2]/power": 0.0,
-  "coherent_wave[2]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[2]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[2]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[2]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[2]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -1878,7 +1878,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[2]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[2]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -1999,7 +1999,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[2]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[2]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -2120,7 +2120,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[2]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[2]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -2264,10 +2264,10 @@
     "rms": 0.7414126573576333
    }
   },
-  "coherent_wave[2]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[2]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[2]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[2]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[2]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -2434,10 +2434,10 @@
     "rms": 0.7412978336504105
    }
   },
-  "coherent_wave[2]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[2]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[2]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[2]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[2]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -2604,10 +2604,10 @@
     "rms": 0.7412978336504105
    }
   },
-  "coherent_wave[2]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[2]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[2]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[2]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[2]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -2679,17 +2679,17 @@
   "coherent_wave[3]/wave_solver_type/index": 1,
   "coherent_wave[3]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[3]/global_quantities[0]/power": 0.0,
-  "coherent_wave[3]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[3]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[3]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[3]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[3]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[3]/global_quantities[1]/power": 0.0,
-  "coherent_wave[3]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[3]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[3]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[3]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[3]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[3]/global_quantities[2]/power": 0.0,
-  "coherent_wave[3]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[3]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[3]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[3]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[3]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -2769,7 +2769,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[3]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[3]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -2890,7 +2890,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[3]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[3]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -3011,7 +3011,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[3]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[3]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -3155,10 +3155,10 @@
     "rms": 0.7734292699909594
    }
   },
-  "coherent_wave[3]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[3]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[3]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[3]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[3]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -3325,10 +3325,10 @@
     "rms": 0.7733254669664965
    }
   },
-  "coherent_wave[3]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[3]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[3]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[3]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[3]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -3495,10 +3495,10 @@
     "rms": 0.7733254669664965
    }
   },
-  "coherent_wave[3]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[3]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[3]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[3]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[3]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -3570,17 +3570,17 @@
   "coherent_wave[4]/wave_solver_type/index": 1,
   "coherent_wave[4]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[4]/global_quantities[0]/power": 0.0,
-  "coherent_wave[4]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[4]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[4]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[4]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[4]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[4]/global_quantities[1]/power": 0.0,
-  "coherent_wave[4]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[4]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[4]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[4]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[4]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[4]/global_quantities[2]/power": 0.0,
-  "coherent_wave[4]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[4]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[4]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[4]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[4]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -3660,7 +3660,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[4]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[4]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -3781,7 +3781,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[4]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[4]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -3902,7 +3902,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[4]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[4]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -4046,10 +4046,10 @@
     "rms": 0.7553138742112727
    }
   },
-  "coherent_wave[4]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[4]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[4]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[4]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[4]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -4216,10 +4216,10 @@
     "rms": 0.7552040246211713
    }
   },
-  "coherent_wave[4]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[4]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[4]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[4]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[4]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -4386,10 +4386,10 @@
     "rms": 0.7552040246211713
    }
   },
-  "coherent_wave[4]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[4]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[4]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[4]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[4]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -4461,17 +4461,17 @@
   "coherent_wave[5]/wave_solver_type/index": 1,
   "coherent_wave[5]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[5]/global_quantities[0]/power": 0.0,
-  "coherent_wave[5]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[5]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[5]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[5]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[5]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[5]/global_quantities[1]/power": 0.0,
-  "coherent_wave[5]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[5]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[5]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[5]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[5]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[5]/global_quantities[2]/power": 0.0,
-  "coherent_wave[5]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[5]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[5]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[5]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[5]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -4551,7 +4551,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[5]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[5]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -4672,7 +4672,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[5]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[5]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -4793,7 +4793,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[5]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[5]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -4937,10 +4937,10 @@
     "rms": 0.7826076968221616
    }
   },
-  "coherent_wave[5]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[5]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[5]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[5]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[5]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -5107,10 +5107,10 @@
     "rms": 0.7825112012380204
    }
   },
-  "coherent_wave[5]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[5]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[5]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[5]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[5]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -5277,10 +5277,10 @@
     "rms": 0.7825112012380204
    }
   },
-  "coherent_wave[5]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[5]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[5]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[5]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[5]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -5352,17 +5352,17 @@
   "coherent_wave[6]/wave_solver_type/index": 1,
   "coherent_wave[6]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[6]/global_quantities[0]/power": 0.0,
-  "coherent_wave[6]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[6]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[6]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[6]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[6]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[6]/global_quantities[1]/power": 0.0,
-  "coherent_wave[6]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[6]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[6]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[6]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[6]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[6]/global_quantities[2]/power": 0.0,
-  "coherent_wave[6]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[6]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[6]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[6]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[6]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -5442,7 +5442,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[6]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[6]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -5563,7 +5563,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[6]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[6]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -5684,7 +5684,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[6]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[6]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -5828,10 +5828,10 @@
     "rms": 0.77214204633117
    }
   },
-  "coherent_wave[6]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[6]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[6]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[6]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[6]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -5998,10 +5998,10 @@
     "rms": 0.7720652738475431
    }
   },
-  "coherent_wave[6]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[6]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[6]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[6]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[6]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -6168,10 +6168,10 @@
     "rms": 0.7720652738475431
    }
   },
-  "coherent_wave[6]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[6]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[6]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[6]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[6]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -6243,17 +6243,17 @@
   "coherent_wave[7]/wave_solver_type/index": 1,
   "coherent_wave[7]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[7]/global_quantities[0]/power": 0.0,
-  "coherent_wave[7]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[7]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[7]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[7]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[7]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[7]/global_quantities[1]/power": 0.0,
-  "coherent_wave[7]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[7]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[7]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[7]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[7]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[7]/global_quantities[2]/power": 0.0,
-  "coherent_wave[7]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[7]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[7]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[7]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[7]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -6333,7 +6333,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[7]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[7]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -6454,7 +6454,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[7]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[7]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -6575,7 +6575,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[7]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[7]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -6719,10 +6719,10 @@
     "rms": 0.7459418980529868
    }
   },
-  "coherent_wave[7]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[7]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[7]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[7]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[7]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -6889,10 +6889,10 @@
     "rms": 0.7458195501235896
    }
   },
-  "coherent_wave[7]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[7]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[7]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[7]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[7]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -7059,10 +7059,10 @@
     "rms": 0.7458195501235896
    }
   },
-  "coherent_wave[7]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[7]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    -3
   ],
-  "coherent_wave[7]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[7]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[7]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -7134,17 +7134,17 @@
   "coherent_wave[8]/wave_solver_type/index": 1,
   "coherent_wave[8]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[8]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[8]/global_quantities[0]/current_tor": -20743.281145458684,
+  "coherent_wave[8]/global_quantities[0]/current_phi": -20743.281145458684,
   "coherent_wave[8]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[8]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[8]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[8]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[8]/global_quantities[1]/current_tor": -20822.268210447583,
+  "coherent_wave[8]/global_quantities[1]/current_phi": -20822.268210447583,
   "coherent_wave[8]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[8]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[8]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[8]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[8]/global_quantities[2]/current_tor": -20822.268210447583,
+  "coherent_wave[8]/global_quantities[2]/current_phi": -20822.268210447583,
   "coherent_wave[8]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[8]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[8]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -7224,7 +7224,7 @@
     "rms": 548727.437476922
    }
   },
-  "coherent_wave[8]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[8]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -7345,7 +7345,7 @@
     "rms": 549645.6187507774
    }
   },
-  "coherent_wave[8]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[8]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -7466,7 +7466,7 @@
     "rms": 549645.6187507774
    }
   },
-  "coherent_wave[8]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[8]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -7610,10 +7610,10 @@
     "rms": 0.6614853339403498
    }
   },
-  "coherent_wave[8]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[8]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[8]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[8]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[8]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -7780,10 +7780,10 @@
     "rms": 0.6615488956615125
    }
   },
-  "coherent_wave[8]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[8]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[8]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[8]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[8]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -7950,10 +7950,10 @@
     "rms": 0.6615488956615125
    }
   },
-  "coherent_wave[8]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[8]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[8]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[8]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[8]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -8025,17 +8025,17 @@
   "coherent_wave[9]/wave_solver_type/index": 1,
   "coherent_wave[9]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[9]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[9]/global_quantities[0]/current_tor": -20723.08420317326,
+  "coherent_wave[9]/global_quantities[0]/current_phi": -20723.08420317326,
   "coherent_wave[9]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[9]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[9]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[9]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[9]/global_quantities[1]/current_tor": -20801.090294462556,
+  "coherent_wave[9]/global_quantities[1]/current_phi": -20801.090294462556,
   "coherent_wave[9]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[9]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[9]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[9]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[9]/global_quantities[2]/current_tor": -20801.090294462556,
+  "coherent_wave[9]/global_quantities[2]/current_phi": -20801.090294462556,
   "coherent_wave[9]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[9]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[9]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -8115,7 +8115,7 @@
     "rms": 548432.8445845563
    }
   },
-  "coherent_wave[9]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[9]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -8236,7 +8236,7 @@
     "rms": 549332.7778700443
    }
   },
-  "coherent_wave[9]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[9]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -8357,7 +8357,7 @@
     "rms": 549332.7778700443
    }
   },
-  "coherent_wave[9]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[9]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -8501,10 +8501,10 @@
     "rms": 0.6564292472330677
    }
   },
-  "coherent_wave[9]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[9]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[9]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[9]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[9]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -8671,10 +8671,10 @@
     "rms": 0.6564874565458662
    }
   },
-  "coherent_wave[9]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[9]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[9]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[9]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[9]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -8841,10 +8841,10 @@
     "rms": 0.6564874565458662
    }
   },
-  "coherent_wave[9]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[9]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[9]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[9]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[9]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -8916,17 +8916,17 @@
   "coherent_wave[10]/wave_solver_type/index": 1,
   "coherent_wave[10]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[10]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[10]/global_quantities[0]/current_tor": -19085.28963261963,
+  "coherent_wave[10]/global_quantities[0]/current_phi": -19085.28963261963,
   "coherent_wave[10]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[10]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[10]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[10]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[10]/global_quantities[1]/current_tor": -19160.406092241003,
+  "coherent_wave[10]/global_quantities[1]/current_phi": -19160.406092241003,
   "coherent_wave[10]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[10]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[10]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[10]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[10]/global_quantities[2]/current_tor": -19160.406092241003,
+  "coherent_wave[10]/global_quantities[2]/current_phi": -19160.406092241003,
   "coherent_wave[10]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[10]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[10]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -9006,7 +9006,7 @@
     "rms": 532366.3520581955
    }
   },
-  "coherent_wave[10]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[10]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -9127,7 +9127,7 @@
     "rms": 533195.1704748266
    }
   },
-  "coherent_wave[10]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[10]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -9248,7 +9248,7 @@
     "rms": 533195.1704748266
    }
   },
-  "coherent_wave[10]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[10]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -9392,10 +9392,10 @@
     "rms": 0.6322161957601368
    }
   },
-  "coherent_wave[10]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[10]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[10]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[10]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[10]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -9562,10 +9562,10 @@
     "rms": 0.6322159413295907
    }
   },
-  "coherent_wave[10]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[10]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[10]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[10]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[10]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -9732,10 +9732,10 @@
     "rms": 0.6322159413295907
    }
   },
-  "coherent_wave[10]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[10]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[10]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[10]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[10]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -9807,17 +9807,17 @@
   "coherent_wave[11]/wave_solver_type/index": 1,
   "coherent_wave[11]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[11]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[11]/global_quantities[0]/current_tor": -21692.42356196942,
+  "coherent_wave[11]/global_quantities[0]/current_phi": -21692.42356196942,
   "coherent_wave[11]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[11]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[11]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[11]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[11]/global_quantities[1]/current_tor": -21768.370399829455,
+  "coherent_wave[11]/global_quantities[1]/current_phi": -21768.370399829455,
   "coherent_wave[11]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[11]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[11]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[11]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[11]/global_quantities[2]/current_tor": -21768.370399829455,
+  "coherent_wave[11]/global_quantities[2]/current_phi": -21768.370399829455,
   "coherent_wave[11]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[11]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[11]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -9897,7 +9897,7 @@
     "rms": 561971.9017197638
    }
   },
-  "coherent_wave[11]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[11]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -10018,7 +10018,7 @@
     "rms": 562838.3593337317
    }
   },
-  "coherent_wave[11]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[11]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -10139,7 +10139,7 @@
     "rms": 562838.3593337317
    }
   },
-  "coherent_wave[11]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[11]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -10283,10 +10283,10 @@
     "rms": 0.6248941759591771
    }
   },
-  "coherent_wave[11]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[11]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[11]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[11]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[11]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -10453,10 +10453,10 @@
     "rms": 0.6248213003490679
    }
   },
-  "coherent_wave[11]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[11]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[11]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[11]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[11]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -10623,10 +10623,10 @@
     "rms": 0.6248213003490679
    }
   },
-  "coherent_wave[11]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[11]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[11]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[11]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[11]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -10698,17 +10698,17 @@
   "coherent_wave[12]/wave_solver_type/index": 1,
   "coherent_wave[12]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[12]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[12]/global_quantities[0]/current_tor": -20787.700330904583,
+  "coherent_wave[12]/global_quantities[0]/current_phi": -20787.700330904583,
   "coherent_wave[12]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[12]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[12]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[12]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[12]/global_quantities[1]/current_tor": -20862.011855698125,
+  "coherent_wave[12]/global_quantities[1]/current_phi": -20862.011855698125,
   "coherent_wave[12]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[12]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[12]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[12]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[12]/global_quantities[2]/current_tor": -20862.011855698125,
+  "coherent_wave[12]/global_quantities[2]/current_phi": -20862.011855698125,
   "coherent_wave[12]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[12]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[12]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -10788,7 +10788,7 @@
     "rms": 552557.315671869
    }
   },
-  "coherent_wave[12]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[12]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -10909,7 +10909,7 @@
     "rms": 553374.9456949714
    }
   },
-  "coherent_wave[12]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[12]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -11030,7 +11030,7 @@
     "rms": 553374.9456949714
    }
   },
-  "coherent_wave[12]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[12]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -11174,10 +11174,10 @@
     "rms": 0.6038805064434789
    }
   },
-  "coherent_wave[12]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[12]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[12]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[12]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[12]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -11344,10 +11344,10 @@
     "rms": 0.6037370998901062
    }
   },
-  "coherent_wave[12]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[12]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[12]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[12]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[12]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -11514,10 +11514,10 @@
     "rms": 0.6037370998901062
    }
   },
-  "coherent_wave[12]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[12]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[12]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[12]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[12]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -11589,17 +11589,17 @@
   "coherent_wave[13]/wave_solver_type/index": 1,
   "coherent_wave[13]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[13]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[13]/global_quantities[0]/current_tor": -23009.445686345312,
+  "coherent_wave[13]/global_quantities[0]/current_phi": -23009.445686345312,
   "coherent_wave[13]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[13]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[13]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[13]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[13]/global_quantities[1]/current_tor": -23082.63394101058,
+  "coherent_wave[13]/global_quantities[1]/current_phi": -23082.63394101058,
   "coherent_wave[13]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[13]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[13]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[13]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[13]/global_quantities[2]/current_tor": -23082.63394101058,
+  "coherent_wave[13]/global_quantities[2]/current_phi": -23082.63394101058,
   "coherent_wave[13]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[13]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[13]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -11679,7 +11679,7 @@
     "rms": 579250.7368571735
    }
   },
-  "coherent_wave[13]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[13]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -11800,7 +11800,7 @@
     "rms": 580101.4987008407
    }
   },
-  "coherent_wave[13]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[13]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -11921,7 +11921,7 @@
     "rms": 580101.4987008407
    }
   },
-  "coherent_wave[13]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[13]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -12065,10 +12065,10 @@
     "rms": 0.5867360752493577
    }
   },
-  "coherent_wave[13]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[13]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[13]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[13]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[13]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -12235,10 +12235,10 @@
     "rms": 0.5871813511621043
    }
   },
-  "coherent_wave[13]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[13]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[13]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[13]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[13]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -12405,10 +12405,10 @@
     "rms": 0.5871813511621043
    }
   },
-  "coherent_wave[13]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[13]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[13]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[13]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[13]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -12480,17 +12480,17 @@
   "coherent_wave[14]/wave_solver_type/index": 1,
   "coherent_wave[14]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[14]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[14]/global_quantities[0]/current_tor": -22826.004446039966,
+  "coherent_wave[14]/global_quantities[0]/current_phi": -22826.004446039966,
   "coherent_wave[14]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[14]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[14]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[14]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[14]/global_quantities[1]/current_tor": -22898.68143631317,
+  "coherent_wave[14]/global_quantities[1]/current_phi": -22898.68143631317,
   "coherent_wave[14]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[14]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[14]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[14]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[14]/global_quantities[2]/current_tor": -22898.68143631317,
+  "coherent_wave[14]/global_quantities[2]/current_phi": -22898.68143631317,
   "coherent_wave[14]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[14]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[14]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -12570,7 +12570,7 @@
     "rms": 577012.7026493265
    }
   },
-  "coherent_wave[14]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[14]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -12691,7 +12691,7 @@
     "rms": 577846.2064081853
    }
   },
-  "coherent_wave[14]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[14]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -12812,7 +12812,7 @@
     "rms": 577846.2064081853
    }
   },
-  "coherent_wave[14]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[14]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -12956,10 +12956,10 @@
     "rms": 0.58661236817498
    }
   },
-  "coherent_wave[14]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[14]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[14]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[14]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[14]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -13126,10 +13126,10 @@
     "rms": 0.5870289612985089
    }
   },
-  "coherent_wave[14]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[14]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[14]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[14]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[14]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -13296,10 +13296,10 @@
     "rms": 0.5870289612985089
    }
   },
-  "coherent_wave[14]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[14]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[14]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[14]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[14]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -13371,17 +13371,17 @@
   "coherent_wave[15]/wave_solver_type/index": 1,
   "coherent_wave[15]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[15]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[15]/global_quantities[0]/current_tor": -21138.98922613299,
+  "coherent_wave[15]/global_quantities[0]/current_phi": -21138.98922613299,
   "coherent_wave[15]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[15]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[15]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[15]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[15]/global_quantities[1]/current_tor": -21209.363703815565,
+  "coherent_wave[15]/global_quantities[1]/current_phi": -21209.363703815565,
   "coherent_wave[15]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[15]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[15]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[15]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[15]/global_quantities[2]/current_tor": -21209.363703815565,
+  "coherent_wave[15]/global_quantities[2]/current_phi": -21209.363703815565,
   "coherent_wave[15]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[15]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[15]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -13461,7 +13461,7 @@
     "rms": 558993.0243818564
    }
   },
-  "coherent_wave[15]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[15]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -13582,7 +13582,7 @@
     "rms": 559745.4826369643
    }
   },
-  "coherent_wave[15]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[15]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -13703,7 +13703,7 @@
     "rms": 559745.4826369643
    }
   },
-  "coherent_wave[15]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[15]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -13847,10 +13847,10 @@
     "rms": 0.5731483987030199
    }
   },
-  "coherent_wave[15]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[15]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[15]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[15]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[15]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -14017,10 +14017,10 @@
     "rms": 0.5733286195893431
    }
   },
-  "coherent_wave[15]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[15]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[15]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[15]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[15]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -14187,10 +14187,10 @@
     "rms": 0.5733286195893431
    }
   },
-  "coherent_wave[15]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[15]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[15]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[15]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[15]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -14262,17 +14262,17 @@
   "coherent_wave[16]/wave_solver_type/index": 1,
   "coherent_wave[16]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[16]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[16]/global_quantities[0]/current_tor": -27906.43636677421,
+  "coherent_wave[16]/global_quantities[0]/current_phi": -27906.43636677421,
   "coherent_wave[16]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[16]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[16]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[16]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[16]/global_quantities[1]/current_tor": -27839.565094579306,
+  "coherent_wave[16]/global_quantities[1]/current_phi": -27839.565094579306,
   "coherent_wave[16]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[16]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[16]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[16]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[16]/global_quantities[2]/current_tor": -27839.565094579306,
+  "coherent_wave[16]/global_quantities[2]/current_phi": -27839.565094579306,
   "coherent_wave[16]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[16]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[16]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -14352,7 +14352,7 @@
     "rms": 714193.7262137485
    }
   },
-  "coherent_wave[16]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[16]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -14473,7 +14473,7 @@
     "rms": 713548.3329675902
    }
   },
-  "coherent_wave[16]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[16]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -14594,7 +14594,7 @@
     "rms": 713548.3329675902
    }
   },
-  "coherent_wave[16]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[16]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -14738,10 +14738,10 @@
     "rms": 0.6694366582189963
    }
   },
-  "coherent_wave[16]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[16]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[16]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[16]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[16]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -14908,10 +14908,10 @@
     "rms": 0.6697231106728052
    }
   },
-  "coherent_wave[16]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[16]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[16]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[16]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[16]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -15078,10 +15078,10 @@
     "rms": 0.6697231106728052
    }
   },
-  "coherent_wave[16]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[16]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[16]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[16]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[16]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -15153,17 +15153,17 @@
   "coherent_wave[17]/wave_solver_type/index": 1,
   "coherent_wave[17]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[17]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[17]/global_quantities[0]/current_tor": -27830.78506737208,
+  "coherent_wave[17]/global_quantities[0]/current_phi": -27830.78506737208,
   "coherent_wave[17]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[17]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[17]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[17]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[17]/global_quantities[1]/current_tor": -27768.54963965142,
+  "coherent_wave[17]/global_quantities[1]/current_phi": -27768.54963965142,
   "coherent_wave[17]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[17]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[17]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[17]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[17]/global_quantities[2]/current_tor": -27768.54963965142,
+  "coherent_wave[17]/global_quantities[2]/current_phi": -27768.54963965142,
   "coherent_wave[17]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[17]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[17]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -15243,7 +15243,7 @@
     "rms": 703884.5322662676
    }
   },
-  "coherent_wave[17]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[17]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -15364,7 +15364,7 @@
     "rms": 703285.0629967516
    }
   },
-  "coherent_wave[17]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[17]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -15485,7 +15485,7 @@
     "rms": 703285.0629967516
    }
   },
-  "coherent_wave[17]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[17]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -15629,10 +15629,10 @@
     "rms": 0.5737682570760556
    }
   },
-  "coherent_wave[17]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[17]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[17]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[17]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[17]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -15799,10 +15799,10 @@
     "rms": 0.5737798731911262
    }
   },
-  "coherent_wave[17]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[17]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[17]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[17]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[17]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -15969,10 +15969,10 @@
     "rms": 0.5737798731911262
    }
   },
-  "coherent_wave[17]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[17]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[17]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[17]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[17]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -16044,17 +16044,17 @@
   "coherent_wave[18]/wave_solver_type/index": 1,
   "coherent_wave[18]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[18]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[18]/global_quantities[0]/current_tor": -27444.85443855018,
+  "coherent_wave[18]/global_quantities[0]/current_phi": -27444.85443855018,
   "coherent_wave[18]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[18]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[18]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[18]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[18]/global_quantities[1]/current_tor": -27393.992738009474,
+  "coherent_wave[18]/global_quantities[1]/current_phi": -27393.992738009474,
   "coherent_wave[18]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[18]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[18]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[18]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[18]/global_quantities[2]/current_tor": -27393.992738009474,
+  "coherent_wave[18]/global_quantities[2]/current_phi": -27393.992738009474,
   "coherent_wave[18]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[18]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[18]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -16134,7 +16134,7 @@
     "rms": 679200.0843622491
    }
   },
-  "coherent_wave[18]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[18]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -16255,7 +16255,7 @@
     "rms": 678688.1364483425
    }
   },
-  "coherent_wave[18]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[18]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -16376,7 +16376,7 @@
     "rms": 678688.1364483425
    }
   },
-  "coherent_wave[18]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[18]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -16520,10 +16520,10 @@
     "rms": 0.5595421006673285
    }
   },
-  "coherent_wave[18]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[18]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[18]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[18]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[18]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -16690,10 +16690,10 @@
     "rms": 0.5597549839330491
    }
   },
-  "coherent_wave[18]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[18]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[18]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[18]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[18]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -16860,10 +16860,10 @@
     "rms": 0.5597549839330491
    }
   },
-  "coherent_wave[18]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[18]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[18]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[18]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[18]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -16935,17 +16935,17 @@
   "coherent_wave[19]/wave_solver_type/index": 1,
   "coherent_wave[19]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[19]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[19]/global_quantities[0]/current_tor": -27263.373734138266,
+  "coherent_wave[19]/global_quantities[0]/current_phi": -27263.373734138266,
   "coherent_wave[19]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[19]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[19]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[19]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[19]/global_quantities[1]/current_tor": -27194.38452859402,
+  "coherent_wave[19]/global_quantities[1]/current_phi": -27194.38452859402,
   "coherent_wave[19]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[19]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[19]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[19]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[19]/global_quantities[2]/current_tor": -27194.38452859402,
+  "coherent_wave[19]/global_quantities[2]/current_phi": -27194.38452859402,
   "coherent_wave[19]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[19]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[19]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -17025,7 +17025,7 @@
     "rms": 704195.1113412483
    }
   },
-  "coherent_wave[19]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[19]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -17146,7 +17146,7 @@
     "rms": 703457.3755238656
    }
   },
-  "coherent_wave[19]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[19]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -17267,7 +17267,7 @@
     "rms": 703457.3755238656
    }
   },
-  "coherent_wave[19]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[19]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -17411,10 +17411,10 @@
     "rms": 0.652025414095177
    }
   },
-  "coherent_wave[19]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[19]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[19]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[19]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[19]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -17581,10 +17581,10 @@
     "rms": 0.6523934331304572
    }
   },
-  "coherent_wave[19]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[19]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[19]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[19]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[19]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -17751,10 +17751,10 @@
     "rms": 0.6523934331304572
    }
   },
-  "coherent_wave[19]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[19]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[19]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[19]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[19]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -17826,17 +17826,17 @@
   "coherent_wave[20]/wave_solver_type/index": 1,
   "coherent_wave[20]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[20]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[20]/global_quantities[0]/current_tor": -27140.297826027665,
+  "coherent_wave[20]/global_quantities[0]/current_phi": -27140.297826027665,
   "coherent_wave[20]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[20]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[20]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[20]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[20]/global_quantities[1]/current_tor": -27078.268671937512,
+  "coherent_wave[20]/global_quantities[1]/current_phi": -27078.268671937512,
   "coherent_wave[20]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[20]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[20]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[20]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[20]/global_quantities[2]/current_tor": -27078.268671937512,
+  "coherent_wave[20]/global_quantities[2]/current_phi": -27078.268671937512,
   "coherent_wave[20]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[20]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[20]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -17916,7 +17916,7 @@
     "rms": 688125.9961826606
    }
   },
-  "coherent_wave[20]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[20]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -18037,7 +18037,7 @@
     "rms": 687446.7374346423
    }
   },
-  "coherent_wave[20]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[20]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -18158,7 +18158,7 @@
     "rms": 687446.7374346423
    }
   },
-  "coherent_wave[20]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[20]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -18302,10 +18302,10 @@
     "rms": 0.5767430523110009
    }
   },
-  "coherent_wave[20]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[20]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[20]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[20]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[20]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -18472,10 +18472,10 @@
     "rms": 0.5770015296957298
    }
   },
-  "coherent_wave[20]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[20]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[20]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[20]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[20]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -18642,10 +18642,10 @@
     "rms": 0.5770015296957298
    }
   },
-  "coherent_wave[20]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[20]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[20]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[20]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[20]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -18717,17 +18717,17 @@
   "coherent_wave[21]/wave_solver_type/index": 1,
   "coherent_wave[21]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[21]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[21]/global_quantities[0]/current_tor": -26539.77004841536,
+  "coherent_wave[21]/global_quantities[0]/current_phi": -26539.77004841536,
   "coherent_wave[21]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[21]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[21]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[21]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[21]/global_quantities[1]/current_tor": -26464.882972981806,
+  "coherent_wave[21]/global_quantities[1]/current_phi": -26464.882972981806,
   "coherent_wave[21]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[21]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[21]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[21]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[21]/global_quantities[2]/current_tor": -26464.882972981806,
+  "coherent_wave[21]/global_quantities[2]/current_phi": -26464.882972981806,
   "coherent_wave[21]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[21]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[21]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -18807,7 +18807,7 @@
     "rms": 703564.8376390901
    }
   },
-  "coherent_wave[21]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[21]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -18928,7 +18928,7 @@
     "rms": 702679.9419860089
    }
   },
-  "coherent_wave[21]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[21]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -19049,7 +19049,7 @@
     "rms": 702679.9419860089
    }
   },
-  "coherent_wave[21]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[21]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -19193,10 +19193,10 @@
     "rms": 0.690940511421097
    }
   },
-  "coherent_wave[21]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[21]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[21]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[21]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[21]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -19363,10 +19363,10 @@
     "rms": 0.6911673740920248
    }
   },
-  "coherent_wave[21]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[21]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[21]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[21]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[21]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -19533,10 +19533,10 @@
     "rms": 0.6911673740920248
    }
   },
-  "coherent_wave[21]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[21]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    3
   ],
-  "coherent_wave[21]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[21]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[21]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -19608,17 +19608,17 @@
   "coherent_wave[22]/wave_solver_type/index": 1,
   "coherent_wave[22]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[22]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[22]/global_quantities[0]/current_tor": -26587.017024662135,
+  "coherent_wave[22]/global_quantities[0]/current_phi": -26587.017024662135,
   "coherent_wave[22]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[22]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[22]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[22]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[22]/global_quantities[1]/current_tor": -26515.661342945106,
+  "coherent_wave[22]/global_quantities[1]/current_phi": -26515.661342945106,
   "coherent_wave[22]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[22]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[22]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[22]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[22]/global_quantities[2]/current_tor": -26515.661342945106,
+  "coherent_wave[22]/global_quantities[2]/current_phi": -26515.661342945106,
   "coherent_wave[22]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[22]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[22]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -19698,7 +19698,7 @@
     "rms": 695314.9520451394
    }
   },
-  "coherent_wave[22]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[22]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -19819,7 +19819,7 @@
     "rms": 694471.8494619331
    }
   },
-  "coherent_wave[22]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[22]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -19940,7 +19940,7 @@
     "rms": 694471.8494619331
    }
   },
-  "coherent_wave[22]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[22]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -20084,10 +20084,10 @@
     "rms": 0.6481562773642503
    }
   },
-  "coherent_wave[22]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[22]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[22]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[22]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[22]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -20254,10 +20254,10 @@
     "rms": 0.6487063938948909
    }
   },
-  "coherent_wave[22]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[22]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[22]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[22]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[22]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -20424,10 +20424,10 @@
     "rms": 0.6487063938948909
    }
   },
-  "coherent_wave[22]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[22]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[22]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[22]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[22]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -20499,17 +20499,17 @@
   "coherent_wave[23]/wave_solver_type/index": 1,
   "coherent_wave[23]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[23]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[23]/global_quantities[0]/current_tor": -26340.290598453048,
+  "coherent_wave[23]/global_quantities[0]/current_phi": -26340.290598453048,
   "coherent_wave[23]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[23]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[23]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[23]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[23]/global_quantities[1]/current_tor": -26277.363926241298,
+  "coherent_wave[23]/global_quantities[1]/current_phi": -26277.363926241298,
   "coherent_wave[23]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[23]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[23]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[23]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[23]/global_quantities[2]/current_tor": -26277.363926241298,
+  "coherent_wave[23]/global_quantities[2]/current_phi": -26277.363926241298,
   "coherent_wave[23]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[23]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[23]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -20589,7 +20589,7 @@
     "rms": 672854.3942177588
    }
   },
-  "coherent_wave[23]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[23]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -20710,7 +20710,7 @@
     "rms": 672058.1177010963
    }
   },
-  "coherent_wave[23]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[23]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -20831,7 +20831,7 @@
     "rms": 672058.1177010963
    }
   },
-  "coherent_wave[23]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[23]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -20975,10 +20975,10 @@
     "rms": 0.5835604971665646
    }
   },
-  "coherent_wave[23]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[23]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[23]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[23]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[23]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -21145,10 +21145,10 @@
     "rms": 0.5838553577962247
    }
   },
-  "coherent_wave[23]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[23]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[23]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[23]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[23]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -21315,10 +21315,10 @@
     "rms": 0.5838553577962247
    }
   },
-  "coherent_wave[23]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[23]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    4
   ],
-  "coherent_wave[23]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[23]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[23]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -21390,17 +21390,17 @@
   "coherent_wave[24]/wave_solver_type/index": 1,
   "coherent_wave[24]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[24]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[24]/global_quantities[0]/current_tor": -7114.181328958062,
+  "coherent_wave[24]/global_quantities[0]/current_phi": -7114.181328958062,
   "coherent_wave[24]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[24]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[24]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[24]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[24]/global_quantities[1]/current_tor": -7091.382273980006,
+  "coherent_wave[24]/global_quantities[1]/current_phi": -7091.382273980006,
   "coherent_wave[24]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[24]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[24]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[24]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[24]/global_quantities[2]/current_tor": -7091.382273980006,
+  "coherent_wave[24]/global_quantities[2]/current_phi": -7091.382273980006,
   "coherent_wave[24]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[24]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[24]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -21480,7 +21480,7 @@
     "rms": 341467.8012623893
    }
   },
-  "coherent_wave[24]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[24]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -21601,7 +21601,7 @@
     "rms": 340510.83945821645
    }
   },
-  "coherent_wave[24]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[24]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -21722,7 +21722,7 @@
     "rms": 340510.83945821645
    }
   },
-  "coherent_wave[24]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[24]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -21866,10 +21866,10 @@
     "rms": 0.8032172265993689
    }
   },
-  "coherent_wave[24]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[24]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[24]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[24]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[24]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -22036,10 +22036,10 @@
     "rms": 0.8031926592048892
    }
   },
-  "coherent_wave[24]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[24]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[24]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[24]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[24]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -22206,10 +22206,10 @@
     "rms": 0.8031926592048892
    }
   },
-  "coherent_wave[24]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[24]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[24]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[24]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[24]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -22281,17 +22281,17 @@
   "coherent_wave[25]/wave_solver_type/index": 1,
   "coherent_wave[25]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[25]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[25]/global_quantities[0]/current_tor": -6460.2994700078125,
+  "coherent_wave[25]/global_quantities[0]/current_phi": -6460.2994700078125,
   "coherent_wave[25]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[25]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[25]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[25]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[25]/global_quantities[1]/current_tor": -6448.748959206023,
+  "coherent_wave[25]/global_quantities[1]/current_phi": -6448.748959206023,
   "coherent_wave[25]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[25]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[25]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[25]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[25]/global_quantities[2]/current_tor": -6448.748959206023,
+  "coherent_wave[25]/global_quantities[2]/current_phi": -6448.748959206023,
   "coherent_wave[25]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[25]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[25]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -22371,7 +22371,7 @@
     "rms": 345129.7422225458
    }
   },
-  "coherent_wave[25]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[25]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -22492,7 +22492,7 @@
     "rms": 344205.8333590853
    }
   },
-  "coherent_wave[25]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[25]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -22613,7 +22613,7 @@
     "rms": 344205.8333590853
    }
   },
-  "coherent_wave[25]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[25]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -22757,10 +22757,10 @@
     "rms": 0.8199851691542529
    }
   },
-  "coherent_wave[25]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[25]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[25]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[25]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[25]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -22927,10 +22927,10 @@
     "rms": 0.8199814260570809
    }
   },
-  "coherent_wave[25]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[25]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[25]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[25]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[25]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -23097,10 +23097,10 @@
     "rms": 0.8199814260570809
    }
   },
-  "coherent_wave[25]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[25]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[25]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[25]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[25]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -23172,17 +23172,17 @@
   "coherent_wave[26]/wave_solver_type/index": 1,
   "coherent_wave[26]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[26]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[26]/global_quantities[0]/current_tor": -5728.089333839594,
+  "coherent_wave[26]/global_quantities[0]/current_phi": -5728.089333839594,
   "coherent_wave[26]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[26]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[26]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[26]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[26]/global_quantities[1]/current_tor": -5723.270242625255,
+  "coherent_wave[26]/global_quantities[1]/current_phi": -5723.270242625255,
   "coherent_wave[26]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[26]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[26]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[26]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[26]/global_quantities[2]/current_tor": -5723.270242625255,
+  "coherent_wave[26]/global_quantities[2]/current_phi": -5723.270242625255,
   "coherent_wave[26]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[26]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[26]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -23262,7 +23262,7 @@
     "rms": 344981.07146425237
    }
   },
-  "coherent_wave[26]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[26]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -23383,7 +23383,7 @@
     "rms": 344114.59152188414
    }
   },
-  "coherent_wave[26]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[26]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -23504,7 +23504,7 @@
     "rms": 344114.59152188414
    }
   },
-  "coherent_wave[26]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[26]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -23648,10 +23648,10 @@
     "rms": 0.8321781625717817
    }
   },
-  "coherent_wave[26]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[26]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[26]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[26]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[26]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -23818,10 +23818,10 @@
     "rms": 0.832197588690939
    }
   },
-  "coherent_wave[26]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[26]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[26]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[26]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[26]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -23988,10 +23988,10 @@
     "rms": 0.832197588690939
    }
   },
-  "coherent_wave[26]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[26]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[26]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[26]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[26]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -24063,17 +24063,17 @@
   "coherent_wave[27]/wave_solver_type/index": 1,
   "coherent_wave[27]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[27]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[27]/global_quantities[0]/current_tor": -4910.559151806994,
+  "coherent_wave[27]/global_quantities[0]/current_phi": -4910.559151806994,
   "coherent_wave[27]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[27]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[27]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[27]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[27]/global_quantities[1]/current_tor": -4909.810643929565,
+  "coherent_wave[27]/global_quantities[1]/current_phi": -4909.810643929565,
   "coherent_wave[27]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[27]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[27]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[27]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[27]/global_quantities[2]/current_tor": -4909.810643929565,
+  "coherent_wave[27]/global_quantities[2]/current_phi": -4909.810643929565,
   "coherent_wave[27]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[27]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[27]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -24153,7 +24153,7 @@
     "rms": 343017.15131037147
    }
   },
-  "coherent_wave[27]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[27]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -24274,7 +24274,7 @@
     "rms": 342211.87893731595
    }
   },
-  "coherent_wave[27]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[27]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -24395,7 +24395,7 @@
     "rms": 342211.87893731595
    }
   },
-  "coherent_wave[27]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[27]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -24539,10 +24539,10 @@
     "rms": 0.8434044175995439
    }
   },
-  "coherent_wave[27]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[27]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[27]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[27]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[27]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -24709,10 +24709,10 @@
     "rms": 0.8434478750646174
    }
   },
-  "coherent_wave[27]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[27]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[27]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[27]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[27]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -24879,10 +24879,10 @@
     "rms": 0.8434478750646174
    }
   },
-  "coherent_wave[27]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[27]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[27]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[27]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[27]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -24954,17 +24954,17 @@
   "coherent_wave[28]/wave_solver_type/index": 1,
   "coherent_wave[28]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[28]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[28]/global_quantities[0]/current_tor": -4978.021173874555,
+  "coherent_wave[28]/global_quantities[0]/current_phi": -4978.021173874555,
   "coherent_wave[28]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[28]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[28]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[28]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[28]/global_quantities[1]/current_tor": -4959.578702170122,
+  "coherent_wave[28]/global_quantities[1]/current_phi": -4959.578702170122,
   "coherent_wave[28]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[28]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[28]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[28]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[28]/global_quantities[2]/current_tor": -4959.578702170122,
+  "coherent_wave[28]/global_quantities[2]/current_phi": -4959.578702170122,
   "coherent_wave[28]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[28]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[28]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -25044,7 +25044,7 @@
     "rms": 280202.68882950436
    }
   },
-  "coherent_wave[28]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[28]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -25165,7 +25165,7 @@
     "rms": 279531.14020858094
    }
   },
-  "coherent_wave[28]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[28]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -25286,7 +25286,7 @@
     "rms": 279531.14020858094
    }
   },
-  "coherent_wave[28]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[28]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -25430,10 +25430,10 @@
     "rms": 0.8070394511884467
    }
   },
-  "coherent_wave[28]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[28]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[28]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[28]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[28]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -25600,10 +25600,10 @@
     "rms": 0.8071185249965769
    }
   },
-  "coherent_wave[28]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[28]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[28]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[28]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[28]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -25770,10 +25770,10 @@
     "rms": 0.8071185249965769
    }
   },
-  "coherent_wave[28]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[28]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[28]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[28]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[28]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -25845,17 +25845,17 @@
   "coherent_wave[29]/wave_solver_type/index": 1,
   "coherent_wave[29]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[29]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[29]/global_quantities[0]/current_tor": -4745.7270008549085,
+  "coherent_wave[29]/global_quantities[0]/current_phi": -4745.7270008549085,
   "coherent_wave[29]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[29]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[29]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[29]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[29]/global_quantities[1]/current_tor": -4731.069036082575,
+  "coherent_wave[29]/global_quantities[1]/current_phi": -4731.069036082575,
   "coherent_wave[29]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[29]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[29]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[29]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[29]/global_quantities[2]/current_tor": -4731.069036082575,
+  "coherent_wave[29]/global_quantities[2]/current_phi": -4731.069036082575,
   "coherent_wave[29]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[29]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[29]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -25935,7 +25935,7 @@
     "rms": 279332.7743020307
    }
   },
-  "coherent_wave[29]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[29]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -26056,7 +26056,7 @@
     "rms": 278684.5757123434
    }
   },
-  "coherent_wave[29]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[29]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -26177,7 +26177,7 @@
     "rms": 278684.5757123434
    }
   },
-  "coherent_wave[29]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[29]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -26321,10 +26321,10 @@
     "rms": 0.8207825145664497
    }
   },
-  "coherent_wave[29]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[29]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[29]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[29]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[29]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -26491,10 +26491,10 @@
     "rms": 0.8208903022841817
    }
   },
-  "coherent_wave[29]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[29]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[29]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[29]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[29]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -26661,10 +26661,10 @@
     "rms": 0.8208903022841817
    }
   },
-  "coherent_wave[29]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[29]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[29]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[29]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[29]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -26736,17 +26736,17 @@
   "coherent_wave[30]/wave_solver_type/index": 1,
   "coherent_wave[30]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[30]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[30]/global_quantities[0]/current_tor": -4424.851341066792,
+  "coherent_wave[30]/global_quantities[0]/current_phi": -4424.851341066792,
   "coherent_wave[30]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[30]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[30]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[30]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[30]/global_quantities[1]/current_tor": -4413.531696797344,
+  "coherent_wave[30]/global_quantities[1]/current_phi": -4413.531696797344,
   "coherent_wave[30]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[30]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[30]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[30]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[30]/global_quantities[2]/current_tor": -4413.531696797344,
+  "coherent_wave[30]/global_quantities[2]/current_phi": -4413.531696797344,
   "coherent_wave[30]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[30]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[30]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -26826,7 +26826,7 @@
     "rms": 275192.8697885719
    }
   },
-  "coherent_wave[30]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[30]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -26947,7 +26947,7 @@
     "rms": 274568.0443417475
    }
   },
-  "coherent_wave[30]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[30]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -27068,7 +27068,7 @@
     "rms": 274568.0443417475
    }
   },
-  "coherent_wave[30]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[30]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -27212,10 +27212,10 @@
     "rms": 0.8317811356331498
    }
   },
-  "coherent_wave[30]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[30]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[30]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[30]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[30]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -27382,10 +27382,10 @@
     "rms": 0.8319160193098453
    }
   },
-  "coherent_wave[30]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[30]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[30]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[30]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[30]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -27552,10 +27552,10 @@
     "rms": 0.8319160193098453
    }
   },
-  "coherent_wave[30]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[30]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[30]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[30]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[30]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -27627,17 +27627,17 @@
   "coherent_wave[31]/wave_solver_type/index": 1,
   "coherent_wave[31]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[31]/global_quantities[0]/power": 833000.0,
-  "coherent_wave[31]/global_quantities[0]/current_tor": -4032.521166602601,
+  "coherent_wave[31]/global_quantities[0]/current_phi": -4032.521166602601,
   "coherent_wave[31]/global_quantities[0]/electrons/power_thermal": 833000.0,
   "coherent_wave[31]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[31]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[31]/global_quantities[1]/power": 833000.0,
-  "coherent_wave[31]/global_quantities[1]/current_tor": -4024.196962475374,
+  "coherent_wave[31]/global_quantities[1]/current_phi": -4024.196962475374,
   "coherent_wave[31]/global_quantities[1]/electrons/power_thermal": 833000.0,
   "coherent_wave[31]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[31]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[31]/global_quantities[2]/power": 833000.0,
-  "coherent_wave[31]/global_quantities[2]/current_tor": -4024.196962475374,
+  "coherent_wave[31]/global_quantities[2]/current_phi": -4024.196962475374,
   "coherent_wave[31]/global_quantities[2]/electrons/power_thermal": 833000.0,
   "coherent_wave[31]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[31]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -27717,7 +27717,7 @@
     "rms": 269001.90629749437
    }
   },
-  "coherent_wave[31]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[31]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -27838,7 +27838,7 @@
     "rms": 268395.95026681386
    }
   },
-  "coherent_wave[31]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[31]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -27959,7 +27959,7 @@
     "rms": 268395.95026681386
    }
   },
-  "coherent_wave[31]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[31]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -28103,10 +28103,10 @@
     "rms": 0.8423299235266569
    }
   },
-  "coherent_wave[31]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[31]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[31]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[31]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[31]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -28273,10 +28273,10 @@
     "rms": 0.8424927736634095
    }
   },
-  "coherent_wave[31]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[31]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[31]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[31]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[31]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -28443,10 +28443,10 @@
     "rms": 0.8424927736634095
    }
   },
-  "coherent_wave[31]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[31]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[31]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[31]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[31]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -28518,17 +28518,17 @@
   "coherent_wave[32]/wave_solver_type/index": 1,
   "coherent_wave[32]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[32]/global_quantities[0]/power": 0.0,
-  "coherent_wave[32]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[32]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[32]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[32]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[32]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[32]/global_quantities[1]/power": 0.0,
-  "coherent_wave[32]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[32]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[32]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[32]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[32]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[32]/global_quantities[2]/power": 0.0,
-  "coherent_wave[32]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[32]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[32]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[32]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[32]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -28608,7 +28608,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[32]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[32]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -28729,7 +28729,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[32]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[32]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -28850,7 +28850,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[32]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[32]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -28994,10 +28994,10 @@
     "rms": 0.8032172265993175
    }
   },
-  "coherent_wave[32]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[32]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[32]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[32]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[32]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -29164,10 +29164,10 @@
     "rms": 0.8031926147665583
    }
   },
-  "coherent_wave[32]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[32]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[32]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[32]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[32]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -29334,10 +29334,10 @@
     "rms": 0.8031926147665583
    }
   },
-  "coherent_wave[32]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[32]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[32]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[32]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[32]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -29409,17 +29409,17 @@
   "coherent_wave[33]/wave_solver_type/index": 1,
   "coherent_wave[33]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[33]/global_quantities[0]/power": 0.0,
-  "coherent_wave[33]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[33]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[33]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[33]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[33]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[33]/global_quantities[1]/power": 0.0,
-  "coherent_wave[33]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[33]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[33]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[33]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[33]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[33]/global_quantities[2]/power": 0.0,
-  "coherent_wave[33]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[33]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[33]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[33]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[33]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -29499,7 +29499,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[33]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[33]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -29620,7 +29620,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[33]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[33]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -29741,7 +29741,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[33]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[33]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -29885,10 +29885,10 @@
     "rms": 0.8199851691546073
    }
   },
-  "coherent_wave[33]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[33]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[33]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[33]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[33]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -30055,10 +30055,10 @@
     "rms": 0.8199814260570497
    }
   },
-  "coherent_wave[33]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[33]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[33]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[33]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[33]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -30225,10 +30225,10 @@
     "rms": 0.8199814260570497
    }
   },
-  "coherent_wave[33]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[33]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[33]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[33]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[33]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -30300,17 +30300,17 @@
   "coherent_wave[34]/wave_solver_type/index": 1,
   "coherent_wave[34]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[34]/global_quantities[0]/power": 0.0,
-  "coherent_wave[34]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[34]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[34]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[34]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[34]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[34]/global_quantities[1]/power": 0.0,
-  "coherent_wave[34]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[34]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[34]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[34]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[34]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[34]/global_quantities[2]/power": 0.0,
-  "coherent_wave[34]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[34]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[34]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[34]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[34]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -30390,7 +30390,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[34]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[34]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -30511,7 +30511,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[34]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[34]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -30632,7 +30632,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[34]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[34]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -30776,10 +30776,10 @@
     "rms": 0.8321781625718064
    }
   },
-  "coherent_wave[34]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[34]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[34]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[34]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[34]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -30946,10 +30946,10 @@
     "rms": 0.8321975886908898
    }
   },
-  "coherent_wave[34]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[34]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[34]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[34]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[34]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -31116,10 +31116,10 @@
     "rms": 0.8321975886908898
    }
   },
-  "coherent_wave[34]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[34]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[34]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[34]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[34]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -31191,17 +31191,17 @@
   "coherent_wave[35]/wave_solver_type/index": 1,
   "coherent_wave[35]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[35]/global_quantities[0]/power": 0.0,
-  "coherent_wave[35]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[35]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[35]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[35]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[35]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[35]/global_quantities[1]/power": 0.0,
-  "coherent_wave[35]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[35]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[35]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[35]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[35]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[35]/global_quantities[2]/power": 0.0,
-  "coherent_wave[35]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[35]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[35]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[35]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[35]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -31281,7 +31281,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[35]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[35]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -31402,7 +31402,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[35]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[35]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -31523,7 +31523,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[35]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[35]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -31667,10 +31667,10 @@
     "rms": 0.8434044175995437
    }
   },
-  "coherent_wave[35]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[35]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[35]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[35]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[35]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -31837,10 +31837,10 @@
     "rms": 0.843447875064626
    }
   },
-  "coherent_wave[35]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[35]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[35]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[35]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[35]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -32007,10 +32007,10 @@
     "rms": 0.843447875064626
    }
   },
-  "coherent_wave[35]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[35]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[35]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[35]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[35]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -32082,17 +32082,17 @@
   "coherent_wave[36]/wave_solver_type/index": 1,
   "coherent_wave[36]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[36]/global_quantities[0]/power": 0.0,
-  "coherent_wave[36]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[36]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[36]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[36]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[36]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[36]/global_quantities[1]/power": 0.0,
-  "coherent_wave[36]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[36]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[36]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[36]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[36]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[36]/global_quantities[2]/power": 0.0,
-  "coherent_wave[36]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[36]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[36]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[36]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[36]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -32172,7 +32172,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[36]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[36]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -32293,7 +32293,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[36]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[36]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -32414,7 +32414,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[36]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[36]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -32558,10 +32558,10 @@
     "rms": 0.8070394511883773
    }
   },
-  "coherent_wave[36]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[36]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[36]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[36]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[36]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -32728,10 +32728,10 @@
     "rms": 0.8071185249949425
    }
   },
-  "coherent_wave[36]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[36]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[36]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[36]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[36]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -32898,10 +32898,10 @@
     "rms": 0.8071185249949425
    }
   },
-  "coherent_wave[36]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[36]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[36]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[36]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[36]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -32973,17 +32973,17 @@
   "coherent_wave[37]/wave_solver_type/index": 1,
   "coherent_wave[37]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[37]/global_quantities[0]/power": 0.0,
-  "coherent_wave[37]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[37]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[37]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[37]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[37]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[37]/global_quantities[1]/power": 0.0,
-  "coherent_wave[37]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[37]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[37]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[37]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[37]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[37]/global_quantities[2]/power": 0.0,
-  "coherent_wave[37]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[37]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[37]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[37]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[37]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -33063,7 +33063,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[37]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[37]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -33184,7 +33184,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[37]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[37]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -33305,7 +33305,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[37]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[37]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -33449,10 +33449,10 @@
     "rms": 0.8207825145664768
    }
   },
-  "coherent_wave[37]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[37]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[37]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[37]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[37]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -33619,10 +33619,10 @@
     "rms": 0.8208903022842229
    }
   },
-  "coherent_wave[37]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[37]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[37]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[37]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[37]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -33789,10 +33789,10 @@
     "rms": 0.8208903022842229
    }
   },
-  "coherent_wave[37]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[37]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[37]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[37]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[37]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -33864,17 +33864,17 @@
   "coherent_wave[38]/wave_solver_type/index": 1,
   "coherent_wave[38]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[38]/global_quantities[0]/power": 0.0,
-  "coherent_wave[38]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[38]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[38]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[38]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[38]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[38]/global_quantities[1]/power": 0.0,
-  "coherent_wave[38]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[38]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[38]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[38]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[38]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[38]/global_quantities[2]/power": 0.0,
-  "coherent_wave[38]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[38]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[38]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[38]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[38]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -33954,7 +33954,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[38]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[38]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -34075,7 +34075,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[38]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[38]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -34196,7 +34196,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[38]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[38]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -34340,10 +34340,10 @@
     "rms": 0.8317811356331416
    }
   },
-  "coherent_wave[38]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[38]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[38]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[38]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[38]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -34510,10 +34510,10 @@
     "rms": 0.8319160193098708
    }
   },
-  "coherent_wave[38]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[38]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[38]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[38]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[38]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -34680,10 +34680,10 @@
     "rms": 0.8319160193098708
    }
   },
-  "coherent_wave[38]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[38]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[38]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[38]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[38]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -34755,17 +34755,17 @@
   "coherent_wave[39]/wave_solver_type/index": 1,
   "coherent_wave[39]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[39]/global_quantities[0]/power": 0.0,
-  "coherent_wave[39]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[39]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[39]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[39]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[39]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[39]/global_quantities[1]/power": 0.0,
-  "coherent_wave[39]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[39]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[39]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[39]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[39]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[39]/global_quantities[2]/power": 0.0,
-  "coherent_wave[39]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[39]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[39]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[39]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[39]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -34845,7 +34845,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[39]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[39]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -34966,7 +34966,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[39]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[39]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -35087,7 +35087,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[39]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[39]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -35231,10 +35231,10 @@
     "rms": 0.8423299235266648
    }
   },
-  "coherent_wave[39]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[39]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[39]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[39]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[39]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -35401,10 +35401,10 @@
     "rms": 0.8424927736633907
    }
   },
-  "coherent_wave[39]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[39]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[39]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[39]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[39]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -35571,10 +35571,10 @@
     "rms": 0.8424927736633907
    }
   },
-  "coherent_wave[39]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[39]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[39]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[39]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[39]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -35646,17 +35646,17 @@
   "coherent_wave[40]/wave_solver_type/index": 1,
   "coherent_wave[40]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[40]/global_quantities[0]/power": 0.0,
-  "coherent_wave[40]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[40]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[40]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[40]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[40]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[40]/global_quantities[1]/power": 0.0,
-  "coherent_wave[40]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[40]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[40]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[40]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[40]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[40]/global_quantities[2]/power": 0.0,
-  "coherent_wave[40]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[40]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[40]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[40]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[40]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -35736,7 +35736,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[40]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[40]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -35857,7 +35857,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[40]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[40]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -35978,7 +35978,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[40]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[40]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -36122,10 +36122,10 @@
     "rms": 0.803217226599287
    }
   },
-  "coherent_wave[40]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[40]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[40]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[40]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[40]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -36292,10 +36292,10 @@
     "rms": 0.8031926001104024
    }
   },
-  "coherent_wave[40]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[40]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[40]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[40]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[40]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -36462,10 +36462,10 @@
     "rms": 0.8031926001104024
    }
   },
-  "coherent_wave[40]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[40]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[40]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[40]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[40]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -36537,17 +36537,17 @@
   "coherent_wave[41]/wave_solver_type/index": 1,
   "coherent_wave[41]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[41]/global_quantities[0]/power": 0.0,
-  "coherent_wave[41]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[41]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[41]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[41]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[41]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[41]/global_quantities[1]/power": 0.0,
-  "coherent_wave[41]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[41]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[41]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[41]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[41]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[41]/global_quantities[2]/power": 0.0,
-  "coherent_wave[41]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[41]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[41]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[41]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[41]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -36627,7 +36627,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[41]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[41]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -36748,7 +36748,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[41]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[41]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -36869,7 +36869,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[41]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[41]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -37013,10 +37013,10 @@
     "rms": 0.8199851691546192
    }
   },
-  "coherent_wave[41]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[41]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[41]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[41]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[41]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -37183,10 +37183,10 @@
     "rms": 0.8199814260571174
    }
   },
-  "coherent_wave[41]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[41]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[41]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[41]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[41]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -37353,10 +37353,10 @@
     "rms": 0.8199814260571174
    }
   },
-  "coherent_wave[41]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[41]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[41]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[41]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[41]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -37428,17 +37428,17 @@
   "coherent_wave[42]/wave_solver_type/index": 1,
   "coherent_wave[42]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[42]/global_quantities[0]/power": 0.0,
-  "coherent_wave[42]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[42]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[42]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[42]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[42]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[42]/global_quantities[1]/power": 0.0,
-  "coherent_wave[42]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[42]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[42]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[42]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[42]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[42]/global_quantities[2]/power": 0.0,
-  "coherent_wave[42]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[42]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[42]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[42]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[42]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -37518,7 +37518,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[42]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[42]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -37639,7 +37639,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[42]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[42]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -37760,7 +37760,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[42]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[42]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -37904,10 +37904,10 @@
     "rms": 0.8321781625718236
    }
   },
-  "coherent_wave[42]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[42]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[42]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[42]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[42]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -38074,10 +38074,10 @@
     "rms": 0.8321975886898906
    }
   },
-  "coherent_wave[42]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[42]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[42]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[42]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[42]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -38244,10 +38244,10 @@
     "rms": 0.8321975886898906
    }
   },
-  "coherent_wave[42]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[42]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[42]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[42]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[42]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -38319,17 +38319,17 @@
   "coherent_wave[43]/wave_solver_type/index": 1,
   "coherent_wave[43]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[43]/global_quantities[0]/power": 0.0,
-  "coherent_wave[43]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[43]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[43]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[43]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[43]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[43]/global_quantities[1]/power": 0.0,
-  "coherent_wave[43]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[43]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[43]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[43]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[43]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[43]/global_quantities[2]/power": 0.0,
-  "coherent_wave[43]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[43]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[43]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[43]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[43]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -38409,7 +38409,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[43]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[43]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -38530,7 +38530,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[43]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[43]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -38651,7 +38651,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[43]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[43]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -38795,10 +38795,10 @@
     "rms": 0.8434044175994821
    }
   },
-  "coherent_wave[43]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[43]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[43]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[43]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[43]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -38965,10 +38965,10 @@
     "rms": 0.8434478750646142
    }
   },
-  "coherent_wave[43]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[43]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[43]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[43]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[43]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -39135,10 +39135,10 @@
     "rms": 0.8434478750646142
    }
   },
-  "coherent_wave[43]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[43]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[43]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[43]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[43]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -39210,17 +39210,17 @@
   "coherent_wave[44]/wave_solver_type/index": 1,
   "coherent_wave[44]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[44]/global_quantities[0]/power": 0.0,
-  "coherent_wave[44]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[44]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[44]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[44]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[44]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[44]/global_quantities[1]/power": 0.0,
-  "coherent_wave[44]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[44]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[44]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[44]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[44]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[44]/global_quantities[2]/power": 0.0,
-  "coherent_wave[44]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[44]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[44]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[44]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[44]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -39300,7 +39300,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[44]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[44]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -39421,7 +39421,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[44]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[44]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -39542,7 +39542,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[44]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[44]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -39686,10 +39686,10 @@
     "rms": 0.8070394511883229
    }
   },
-  "coherent_wave[44]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[44]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[44]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[44]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[44]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -39856,10 +39856,10 @@
     "rms": 0.8071185249972066
    }
   },
-  "coherent_wave[44]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[44]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[44]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[44]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[44]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -40026,10 +40026,10 @@
     "rms": 0.8071185249972066
    }
   },
-  "coherent_wave[44]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[44]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[44]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[44]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[44]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -40101,17 +40101,17 @@
   "coherent_wave[45]/wave_solver_type/index": 1,
   "coherent_wave[45]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[45]/global_quantities[0]/power": 0.0,
-  "coherent_wave[45]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[45]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[45]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[45]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[45]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[45]/global_quantities[1]/power": 0.0,
-  "coherent_wave[45]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[45]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[45]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[45]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[45]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[45]/global_quantities[2]/power": 0.0,
-  "coherent_wave[45]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[45]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[45]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[45]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[45]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -40191,7 +40191,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[45]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[45]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -40312,7 +40312,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[45]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[45]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -40433,7 +40433,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[45]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[45]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -40577,10 +40577,10 @@
     "rms": 0.8207825145664055
    }
   },
-  "coherent_wave[45]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[45]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[45]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[45]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[45]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -40747,10 +40747,10 @@
     "rms": 0.8208903022841315
    }
   },
-  "coherent_wave[45]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[45]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[45]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[45]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[45]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -40917,10 +40917,10 @@
     "rms": 0.8208903022841315
    }
   },
-  "coherent_wave[45]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[45]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[45]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[45]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[45]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -40992,17 +40992,17 @@
   "coherent_wave[46]/wave_solver_type/index": 1,
   "coherent_wave[46]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[46]/global_quantities[0]/power": 0.0,
-  "coherent_wave[46]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[46]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[46]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[46]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[46]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[46]/global_quantities[1]/power": 0.0,
-  "coherent_wave[46]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[46]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[46]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[46]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[46]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[46]/global_quantities[2]/power": 0.0,
-  "coherent_wave[46]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[46]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[46]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[46]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[46]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -41082,7 +41082,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[46]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[46]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -41203,7 +41203,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[46]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[46]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -41324,7 +41324,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[46]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[46]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -41468,10 +41468,10 @@
     "rms": 0.83178113563316
    }
   },
-  "coherent_wave[46]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[46]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[46]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[46]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[46]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -41638,10 +41638,10 @@
     "rms": 0.8319160193099124
    }
   },
-  "coherent_wave[46]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[46]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[46]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[46]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[46]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -41808,10 +41808,10 @@
     "rms": 0.8319160193099124
    }
   },
-  "coherent_wave[46]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[46]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[46]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[46]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[46]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -41883,17 +41883,17 @@
   "coherent_wave[47]/wave_solver_type/index": 1,
   "coherent_wave[47]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[47]/global_quantities[0]/power": 0.0,
-  "coherent_wave[47]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[47]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[47]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[47]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[47]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[47]/global_quantities[1]/power": 0.0,
-  "coherent_wave[47]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[47]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[47]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[47]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[47]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[47]/global_quantities[2]/power": 0.0,
-  "coherent_wave[47]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[47]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[47]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[47]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[47]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -41973,7 +41973,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[47]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[47]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -42094,7 +42094,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[47]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[47]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -42215,7 +42215,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[47]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[47]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -42359,10 +42359,10 @@
     "rms": 0.8423299235264368
    }
   },
-  "coherent_wave[47]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[47]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[47]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[47]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[47]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -42529,10 +42529,10 @@
     "rms": 0.8424927736633662
    }
   },
-  "coherent_wave[47]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[47]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[47]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[47]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[47]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -42699,10 +42699,10 @@
     "rms": 0.8424927736633662
    }
   },
-  "coherent_wave[47]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[47]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[47]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[47]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[47]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -42774,17 +42774,17 @@
   "coherent_wave[48]/wave_solver_type/index": 1,
   "coherent_wave[48]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[48]/global_quantities[0]/power": 0.0,
-  "coherent_wave[48]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[48]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[48]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[48]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[48]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[48]/global_quantities[1]/power": 0.0,
-  "coherent_wave[48]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[48]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[48]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[48]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[48]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[48]/global_quantities[2]/power": 0.0,
-  "coherent_wave[48]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[48]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[48]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[48]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[48]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -42864,7 +42864,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[48]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[48]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -42985,7 +42985,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[48]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[48]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -43106,7 +43106,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[48]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[48]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -43250,10 +43250,10 @@
     "rms": 0.8032172265993325
    }
   },
-  "coherent_wave[48]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[48]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[48]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[48]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[48]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -43420,10 +43420,10 @@
     "rms": 0.8031927011139595
    }
   },
-  "coherent_wave[48]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[48]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[48]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[48]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[48]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -43590,10 +43590,10 @@
     "rms": 0.8031927011139595
    }
   },
-  "coherent_wave[48]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[48]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[48]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[48]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[48]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -43665,17 +43665,17 @@
   "coherent_wave[49]/wave_solver_type/index": 1,
   "coherent_wave[49]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[49]/global_quantities[0]/power": 0.0,
-  "coherent_wave[49]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[49]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[49]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[49]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[49]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[49]/global_quantities[1]/power": 0.0,
-  "coherent_wave[49]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[49]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[49]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[49]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[49]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[49]/global_quantities[2]/power": 0.0,
-  "coherent_wave[49]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[49]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[49]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[49]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[49]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -43755,7 +43755,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[49]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[49]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -43876,7 +43876,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[49]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[49]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -43997,7 +43997,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[49]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[49]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -44141,10 +44141,10 @@
     "rms": 0.8199851691544379
    }
   },
-  "coherent_wave[49]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[49]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[49]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[49]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[49]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -44311,10 +44311,10 @@
     "rms": 0.8199814260570722
    }
   },
-  "coherent_wave[49]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[49]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[49]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[49]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[49]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -44481,10 +44481,10 @@
     "rms": 0.8199814260570722
    }
   },
-  "coherent_wave[49]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[49]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[49]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[49]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[49]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -44556,17 +44556,17 @@
   "coherent_wave[50]/wave_solver_type/index": 1,
   "coherent_wave[50]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[50]/global_quantities[0]/power": 0.0,
-  "coherent_wave[50]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[50]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[50]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[50]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[50]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[50]/global_quantities[1]/power": 0.0,
-  "coherent_wave[50]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[50]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[50]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[50]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[50]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[50]/global_quantities[2]/power": 0.0,
-  "coherent_wave[50]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[50]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[50]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[50]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[50]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -44646,7 +44646,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[50]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[50]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -44767,7 +44767,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[50]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[50]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -44888,7 +44888,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[50]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[50]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -45032,10 +45032,10 @@
     "rms": 0.8321781625718592
    }
   },
-  "coherent_wave[50]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[50]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[50]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[50]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[50]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -45202,10 +45202,10 @@
     "rms": 0.8321975886912443
    }
   },
-  "coherent_wave[50]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[50]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[50]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[50]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[50]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -45372,10 +45372,10 @@
     "rms": 0.8321975886912443
    }
   },
-  "coherent_wave[50]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[50]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[50]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[50]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[50]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -45447,17 +45447,17 @@
   "coherent_wave[51]/wave_solver_type/index": 1,
   "coherent_wave[51]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[51]/global_quantities[0]/power": 0.0,
-  "coherent_wave[51]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[51]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[51]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[51]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[51]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[51]/global_quantities[1]/power": 0.0,
-  "coherent_wave[51]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[51]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[51]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[51]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[51]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[51]/global_quantities[2]/power": 0.0,
-  "coherent_wave[51]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[51]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[51]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[51]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[51]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -45537,7 +45537,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[51]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[51]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -45658,7 +45658,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[51]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[51]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -45779,7 +45779,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[51]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[51]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -45923,10 +45923,10 @@
     "rms": 0.8434044175995021
    }
   },
-  "coherent_wave[51]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[51]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[51]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[51]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[51]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -46093,10 +46093,10 @@
     "rms": 0.8434478750647738
    }
   },
-  "coherent_wave[51]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[51]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[51]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[51]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[51]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -46263,10 +46263,10 @@
     "rms": 0.8434478750647738
    }
   },
-  "coherent_wave[51]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[51]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[51]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[51]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[51]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -46338,17 +46338,17 @@
   "coherent_wave[52]/wave_solver_type/index": 1,
   "coherent_wave[52]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[52]/global_quantities[0]/power": 0.0,
-  "coherent_wave[52]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[52]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[52]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[52]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[52]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[52]/global_quantities[1]/power": 0.0,
-  "coherent_wave[52]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[52]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[52]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[52]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[52]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[52]/global_quantities[2]/power": 0.0,
-  "coherent_wave[52]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[52]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[52]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[52]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[52]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -46428,7 +46428,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[52]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[52]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -46549,7 +46549,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[52]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[52]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -46670,7 +46670,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[52]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[52]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -46814,10 +46814,10 @@
     "rms": 0.8070394511883956
    }
   },
-  "coherent_wave[52]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[52]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[52]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[52]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[52]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -46984,10 +46984,10 @@
     "rms": 0.8071185249947362
    }
   },
-  "coherent_wave[52]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[52]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[52]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[52]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[52]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -47154,10 +47154,10 @@
     "rms": 0.8071185249947362
    }
   },
-  "coherent_wave[52]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[52]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[52]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[52]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[52]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -47229,17 +47229,17 @@
   "coherent_wave[53]/wave_solver_type/index": 1,
   "coherent_wave[53]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[53]/global_quantities[0]/power": 0.0,
-  "coherent_wave[53]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[53]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[53]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[53]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[53]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[53]/global_quantities[1]/power": 0.0,
-  "coherent_wave[53]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[53]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[53]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[53]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[53]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[53]/global_quantities[2]/power": 0.0,
-  "coherent_wave[53]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[53]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[53]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[53]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[53]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -47319,7 +47319,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[53]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[53]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -47440,7 +47440,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[53]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[53]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -47561,7 +47561,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[53]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[53]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -47705,10 +47705,10 @@
     "rms": 0.8207825145664955
    }
   },
-  "coherent_wave[53]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[53]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[53]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[53]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[53]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -47875,10 +47875,10 @@
     "rms": 0.8208903022842783
    }
   },
-  "coherent_wave[53]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[53]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[53]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[53]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[53]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -48045,10 +48045,10 @@
     "rms": 0.8208903022842783
    }
   },
-  "coherent_wave[53]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[53]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[53]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[53]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[53]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -48120,17 +48120,17 @@
   "coherent_wave[54]/wave_solver_type/index": 1,
   "coherent_wave[54]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[54]/global_quantities[0]/power": 0.0,
-  "coherent_wave[54]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[54]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[54]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[54]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[54]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[54]/global_quantities[1]/power": 0.0,
-  "coherent_wave[54]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[54]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[54]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[54]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[54]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[54]/global_quantities[2]/power": 0.0,
-  "coherent_wave[54]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[54]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[54]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[54]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[54]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -48210,7 +48210,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[54]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[54]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -48331,7 +48331,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[54]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[54]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -48452,7 +48452,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[54]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[54]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -48596,10 +48596,10 @@
     "rms": 0.83178113563313
    }
   },
-  "coherent_wave[54]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[54]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[54]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[54]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[54]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -48766,10 +48766,10 @@
     "rms": 0.8319160193101696
    }
   },
-  "coherent_wave[54]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[54]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[54]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[54]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[54]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -48936,10 +48936,10 @@
     "rms": 0.8319160193101696
    }
   },
-  "coherent_wave[54]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[54]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[54]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[54]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[54]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -49011,17 +49011,17 @@
   "coherent_wave[55]/wave_solver_type/index": 1,
   "coherent_wave[55]/global_quantities[0]/frequency": 170000000000.0,
   "coherent_wave[55]/global_quantities[0]/power": 0.0,
-  "coherent_wave[55]/global_quantities[0]/current_tor": 0.0,
+  "coherent_wave[55]/global_quantities[0]/current_phi": 0.0,
   "coherent_wave[55]/global_quantities[0]/electrons/power_thermal": 0.0,
   "coherent_wave[55]/global_quantities[0]/electrons/distribution_assumption": 0,
   "coherent_wave[55]/global_quantities[1]/frequency": 170000000000.0,
   "coherent_wave[55]/global_quantities[1]/power": 0.0,
-  "coherent_wave[55]/global_quantities[1]/current_tor": 0.0,
+  "coherent_wave[55]/global_quantities[1]/current_phi": 0.0,
   "coherent_wave[55]/global_quantities[1]/electrons/power_thermal": 0.0,
   "coherent_wave[55]/global_quantities[1]/electrons/distribution_assumption": 0,
   "coherent_wave[55]/global_quantities[2]/frequency": 170000000000.0,
   "coherent_wave[55]/global_quantities[2]/power": 0.0,
-  "coherent_wave[55]/global_quantities[2]/current_tor": 0.0,
+  "coherent_wave[55]/global_quantities[2]/current_phi": 0.0,
   "coherent_wave[55]/global_quantities[2]/electrons/power_thermal": 0.0,
   "coherent_wave[55]/global_quantities[2]/electrons/distribution_assumption": 0,
   "coherent_wave[55]/profiles_1d[0]/grid/rho_tor_norm": {
@@ -49101,7 +49101,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[55]/profiles_1d[0]/current_tor_inside": {
+  "coherent_wave[55]/profiles_1d[0]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -49222,7 +49222,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[55]/profiles_1d[1]/current_tor_inside": {
+  "coherent_wave[55]/profiles_1d[1]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -49343,7 +49343,7 @@
     "rms": 0.0
    }
   },
-  "coherent_wave[55]/profiles_1d[2]/current_tor_inside": {
+  "coherent_wave[55]/profiles_1d[2]/current_phi_inside": {
    "summary": {
     "shape": [
      501
@@ -49487,10 +49487,10 @@
     "rms": 0.8423299235266731
    }
   },
-  "coherent_wave[55]/beam_tracing[0]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[55]/beam_tracing[0]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[55]/beam_tracing[0]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[55]/beam_tracing[0]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[55]/beam_tracing[0]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -49657,10 +49657,10 @@
     "rms": 0.8424927736634509
    }
   },
-  "coherent_wave[55]/beam_tracing[1]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[55]/beam_tracing[1]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[55]/beam_tracing[1]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[55]/beam_tracing[1]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[55]/beam_tracing[1]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
@@ -49827,10 +49827,10 @@
     "rms": 0.8424927736634509
    }
   },
-  "coherent_wave[55]/beam_tracing[2]/beam[0]/wave_vector/n_tor": [
+  "coherent_wave[55]/beam_tracing[2]/beam[0]/wave_vector/n_phi": [
    2
   ],
-  "coherent_wave[55]/beam_tracing[2]/beam[0]/wave_vector/varying_n_tor": 0,
+  "coherent_wave[55]/beam_tracing[2]/beam[0]/wave_vector/varying_n_phi": 0,
   "coherent_wave[55]/beam_tracing[2]/beam[0]/e_field/plus/real": {
    "summary": {
     "shape": [
