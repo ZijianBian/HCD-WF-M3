@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR: cyrano
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib, INTERPOS]
+MODULES: [IMAS-Python, iWrap, XMLlib, INTERPOS, IMAS-Fortran]
 
 BUILDS: 
   - DIR: cyrano
-    CMD: make veryclean validate library DEBUG=yes FC=ifort
+    CMD: make veryclean validate library DEBUG=yes FC="$FC"
 
 ACTORS: 
   - DIR: cyrano
-    CMD: make actor DEBUG=yes FC=ifort
+    CMD: make actor DEBUG=yes FC="$FC"
 
 #COMMENTS:  
 ...

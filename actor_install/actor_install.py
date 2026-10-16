@@ -181,14 +181,18 @@ def get_sources(desc, args):
                 print("Checked-out " + s.get("REPO") + " in revision " + str(wcrev))
 
         elif s.get("VCS").lower() == "git":
+            version = str(s.get("VERSION"))
+            if is_commit_hash(version):
+                clone_cmds = [
+                    ["git", "clone", s.get("REPO"), s.get("DIR")],
+                    ["git", "-C", s.get("DIR"), "checkout", "--detach", version],
+                ]
+            else:
+                clone_cmds = [["git", "clone", "--single-branch", "-b", version, s.get("REPO"), s.get("DIR")]]
             try:
-                result = subprocess.run(
-                    ["git", "clone", "--single-branch", "-b", s.get("VERSION"), s.get("REPO"), s.get("DIR")],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
-                print(result.stdout)
+                for cmd in clone_cmds:
+                    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                    print(result.stdout)
             except subprocess.CalledProcessError as e:
                 print(f"Git clone error: {e}")
                 print(e.stderr)
@@ -207,19 +211,14 @@ def get_sources(desc, args):
                 os.chdir(prevdir)
                 return 1
 
-            version = s.get("VERSION")
-
             if not args.checkRevision:
                 print(f"Cloned {s.get('REPO')} with HEAD at {hhash}")
                 os.chdir(prevdir)
                 continue
 
-            # Check if VERSION is a commit hash (40 hex characters)
-            is_hash = len(version) == 40 and all(c in "0123456789abcdef" for c in version.lower())
-
-            if is_hash:
-                # Compare commit hashes
-                if hhash != version:
+            if is_commit_hash(version):
+                # Compare commit hashes (VERSION may be abbreviated)
+                if not hhash.startswith(version.lower()):
                     print("Wrong commit hash of cloned GIT repo")
                     print(f"Got {hhash} and was expecting {version}")
                     return 1
@@ -344,6 +343,56 @@ def install_actors(desc, args):
     return 0
 
 
+def is_commit_hash(version):
+    """True if VERSION looks like a (possibly abbreviated) git commit hash rather than a branch or tag"""
+    return 7 <= len(version) <= 40 and all(c in "0123456789abcdef" for c in version.lower())
+
+
+def parse_version_overrides(specs):
+    """Parse ["DIR=VERSION", ...] into a dict, keyed by the SOURCES DIR"""
+    overrides = {}
+    for spec in specs:
+        if "=" not in spec:
+            raise ValueError(f"Invalid version override '{spec}', expected DIR=VERSION")
+        src_dir, version = spec.split("=", 1)
+        overrides[src_dir.strip()] = version.strip()
+    return overrides
+
+
+def apply_version_overrides(sources, overrides, used):
+    for s in sources:
+        if s.get("DIR") in overrides:
+            print(f"Overriding VERSION of {s.get('DIR')}: {s.get('VERSION')} -> {overrides[s.get('DIR')]}")
+            s["VERSION"] = overrides[s.get("DIR")]
+            used.add(s.get("DIR"))
+
+
+def setup_fc(user_fc):
+    """Select the Fortran compiler from the loaded modules unless FC was given by the caller"""
+    if user_fc:
+        fc = user_fc
+    else:
+        fc = next((c for c in ("ifort", "ifx", "gfortran") if shutil.which(c)), None)
+        if fc is None:
+            print("No supported Fortran compiler (ifort/ifx/gfortran) found in loaded modules. Set FC explicitly.")
+            return 1
+    os.environ["FC"] = fc
+    print(f"Using FC={fc}")
+    return 0
+
+
+def check_actors(names):
+    """Verify that each actor package was installed in ACTOR_FOLDER"""
+    actor_folder = os.environ.get("ACTOR_FOLDER")
+    if not actor_folder:
+        print("Warning: ACTOR_FOLDER is not set, skipping installed actor check")
+        return 0
+    missing = [n for n in names if not os.path.isfile(os.path.join(actor_folder, n, "actor.py"))]
+    for n in missing:
+        print(f"Actor {n} not found: {os.path.join(actor_folder, n, 'actor.py')} does not exist")
+    return 1 if missing else 0
+
+
 # main
 argp = argparse.ArgumentParser(
     prog="actor_install.py",
@@ -372,6 +421,15 @@ argp.add_argument(
     "--checkRevision",
     action="store_true",
     help="Check if checked-out sources correspond to expected revision",
+)
+argp.add_argument(
+    "-V",
+    "--version",
+    action="append",
+    default=[],
+    metavar="DIR=VERSION",
+    help="Override VERSION (branch, tag or commit) of the source checked out in DIR; can be repeated. "
+    "Also read from the space-separated ACTOR_VERSIONS environment variable (command line wins)",
 )
 argp.add_argument(
     "--skipModules",
@@ -420,83 +478,65 @@ if args.skipModules:
         release["Default Modules"] = []
 
 release["Projects"] = []
+failures = []
+user_fc = os.environ.get("FC")
+# MODULES and ACTOR_VERSIONS from the environment (e.g. Bamboo plan variables) replace the YAML values
+env_modules = os.environ.get("MODULES", "").split()
+version_overrides = parse_version_overrides(os.environ.get("ACTOR_VERSIONS", "").split() + args.version)
+used_overrides = set()
 
-for yml in args.yml:
-    fname = yml.name
-    if fname == "TEMPLATE.yml":
-        continue
+
+def fail(fname, step):
+    print(f"Error during {step} steps for {fname}")
+    return 1
+
+
+def process_yml(desc, fname, project):
+    """Run all steps for one YAML description, return non-zero on the first failing step"""
+    if args.skipModules:
+        print("Bypassing environment modules setup")
+        # But still load preModule if specified
+        if args.preModule is not None:
+            print(f"Loading pre-module: {args.preModule}")
+            err = module("load", args.preModule)
+            if err != "":
+                print(err)
+                if "ERROR" in err:
+                    return fail(fname, "MODULE")
+            print(f"Loaded {args.preModule}")
+    else:
+        modules = env_modules or desc.get("MODULES")
+        if env_modules:
+            print("Using modules from MODULES environment variable instead of " + fname)
+        project["MODULES"] = modules
+        if setup_env(modules, args):
+            return fail(fname, "MODULE")
+
+    if args.verbose:
+        print("Check modules list:")
+        print(module("list"))
+
+    if setup_fc(user_fc):
+        return fail(fname, "COMPILER")
 
     try:
-        desc = yamlload(yml, Loader=yamlLoader)
-
-        if args.verbose:
-            print(desc)
-
-        project = {
-            "DEPLOYER": getuser(),
-            "DATE": datetime.now(),
-        }  # .strftime('%Y-%m-%d_%Hh%Mm%Ss')}
-
-        # 'SOURCES': desc.get('SOURCES'),
-        # 'MODULES': desc.get('MODULES'),
-        # 'BUILDS': desc.get('BUILDS'),
-        # 'ACTORS': desc.get('ACTORS')
-        # release['Projects'] += [{fname: project}]
-
-        print("============" + len(fname) * "=" + "=======")
-        print(" ===== from " + fname + " =====")
-        print("============" + len(fname) * "=" + "=======")
-
-        if args.skipModules:
-            print("Bypassing environment modules setup")
-            # But still load preModule if specified
-            if args.preModule is not None:
-                print(f"Loading pre-module: {args.preModule}")
-                err = module("load", args.preModule)
-                if err != "":
-                    if "ERROR" in err:
-                        print(f"Error loading pre-module {args.preModule}")
-                        print(err)
-                        if args.pedantic:
-                            sys.exit()
-                        else:
-                            continue
-                    else:
-                        print(err)
-                print(f"Loaded {args.preModule}")
-        else:
-            project["MODULES"] = desc.get("MODULES")
-            if setup_env(desc.get("MODULES"), args):
-                print("Error during MODULE steps for " + fname)
-                if args.pedantic:
-                    sys.exit()
-                else:
-                    continue
-
-        if args.verbose:
-            print("Check modules list:")
-            print(module("list"))
-
-        try:
-            os.mkdir(args.workDir)
-            print("Workdir=" + args.workDir + " created successfully")
-        except OSError:
-            print("Workdir=" + args.workDir + " exists already")
-        prevdir = os.getcwd()
-        os.chdir(args.workDir)
-
+        os.mkdir(args.workDir)
+        print("Workdir=" + args.workDir + " created successfully")
+    except OSError:
+        print("Workdir=" + args.workDir + " exists already")
+    prevdir = os.getcwd()
+    os.chdir(args.workDir)
+    try:
         if args.skipSources:
             print("Bypassing sources checkout")
         else:
+            if desc.get("SOURCES") is not None:
+                apply_version_overrides(desc.get("SOURCES"), version_overrides, used_overrides)
             project["SOURCES"] = desc.get("SOURCES")
             if desc.get("SOURCES") is None:
                 print(f"Warning: No SOURCES section in {fname}, skipping source checkout")
             elif get_sources(desc.get("SOURCES"), args):
-                print("Error during SOURCE steps for " + fname)
-                if args.pedantic:
-                    sys.exit()
-                else:
-                    continue
+                return fail(fname, "SOURCE")
 
         if args.skipBuilds:
             print("Bypassing libraries build")
@@ -505,11 +545,7 @@ for yml in args.yml:
             if desc.get("BUILDS") is None:
                 print(f"Warning: No BUILDS section in {fname}, skipping build")
             elif build_libs(desc.get("BUILDS"), args):
-                print("Error during BUILD steps for " + fname)
-                if args.pedantic:
-                    sys.exit()
-                else:
-                    continue
+                return fail(fname, "BUILD")
 
         if args.skipActors:
             print("Bypassing actors install")
@@ -518,19 +554,55 @@ for yml in args.yml:
             if desc.get("ACTORS") is None:
                 print(f"Warning: No ACTORS section in {fname}, skipping actor install")
             elif install_actors(desc.get("ACTORS"), args):
-                print("Error during ACTOR steps for " + fname)
-                if args.pedantic:
-                    sys.exit()
-                else:
-                    continue
-
+                return fail(fname, "ACTOR")
+            # Actor package names default to the YAML file name (hcd2core-sources.yml -> hcd2core_sources)
+            default_name = os.path.splitext(os.path.basename(fname))[0].replace("-", "_")
+            if check_actors(desc.get("ACTOR_NAMES", [default_name])):
+                return fail(fname, "ACTOR CHECK")
+    finally:
         os.chdir(prevdir)
 
-        release["Projects"] += [{fname: project}]
+    return 0
 
+
+for yml in args.yml:
+    fname = yml.name
+    if fname == "TEMPLATE.yml":
+        continue
+
+    print("============" + len(fname) * "=" + "=======")
+    print(" ===== from " + fname + " =====")
+    print("============" + len(fname) * "=" + "=======")
+
+    project = {
+        "DEPLOYER": getuser(),
+        "DATE": datetime.now(),
+    }
+    try:
+        desc = yamlload(yml, Loader=yamlLoader)
+        if args.verbose:
+            print(desc)
+        status = process_yml(desc, fname, project)
     except Exception as exc:
         print(f"Error processing {fname}: {exc}")
+        status = 1
+
+    if status:
+        failures.append(fname)
+        if args.pedantic:
+            break
+    else:
+        release["Projects"] += [{fname: project}]
 
 # Write release information to file
 with open("RELEASE.yaml", "w", encoding="utf-8") as stream:
     yamldump(release, stream)
+
+unused_overrides = set(version_overrides) - used_overrides
+if unused_overrides and not args.skipSources and not (args.pedantic and failures):
+    print("Version overrides matching no SOURCES DIR: " + ", ".join(sorted(unused_overrides)))
+    failures.append("ACTOR_VERSIONS")
+
+if failures:
+    print("Failed: " + ", ".join(failures))
+    sys.exit(1)

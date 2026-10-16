@@ -3,18 +3,18 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/torbeam.git
-    VERSION: master
+    VERSION: develop
     DIR: torbeam
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib, CMake]
+MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, CMake, IMAS-Fortran]
 
 BUILDS: 
   - DIR: torbeam/tests/test_imas
-    CMD: cd build && export FC=ifort && rm -f CMakeCache.txt && find . -name link.txt -exec rm -rf {} \; && cmake ../../.. -DUSE_PERF=ON -DUSE_LAGR_INTERPOL=ON -DUSE_XHOST=ON -DUSE_OPENMP=ON && make clean && make torbeam_imas
+    CMD: cd build && rm -f CMakeCache.txt && find . -name link.txt -exec rm -rf {} \; && cmake ../../.. -DUSE_PERF=ON -DUSE_LAGR_INTERPOL=ON -DUSE_XHOST=ON -DUSE_OPENMP=ON && make clean && make torbeam_imas
 
 ACTORS: 
   - DIR: torbeam/tests/test_imas
-    CMD: cd build && export FC=ifort && iwrap -f torbeam.yaml -i "$ACTOR_FOLDER"
+    CMD: cd build && iwrap -f torbeam.yaml -i "$ACTOR_FOLDER"
 #COMMENTS:  
 ...
   

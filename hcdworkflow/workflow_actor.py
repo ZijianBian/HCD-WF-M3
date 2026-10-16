@@ -64,7 +64,7 @@ class WorkflowActor:
 
         actor = eval(actorName)
         runtime_settings = actor.get_runtime_settings()
-        runtime_settings.ids_storage.backend = imas.imasdef.MEMORY_BACKEND  # pylint: disable=no-member # IMAS-4055
+        runtime_settings.ids_storage.backend = imas.ids_defs.MEMORY_BACKEND  # IMAS-4055
         code_parameters = actor.get_code_parameters()
         if xmlPath:
             code_parameters.parameters_path = xmlPath
@@ -112,11 +112,12 @@ class WorkflowActor:
 
     def getIDSDict(self, idsData):
         idsDict = {}
+        factory = imas.IDSFactory()
         if isinstance(idsData, list):
             for idsName in idsData:
-                idsDict[idsName] = eval(f"imas.{idsName}()")
+                idsDict[idsName] = factory.new(idsName)
         else:
-            idsDict[idsData] = eval(f"imas.{idsData}()")
+            idsDict[idsData] = factory.new(idsData)
         return idsDict
 
     def getIDSList(self, intentType="IN"):

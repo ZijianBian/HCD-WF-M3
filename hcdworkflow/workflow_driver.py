@@ -3,6 +3,7 @@ import os
 import sys
 
 from hcdworkflow.hcd_workflow import HCDWorkflow
+from hcdworkflow.workflow_dbhelper import get_ids
 
 log = logging.getLogger()
 log.setLevel(logging.ERROR)
@@ -39,7 +40,7 @@ class WorkflowDriver:
         if self.workflowObject.workflowData.one_time_slice == 0:
             # INPUT TIME ARRAY
             # try:
-            time_array = self.inputDb.partial_get(ids_name="equilibrium", data_path="time")
+            time_array = self.inputDb.get("equilibrium", lazy=True).time.value
             # except:
             #     print(
             #         "  ERROR while reading the equilibrium IDS: is it really present in the input file?",
@@ -177,7 +178,7 @@ class WorkflowDriver:
         for ids in self.inputIds:
             print("  Get", ids, file=sys.stdout)
             try:
-                idsSlices[ids] = self.inputDb.get_slice(ids, timenow, 1)
+                idsSlices[ids] = get_ids(self.inputDb, ids, timenow)
             except Exception:
                 print(f"  ERROR while reading the {ids} IDS:", file=sys.stderr)
                 print(
@@ -195,7 +196,7 @@ class WorkflowDriver:
                 # feature/repair_231017
                 # TODO This change is not needed as input slices are separate from process
                 # if 'merge_' not in process:
-                idsSlices[ids] = self.md.get_slice(ids, timenow, 1)
+                idsSlices[ids] = get_ids(self.md, ids, timenow)
             except Exception:
                 print(f"  ERROR while reading the {ids} IDS:", file=sys.stderr)
                 print(

@@ -3,10 +3,12 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/traj/ascot.git
-    VERSION: master
+    VERSION: develop
     DIR:     ascot
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib, AMNS]
+MODULES: [IMAS-Python, iWrap, XMLlib, AMNS, IMAS-Fortran]
+
+ACTOR_NAMES: [afsi, ascot_serial, ascot_parallel, ascot4rfof_serial, ascot4rfof_parallel, bbnbi_serial, bbnbi_parallel]
 
 BUILDS: 
   - DIR: ascot

@@ -326,14 +326,8 @@ Currently the project has test data but no automated tests. To test:
 Code Quality
 ~~~~~~~~~~~~
 
-Run static analysis as done in CI:
-
-.. code-block:: bash
-
-   # From project root
-   bash ci-sdcc/st05-staticanalysis.sh
-
-Or manually:
+Static analysis runs in GitHub Actions on every push (``.github/workflows/linting.yml``).
+To run the same checks locally:
 
 .. code-block:: bash
 

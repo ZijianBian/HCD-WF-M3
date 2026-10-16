@@ -6,15 +6,17 @@ SOURCES:
     VERSION: develop
     DIR:     hcd_mergers
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap]
+MODULES: [IMAS-Python, iWrap, IMAS-Fortran]
+
+ACTOR_NAMES: [merge_core_sources, merge_distribution_sources, merge_distributions, merge_waves]
 
 BUILDS: 
   - DIR: hcd_mergers
-    CMD: make -C mergers/ clean library FC=ifort
+    CMD: make -C mergers/ clean library FC="$FC"
 
 ACTORS: 
   - DIR: hcd_mergers
-    CMD: make -C mergers/ iwrapactor FC=ifort
+    CMD: make -C mergers/ iwrapactor FC="$FC"
 
 #COMMENTS: |
 ...

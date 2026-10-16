@@ -2,6 +2,8 @@ import collections
 import copy
 import sys
 
+import imas
+
 from tools.hcd_tools import is_ec_on, is_ic_on, is_lh_on, is_nbi_on
 from tools.stdout_redirector import redirect_stdout, stdout_back
 
@@ -282,17 +284,17 @@ class WorkflowExecutor:
                             if ids in self.process_bundle[process]["input"]:
                                 output_ids_data = self.process_bundle[process]["input"][ids]
                             else:
-                                output_ids_data = eval("imas." + ids + "()")
+                                output_ids_data = imas.IDSFactory().new(ids)
                         else:
                             if ids in self.process_bundle[process]["input"]:
                                 output_ids_data.append(self.process_bundle[process]["input"][ids])
                             else:
-                                output_ids_data.append(eval("imas." + ids + "()"))
+                                output_ids_data.append(imas.IDSFactory().new(ids))
             else:
                 # feature/repair_231017
                 actor = self.dictionary_of_actors[process]
                 kmerge = 0
-                ids_to_be_merged = self.process_bundle[process]["input"][0].__name__
+                ids_to_be_merged = self.process_bundle[process]["input"][0].metadata.name
                 for each_proc in self.process_bundle.keys():  # merge only if at least one of involved codes is called
                     if (
                         ids_to_be_merged in self.process_bundle[each_proc]["input"]
@@ -313,18 +315,18 @@ class WorkflowExecutor:
                 if not hasattr(output_ids_data, "__len__"):
                     # if hasattr(output_ids_data,'__len__'):
                     #    for iids in range(len(output_ids_data)):
-                    self.process_bundle[process]["output"][output_ids_data.__name__] = output_ids_data
+                    self.process_bundle[process]["output"][output_ids_data.metadata.name] = output_ids_data
                 else:
-                    self.process_bundle[process]["output"][output_ids_data[iids].__name__] = output_ids_data[iids]
+                    self.process_bundle[process]["output"][output_ids_data[iids].metadata.name] = output_ids_data[iids]
 
                 if output_ids_list[iids] not in bundle_out.keys() or "merge_" in process:
                     if not hasattr(output_ids_data, "__len__"):
                         bundle_out[output_ids_list[iids]] = self.process_bundle[process]["output"][
-                            output_ids_data.__name__
+                            output_ids_data.metadata.name
                         ]
                     else:
                         bundle_out[output_ids_list[iids]] = self.process_bundle[process]["output"][
-                            output_ids_data[iids].__name__
+                            output_ids_data[iids].metadata.name
                         ]
                 else:
                     # feature/repair_231017
@@ -332,7 +334,7 @@ class WorkflowExecutor:
                         tmp_output_ids_data = output_ids_data[iids]
                     else:
                         tmp_output_ids_data = output_ids_data
-                    if bundle_out[output_ids_list[iids]].__name__ == tmp_output_ids_data.__name__:
+                    if bundle_out[output_ids_list[iids]].metadata.name == tmp_output_ids_data.metadata.name:
                         self.process_bundle["merge_" + output_ids_list[iids]] = {}
                         self.process_bundle["merge_" + output_ids_list[iids]]["input"] = [
                             bundle_out[output_ids_list[iids]],

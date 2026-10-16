@@ -7,7 +7,7 @@ import imas
 
 from gui.gui_methods import create_workflow_param_from_file
 from hcdworkflow.hcd_workflow import HCDWorkflow
-from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
+from hcdworkflow.workflow_dbhelper import WorkflowDbHelper, get_ids
 
 isWaveformCookerPresent = True
 try:
@@ -72,9 +72,9 @@ inputMds = ["nbi", "ic_antennas", "ec_launchers", "lh_antennas", "wall"]
 # Prepare Memory DB
 # Check if Machine description is exists and write to memory db
 for idsName in inputMds:
-    idsObject = inputDb.get(idsName)
+    idsObject = get_ids(inputDb, idsName)
 
-    if idsObject.ids_properties.homogeneous_time != imas.imasdef.EMPTY_INT:
+    if idsObject.ids_properties.homogeneous_time != imas.ids_defs.EMPTY_INT:
         machineDb.put(idsObject)
     else:
         print(f"{idsName} is not present in the scenario data, you can provide it with waveform cooker if required", file=sys.stderr)
@@ -112,15 +112,15 @@ for filename in os.listdir(config_folder_path):
 timeArray = dbhelper.getTimeArray(inputDb)
 
 timenow = 320.00
-equilibrium = inputDb.get_slice("equilibrium", timenow, 1)
-core_profiles = inputDb.get_slice("core_profiles", timenow, 1)
-workflow = inputDb.get_slice("workflow", timenow, 1)
+equilibrium = get_ids(inputDb, "equilibrium", timenow)
+core_profiles = get_ids(inputDb, "core_profiles", timenow)
+workflow = get_ids(inputDb, "workflow", timenow)
 
-nbi = machineDb.get_slice("nbi", timenow, 1)
-ic_antennas = machineDb.get_slice("ic_antennas", timenow, 1)
-ec_launchers = machineDb.get_slice("ec_launchers", timenow, 1)
-lh_antennas = machineDb.get_slice("lh_antennas", timenow, 1)
-wall = machineDb.get_slice("wall", timenow, 1)
+nbi = get_ids(machineDb, "nbi", timenow)
+ic_antennas = get_ids(machineDb, "ic_antennas", timenow)
+ec_launchers = get_ids(machineDb, "ec_launchers", timenow)
+lh_antennas = get_ids(machineDb, "lh_antennas", timenow)
+wall = get_ids(machineDb, "wall", timenow)
 
 hcdWorkflow = HCDWorkflow()
 hcdWorkflow.initialize(config_folder_path)

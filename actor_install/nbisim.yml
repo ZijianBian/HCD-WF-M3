@@ -4,13 +4,13 @@ SOURCES:
     VERSION: develop
     DIR:     nbisim
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib]
+MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: nbisim
-    CMD: make -C devel/ veryclean veryclean-deps DATAMODEL=IMAS DEBUG=yes FC=ifort
+    CMD: make -C devel/ veryclean veryclean-deps DATAMODEL=IMAS DEBUG=yes FC="$FC"
 
 ACTORS: 
   - DIR: nbisim
-    CMD: make -C devel/ iwrap_actor FC=ifort DEBUG=yes
+    CMD: make -C devel/ iwrap_actor FC="$FC" DEBUG=yes
 

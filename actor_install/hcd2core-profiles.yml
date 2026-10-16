@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR:     hcd2core-profiles
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib]
+MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: hcd2core-profiles
-    CMD: make -C src/ clean veryclean info validate library DEBUG=yes FC=ifort
+    CMD: make -C src/ clean veryclean info validate library DEBUG=yes FC="$FC"
 
 ACTORS: 
   - DIR: hcd2core-profiles
-    CMD: make -C src/ iwrapactor FC=ifort DEBUG=yes
+    CMD: make -C src/ iwrapactor FC="$FC" DEBUG=yes
 
 #COMMENTS:  
 ...

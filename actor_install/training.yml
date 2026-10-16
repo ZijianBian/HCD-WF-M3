@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR: training
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib]
+MODULES: [IMAS-Python, iWrap, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: training/level2/fortran

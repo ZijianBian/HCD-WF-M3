@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR:     lion
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib]
+MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: lion
-    CMD: make -C src_f90/ clean veryclean libraries IMAS_ENVIRONMENT_LOADED=yes DEBUG=no F90=ifort
+    CMD: make -C src_f90/ clean veryclean libraries IMAS_ENVIRONMENT_LOADED=yes DEBUG=no F90="$FC"
 
 ACTORS: 
   - DIR: lion
-    CMD: make -C src_f90/ iwrap_actor IMAS_ENVIRONMENT_LOADED=yes DEBUG=no F90=ifort
+    CMD: make -C src_f90/ iwrap_actor IMAS_ENVIRONMENT_LOADED=yes DEBUG=no F90="$FC"
 
 #COMMENTS:  
 ...

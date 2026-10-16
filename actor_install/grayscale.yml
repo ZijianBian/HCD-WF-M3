@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR: grayscale
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib,lxml]
+MODULES: [IMAS-Python, iWrap, XMLlib, lxml, IMAS-Fortran]
 
 BUILDS: 
   - DIR: grayscale
-    CMD: make clean library FC=ifort DEBUG=yes
+    CMD: make clean library FC="$FC" DEBUG=yes
 
 ACTORS: 
   - DIR: grayscale
-    CMD: make clean iwrap_actor FC=ifort DEBUG=yes
+    CMD: make clean iwrap_actor FC="$FC" DEBUG=yes
 
 #COMMENTS:  
 ...

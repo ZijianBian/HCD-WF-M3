@@ -6,7 +6,7 @@ import imas
 
 import hcdworkflow
 from gui.gui_methods import create_workflow_param_from_file
-from hcdworkflow.workflow_dbhelper import WorkflowDbHelper
+from hcdworkflow.workflow_dbhelper import WorkflowDbHelper, get_ids
 from hcdworkflow.workflow_driver import WorkflowDriver
 from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 
@@ -66,13 +66,13 @@ def wf_wrapper(par_path):
     # TODO load only required by process machine descriptions
     # Prepare Memory DB, Check if Machine description is exists and write to memory db
     for idsName in inputMds:
-        idsObject = inputDb.get(idsName)
-        if idsObject.ids_properties.homogeneous_time != imas.imasdef.EMPTY_INT:
+        idsObject = get_ids(inputDb, idsName)
+        if idsObject.ids_properties.homogeneous_time != imas.ids_defs.EMPTY_INT:
             machineDb.put(idsObject)
         else:
             if idsName == "wall":
                 try:
-                    _backend = getattr(imas.imasdef, wall_md["backend"] + "_BACKEND")
+                    _backend = getattr(imas.ids_defs, wall_md["backend"] + "_BACKEND")
                     wall = imas.DBEntry(
                         _backend,
                         wall_md["database"],

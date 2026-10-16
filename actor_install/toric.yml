@@ -6,7 +6,7 @@ SOURCES:
     VERSION: develop
     DIR: toric
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib, netCDF-Fortran, FFTW]
+MODULES: [IMAS-Python, iWrap, XMLlib, netCDF-Fortran, FFTW, IMAS-Fortran]
 
 BUILDS: 
   - DIR: toric

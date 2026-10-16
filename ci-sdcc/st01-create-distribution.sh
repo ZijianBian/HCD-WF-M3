@@ -1,13 +1,14 @@
 #!/bin/bash
 # Bamboo CI script to create source distribution and whl package
 # Execute script from root directory
-source /etc/profile.d/modules.sh
-module use /work/imas/etc/modules/all
 
-if [[ "$(uname -n)" == *"bamboo"* ]]; then
+# setup environment
+source ./ci-sdcc/st00-header.sh || exit 1
+
+# Note Disable set -e option when using on local as it will exit the shell on error
+if [[ -n "${bamboo_buildKey:-}" ]]; then
     set -e -u -o pipefail
 fi
-module load Python
 #remove previously created environment
 VIRTUALENV_DIR=virtualenvdir
 if [ -d "$VIRTUALENV_DIR" ]; then

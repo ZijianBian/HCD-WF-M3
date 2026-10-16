@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR: genray
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib, netCDF-Fortran]
+MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, netCDF-Fortran, IMAS-Fortran]
 
 BUILDS: 
   - DIR: genray
-    CMD: make clean libgenray_actor.a F90=ifort
+    CMD: make clean libgenray_actor.a F90="$FC"
 
 ACTORS: 
   - DIR: genray
-    CMD: make actor FC=ifort
+    CMD: make actor FC="$FC"
 
 #COMMENTS:  
 ...

@@ -6,11 +6,11 @@ SOURCES:
     VERSION: develop
     DIR: iccoup
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib]
+MODULES: [IMAS-Python, iWrap, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: iccoup
-    CMD: make -C iccoup/ DEBUG=yes veryclean clean library FC=ifort
+    CMD: make -C iccoup/ DEBUG=yes veryclean clean library FC="$FC"
 
 ACTORS: 
   - DIR: iccoup

@@ -6,19 +6,19 @@ SOURCES:
     VERSION: develop
     DIR: toray
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, XMLlib]
+MODULES: [IMAS-Python, iWrap, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: toray
     CMD:
-      - cd lib/nag && FC=ifort ./naglib.mk
-      - cd lib/netlib && FC=ifort ./netlib.mk
-      - cd lib/ppplib && FC=ifort ./ppplib.mk
-      - FC=ifort make -f make/makefile_imas clean libtoray.a 
+      - cd lib/nag && FC="$FC" ./naglib.mk
+      - cd lib/netlib && FC="$FC" ./netlib.mk
+      - cd lib/ppplib && FC="$FC" ./ppplib.mk
+      - FC="$FC" make -f make/makefile_imas clean libtoray.a 
 
 ACTORS: 
   - DIR: toray
-    CMD: make -f make/makefile_imas actor FC=ifort
+    CMD: make -f make/makefile_imas actor FC="$FC"
 
 #COMMENTS:  
 ...

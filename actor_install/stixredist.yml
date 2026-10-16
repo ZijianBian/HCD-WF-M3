@@ -6,15 +6,17 @@ SOURCES:
     VERSION: develop
     DIR: stixredist
 
-MODULES: [IMAS, iWrap]
+MODULES: [IMAS-Python, iWrap, IMAS-Fortran]
+
+ACTOR_NAMES: [stix_redist]
 
 BUILDS:
   - DIR: stixredist 
-    CMD: make veryclean validate library DEBUG=yes FC=ifort
+    CMD: make veryclean validate library DEBUG=yes FC="$FC"
 
 ACTORS: 
   - DIR: stixredist
-    CMD: make iwrap_actor DEBUG=yes FC=ifort
+    CMD: make iwrap_actor DEBUG=yes FC="$FC"
 
 #COMMENTS:  
 ...

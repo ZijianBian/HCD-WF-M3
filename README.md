@@ -102,10 +102,9 @@ ruff format --check
 
 # Run tests
 hcdslice_nogui -c tests/data/GRAYSCALE/
-
-# Or use the CI script
-bash ci-sdcc/st05-staticanalysis.sh
 ```
+
+Static analysis also runs in CI on every push (`.github/workflows/linting.yml`).
 
 To run the workflow integration tests using pytest:
 

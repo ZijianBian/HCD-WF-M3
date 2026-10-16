@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR: pion
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, NAG/26-intel-compilers-2023.2.1, XMLlib]
+MODULES: [IMAS-Python, iWrap, INTERPOS, NAG/26-intel-compilers-2023.2.1, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: pion
-    CMD: IMASFORPION=DIMAS_LATEST make clean veryclean pimascal.a F90=ifort
+    CMD: IMASFORPION=DIMAS_LATEST make clean veryclean pimascal.a F90="$FC"
 
 ACTORS: 
   - DIR: pion
-    CMD: IMASFORPION=DIMAS_LATEST make iwrap_actor F90=ifort
+    CMD: IMASFORPION=DIMAS_LATEST make iwrap_actor F90="$FC"
 
 #COMMENTS:  
 ...

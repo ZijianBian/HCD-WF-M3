@@ -74,7 +74,7 @@ class WorkflowData:
 
     def createWorkflowIDS(self, dt_required):
         # WORKFLOW IDS CONFIGURATION ACCORDING TO THE TIME LOOP PARAMETERS
-        workflow = imas.workflow()
+        workflow = imas.IDSFactory().workflow()
         workflow.ids_properties.homogeneous_time = 1
         workflow.time.resize(1)
         workflow.time_loop.component.resize(1)

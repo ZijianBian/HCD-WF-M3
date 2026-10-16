@@ -6,15 +6,15 @@ SOURCES:
     VERSION: develop
     DIR: fopla
 
-MODULES: [IMAS-AL-Fortran, IMAS-AL-Python, iWrap, INTERPOS, XMLlib]
+MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: fopla
-    CMD: make veryclean validate clean library DEBUG=yes FC=ifort
+    CMD: make veryclean validate clean library DEBUG=yes FC="$FC"
 
 ACTORS: 
   - DIR: fopla
-    CMD: make iwrap_actor DEBUG=yes FC=ifort
+    CMD: make iwrap_actor DEBUG=yes FC="$FC"
 
 #COMMENTS:  
 ...

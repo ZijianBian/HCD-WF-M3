@@ -92,9 +92,8 @@ Test your changes with the test data:
 Run Static Analysis
 ~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: bash
-
-   bash ci-sdcc/st05-staticanalysis.sh
+Static analysis (black, flake8, pylint, ruff) runs in GitHub Actions on every push
+(``.github/workflows/linting.yml``). See :doc:`setup` to run the same checks locally.
 
 Commit Guidelines
 -----------------

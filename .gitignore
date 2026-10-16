@@ -49,3 +49,8 @@ MANIFEST
 
 # Generated version file
 hcdworkflow/_version.py
+
+# CI outputs
+ci_regression/
+actor_paths.env
+virtualenvdir/

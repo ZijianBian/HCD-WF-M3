@@ -8,6 +8,7 @@ description = "Python H&CD Workflow for ITER plasma heating and current drive si
 authors = [{name = "ITER Organization"}]
 maintainers = [{name = "ITER Organization"}]
 readme = {file = "README.md", content-type = "text/markdown"}
+license = "LGPL-3.0-only"
 license-files = ["LICENSE.txt"]
 requires-python = ">=3.11"
 classifiers = [

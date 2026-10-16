@@ -2,6 +2,21 @@ import os
 import sys
 
 import imas
+from imas.exception import DataEntryException
+
+
+def get_ids(db, ids_name, time=None):
+    """Read an IDS, or its time slice closest to time, from db.
+
+    Returns an empty IDS when db has no data for it.
+    IMAS-Python raises DataEntryException in that case instead.
+    """
+    try:
+        if time is None:
+            return db.get(ids_name)
+        return db.get_slice(ids_name, time, imas.ids_defs.CLOSEST_INTERP)
+    except DataEntryException:
+        return imas.IDSFactory(db.dd_version).new(ids_name)
 
 
 class WorkflowDbHelper:
@@ -52,14 +67,16 @@ class WorkflowDbHelper:
         # OPEN INPUT DATAFILE
         print("-- Open input and output file --", file=sys.stdout)
         inputDb = imas.DBEntry(
-            getattr(imas.imasdef, f"{self.input_backend}_BACKEND"),
+            getattr(imas.ids_defs, f"{self.input_backend}_BACKEND"),
             self.input_database,
             self.shot_number,
             self.input_run,
             self.input_user_or_path,
         )
-        retstatus, idx_in = inputDb.open()
-        if retstatus != 0:
+        try:
+            inputDb.open()
+        except Exception as exc:
+            print(f"   {exc}", file=sys.stderr)
             print(
                 "   ERROR while reading the inputDb shot="
                 + str(self.shot_number)
@@ -77,7 +94,7 @@ class WorkflowDbHelper:
     def getOutputDatabase(self):
         # CREATE OUTPUT DATAFILE
         outputDb = imas.DBEntry(
-            getattr(imas.imasdef, f"{self.output_backend}_BACKEND"),
+            getattr(imas.ids_defs, f"{self.output_backend}_BACKEND"),
             self.output_database,
             self.shot_number,
             self.output_run,
@@ -97,8 +114,10 @@ class WorkflowDbHelper:
         if os.path.isfile(h5_master_file):  # IMAS-5428 still not fixed!!!
             os.remove(h5_master_file)
 
-        retstatus, idx_out = outputDb.create()
-        if retstatus != 0:
+        try:
+            outputDb.create()
+        except Exception as exc:
+            print(f"   {exc}", file=sys.stderr)
             print(
                 "   ERROR while creating the output shot="
                 + str(self.shot_number)
@@ -115,7 +134,7 @@ class WorkflowDbHelper:
 
     def getMachineDatabase(self):
         machineDb = imas.DBEntry(
-            imas.imasdef.MEMORY_BACKEND,  # pylint: disable=no-member
+            imas.ids_defs.MEMORY_BACKEND,
             self.output_database,
             0,
             self.output_run,
@@ -127,7 +146,7 @@ class WorkflowDbHelper:
     def getTimeArray(self, inputDb):
         time_array = None
         try:
-            time_array = inputDb.partial_get(ids_name="equilibrium", data_path="time")
+            time_array = inputDb.get("equilibrium", lazy=True).time.value
         except Exception:
             print(
                 "  ERROR while reading the equilibrium IDS: is it really present in the input file?",
