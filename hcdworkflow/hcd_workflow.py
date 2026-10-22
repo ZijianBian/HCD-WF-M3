@@ -116,6 +116,7 @@ class HCDWorkflow(WorkflowBase):
 
     def _getIDSes(self):
         idsOut = {}
+        idsEmpty = {}
         for process in self.workflowData.process_bundle.keys():
             if "merge_" in process:
                 key, value = list(self.workflowData.process_bundle[process]["output"].items())[0]
@@ -126,9 +127,16 @@ class HCDWorkflow(WorkflowBase):
         for process in self.workflowData.process_bundle.keys():
             for key, value in self.workflowData.process_bundle[process]["output"].items():
                 if key not in idsOut.keys():
-                    if isinstance(value, dict) or value.ids_properties.homogeneous_time < 0:
+                    if isinstance(value, dict):
+                        continue
+                    if value.ids_properties.homogeneous_time < 0:
+                        idsEmpty.setdefault(key, value)
                         continue
                     idsOut[key] = value
+        # Keep an empty IDS when no actor produced a valid one (e.g. waves when the EC power is zero),
+        # so that the returned keys do not depend on which actors ran in this slice.
+        for key, value in idsEmpty.items():
+            idsOut.setdefault(key, value)
         return idsOut
 
     def finalize(self):
