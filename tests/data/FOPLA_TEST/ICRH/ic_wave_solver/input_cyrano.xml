@@ -56,5 +56,4 @@
 
   <verbosity>3</verbosity>
   <rm_tmp>false</rm_tmp>                 <!--true: Delete temporary data folder -->
-
 </parameters>
