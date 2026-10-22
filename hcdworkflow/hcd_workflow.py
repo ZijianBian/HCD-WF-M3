@@ -1,6 +1,5 @@
 import copy
 import logging
-import sys
 
 import numpy as np
 
@@ -58,8 +57,8 @@ class HCDWorkflow(WorkflowBase):
         )
         err = hcd_wf.execute()
         if err < 0:
-            print("  Error in H&CD workflow.", file=sys.stderr)
-            return
+            # Raise instead of returning None: callers (e.g. the JINTRAC driver) use the result as a dict
+            raise RuntimeError(f"H&CD workflow validation failed: {hcd_wf.validation_error}")
 
         return self._getIDSes()
 

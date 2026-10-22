@@ -32,6 +32,8 @@ class WorkflowExecutor:
         self.algorithm = algorithm
         self.parallel_dependency_list = parallel_dependency_list
         self.merge_actor_list = merge_actor_list
+        # Reason of the last validation failure, raised by HCDWorkflow.run()
+        self.validation_error = None
 
     def _reset_runtime_state(self):
         """Drop IDS products and dynamic mergers left from the previous slice."""
@@ -54,12 +56,19 @@ class WorkflowExecutor:
                     if ids_name in outputs:
                         outputs[ids_name] = _create_ids(ids_name)
 
+    def _validation_failed(self, message):
+        """Record and print why the slice cannot be computed; HCDWorkflow.run() raises it."""
+        self.validation_error = message
+        print(f"  {message}", file=sys.stderr)
+        print("  --> Edit H&CD waveforms before executing the workflow.", file=sys.stderr)
+        print("  --> Abort.", file=sys.stderr)
+        return -1
+
     def execute(self):
         print("Execute H&CD workflow for current time slice", file=sys.stdout)
         self._reset_runtime_state()
         err = self.validateAndUpdateProcessBundle()
         if err is not None and err < 0:
-            print("  Skipping time slice due to validation error", file=sys.stderr)
             return err
         final_algorithm, waiting_for, parallel_runs = self.decideAlgorithm()
         # print("final_algo", final_algorithm)
@@ -111,13 +120,7 @@ class WorkflowExecutor:
                 and nbi_selected
                 and self.process_bundle[process]["input"]["nbi"].ids_properties.homogeneous_time < 0
             ):
-                print("  NBI required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                return self._validation_failed(f"NBI required but no waveform (nbi is empty) for {process}")
 
             if (
                 nbi_selected
@@ -135,13 +138,7 @@ class WorkflowExecutor:
                 "ic_antennas" in self.process_bundle[process]["input"]
                 and self.process_bundle[process]["input"]["ic_antennas"].ids_properties.homogeneous_time < 0
             ):
-                print("  ICRH required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                return self._validation_failed(f"ICRH required but no waveform (ic_antennas is empty) for {process}")
 
             if "ic_antennas" in self.process_bundle[process]["input"] and not is_ic_on(
                 self.process_bundle[process]["input"]["ic_antennas"],
@@ -156,13 +153,7 @@ class WorkflowExecutor:
                 "ec_launchers" in self.process_bundle[process]["input"]
                 and self.process_bundle[process]["input"]["ec_launchers"].ids_properties.homogeneous_time < 0
             ):
-                print("  ECRH required but no waveform!!!", file=sys.stderr)
-                print(
-                    "  --> Edit H&CD waveforms before executing the workflow.",
-                    file=sys.stderr,
-                )
-                print("  --> Abort.", file=sys.stderr)
-                return -1
+                return self._validation_failed(f"ECRH required but no waveform (ec_launchers is empty) for {process}")
 
             if "ec_launchers" in self.process_bundle[process]["input"] and not is_ec_on(
                 self.process_bundle[process]["input"]["ec_launchers"],
