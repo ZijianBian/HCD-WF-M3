@@ -9,6 +9,7 @@
     <use_internal_power>false</use_internal_power> <!--1: compute RF absorption internally, 0: importing it from CPOs -->
     <total_power>0</total_power>               <!--Total RF Power [W] (=0 do not normalize, larger than 0 normalize) -->
     <Ntor>0</Ntor>                                 <!--Toroidal mode number (=0 read from waves, otherwise impose value) -->
+    <H_conc>0.0</H_conc>                           <!-- If > 0, impose Hconc=nH/ne; FOR TESTING ONLY. Keep at ZERO!-->
     <only_perp>false</only_perp>                   <!--NOT READY: FALSE: default 1D procedure, TRUE: force RF power in perp. direction only -->
     <include_alphas>0</include_alphas>             <!--0: Don't include fast alphas,  >0: Add alphas (from distribution)-->
     <include_nbi>2</include_nbi>                   <!--0: Don't include NBI,  2: Add all NBI info to 1 single species, 3: Use 3 NBI energy components-->

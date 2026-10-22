@@ -1,9 +1,7 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<?xml version="1.0" encoding="UTF-8"?>
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
  
    <!-- document element -->
-   <xs:simpleType name="FloatList">
-	   <xs:list itemType="xs:float"/>
-   </xs:simpleType>
    <xs:element name="parameters">
      <xs:complexType>
        <xs:all>
@@ -30,7 +28,7 @@
 	   </xs:annotation>
 	 </xs:element>
 	 <xs:element name="Np_out" type="xs:integer">
-	   <xs:annotation><xs:documentation>Number of OUTPUT radial points (0:equilibrium, &gt;1:value)</xs:documentation></xs:annotation>
+	   <xs:annotation><xs:documentation>Number of OUTPUT radial points (0:equilibrium, >1:value)</xs:documentation></xs:annotation>
 	 </xs:element>
 	 <xs:element name="BC_axis" type="xs:integer">
 	   <xs:annotation><xs:documentation>Axis boundary conditions test (0:circular BC, 1:D-shape BC)</xs:documentation></xs:annotation>
@@ -63,15 +61,27 @@
 	 <xs:element name="fast_particles">
 	   <xs:complexType>
 	     <xs:all>
+
 	       <xs:element name="include_nbi" type="xs:integer">
 		 <xs:annotation><xs:documentation>Include NBI species (0: don't include, 1: from corefast, 2: from distribution, 3: from distribution with 3 energy sources)-</xs:documentation></xs:annotation>
 	       </xs:element>
+
 	       <xs:element name="include_fasticrh" type="xs:integer">
 		 <xs:annotation><xs:documentation>Include ICRH heated species (0: don't include, 1: from corefast, 2: from distribution) -NOT READY-</xs:documentation></xs:annotation>
 	       </xs:element>
+
 	       <xs:element name="include_alphas" type="xs:integer">
 		 <xs:annotation><xs:documentation>Include fast alphas from corefast (0: don't include, 1: from corefast, 2: from distribution) -NOT READY-</xs:documentation></xs:annotation>
 	       </xs:element>
+	       
+	       <xs:element name="alpha_fac" type="xs:float">
+		 <xs:annotation><xs:documentation>Multiply alpha density by factor; FOR TESTING ONLY. </xs:documentation></xs:annotation>
+	       </xs:element>
+	       
+	       <xs:element name="H_conc" type="xs:float">
+		 <xs:annotation><xs:documentation>If larger than 0, impose Hconc=nH/ne; FOR TESTING ONLY. Keep at ZERO </xs:documentation></xs:annotation>
+	       </xs:element>
+	       
 	     </xs:all>
 	   </xs:complexType>
 	 </xs:element>
@@ -83,22 +93,19 @@
 	       <xs:element name="RF">
 		 <xs:complexType>
 		   <xs:all>
-		     <xs:element name="total_power" type="FloatList">
-		       <xs:annotation><xs:documentation>Total RF Power [W] (0:waves, 1: antennas, &gt;1:value)</xs:documentation></xs:annotation>
+		     <xs:element name="total_power" type="xs:float">
+		       <xs:annotation><xs:documentation>Total RF Power [W] (0:waves, 1: antennas, >1:value)</xs:documentation></xs:annotation>
 		     </xs:element>
-		     <xs:element name="frequency" type="FloatList">
+		     <xs:element name="frequency" type="xs:float">
 		       <xs:annotation><xs:documentation>RF frequency (Hz)</xs:documentation></xs:annotation>
 		     </xs:element>
-                     <xs:element name="orbit_width" type="FloatList">
-                       <xs:annotation><xs:documentation>Orbit width (m) (0:no averaging, &gt;0:averaging size) </xs:documentation></xs:annotation>
-                     </xs:element>
-
 		     <xs:element name="Ntor" type="xs:integer">
-		       <xs:annotation><xs:documentation>Single toroidal mode number (0:waves, &gt;0:value)</xs:documentation></xs:annotation>
+		       <xs:annotation><xs:documentation>Single toroidal mode number (0:waves, >0:value)</xs:documentation></xs:annotation>
 		     </xs:element>
 		   </xs:all>
 		 </xs:complexType>
 	       </xs:element>
+
 	       <xs:element name="impose_antenna" type="xs:boolean"/>
 	       <xs:element name="antenna_geometry">
 		 <xs:complexType>
@@ -121,3 +128,4 @@
      </xs:complexType>
    </xs:element>
  </xs:schema>
+ 

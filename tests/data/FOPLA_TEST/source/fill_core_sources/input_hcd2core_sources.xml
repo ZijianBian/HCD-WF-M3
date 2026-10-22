@@ -2,4 +2,6 @@
 <parameters>
   <tension> 0.0 </tension>
   <verbosity> 3 </verbosity>
+  <radial_resolution> 300 </radial_resolution>
+  <interp_option> 13 </interp_option>
 </parameters>
