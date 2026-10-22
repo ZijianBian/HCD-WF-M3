@@ -41,7 +41,7 @@
     
       <NBI display="NBI">
 	<nbi_source display="Beam deposition" list="nemo bbnbi_serial bbnbi_parallel">1</nbi_source>
-	<nbi_fp display="Ion Fokker-Planck" list="rabbit risk spot ascot_serial ascot_parallel nbisim">1</nbi_fp>
+	<nbi_fp display="Ion Fokker-Planck" list="rabbit risk spot ascot_serial ascot_parallel nbisim">2</nbi_fp>
       </NBI>
     
       <NUCLEAR display="Nuclear reactions">
