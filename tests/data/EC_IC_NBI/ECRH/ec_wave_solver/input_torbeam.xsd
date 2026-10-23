@@ -1,4 +1,7 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<?xml version="1.0" encoding="UTF-8"?>
+
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   elementFormDefault="qualified">
    <xs:annotation>
      <xs:documentation>Code parameters for TORBEAM</xs:documentation>
    </xs:annotation>
@@ -27,6 +30,10 @@
          <xs:element ref="rhostop" minOccurs="1"/>
          <xs:element ref="xzsrch" minOccurs="1"/>
          <xs:element ref="ascii_export" minOccurs="1"/>
+         <xs:element ref="stepray" minOccurs="1"/>
+         <xs:element ref="nray" minOccurs="1"/>
+         <xs:element ref="nradial" minOccurs="1"/>
+         <xs:element ref="vol_force" minOccurs="1"/>
        </xs:all>
      </xs:complexType>
    </xs:element>
@@ -48,7 +55,7 @@
    <!-- Curba, 1 => Lin-Liu, 2 => Lin-Liu+mom. conserv. -->
    <xs:element name="ncdroutine" type="xs:integer">
       <xs:annotation>
-          <xs:documentation>Curba, 1 =&gt; Lin-Liu, 2 =&gt; Lin-Liu+mom. conserv.</xs:documentation>
+          <xs:documentation>Curba, 1 => Lin-Liu, 2 => Lin-Liu+mom. conserv.</xs:documentation>
       </xs:annotation>
    </xs:element>
 
@@ -125,7 +132,7 @@
    <!-- 1 => rel. mass correction for reflectometry -->
    <xs:element name="nrel" type="xs:integer">
       <xs:annotation>
-          <xs:documentation>1 =&gt; rel. mass correction for reflectometry</xs:documentation>
+          <xs:documentation>1 => rel. mass correction for reflectometry</xs:documentation>
       </xs:annotation>
    </xs:element>
 
@@ -171,4 +178,33 @@
       </xs:annotation>
    </xs:element>
      
+   <!-- Optionally save ray-tracing only every stepray points (to save memory) -->
+   <xs:element name="stepray" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Optionally save ray-tracing only every stepray points (to save memory)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+     
+   <!-- Optionally save less than 5 rays per beam (to save memory) -->
+   <xs:element name="nray" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Optionally save less than 5 rays per beam (to save memory)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+     
+   <!-- Optionally reduce radial resolution to below 5000 (to save memory) -->
+   <xs:element name="nradial" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Optionally reduce radial resolution to below 5000 (to save memory)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+   
+    <!-- Optionally force output 1D volume profile to fit exactly core_profiles (1 to force it, 0 otherwise) -->
+   <xs:element name="vol_force" type="xs:integer">
+      <xs:annotation>
+          <xs:documentation>Optionally force output 1D volume profile to fit exactly core_profiles (1 to force it, 0 otherwise)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+    
 </xs:schema>
+ 

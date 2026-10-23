@@ -40,6 +40,21 @@
    <!-- Follow just one particle (1) or not (0) -->
    <korbdisp> 0 </korbdisp>
 
+   <!-- Force unique instantaneous source at the beginning of the simulation (1) or not (0) -->
+   <force_instant_source> 0 </force_instant_source>
+
+   <!-- Quality criteria (allowed error on vpara) for orbit integration, from 0.0001 [accurate] to 1 [bad but fast] (-1 = automatic) -->
+   <zdelvpara_acc> -1 </zdelvpara_acc>
+
+   <!-- Forced time step [s] or not (if equal to -1) -->
+   <forced_timestep> -1 </forced_timestep>
+
+   <!-- Forced thermal energy threshold [keV] or not (if equal to -1) -->
+   <engy_threshold> -1 </engy_threshold>
+
+   <!-- Follow the particles up to the LCFS (0) or up to the wall (1) -->
+   <up2wall> 0 </up2wall>
+
 
 <!--
     ==========================================================
