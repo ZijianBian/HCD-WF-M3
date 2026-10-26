@@ -3,10 +3,11 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/nemo.git
-    VERSION: develop
+    # branch feature/DD3_and_DD4 (DD 3.42.2 and DD 4.1.1, IMAS-Fortran 5.6.0)
+    VERSION: fc1c29f085aa41a9e0e1020da216187bb46e53fd
     DIR:     nemo
 
-MODULES: [IMAS-Python, iWrap, FRUIT, FRUIT_processor, INTERPOS, XMLlib, IMAS-Fortran]
+MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: nemo
