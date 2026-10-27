@@ -41,4 +41,12 @@
   <xzsrch> 0. </xzsrch>
   <!-- Write Torbeam input/output ascii files (1) or not (0) -->
   <ascii_export> 0 </ascii_export>
+  <!-- Optionally save ray-tracing only every stepray points (to save memory) -->
+  <stepray> 20 </stepray>
+  <!-- Optionally save less than 5 rays per beam (to save memory) -->
+  <nray> 5 </nray>
+  <!-- Optionally reduce radial resolution to below 5000 (to save memory) -->
+  <nradial> 5000 </nradial>
+  <!-- Optionally force output 1D volume profile to fit exactly core_profiles (1 to force it, 0 otherwise) -->
+  <vol_force> 1 </vol_force>
 </parameters>

@@ -152,7 +152,7 @@ hcd-wf/
 ├── hcdworkflow/           # Main workflow package
 ├── gui/                   # GUI components
 ├── tools/                 # Utility tools
-├── workflow/              # Workflow wrapper
+├── workflow/              # Shared workflow driver
 ├── actor_install/         # Actor installation scripts
 ├── tests/                 # Test data
 ├── ci-sdcc/               # CI/CD scripts

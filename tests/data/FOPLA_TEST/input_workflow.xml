@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
   <workflow_parameters display="Workflow parameters (standalone)">
-    <input_user_or_path display="Input user or path">sawantp1</input_user_or_path>
+    <input_user_or_path display="Input user or path">public</input_user_or_path>
     <input_database display="Input database">ITER</input_database>
-    <input_backend  display="Input backend">MDSPLUS</input_backend>
-    <shot_nr display="Input shot">114101</shot_nr>
-    <run_in display="Input run">157</run_in>
+    <input_backend display="Input backend">HDF5</input_backend>
+    <shot_nr display="Input shot">130012</shot_nr>
+    <run_in display="Input run">5</run_in>
     <output_user_or_path display="Output user or path">default</output_user_or_path>
     <output_database display="Output database">ITER</output_database>
-    <output_backend  display="Output backend">MDSPLUS</output_backend>
+    <output_backend display="Output backend">HDF5</output_backend>
     <run_out display="Output run">160</run_out>
     <tbegin display="Start Time [s]">267.5</tbegin>
     <tend display="End Time   [s]">350.0</tend>
@@ -20,7 +20,7 @@
   <actor_selection display="Actor selection"> <!-- 0 = None; >0 follows code ordering -->
     <main_process display="Main processes">
       
-      <EQUI                 display="EQUILIBRIUM">
+      <EQUI display="EQUILIBRIUM">
 	<equilibrium_solver display="Equilibrium solver" list="chease">0</equilibrium_solver>
       </EQUI>
 
@@ -41,7 +41,7 @@
     
       <NBI display="NBI">
 	<nbi_source display="Beam deposition" list="nemo bbnbi_serial bbnbi_parallel">1</nbi_source>
-	<nbi_fp display="Ion Fokker-Planck" list="risk spot ascot_serial ascot_parallel nbisim">1</nbi_fp>
+	<nbi_fp display="Ion Fokker-Planck" list="rabbit risk spot ascot_serial ascot_parallel nbisim">2</nbi_fp>
       </NBI>
     
       <NUCLEAR display="Nuclear reactions">

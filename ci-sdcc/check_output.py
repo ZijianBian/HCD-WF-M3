@@ -7,6 +7,8 @@ Each IDS must be written with at least one time slice. When --reference-dir is g
 values of the IDS (except ids_properties and code) are also compared with DIR/<ids>.json:
 each array must match within RTOL relative to the largest absolute value of its reference.
 With --update, the reference files are (re)written from this run instead.
+A NaN or +-Inf value in the output or in the reference is a failure, and no reference is written
+from an output that holds one.
 
 To keep the references small enough for the repository, arrays with more than MAX_FULL_SIZE values
 (e.g. ray tracing trajectories) are stored as a summary (shape, min, max, mean, rms) instead of in full.
@@ -38,6 +40,22 @@ def summary(value):
         "mean": float(np.mean(value)),
         "rms": float(np.sqrt(np.mean(np.square(value, dtype=float)))),
     }
+
+
+def is_finite(value):
+    """True when an array holds no NaN or +-Inf; for a summary {"summary": {...}}, when its min, max, mean
+    and rms are finite (an rms overflows to Inf for values above about 1e154)"""
+    if isinstance(value, dict):
+        value = [value["summary"][key] for key in SUMMARY_KEYS]
+    return bool(np.all(np.isfinite(np.asarray(value, dtype=float))))
+
+
+def report_non_finite(values):
+    """Print the paths of the arrays holding NaN or +-Inf values; 1 when there is one, else 0"""
+    bad = [path for path in sorted(values) if not is_finite(values[path])]
+    for path in bad:
+        print(f"    {path}: NaN or Inf in output")
+    return 1 if bad else 0
 
 
 def workflow_parameters(config_folder):
@@ -102,6 +120,13 @@ def compare(name, values, reference, rtol):
             print(f"    {path}: NOT in reference")
             failed = 1
             continue
+        non_finite = [
+            label for label, value in (("output", values[path]), ("reference", reference[path])) if not is_finite(value)
+        ]
+        if non_finite:
+            print(f"    {path}: NaN or Inf in {' and '.join(non_finite)}")
+            failed = 1
+            continue
         if isinstance(reference[path], dict) or isinstance(values[path], dict):
             failed |= compare_summary(path, values[path], reference[path], rtol)
             continue
@@ -155,6 +180,10 @@ def main():
         ref_file = os.path.join(args.reference_dir, f"{name}.json")
         values = numerical_values(ids)
         if args.update:
+            if report_non_finite(values):
+                print(f"  {name}: NaN or Inf in output, reference not written")
+                failed = 1
+                continue
             os.makedirs(args.reference_dir, exist_ok=True)
             with open(ref_file, "w", encoding="utf-8") as stream:
                 json.dump({"dd_version": ids._dd_version, "values": values}, stream, indent=1)

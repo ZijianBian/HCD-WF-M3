@@ -19,6 +19,8 @@
       <include_nbi>0</include_nbi>           <!-- 0: Don't include NBI species, 1: use corefast, 2: use distribution, 3: use distribution with 3 energy sources -->
       <include_fasticrh>0</include_fasticrh> <!-- 0: Don't include fast ICRH species, 1: use corefast, 2: use distribution (NOT READY)-->
       <include_alphas>0</include_alphas>     <!-- 0: Don't include fast alphas, 1: use corefast, 2: use distribution (NOT READY)-->
+      <alpha_fac>0.0</alpha_fac>             <!-- If > 0, multiply alpha density by factor; FOR TESTING ONLY. Keep at ZERO!-->
+      <H_conc>0.0</H_conc>                   <!-- If > 0, impose Hconc=nH/ne; FOR TESTING ONLY. Keep at ZERO!-->
     </fast_particles>
 
     <overwrite_params>
@@ -26,7 +28,6 @@
       <RF>
 	<total_power>10e6</total_power>       <!--Total RF Power [W] (0:waves, 1:antennas, >1:value) -->
 	<frequency>40e6</frequency>           <!--RF frequency (0:antennas, >0:value) -->
-        <orbit_width>0.05</orbit_width>          <!--Orbit width [m] (0:no averaging, >0:size averaging) -->
 	<Ntor>30</Ntor>                     <!--Single toroidal mode number (0:waves, >0:value) -->
       </RF>
 

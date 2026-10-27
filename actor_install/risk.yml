@@ -3,10 +3,11 @@
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/heat/risk.git
-    VERSION: develop
+    # branch feature/DD3_and_DD4 (DD 3.42.2 and DD 4.1.1, IMAS-Fortran 5.6.0)
+    VERSION: 1888c1d3c42b031ef773a89c68f07f024d94158c
     DIR:     risk
 
-MODULES: [IMAS-Python, iWrap, GGD, INTERPOS, XMLlib, IMAS-Fortran]
+MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, IMAS-Fortran]
 
 BUILDS: 
   - DIR: risk

@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <parameters>
   <input_cyrano>
 
     <Npol>12</Npol>                       <!--Number of poloidal modes -->
     <Np_out>0</Np_out>                    <!--Number of OUTPUT radial points (0:equilibrium, >1:value) -->
-    <BC_axis>0</BC_axis>                  <!--Axis boundary conditions test (0:circular BC, 1:D-shape BC) -->
+    <BC_axis>1</BC_axis>                  <!--Axis boundary conditions test (0:circular BC, 1:D-shape BC) -->
     <fix_triang>true</fix_triang>        <!--true: Fixed triangularity (edge value); false: Use triangularity fprofile from equilibrium CPO -->
     <smooth>true</smooth>                <!--true: Smooth power deposition profiles in case of tangent resonances (e.g. for large Npol); false: Don't smooth -->
 
@@ -56,5 +56,4 @@
 
   <verbosity>3</verbosity>
   <rm_tmp>false</rm_tmp>                 <!--true: Delete temporary data folder -->
-
 </parameters>

@@ -1,6 +1,5 @@
 import copy
 import logging
-import sys
 
 import numpy as np
 
@@ -58,8 +57,8 @@ class HCDWorkflow(WorkflowBase):
         )
         err = hcd_wf.execute()
         if err < 0:
-            print("  Error in H&CD workflow.", file=sys.stderr)
-            return
+            # Raise instead of returning None: callers (e.g. the JINTRAC driver) use the result as a dict
+            raise RuntimeError(f"H&CD workflow validation failed: {hcd_wf.validation_error}")
 
         return self._getIDSes()
 
@@ -116,23 +115,28 @@ class HCDWorkflow(WorkflowBase):
                 self.workflowData.process_bundle[process]["status"] = 1
 
     def _getIDSes(self):
-        # ------------------------------
-        # COMMON BUNDLE TO SAVE TO DISK
-        # ------------------------------
         idsOut = {}
-
-        # TAKE THE MERGER OUTPUT IDS IF THERE IS ANY
+        idsEmpty = {}
         for process in self.workflowData.process_bundle.keys():
             if "merge_" in process:
                 key, value = list(self.workflowData.process_bundle[process]["output"].items())[0]
+                # Unexecuted actors and mergers must not hide a valid result.
+                if isinstance(value, dict) or value.ids_properties.homogeneous_time < 0:
+                    continue
                 idsOut[key] = value
-
-        # TAKE ALL OTHER OUTPUT IDS BUT ONLY IF IT WAS NOT A MERGER OUTPUT ALREADY
         for process in self.workflowData.process_bundle.keys():
             for key, value in self.workflowData.process_bundle[process]["output"].items():
                 if key not in idsOut.keys():
+                    if isinstance(value, dict):
+                        continue
+                    if value.ids_properties.homogeneous_time < 0:
+                        idsEmpty.setdefault(key, value)
+                        continue
                     idsOut[key] = value
-
+        # Keep an empty IDS when no actor produced a valid one (e.g. waves when the EC power is zero),
+        # so that the returned keys do not depend on which actors ran in this slice.
+        for key, value in idsEmpty.items():
+            idsOut.setdefault(key, value)
         return idsOut
 
     def finalize(self):

@@ -1,4 +1,7 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<?xml version="1.0" encoding="UTF-8"?>
+
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   elementFormDefault="qualified">
    <xs:annotation>
      <xs:documentation>Code parameters for Nemo (neutral beam deposition code)</xs:documentation>
    </xs:annotation>
@@ -87,6 +90,7 @@
          <xs:element ref="ibeamletflag" minOccurs="1"/>
          <xs:element ref="fokker_flag" minOccurs="1"/>
          <xs:element ref="nmarker" minOccurs="1"/>
+         <xs:element ref="fill_ggd" minOccurs="1"/>
          <xs:element ref="fast_and_wrong" minOccurs="1"/>
        </xs:all>
      </xs:complexType>
@@ -239,6 +243,13 @@
       </xs:annotation>
    </xs:element>
     
+   <!-- Fill GGD (1) or not (0) -->
+   <xs:element name="fill_ggd" type="integer_minmaxInclusive_01">
+      <xs:annotation>
+          <xs:documentation>Fill GGD (1) or not (0)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+    
    <!-- Flag for quick test (0 = slow and right, 1 = fast and wrong) -->
    <xs:element name="fast_and_wrong" type="integer_minmaxInclusive_01">
       <xs:annotation>
@@ -247,3 +258,4 @@
    </xs:element>
     
  </xs:schema>
+ 

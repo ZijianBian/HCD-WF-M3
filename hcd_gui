@@ -12,7 +12,7 @@ from gui.waveform_edition import edit_waveforms
 from hcdworkflow.workflow_actor import WorkflowActor
 from hcdworkflow.workflow_config_reader import WorkflowConfigReader
 from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
-from workflow.wf_wrapper import wf_wrapper
+from workflow.workflow_driver import workflow_driver
 
 isWaveformCookerPresent = True
 try:
@@ -101,7 +101,7 @@ def run(current_config_folder):
 
     if current_config_folder != None:
 
-        wf_wrapper(current_config_folder)
+        workflow_driver(current_config_folder)
     else:
         print("Aborted.")
         

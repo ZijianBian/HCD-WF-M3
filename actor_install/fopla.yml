@@ -3,7 +3,8 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/fopla.git
-    VERSION: develop
+    # branch feature/DD3_and_DD4 (DD 3.42.2 and DD 4.1.1, IMAS-Fortran 5.6.0)
+    VERSION: feature/DD3_and_DD4
     DIR: fopla
 
 MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, IMAS-Fortran]
@@ -13,8 +14,9 @@ BUILDS:
     CMD: make veryclean validate clean library DEBUG=yes FC="$FC"
 
 ACTORS: 
+  # the Makefile picks the iWrap yaml fopla_<FC>[_dd3].yaml from FC and the Data Dictionary version
   - DIR: fopla
-    CMD: make iwrap_actor DEBUG=yes FC="$FC"
+    CMD: MAKEFLAGS=-j1 MFLAGS= make iwrap_actor DEBUG=yes FC="$FC"
 
 #COMMENTS:  
 ...

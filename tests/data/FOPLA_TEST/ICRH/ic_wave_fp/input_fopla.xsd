@@ -30,6 +30,7 @@
          <xs:element ref="use_internal_power"/>
          <xs:element ref="total_power"/>
          <xs:element ref="Ntor"/>
+         <xs:element ref="H_conc"/>	 
          <xs:element ref="only_perp"/>
          <xs:element ref="include_alphas"/>
          <xs:element ref="include_nbi"/>
@@ -94,6 +95,12 @@
           <xs:documentation>Impose toroidal mode number, or use from waves-CPO for Ntor==0</xs:documentation>
       </xs:annotation>
    </xs:element>
+
+   <xs:element name="H_conc" type="xs:float">
+      <xs:annotation>
+          <xs:documentation>If &gt; 0, impose Hconc=nH/ne; FOR TESTING ONLY. Keep at ZERO!</xs:documentation>
+      </xs:annotation>
+   </xs:element>   
 
    <xs:element name="only_perp" type="xs:boolean">
       <xs:annotation>

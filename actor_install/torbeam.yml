@@ -3,18 +3,29 @@
 SOURCES:
   - VCS:  git
     REPO: ssh://git@git.iter.org/heat/torbeam.git
-    VERSION: develop
+    # branch feature/DD3_and_DD4 (DD 3.42.2 and DD 4.1.1, IMAS-Fortran 5.6.0)
+    VERSION: feature/DD3_and_DD4
     DIR: torbeam
 
 MODULES: [IMAS-Python, iWrap, INTERPOS, XMLlib, CMake, IMAS-Fortran]
 
-BUILDS: 
+BUILDS:
   - DIR: torbeam/tests/test_imas
     CMD: cd build && rm -f CMakeCache.txt && find . -name link.txt -exec rm -rf {} \; && cmake ../../.. -DUSE_PERF=ON -DUSE_LAGR_INTERPOL=ON -DUSE_XHOST=ON -DUSE_OPENMP=ON && make clean && make torbeam_imas
 
-ACTORS: 
+ACTORS:
+  # iWrap yaml chosen from the compiler (FC) and the Data Dictionary major version (IMAS_VERSION)
   - DIR: torbeam/tests/test_imas
-    CMD: cd build && iwrap -f torbeam.yaml -i "$ACTOR_FOLDER"
-#COMMENTS:  
+    CMD: >-
+      cd build &&
+      case "$FC:${IMAS_VERSION%%.*}" in
+      ifx:3) YAML=torbeam_ifx_dd3.yaml ;;
+      ifx:*) YAML=torbeam_ifx.yaml ;;
+      ifort:3) YAML=torbeam_ifort_dd3.yaml ;;
+      gfortran:*) YAML=torbeam_gfortran.yaml ;;
+      *) echo "ERROR - no iWrap yaml for FC=$FC and IMAS_VERSION=$IMAS_VERSION" >&2; exit 1 ;;
+      esac &&
+      MAKEFLAGS=-j1 MFLAGS= iwrap -f "$YAML" -i "$ACTOR_FOLDER"
+#COMMENTS:
 ...
-  
+

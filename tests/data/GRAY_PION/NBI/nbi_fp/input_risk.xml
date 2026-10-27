@@ -16,6 +16,9 @@
     <!-- Flag telling if RISK is called for NUCLEAR source (0) or NBI source (1) -->
     <ksource>1</ksource>
 
+    <!-- Flag telling if RISK should use marker (1) or GGD (2) input -->
+    <marker_or_ggd_input>1</marker_or_ggd_input>
+
 <!-- Number of processors for parallel run (parameter added by HCD wf) -->
   <nproc_actor>4</nproc_actor>
 </parameters>

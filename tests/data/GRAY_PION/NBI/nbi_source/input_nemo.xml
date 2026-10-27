@@ -66,4 +66,7 @@
 
     <!-- Flag for quick test (0 = slow and right, 1 = fast and wrong) -->
     <fast_and_wrong>1</fast_and_wrong>
+
+    <!-- Fill GGD grid (1) or not (0) -->
+    <fill_ggd> 0 </fill_ggd>
 </parameters>

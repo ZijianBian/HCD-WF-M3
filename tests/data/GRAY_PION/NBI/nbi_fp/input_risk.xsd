@@ -16,6 +16,13 @@
      </xs:restriction>
    </xs:simpleType>
 
+   <xs:simpleType name="integer_minmaxInclusive_12">
+     <xs:restriction base="xs:integer">
+       <xs:minInclusive value="1"/>
+       <xs:maxInclusive value="2"/>
+     </xs:restriction>
+   </xs:simpleType>
+
   <xs:simpleType name="float_minInclusive_dot0001">
      <xs:restriction base="xs:float">
        <xs:minInclusive value="0.0001"/>
@@ -44,6 +51,7 @@
          <xs:element ref="fac_implicit" minOccurs="0"/>
          <xs:element ref="dt_factor" minOccurs="0"/>
          <xs:element ref="ksource" minOccurs="0"/>
+         <xs:element ref="marker_or_ggd_input" minOccurs="0"/>
        <xs:element ref="nproc_actor" minOccurs="0"/></xs:all>
      </xs:complexType>
    </xs:element>
@@ -80,6 +88,13 @@
    <xs:element name="ksource" type="integer_minmaxInclusive_01">
       <xs:annotation>
           <xs:documentation>Flag telling if RISK is called for NUCLEAR source (0) or NBI source (1)</xs:documentation>
+      </xs:annotation>
+   </xs:element>
+
+   <!-- Flag telling if RISK should use marker (1) or GGD (2) input -->
+   <xs:element name="marker_or_ggd_input" type="integer_minmaxInclusive_12">
+      <xs:annotation>
+          <xs:documentation>Flag telling if RISK should use marker (1) or GGD (2) input</xs:documentation>
       </xs:annotation>
    </xs:element>
 
