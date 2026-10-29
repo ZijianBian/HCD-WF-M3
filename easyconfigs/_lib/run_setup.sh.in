@@ -1,0 +1,121 @@
+#!/bin/bash
+# @HELPER@ <run_dir>
+#
+@@if actor_archive@@
+# Creates a writable @NAME@ run directory from the run kit of the loaded @NAME@ module
+# ($@EBROOT@/run_kit: the files of the repository at the module's commit with the build products
+# @KIT_PRODUCTS@ and the build stamp .build_combo of the module's combination). The iWrap actor package
+# @ACTOR@ is taken from the module through PYTHONPATH; actor.tar.gz (a copy of it, read by the ci-sdcc
+# run scripts) is written into <run_dir>. ci-sdcc/resolve_deps.sh of the run kit takes the environment
+# of the loaded module (no module purge), so the ci-sdcc scripts run with the module loaded.
+#
+# Run from <run_dir>:
+@USAGE@
+# Do not source the config_sdcc*.sh env files of the repository: they purge the modules (including
+# @NAME@) and select a local build; they are not copied.
+@@end@@
+@@if actor_links@@
+# Creates a writable @CODE@ run directory from the run kit of the loaded @NAME@ module
+# ($@EBROOT@/run_kit, the repository tree of the pinned commit with the build products and the
+# build stamp of the module's combination). The files are copied; the iWrap actor package of the
+# module ($@EBROOT@/<actor>) is linked where the run scripts expect it, and it is also on
+# PYTHONPATH.
+#
+# Then, from <run_dir>:
+@USAGE@
+# Do not source the config_sdcc*.sh env files of the repository in the run directory: they purge the
+# modules (including @NAME@) and expect a local build; they are not copied.
+@@end@@
+@@if kit_links@@
+# Creates a writable @CODE@ run directory from the run kit of the loaded @NAME@ module
+# ($@EBROOT@/run_kit): the run scripts, inputs and yMMSL files are copied, the links to the build
+# products of the module (@LINKS@) are kept as links. The iWrap actor packages are taken from
+# the module through PYTHONPATH.
+#
+# Then, from @RUNDIR@:
+@USAGE@
+# Do not source the config_sdcc*.sh env files of the repository in the run directory: they purge
+# the modules (including @NAME@) and expect a local build; they are not part of the run kit.
+@@end@@
+
+set -euo pipefail
+
+usage() {
+@@if actor_archive@@
+    sed -n '2,@USAGE_END@p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+@@end@@
+@@if actor_links@@
+    sed -n '2,/^$/p' "${BASH_SOURCE[0]}" | sed -e '/^$/d' -e 's/^# \{0,1\}//'
+@@end@@
+@@if kit_links@@
+    awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "${BASH_SOURCE[0]}"
+@@end@@
+}
+
+case "${1:-}" in
+    -h|--help) usage; exit 0 ;;
+    "") usage >&2; exit 2 ;;
+esac
+
+@@if actor_archive@@
+if [[ -z "${@EBROOT@:-}" || ! -d "$@EBROOT@/run_kit" ]]; then
+    echo "@HELPER@: load a @NAME@ module with a run kit first (@EBROOT@/run_kit)" >&2
+    exit 1
+fi
+@@end@@
+@@if actor_links kit_links@@
+root=${@EBROOT@:-}
+if [[ -z "$root" || ! -d "$root/run_kit" ]]; then
+    echo "@HELPER@: load a @NAME@ module with a run kit first (@EBROOT@/run_kit)" >&2
+    exit 1
+fi
+@@end@@
+
+dest=$1
+if [[ -e "$dest" && -n "$(ls -A "$dest" 2>/dev/null)" ]]; then
+    echo "@HELPER@: $dest exists and is not empty" >&2
+    exit 1
+fi
+mkdir -p "$dest"
+dest=$(cd "$dest" && pwd -P)
+@@if actor_archive@@
+kit=$@EBROOT@/run_kit
+@@end@@
+@@if actor_links kit_links@@
+kit=$root/run_kit
+@@end@@
+
+@@if actor_archive@@
+( cd "$kit" && tar --exclude='./config_sdcc*.sh' --exclude='__pycache__' -cf - . ) | ( cd "$dest" && tar -xf - )
+chmod -R u+w "$dest"
+tar --exclude='__pycache__' -czf "$dest/actor.tar.gz" -C "$@EBROOT@" @ACTOR@
+
+echo "@NAME@ run directory: $dest (module $@EBROOT@, COMBO ${COMBO:-?}, DD ${IMAS_VERSION:-?})"
+echo "  cd $dest"
+@ECHO_USAGE@
+@@end@@
+@@if actor_links@@
+( cd "$kit" && tar --exclude='./config_sdcc*.sh' --exclude='./.module_actor_links' \
+      --exclude='__pycache__' -cf - . ) | ( cd "$dest" && tar -xf - )
+chmod -R u+w "$dest"
+
+# <path in the run directory> <actor package of the module>
+while read -r path actor; do
+    [[ -n "$path" ]] || continue
+    mkdir -p "$(dirname "$dest/$path")"
+    ln -sfn "$root/$actor" "$dest/$path"
+done < "$kit/.module_actor_links"
+
+echo "@CODE@ run directory: $dest (module $root, COMBO ${COMBO:-?}, DD ${IMAS_VERSION:-?})"
+echo "  cd $dest"
+sed -n 's/^#     /  /p' "${BASH_SOURCE[0]}"
+@@end@@
+@@if kit_links@@
+( cd "$kit" && tar --exclude='__pycache__' -cf - . ) | ( cd "$dest" && tar -xf - )
+chmod -R u+w "$dest"
+
+run=$dest@RUNSUB@
+echo "@CODE@ run directory: $run (module $root, DD ${IMAS_VERSION:-?})"
+echo "  cd $run"
+@ECHO_USAGE@
+@@end@@
