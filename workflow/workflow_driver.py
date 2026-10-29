@@ -19,6 +19,7 @@ from workflow.ids_prep import (
     _create_ids,
     _get_target_dd_version,
     _smart_convert,
+    configure_equilibrium_extension,
     get_backend,
     get_empty_int,
     stabilize_selected_hcd_outputs,
@@ -62,14 +63,23 @@ def _waveform_cooker_imas2_open_compat():
         added_imasdef_alias = True
 
     def _dd_version_compat(data_version):
+        """DD version for a legacy DBEntry(..., data_version=<major>) call.
+
+        A full version is used as given. The major of the target DD gives the target DD;
+        another major gives the newest DD of that major known to IMAS-Python. Reads with
+        autoconvert=False return the IDS in its stored DD; this version applies to the
+        DBEntry factory, i.e. to data without a known stored DD version.
+        """
         text = str(data_version)
         if "." in text:
             return text
-        if text == "3":
-            return "3.41.0"
-        if text == "4":
-            return _get_target_dd_version()
-        return text
+        target_dd = _get_target_dd_version()
+        if text == target_dd.split(".", 1)[0]:
+            return target_dd
+        from imas.dd_zip import dd_xml_versions
+
+        known = [version for version in dd_xml_versions() if version.split(".", 1)[0] == text]
+        return known[-1] if known else text
 
     def _dbentry_compat(*args, **kwargs):
         data_version = kwargs.get("data_version")
@@ -198,6 +208,7 @@ def setup_databases(config_folder_path):
     inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
     print(f"[workflow_driver] Loading config from: {inputworkflow_xml}")
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)["workflow_parameters"][0]
+    configure_equilibrium_extension(wf_parameters)
     param_process = {
         node.tag: int(node.text) for node in ET.parse(inputworkflow_xml).findall("./actor_selection/*/*/*")
     }
@@ -206,7 +217,7 @@ def setup_databases(config_folder_path):
     input_user_or_path = wf_parameters["input_user_or_path"][0]
     input_database = wf_parameters["input_database"][0]
     input_backend = wf_parameters["input_backend"][0]
-    ddv_backend = wf_parameters["ddv_backend"][0] if "ddv_backend" in wf_parameters else _get_target_dd_version()
+    ddv_backend = _get_target_dd_version()
     output_user_or_path = wf_parameters["output_user_or_path"][0]
     output_database = wf_parameters["output_database"][0]
     output_backend = wf_parameters.get("output_backend", ["HDF5"])[0]

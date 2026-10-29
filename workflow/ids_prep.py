@@ -7,7 +7,9 @@ These helpers operate on IDS contents without opening database connections.
 """
 
 import copy
+import functools
 import os
+import subprocess
 
 import imas
 import numpy as np
@@ -44,14 +46,35 @@ def get_backend(backend_name: str):
         raise RuntimeError("Cannot find IMAS backend definitions")
 
 
+@functools.lru_cache(maxsize=1)
+def _al_fortran_dd_version():
+    """DD version of the loaded IMAS-Fortran module ("pkg-config --modversion al-fortran"
+    reports <DD version>-<AL version>), or "" when pkg-config does not find al-fortran."""
+    try:
+        result = subprocess.run(
+            ["pkg-config", "--modversion", "al-fortran"], capture_output=True, text=True, check=False
+        )
+    except OSError:
+        return ""
+    if result.returncode != 0:
+        return ""
+    return result.stdout.strip().split("-", 1)[0]
+
+
 def _get_target_dd_version():
-    """Get the DD version of the current IMAS environment."""
+    """DD version of the IMAS environment: IMAS_VERSION (exported by the env files from the
+    loaded IMAS-Fortran module), else the DD of the loaded IMAS-Fortran module."""
     configured_version = os.getenv("IMAS_VERSION")
     if configured_version:
         return configured_version
-    if hasattr(imas, "al_dd_version"):
-        return imas.al_dd_version
-    return imas.dd_zip.dd_xml_versions()[-1]
+    module_version = _al_fortran_dd_version()
+    if module_version:
+        return module_version
+    raise RuntimeError(
+        "Cannot determine the target Data Dictionary version: IMAS_VERSION is unset and "
+        "'pkg-config --modversion al-fortran' finds no IMAS-Fortran module. Source "
+        "config_hcd_iter_sdcc.sh or config_hcd_iter_sdcc_3.42.0.sh, or load an IMAS-Fortran module."
+    )
 
 
 def _create_ids(ids_name: str):
@@ -247,21 +270,72 @@ def _fixup_core_profiles(cp):
     return cp
 
 
-def _eq_fill_psi_axis(ts):
-    """Fill psi_axis from profiles_1d.psi[0] when missing (CHEASE/DINA workaround).
+# Equilibrium extension outside the LCFS (workflow/extend_equilibrium.py, matched scheme), set from the
+# workflow parameters by configure_equilibrium_extension(); off until enabled there
+_EQ_EXTENSION = {"enabled": False, "box": None, "source": ""}
 
-    Some ITER scenarios leave global_quantities.psi_axis as the
-    IMAS empty sentinel (-9e+40). Downstream code (including _compute_bax and
-    Cyrano's axis-side f-profile picker) compares it against profiles_1d.psi
-    to decide which end is the axis; with the sentinel the comparison is
-    numerical noise. profiles_1d.psi is ordered axis→boundary, so psi_axis
-    = psi1d[0] is the correct recovery.
+
+def configure_equilibrium_extension(wf_parameters):
+    """Enable the equilibrium extension from the workflow parameters of input_workflow.xml.
+
+    extend_equilibrium: 0 (off, also when absent) or 1 (on);
+    extend_equilibrium_box: "Rmin,Rmax,Zmin,Zmax" in m, covered by the extended profiles_2d grid
+    (absent: DEFAULT_BOX of extend_equilibrium.py).
     """
-    if ts.global_quantities.psi_axis.has_value or len(ts.profiles_1d.psi) == 0:
+    _EQ_EXTENSION["enabled"] = int(wf_parameters.get("extend_equilibrium", [0])[0]) == 1
+    if not _EQ_EXTENSION["enabled"]:
+        return
+    from workflow.extend_equilibrium import DEFAULT_BOX
+
+    box = wf_parameters.get("extend_equilibrium_box", [None])[0]
+    _EQ_EXTENSION["box"] = DEFAULT_BOX if box is None else [float(x) for x in str(box).split(",")]
+    _EQ_EXTENSION["source"] = "{}/{}/{} ({})".format(
+        wf_parameters["input_database"][0],
+        wf_parameters["shot_nr"][0],
+        wf_parameters["run_in"][0],
+        wf_parameters["input_user_or_path"][0],
+    )
+    print(
+        "[ids_prep] Equilibrium extension outside the LCFS enabled, box [Rmin, Rmax, Zmin, Zmax] = "
+        f"{list(_EQ_EXTENSION['box'])}",
+        flush=True,
+    )
+
+
+def _eq_extend(eq, ts):
+    """Extend psi and B outside the LCFS and the profiles_2d grid of ts to the configured box, in place
+    (extend_equilibrium.py, matched scheme), when enabled by configure_equilibrium_extension()."""
+    if not _EQ_EXTENSION["enabled"] or len(ts.profiles_2d) == 0:
+        return
+    from workflow.extend_equilibrium import append_caveat, extend_slice, format_info
+
+    info, _ = extend_slice(ts, _EQ_EXTENSION["box"])
+    if not np.isfinite(info["t"]) and len(eq.time) > 0:
+        info["t"] = float(eq.time[0])
+    append_caveat(eq, source=_EQ_EXTENSION["source"])
+    print("  [equilibrium] Equilibrium extended outside the LCFS: " + format_info(info), flush=True)
+
+
+def _eq_fill_psi_axis(ts):
+    """Fill the axis poloidal flux from profiles_1d.psi[0] when missing (CHEASE/DINA workaround).
+
+    The field is the one of the target DD (dd_compat.PSI_MAGNETIC_AXIS:
+    global_quantities.psi_axis in DD3, global_quantities.psi_magnetic_axis in DD4).
+    Some ITER scenarios leave it as the IMAS empty sentinel (-9e+40). Downstream
+    code (including _compute_bax, the LCFS extension and Cyrano's axis-side
+    f-profile picker) compares it against profiles_1d.psi to decide which end is
+    the axis; with the sentinel the comparison is numerical noise.
+    profiles_1d.psi is ordered axis→boundary, so psi1d[0] is the correct recovery.
+    """
+    from workflow import dd_compat
+
+    gq = ts.global_quantities
+    name = dd_compat.PSI_MAGNETIC_AXIS
+    if getattr(gq, name).has_value or len(ts.profiles_1d.psi) == 0:
         return
     psi1d_axis = float(np.asarray(ts.profiles_1d.psi)[0])
-    ts.global_quantities.psi_axis = psi1d_axis
-    print(f"  [equilibrium] Filled psi_axis from profiles_1d.psi[0] (= {psi1d_axis:.4g})", flush=True)
+    setattr(gq, name, psi1d_axis)
+    print(f"  [equilibrium] Filled {name} from profiles_1d.psi[0] (= {psi1d_axis:.4g})", flush=True)
 
 
 def _eq_complete_bfield(eq, ts):
@@ -525,6 +599,7 @@ def _fixup_equilibrium(eq):
 
     _eq_fill_psi_axis(ts)
     _eq_complete_bfield(eq, ts)
+    _eq_extend(eq, ts)
     _eq_replace_nan_2d(eq, ts)
     _eq_rename_b_field_tor(ts)
     _eq_fill_vacuum_field(eq, ts)
@@ -540,9 +615,13 @@ def _compute_b2d(eq):
 
     Ported from add_bfield.py: UpdateEquilibriumB2d.
     Vectorized with np.gradient (matches original edge scheme: forward/backward
-    at boundaries, central in interior).
+    at boundaries, central in interior). The psi sign follows the target DD
+    (dd_compat.COCOS_PSI: -1 for DD3 / COCOS 11, +1 for DD4 / COCOS 17), so that
+    B_R = -COCOS_PSI dpsi/dZ / (2 pi R) and B_Z = COCOS_PSI dpsi/dR / (2 pi R).
     """
-    cocos_psi = 1.0  # 1 for DDV4 (cocos=17), -1 for DDV3 (cocos=11)
+    from workflow import dd_compat
+
+    cocos_psi = dd_compat.COCOS_PSI
     two_pi = 2.0 * np.pi
 
     for ts in eq.time_slice:
@@ -581,15 +660,18 @@ def _compute_b2d(eq):
 def _compute_bax(eq):
     """Compute magnetic axis b_field_phi.
 
-    Ported from add_bfield.py: UpdateEquilibriumBax.
+    Ported from add_bfield.py: UpdateEquilibriumBax. The axis flux is read from
+    the target-DD field dd_compat.PSI_MAGNETIC_AXIS.
     """
+    from workflow import dd_compat
+
     for ts in eq.time_slice:
         rmag = ts.global_quantities.magnetic_axis.r
         if not (rmag > 0.0):
             rmag = eq.vacuum_toroidal_field.r0
 
         psi1d = ts.profiles_1d.psi
-        psi_ax = ts.global_quantities.psi_axis
+        psi_ax = getattr(ts.global_quantities, dd_compat.PSI_MAGNETIC_AXIS)
         if abs(psi1d[0] - psi_ax) < abs(psi1d[-1] - psi_ax):
             f_ax = ts.profiles_1d.f[0]
         else:

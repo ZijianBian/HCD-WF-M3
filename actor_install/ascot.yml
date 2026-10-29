@@ -1,29 +1,32 @@
 #example
+# ASCOT suite: iWrap actors afsi, bbnbi_serial, bbnbi_parallel, ascot_serial and ascot_parallel.
+# Modules: the MODULES environment variable overrides the list below; use the module set of the ascot
+# config_sdcc.sh file (DD 4.1.1 / intel-2025b, ifx) or of config_sdcc_dd3_2025b.sh / config_sdcc_dd3_2023b.sh.
+# The build exports IMAS_VERSION (DD of the IMAS-Fortran module), builds the optimized serial and parallel
+# libraries without ASCOT-RFOF, and `make iwrap_actor_<actor>` generates each actor in $ACTOR_FOLDER from
+# the yaml matching the compiler and the DD (actors/<actor>_ifx.yaml for DD 4).
 ---
 SOURCES:
   - VCS:     git
     REPO:    ssh://git@git.iter.org/traj/ascot.git
-    VERSION: develop
+    VERSION: feature/DD3_and_DD4
     DIR:     ascot
 
-MODULES: [IMAS-Python, iWrap, XMLlib, AMNS, IMAS-Fortran]
+MODULES: [IMAS-Python, iWrap, XMLlib, IMAS-Fortran]
 
-ACTOR_NAMES: [afsi, ascot_serial, ascot_parallel, ascot4rfof_serial, ascot4rfof_parallel, bbnbi_serial, bbnbi_parallel]
+ACTOR_NAMES: [afsi, ascot_serial, ascot_parallel, bbnbi_serial, bbnbi_parallel]
 
-BUILDS: 
+BUILDS:
   - DIR: ascot
-    CMD: ./build.sh
+    CMD: export IMAS_VERSION=$(pkg-config --modversion al-fortran | cut -d- -f1) && ./build.sh -skip_rfof -libs -optimized
 
-ACTORS: 
+ACTORS:
   - DIR: ascot
-    CMD: 
-      - iwrap -f actors/afsi.yaml -i "$ACTOR_FOLDER"
-      - iwrap -f actors/ascot4_serial.yaml -i "$ACTOR_FOLDER"
-      - iwrap -f actors/ascot4_parallel.yaml -i "$ACTOR_FOLDER"
-      - iwrap -f actors/ascot4rfof_serial.yaml -i "$ACTOR_FOLDER"
-      - iwrap -f actors/ascot4rfof_parallel.yaml -i "$ACTOR_FOLDER"
-      - iwrap -f actors/bbnbi_serial.yaml -i "$ACTOR_FOLDER"
-      - iwrap -f actors/bbnbi_parallel.yaml -i "$ACTOR_FOLDER" 
-#COMMENTS:  
+    CMD:
+      - export IMAS_VERSION=$(pkg-config --modversion al-fortran | cut -d- -f1) && make iwrap_actor_afsi
+      - export IMAS_VERSION=$(pkg-config --modversion al-fortran | cut -d- -f1) && make iwrap_actor_bbnbi_serial
+      - export IMAS_VERSION=$(pkg-config --modversion al-fortran | cut -d- -f1) && make iwrap_actor_bbnbi_parallel
+      - export IMAS_VERSION=$(pkg-config --modversion al-fortran | cut -d- -f1) && make iwrap_actor_ascot_serial
+      - export IMAS_VERSION=$(pkg-config --modversion al-fortran | cut -d- -f1) && make iwrap_actor_ascot_parallel
+#COMMENTS:
 ...
-

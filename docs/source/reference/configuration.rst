@@ -112,6 +112,28 @@ Configure time loop execution:
 * ``time_step`` - Time step increment
 * ``time_points`` - Explicit time points (comma-separated)
 
+Equilibrium Preparation
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Optional entries of ``workflow_parameters``:
+
+``extend_equilibrium``
+   ``0`` (default, also when absent) or ``1``. ``1`` extends psi and B outside
+   the LCFS and the ``profiles_2d`` grid of the input equilibrium with
+   ``workflow/extend_equilibrium.py`` (matched scheme), for fixed-boundary
+   equilibria whose psi is clamped outside the LCFS or whose grid stops close
+   to the plasma. It runs in the equilibrium fix-ups of
+   ``workflow/ids_prep.py``, after the completion of ``b_field_r/z/phi`` and
+   before the NaN replacement, when ``workflow/workflow_driver.py`` reads the
+   input database (``hcd_nogui``, ``hcd_gui``). The result is not a
+   reconstructed equilibrium outside the LCFS; the caveat is appended to
+   ``ids_properties.comment``.
+
+``extend_equilibrium_box``
+   Optional ``Rmin,Rmax,Zmin,Zmax`` in m, covered by the extended grid; when
+   absent, the default box of ``extend_equilibrium.py`` (ITER EC launchers,
+   ``3.9,10.6,-4.6,4.9``).
+
 Global Lists (YAML)
 --------------------
 
