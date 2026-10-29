@@ -93,17 +93,20 @@ Verify Installation
 
 For Developers (Source Installation)
 ------------------------------------
-If you want to develop or modify HCD Workflow, install from source. On ITER SDCC, you can use the helper script:
+If you want to develop or modify HCD Workflow, install from source. On ITER SDCC, you can source one of the helper scripts (they take no argument; the file selects the Data Dictionary version):
 
 .. code-block:: bash
 
-   ./config_hcd_iter_sdcc.sh
+   source ./config_hcd_iter_sdcc.sh          # DD 4.1.0 module set
+   source ./config_hcd_iter_sdcc_3.42.0.sh   # DD 3.42.2 module set
 
-Set ``ACTOR_FOLDER`` to point to a directory of locally compiled actors (created with ``actor_install.py``) if you want to work with custom builds:
+The script derives ``IMAS_VERSION`` from the loaded IMAS-Fortran module (``pkg-config --modversion al-fortran``) and stops when an ``IMAS_VERSION`` set beforehand differs from it. The workflow writes its outputs in the DD version given by ``IMAS_VERSION`` (there is no DD setting in ``input_workflow.xml``); the DD version of the input entry is read from its stored version and the input IDSs are converted when it differs.
+
+Set ``ACTOR_FOLDER`` to point to a directory of locally compiled actors (created with ``actor_install.py``, built for the same DD version) if you want to work with custom builds:
 
 .. code-block:: bash
 
-   ACTOR_FOLDER=~/actors/local ./config_hcd_iter_sdcc.sh 3.42.0
+   ACTOR_FOLDER=~/actors/local source ./config_hcd_iter_sdcc.sh
 
 Manual Developer Setup
 ~~~~~~~~~~~~~~~~~~~~~~

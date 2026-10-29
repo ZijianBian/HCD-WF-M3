@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+# Actors need a large stack: raise the soft stack limit before anything else is loaded
+from hcdworkflow.stack_limit import raise_stack_limit
+
+raise_stack_limit()
+
 import argparse
 import os
 import sys
@@ -43,10 +48,7 @@ input_database = wf_parameters["input_database"][0]
 input_backend="MDSPLUS"
 if "input_backend" in wf_parameters:
     input_backend = wf_parameters["input_backend"][0]
-if "ddv_backend" in wf_parameters:
-    ddv_backend = wf_parameters["ddv_backend"][0]
-else:
-    ddv_backend = _get_target_dd_version()
+ddv_backend = _get_target_dd_version()
 output_user_or_path = wf_parameters["output_user_or_path"][0]
 output_database = wf_parameters["output_database"][0]
 

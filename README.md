@@ -13,8 +13,8 @@ Python-based Heating and Current Drive (H&CD) Workflow for ITER plasma simulatio
 | Audience   | Recommended Setup                | Command/Script                        |
 |------------|----------------------------------|---------------------------------------|
 | **User**   | EasyBuild module (SDCC)          | `module load HCD-WF`                  |
-| **User**   | SDCC Helper Script (SDCC)        | `./config_hcd_iter_sdcc.sh`           |
-| **Developer** | SDCC Helper Script (SDCC)     | `./config_hcd_iter_sdcc.sh`           |
+| **User**   | SDCC Helper Script (SDCC)        | `source ./config_hcd_iter_sdcc.sh`    |
+| **Developer** | SDCC Helper Script (SDCC)     | `source ./config_hcd_iter_sdcc.sh`    |
 | **Developer** | Manual Setup (any system)     | See [Developer Setup](#developer-setup) |
 
 ---
@@ -33,16 +33,23 @@ hcd_gui                       # Launch the GUI
 ### 2. On ITER SDCC: Use the Helper Script (Alternative)
 
 ```bash
-./config_hcd_iter_sdcc.sh           # Uses default DD version (3.42.0)
-./config_hcd_iter_sdcc.sh 4.0.0     # Use a different DD version if supported
+source ./config_hcd_iter_sdcc.sh           # DD 4.1.0 (IMAS-Fortran/5.5.0-intel-2023b-DD-4.1.0, 2023b modules)
+source ./config_hcd_iter_sdcc_3.42.0.sh    # DD 3.42.2 (IMAS-Fortran/5.6.0-intel-2023b-DD-3.42.2, 2023b modules)
 # Optionally set ACTOR_FOLDER for local actors:
-ACTOR_FOLDER=~/public/PYTHON_ACTORS ./config_hcd_iter_sdcc.sh
+ACTOR_FOLDER=~/public/PYTHON_ACTORS source ./config_hcd_iter_sdcc.sh
 ```
 
-This script will:
-- Load all required modules (unless `ACTOR_FOLDER` is set)
-- Create and activate the `devenv` virtual environment
-- Install the project and all development dependencies
+The scripts take no argument; the DD version is chosen by the file. Each script will:
+- Purge the loaded modules and load the 2023b modules of its DD version
+- Set `IMAS_VERSION` to the DD version of the loaded IMAS-Fortran module (`pkg-config --modversion al-fortran`);
+  an `IMAS_VERSION` set before sourcing must match it, else the script stops. The workflow writes its outputs in
+  this DD version (`input_workflow.xml` has no DD setting); the input entry's DD version is read from its stored version
+- Put the repository and `ACTOR_FOLDER` on `PYTHONPATH` (`config_hcd_iter_sdcc.sh` defaults
+  `ACTOR_FOLDER` to `PYTHON_ACTORS` in the repository); use iWrap actors built for the same DD version
+- Create (with `--system-site-packages`) and activate a virtual environment, `devenv_dd410` for
+  DD 4.1.0 and `virtualenvdir` for DD 3.42.2 (`HCDWF_VENV_DIR` selects another one)
+- Install the project in editable mode only when `HCDWF_SKIP_PIP_INSTALL=0` is set
+- Remove the soft stack limit
 
 ### 3. Example Commands
 
@@ -67,9 +74,11 @@ hcdslice_nogui -c my_config/
 ### 1. On ITER SDCC: Use the Helper Script (Recommended)
 
 ```bash
-./config_hcd_iter_sdcc.sh
+source ./config_hcd_iter_sdcc.sh
 ```
-- Loads modules, sets up Python venv, installs all dependencies (including dev tools)
+- Loads the DD 4.1.0 modules and activates the `devenv_dd410` virtual environment
+  (`source ./config_hcd_iter_sdcc_3.42.0.sh` for DD 3.42.2); set `HCDWF_SKIP_PIP_INSTALL=0`
+  to install the project in editable mode
 
 ### 2. Manual Setup (Any System)
 

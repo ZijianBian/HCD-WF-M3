@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+# Actors need a large stack: raise the soft stack limit before anything else is loaded
+from hcdworkflow.stack_limit import raise_stack_limit
+
+raise_stack_limit()
+
 import argparse
 from workflow.workflow_driver import workflow_driver
 

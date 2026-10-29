@@ -10,13 +10,18 @@ You can compile the H&CD actors yourself if you have access permissions to their
 .. note::
 
    Before running ``actor_install.py`` on ITER SDCC you can prepare a Python
-   environment with the repository's :file:`config_hcd_iter_sdcc.sh` helper::
+   environment with one of the repository's helper scripts,
+   :file:`config_hcd_iter_sdcc.sh` (DD 4.1.0) or
+   :file:`config_hcd_iter_sdcc_3.42.0.sh` (DD 3.42.2); they take no argument::
 
-      ACTOR_FOLDER=~/actors/local ./config_hcd_iter_sdcc.sh 3.42.0
+      ACTOR_FOLDER=~/actors/local source ./config_hcd_iter_sdcc.sh
 
-   This loads the IMAS modules that ``actor_install.py`` expects and adds your
-   local actor folder to ``PYTHONPATH`` so the workflow picks up the freshly
-   built actors.
+   This loads the IMAS modules that ``actor_install.py`` expects, sets
+   ``IMAS_VERSION`` to the DD version of the loaded IMAS-Fortran module
+   (``pkg-config --modversion al-fortran``; an ``IMAS_VERSION`` set beforehand
+   must match it) and adds your local actor folder to ``PYTHONPATH`` so the
+   workflow picks up the freshly built actors. Build the actors in the
+   environment of the DD version the workflow runs with.
 
 Usage
 -----

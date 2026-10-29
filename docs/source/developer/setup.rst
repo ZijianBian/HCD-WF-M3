@@ -54,18 +54,27 @@ Setting Up Development Environment
 .. tip::
 
    On ITER SDCC systems you can automate most of the steps below with the
-   :file:`config_hcd_iter_sdcc.sh` helper that ships at the root of the
-   repository. Running::
+   helpers that ship at the root of the repository,
+   :file:`config_hcd_iter_sdcc.sh` (DD 4.1.0) and
+   :file:`config_hcd_iter_sdcc_3.42.0.sh` (DD 3.42.2). Sourcing one of them
+   (no argument)::
 
-      ./config_hcd_iter_sdcc.sh
+      source ./config_hcd_iter_sdcc.sh
 
-   loads the standard HCD-WF module stack, creates the ``devenv`` virtual
-   environment, and installs the project in editable mode. Set the
-   ``ACTOR_FOLDER`` environment variable to point at a directory created by
-   ``actor_install.py`` if you prefer to develop against locally built
-   actors::
+   loads the HCD-WF module stack of its DD version, sets ``IMAS_VERSION`` to
+   the DD version of the loaded IMAS-Fortran module (``pkg-config --modversion
+   al-fortran``; an ``IMAS_VERSION`` set beforehand must match it, else the
+   script stops), creates and activates the virtual environment
+   (``devenv_dd410`` for DD 4.1.0, ``virtualenvdir`` for DD 3.42.2,
+   ``HCDWF_VENV_DIR`` selects another one), and installs the project in
+   editable mode when ``HCDWF_SKIP_PIP_INSTALL=0`` is set. The workflow writes
+   its outputs in the DD version of ``IMAS_VERSION`` (``input_workflow.xml``
+   has no DD setting); the DD version of the input entry is read from its
+   stored version. Set the ``ACTOR_FOLDER`` environment variable to point at
+   a directory created by ``actor_install.py`` if you prefer to develop
+   against locally built actors::
 
-      ACTOR_FOLDER=~/actors/local ./config_hcd_iter_sdcc.sh 3.42.0
+      ACTOR_FOLDER=~/actors/local source ./config_hcd_iter_sdcc.sh
 
    The manual instructions below remain available if you need finer control.
 
