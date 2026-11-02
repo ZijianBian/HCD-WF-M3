@@ -40,7 +40,7 @@ VERSION = '2026.10.22'
 # tools/build_hcd_modules.sh.
 VERSION_OVERRIDES = {
     'FoPla': '2026.10.26',
-    'GRAY': '2026.11.02',
+    'GRAY': '2026.11.02.1',
     'HCD2CORE_SOURCES': '2026.10.27',
     'RISK': '2026.11.02',
     'TORBEAM': '2026.11.02',

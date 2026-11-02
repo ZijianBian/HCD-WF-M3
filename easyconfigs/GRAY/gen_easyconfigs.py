@@ -94,7 +94,7 @@ CODE = dict(
     git_base='ssh://git@git.iter.org/heat',
     homepage='https://git.iter.org/projects/HEAT/repos/gray',
     # origin/feature/DD3_and_DD4 (local HEAD == origin, 0/0, fetched 2026-11-02)
-    commit='978034a9eb3575923765f60af477502e394aecb8', describe='1.0.0-9-g978034a',
+    commit='5925b181c6105c219c9c524e9f382b52e775c01d', describe='1.0.0-10-g5925b18',
     description='GRAY quasi-optical beam-tracing code for electron cyclotron heating and current drive.',
     contents=('Fortran library (lib/libgray.a, include/gray), MUSCLE3 actor executable (bin/gray_m3.exe, also '
               'gray/gray_m3.exe), iWrap actor package gray (on PYTHONPATH), and the run kit run_kit (run_gray.py, '

@@ -210,7 +210,7 @@ other codes keep theirs.
    changed.
 4. `--make-sources <CODE>`, `--dry-run <CODE> all`, `--submit <CODE> all`.
 
-Current overrides: FoPla `2026.10.26`, GRAY `2026.11.02`, HCD2CORE_SOURCES `2026.10.27`, RISK `2026.11.02`, TORBEAM `2026.11.02`.
+Current overrides: FoPla `2026.10.26`, GRAY `2026.11.02.1`, HCD2CORE_SOURCES `2026.10.27`, RISK `2026.11.02`, TORBEAM `2026.11.02`.
 
 ## Replacing an older set of modules
 
