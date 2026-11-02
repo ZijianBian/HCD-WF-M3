@@ -6,6 +6,8 @@ from inspect import getmodule, stack
 import imas
 from lxml import etree
 
+from hcdworkflow.config_files import config_file
+
 logger = logging.getLogger("module")
 
 
@@ -35,21 +37,11 @@ class WorkflowActor:
         if not os.path.exists(xmlDirectory):
             print(f"Actor configuration not found for actor name : [{actorName}]")
             return None
-        if not os.path.exists(
-            os.path.join(
-                xmlDirectory,
-                f"input_{actorName}.xml",
-            )
-        ):
+        xmlPath = os.path.join(xmlDirectory, f"input_{actorName}.xml")
+        if not os.path.exists(xmlPath):
             print(f"Actor configuration not found for actor name : [{actorName}]")
             return None
-        return WorkflowActor(
-            actorName,
-            os.path.join(
-                xmlDirectory,
-                f"input_{actorName}.xml",
-            ),
-        )
+        return WorkflowActor(actorName, config_file(xmlPath))
 
     def validate(self):
         if not self.name:

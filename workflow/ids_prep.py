@@ -736,9 +736,10 @@ def _xml_int(config_folder_path, relative_path, tag_name, default=None):
     if not config_folder_path:
         return default
     try:
+        from hcdworkflow.config_files import config_file
         from hcdworkflow.workflow_config_reader import XmlReader
 
-        reader = XmlReader(os.path.join(config_folder_path, relative_path))
+        reader = XmlReader(config_file(os.path.join(config_folder_path, relative_path)))
         elem = reader.xmlRoot.find(f".//{tag_name}")
         if elem is not None and elem.text is not None:
             return int(float(elem.text.strip()))

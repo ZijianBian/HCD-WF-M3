@@ -313,6 +313,27 @@ TORBEAM
        <parameter name="mode">X</parameter>
    </parameters>
 
+Regression Variants
+-------------------
+
+A configuration folder may hold regression variants of its configuration files: ``<name>_reg.xml``
+next to ``input_workflow.xml`` or next to an actor code-parameter file ``input_<actor>.xml``. They
+carry degraded, faster settings (for example fewer time slices or a coarser actor resolution) for
+the regression tests and are copies of the normal files in which only these parameters differ.
+
+The variants are read only when the environment variable ``HCDWF_TEST_MODE`` is ``1`` (or
+``true``); otherwise, and for every file without a variant, the normal file is read. The selection
+is made in ``hcdworkflow/config_files.py`` for every reader of these files (``hcd_nogui``,
+``hcd_gui`` runs, ``hcdslice_nogui``, the actor code parameters and the values that
+``workflow/ids_prep.py`` takes from them), and the workflow prints the file it reads. The GUI
+editors open and save the normal files only. A workflow-specific variable is used so that actors
+running in the workflow process are not switched by their own test variables (``MS_TEST_MODE``).
+
+``ci-sdcc/st03-regression.sh`` sets ``HCDWF_TEST_MODE=1`` unless it is already set; the
+references in ``tests/reference/<CASE>`` are produced in this mode, so a run with
+``HCDWF_TEST_MODE=0`` compares the normal settings with them and is expected to differ for the
+cases that have variants.
+
 Validation
 ----------
 

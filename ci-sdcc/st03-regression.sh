@@ -8,6 +8,8 @@
 #   ACTORS    see st02-build-actors.sh, only needed when actor_paths.env does not exist yet
 #   UPDATE_REFERENCE  set to 1 to write the reference values from this run instead of comparing
 #   RTOL      relative tolerance of the value comparison (default: 1e-6)
+#   HCDWF_TEST_MODE   1 (default) uses the regression variants <name>_reg.xml of the configuration
+#             files where a case has them, 0 the normal files
 #
 # Each case runs on copies of its configuration writing HDF5 output to ci_regression/<CASE>/{full,slice},
 # so runs do not touch the user database and can run in parallel.
@@ -40,6 +42,9 @@ source ./actor_paths.env
 # Need to remove the stack limit to avoid segmentation fault inside codes
 ulimit -Ss unlimited
 export IMAS_AL_DISABLE_OBSOLESCENT_WARNING=1
+# Select the regression variants <name>_reg.xml of the configuration files (HCDWF_TEST_MODE=0 runs the
+# normal configuration files)
+export HCDWF_TEST_MODE="${HCDWF_TEST_MODE:-1}"
 
 # Extend PYTHONPATH with the actor folders and avoid duplicates
 export PYTHONPATH="$ACTOR_PATHS:${PYTHONPATH:-}"
@@ -71,17 +76,22 @@ RESULTS_DIR="$ROOT_DIR/ci_regression"
 rm -rf "$RESULTS_DIR"
 mkdir -p "$RESULTS_DIR"
 
-# Point the output of a configuration copy to a local HDF5 database
+# Point the output of a configuration copy (input_workflow.xml and its regression variant
+# input_workflow_reg.xml when present) to a local HDF5 database
 set_local_output() {
-    python3 - "$1/input_workflow.xml" "$2" <<'EOF'
-import re, sys
-xml_file, output_path = sys.argv[1], sys.argv[2]
-text = open(xml_file).read()
-for tag, value in (("output_user_or_path", output_path), ("output_backend", "HDF5")):
-    text, count = re.subn(rf"(<{tag}\b[^>]*>)[^<]*(</{tag}>)", rf"\g<1>{value}\g<2>", text)
-    if count != 1:
-        sys.exit(f"{tag} not found in {xml_file}")
-open(xml_file, "w").write(text)
+    python3 - "$1" "$2" <<'EOF'
+import os, re, sys
+work_dir, output_path = sys.argv[1], sys.argv[2]
+for name in ("input_workflow.xml", "input_workflow_reg.xml"):
+    xml_file = os.path.join(work_dir, name)
+    if name == "input_workflow_reg.xml" and not os.path.exists(xml_file):
+        continue
+    text = open(xml_file).read()
+    for tag, value in (("output_user_or_path", output_path), ("output_backend", "HDF5")):
+        text, count = re.subn(rf"(<{tag}\b[^>]*>)[^<]*(</{tag}>)", rf"\g<1>{value}\g<2>", text)
+        if count != 1:
+            sys.exit(f"{tag} not found in {xml_file}")
+    open(xml_file, "w").write(text)
 EOF
 }
 

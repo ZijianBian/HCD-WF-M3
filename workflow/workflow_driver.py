@@ -11,6 +11,7 @@ import imas
 
 import hcdworkflow
 from gui.gui_methods import create_workflow_param_from_file
+from hcdworkflow.config_files import config_file
 from hcdworkflow.hcd_workflow import HCDWorkflow
 from hcdworkflow.workflow_dbhelper import WorkflowDbHelper, get_ids
 from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
@@ -204,7 +205,7 @@ def setup_databases(config_folder_path):
     globalListPath = str(pathGlobalConfiguration / "global_lists.yaml")
 
     # Load workflow parameters from XML
-    inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
+    inputworkflow_xml = config_file(os.path.join(config_folder_path, "input_workflow.xml"))
     print(f"[workflow_driver] Loading config from: {inputworkflow_xml}")
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)["workflow_parameters"][0]
     param_process = {

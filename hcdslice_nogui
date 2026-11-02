@@ -11,6 +11,7 @@ import sys
 import imas
 
 from gui.gui_methods import create_workflow_param_from_file
+from hcdworkflow.config_files import config_file
 from hcdworkflow.hcd_workflow import HCDWorkflow
 from hcdworkflow.workflow_dbhelper import WorkflowDbHelper, get_ids
 from workflow.ids_prep import _get_target_dd_version
@@ -37,7 +38,7 @@ config_folder = args["config_folder"]
 config_folder_path = os.path.abspath(config_folder)
 
 rootPath = os.path.dirname(os.path.abspath(__file__))
-inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
+inputworkflow_xml = config_file(os.path.join(config_folder_path, "input_workflow.xml"))
 
 wf_parameters = create_workflow_param_from_file(inputworkflow_xml)[
     "workflow_parameters"

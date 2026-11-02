@@ -7,6 +7,7 @@ from pathlib import Path
 import imas
 
 import hcdworkflow
+from hcdworkflow.config_files import config_file
 from hcdworkflow.workflow_config_reader import WorkflowConfigReader
 from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 
@@ -14,7 +15,7 @@ from hcdworkflow.workflow_globals_reader import WorkflowGlobalsReader
 # TODO Separate static and runtime part of the data
 class WorkflowData:
     def __init__(self, workflowConfig) -> None:
-        workflowConfig = os.path.join(workflowConfig, "input_workflow.xml")
+        workflowConfig = config_file(os.path.join(workflowConfig, "input_workflow.xml"))
 
         pathGlobalConfiguration = Path(inspect.getfile(hcdworkflow)).parent / "global_configuration"
 

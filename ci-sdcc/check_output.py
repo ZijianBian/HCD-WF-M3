@@ -13,7 +13,8 @@ from an output that holds one.
 To keep the references small enough for the repository, arrays with more than MAX_FULL_SIZE values
 (e.g. ray tracing trajectories) are stored as a summary (shape, min, max, mean, rms) instead of in full.
 
-The output entry is read from <config_folder>/input_workflow.xml, the same way the workflow opens it.
+The output entry is read from <config_folder>/input_workflow.xml (input_workflow_reg.xml when HCDWF_TEST_MODE=1
+selects it), the same way the workflow opens it.
 """
 import argparse
 import json
@@ -25,6 +26,8 @@ import numpy as np
 
 import imas
 from imas import ids_defs
+
+from hcdworkflow.config_files import config_file
 
 SKIPPED = ("ids_properties", "code")
 MAX_FULL_SIZE = 100
@@ -59,7 +62,7 @@ def report_non_finite(values):
 
 
 def workflow_parameters(config_folder):
-    root = ET.parse(os.path.join(config_folder, "input_workflow.xml")).getroot()
+    root = ET.parse(config_file(os.path.join(config_folder, "input_workflow.xml"))).getroot()
     return {child.tag: (child.text or "").strip() for child in root.find("workflow_parameters")}
 
 

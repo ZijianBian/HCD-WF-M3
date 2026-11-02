@@ -222,6 +222,13 @@ The workflow is configured using a main XML file and optional YAML waveform file
   - `lh_waveforms.yaml` – LHCD waveforms
 - Place these files in your configuration folder if your simulation requires time-dependent input.
 
+### Regression Variants (`HCDWF_TEST_MODE`)
+- A configuration folder may hold regression variants `<name>_reg.xml` next to `input_workflow.xml` and the
+  actor code-parameter files `input_<actor>.xml`, with degraded, faster settings for the regression tests.
+- They are used only when the environment variable `HCDWF_TEST_MODE=1` is set (`ci-sdcc/st03-regression.sh`
+  sets it); a file without a variant is read as usual. The workflow prints which file it reads.
+- A variant is a copy of the normal file in which only the degraded parameters differ.
+
 ### Example Configuration Folder
 A typical configuration folder (e.g., `tests/data/GRAY_PION`) contains:
 - `input_workflow.xml` (main workflow definition)
