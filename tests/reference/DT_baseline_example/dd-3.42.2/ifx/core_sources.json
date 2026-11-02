@@ -1,0 +1,338 @@
+{
+ "dd_version": "3.42.2",
+ "values": {
+  "source[0]/identifier/index": 3,
+  "source[0]/global_quantities[0]/power": 19739363.693659954,
+  "source[0]/global_quantities[0]/electrons/power": 19739363.693659954,
+  "source[0]/global_quantities[1]/power": 19828798.81352657,
+  "source[0]/global_quantities[1]/electrons/power": 19828798.81352657,
+  "source[0]/global_quantities[2]/power": 19977569.86699626,
+  "source[0]/global_quantities[2]/electrons/power": 19977569.86699626,
+  "source[0]/profiles_1d[0]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.005025125628140704,
+    "max": 1.0,
+    "mean": 0.49748743756859304,
+    "rms": 0.5763937356630292
+   }
+  },
+  "source[0]/profiles_1d[0]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.01331366229567441,
+    "max": 2.649418796839208,
+    "mean": 1.3180525682856021,
+    "rms": 1.5271083976459994
+   }
+  },
+  "source[0]/profiles_1d[0]/grid/psi": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": 3.8024311725433367e-06,
+    "max": 53.5904870444513,
+    "mean": 29.626870231030612,
+    "rms": 34.513550938593625
+   }
+  },
+  "source[0]/profiles_1d[0]/grid/volume": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.043539786450487714,
+    "max": 791.7573225442977,
+    "mean": 274.8250802510572,
+    "rms": 366.05791943194635
+   }
+  },
+  "source[0]/profiles_1d[0]/grid/area": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": 0.00020605301420331738,
+    "max": 20.78175041559614,
+    "mean": 7.085778393185528,
+    "rms": 9.48255599495642
+   }
+  },
+  "source[0]/profiles_1d[0]/electrons/energy": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -1.5892570161833755e-10,
+    "max": 1481067.0306570774,
+    "mean": 130783.62897888491,
+    "rms": 334660.3416018751
+   }
+  },
+  "source[0]/profiles_1d[0]/j_parallel": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -496966.4817693139,
+    "max": 3125794.9906244795,
+    "mean": 61496.09848279246,
+    "rms": 536535.0093151232
+   }
+  },
+  "source[0]/profiles_1d[0]/ion[0]/element[0]/a": 3.0,
+  "source[0]/profiles_1d[0]/ion[0]/element[0]/z_n": 1.0,
+  "source[0]/profiles_1d[0]/ion[0]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[0]/ion[0]/z_ion": 1.0,
+  "source[0]/profiles_1d[0]/ion[0]/neutral_index": 1,
+  "source[0]/profiles_1d[0]/ion[0]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[0]/ion[1]/element[0]/a": 2.0,
+  "source[0]/profiles_1d[0]/ion[1]/element[0]/z_n": 1.0,
+  "source[0]/profiles_1d[0]/ion[1]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[0]/ion[1]/z_ion": 1.0,
+  "source[0]/profiles_1d[0]/ion[1]/neutral_index": 2,
+  "source[0]/profiles_1d[0]/ion[1]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[0]/ion[2]/element[0]/a": 4.0,
+  "source[0]/profiles_1d[0]/ion[2]/element[0]/z_n": 2.0,
+  "source[0]/profiles_1d[0]/ion[2]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[0]/ion[2]/z_ion": 1.9999978784022316,
+  "source[0]/profiles_1d[0]/ion[2]/neutral_index": 3,
+  "source[0]/profiles_1d[0]/ion[2]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[0]/ion[3]/element[0]/a": 9.0,
+  "source[0]/profiles_1d[0]/ion[3]/element[0]/z_n": 4.0,
+  "source[0]/profiles_1d[0]/ion[3]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[0]/ion[3]/z_ion": 3.999617799966339,
+  "source[0]/profiles_1d[0]/ion[3]/neutral_index": 4,
+  "source[0]/profiles_1d[0]/ion[3]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[0]/ion[4]/element[0]/a": 183.34,
+  "source[0]/profiles_1d[0]/ion[4]/element[0]/z_n": 74.0,
+  "source[0]/profiles_1d[0]/ion[4]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[0]/ion[4]/z_ion": 35.93536088790298,
+  "source[0]/profiles_1d[0]/ion[4]/neutral_index": 5,
+  "source[0]/profiles_1d[0]/ion[4]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[1]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.005025125628140704,
+    "max": 1.0,
+    "mean": 0.49748743756859304,
+    "rms": 0.5763937356630292
+   }
+  },
+  "source[0]/profiles_1d[1]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.013449236042924424,
+    "max": 2.6763979725419604,
+    "mean": 1.3314743692736772,
+    "rms": 1.5426590255144181
+   }
+  },
+  "source[0]/profiles_1d[1]/grid/psi": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": 5.848804941457221e-06,
+    "max": 73.04296438319408,
+    "mean": 41.5542192788592,
+    "rms": 48.190884944574854
+   }
+  },
+  "source[0]/profiles_1d[1]/grid/volume": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.04334587636577179,
+    "max": 803.8943254151196,
+    "mean": 277.7193577104724,
+    "rms": 370.6632762302282
+   }
+  },
+  "source[0]/profiles_1d[1]/grid/area": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": 0.00020543253020866925,
+    "max": 20.973583599097754,
+    "mean": 7.156072724126028,
+    "rms": 9.593641349518272
+   }
+  },
+  "source[0]/profiles_1d[1]/electrons/energy": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -1.63269801326983e-10,
+    "max": 1405832.0262609809,
+    "mean": 109166.09966213531,
+    "rms": 278020.89947512205
+   }
+  },
+  "source[0]/profiles_1d[1]/j_parallel": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -302110.15907314856,
+    "max": 2261960.632359158,
+    "mean": 70088.29544541996,
+    "rms": 432119.56622572505
+   }
+  },
+  "source[0]/profiles_1d[1]/ion[0]/element[0]/a": 3.0,
+  "source[0]/profiles_1d[1]/ion[0]/element[0]/z_n": 1.0,
+  "source[0]/profiles_1d[1]/ion[0]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[1]/ion[0]/z_ion": 1.0,
+  "source[0]/profiles_1d[1]/ion[0]/neutral_index": 1,
+  "source[0]/profiles_1d[1]/ion[0]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[1]/ion[1]/element[0]/a": 2.0,
+  "source[0]/profiles_1d[1]/ion[1]/element[0]/z_n": 1.0,
+  "source[0]/profiles_1d[1]/ion[1]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[1]/ion[1]/z_ion": 1.0,
+  "source[0]/profiles_1d[1]/ion[1]/neutral_index": 2,
+  "source[0]/profiles_1d[1]/ion[1]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[1]/ion[2]/element[0]/a": 4.0,
+  "source[0]/profiles_1d[1]/ion[2]/element[0]/z_n": 2.0,
+  "source[0]/profiles_1d[1]/ion[2]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[1]/ion[2]/z_ion": 1.9999984632166254,
+  "source[0]/profiles_1d[1]/ion[2]/neutral_index": 3,
+  "source[0]/profiles_1d[1]/ion[2]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[1]/ion[3]/element[0]/a": 9.0,
+  "source[0]/profiles_1d[1]/ion[3]/element[0]/z_n": 4.0,
+  "source[0]/profiles_1d[1]/ion[3]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[1]/ion[3]/z_ion": 3.999748160136629,
+  "source[0]/profiles_1d[1]/ion[3]/neutral_index": 4,
+  "source[0]/profiles_1d[1]/ion[3]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[1]/ion[4]/element[0]/a": 183.34,
+  "source[0]/profiles_1d[1]/ion[4]/element[0]/z_n": 74.0,
+  "source[0]/profiles_1d[1]/ion[4]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[1]/ion[4]/z_ion": 38.55715636110193,
+  "source[0]/profiles_1d[1]/ion[4]/neutral_index": 5,
+  "source[0]/profiles_1d[1]/ion[4]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[2]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.005025125628140704,
+    "max": 1.0,
+    "mean": 0.49748743756859304,
+    "rms": 0.5763937356630292
+   }
+  },
+  "source[0]/profiles_1d[2]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.013553394902476465,
+    "max": 2.6971255855928167,
+    "mean": 1.3417860963772614,
+    "rms": 1.5546062918321788
+   }
+  },
+  "source[0]/profiles_1d[2]/grid/psi": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": 9.691096499911798e-06,
+    "max": 86.15048174202671,
+    "mean": 50.455192941776914,
+    "rms": 58.07087211646202
+   }
+  },
+  "source[0]/profiles_1d[2]/grid/volume": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -0.04304264810037738,
+    "max": 810.4415288808183,
+    "mean": 278.53034551176734,
+    "rms": 372.5001088830118
+   }
+  },
+  "source[0]/profiles_1d[2]/grid/area": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": 0.00020475425323631286,
+    "max": 21.300744331301004,
+    "mean": 7.197038205723181,
+    "rms": 9.665857889755756
+   }
+  },
+  "source[0]/profiles_1d[2]/electrons/energy": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -2.8652162659480635e-10,
+    "max": 433536.4839020474,
+    "mean": 66294.56927165393,
+    "rms": 124399.92380682251
+   }
+  },
+  "source[0]/profiles_1d[2]/j_parallel": {
+   "summary": {
+    "shape": [
+     300
+    ],
+    "min": -199571.455108505,
+    "max": 601085.701271565,
+    "mean": 20236.662517026372,
+    "rms": 156670.48371809293
+   }
+  },
+  "source[0]/profiles_1d[2]/ion[0]/element[0]/a": 3.0,
+  "source[0]/profiles_1d[2]/ion[0]/element[0]/z_n": 1.0,
+  "source[0]/profiles_1d[2]/ion[0]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[2]/ion[0]/z_ion": 1.0,
+  "source[0]/profiles_1d[2]/ion[0]/neutral_index": 1,
+  "source[0]/profiles_1d[2]/ion[0]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[2]/ion[1]/element[0]/a": 2.0,
+  "source[0]/profiles_1d[2]/ion[1]/element[0]/z_n": 1.0,
+  "source[0]/profiles_1d[2]/ion[1]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[2]/ion[1]/z_ion": 1.0,
+  "source[0]/profiles_1d[2]/ion[1]/neutral_index": 2,
+  "source[0]/profiles_1d[2]/ion[1]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[2]/ion[2]/element[0]/a": 4.0,
+  "source[0]/profiles_1d[2]/ion[2]/element[0]/z_n": 2.0,
+  "source[0]/profiles_1d[2]/ion[2]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[2]/ion[2]/z_ion": 1.9999988176961896,
+  "source[0]/profiles_1d[2]/ion[2]/neutral_index": 3,
+  "source[0]/profiles_1d[2]/ion[2]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[2]/ion[3]/element[0]/a": 9.0,
+  "source[0]/profiles_1d[2]/ion[3]/element[0]/z_n": 4.0,
+  "source[0]/profiles_1d[2]/ion[3]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[2]/ion[3]/z_ion": 3.999810282224708,
+  "source[0]/profiles_1d[2]/ion[3]/neutral_index": 4,
+  "source[0]/profiles_1d[2]/ion[3]/multiple_states_flag": 1,
+  "source[0]/profiles_1d[2]/ion[4]/element[0]/a": 183.34,
+  "source[0]/profiles_1d[2]/ion[4]/element[0]/z_n": 74.0,
+  "source[0]/profiles_1d[2]/ion[4]/element[0]/atoms_n": 1,
+  "source[0]/profiles_1d[2]/ion[4]/z_ion": 40.3114825094593,
+  "source[0]/profiles_1d[2]/ion[4]/neutral_index": 5,
+  "source[0]/profiles_1d[2]/ion[4]/multiple_states_flag": 1,
+  "time": [
+   39.937597812055124,
+   59.937597812055124,
+   79.93759781205512
+  ]
+ }
+}

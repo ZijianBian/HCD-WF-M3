@@ -35,10 +35,10 @@ def _open_or_create(entry, operation, description):
         raise RuntimeError(f"Could not {operation} {description}: {error}") from error
 
 
-def legacy_uri(user_or_path, database, pulse, run, backend="HDF5"):
+def legacy_uri(user_or_path, database, pulse, run, backend="HDF5", data_version=None):
     """URI that the Access Layer builds from the legacy arguments, as imas.DBEntry does for
-    DBEntry(backend, database, pulse, run, user_or_path) in this environment (DD version of the
-    IMAS-Python factory)."""
+    DBEntry(backend, database, pulse, run, user_or_path, data_version): the version folder is given by
+    data_version, by default by the DD version of the IMAS-Python factory of this environment."""
     from imas.backends.imas_core.imas_interface import ll_interface
 
     status, uri = ll_interface.build_uri_from_legacy_parameters(
@@ -47,7 +47,7 @@ def legacy_uri(user_or_path, database, pulse, run, backend="HDF5"):
         int(run),
         str(user_or_path),
         str(database),
-        imas.IDSFactory().dd_version,
+        str(data_version or imas.IDSFactory().dd_version),
         "",
     )
     if status != 0:
@@ -55,12 +55,12 @@ def legacy_uri(user_or_path, database, pulse, run, backend="HDF5"):
     return uri
 
 
-def legacy_entry_dir(user_or_path, database, pulse, run, backend="HDF5"):
+def legacy_entry_dir(user_or_path, database, pulse, run, backend="HDF5", data_version=None):
     """Directory of the data entry given by the legacy arguments, resolved as the Access Layer does:
-    <base>/<database>/<version>/<pulse>/<run>, with <version> taken from the URI (DD major version) and
-    <base> = user_or_path when it is an absolute path, $IMAS_HOME/shared/imasdb for "public", and
-    <home directory of the user>/public/imasdb for a user name."""
-    uri = legacy_uri(user_or_path, database, pulse, run, backend)
+    <base>/<database>/<version>/<pulse>/<run>, with <version> taken from the URI (DD major version, see
+    legacy_uri) and <base> = user_or_path when it is an absolute path, $IMAS_HOME/shared/imasdb for
+    "public", and <home directory of the user>/public/imasdb for a user name."""
+    uri = legacy_uri(user_or_path, database, pulse, run, backend, data_version)
     query = dict(item.split("=", 1) for item in re.split("[;&]", urlparse(uri).query) if "=" in item)
     user = query["user"]
     if user.startswith("/"):
@@ -109,8 +109,19 @@ class WorkflowDbHelper:
         if output_database == "default":
             output_database = input_database
 
-        # The output data entry must differ from the input one; checked before any file is opened or written
+        # Input entry: the entry of the DD major of this environment; for DD 4, when that entry does not
+        # exist, the DD 3 entry of the same database, pulse and run (its IDSs are read in their stored DD
+        # and converted to the DD of this environment like every input IDS)
+        self.input_data_version = None
         self.input_entry = legacy_entry_dir(input_user_or_path, input_database, shot_number, input_run, input_backend)
+        if str(ddv_backend).split(".", 1)[0] == "4" and not os.path.isdir(self.input_entry):
+            dd3_entry = legacy_entry_dir(
+                input_user_or_path, input_database, shot_number, input_run, input_backend, data_version="3"
+            )
+            if os.path.isdir(dd3_entry):
+                self.input_data_version = "3"
+                self.input_entry = dd3_entry
+        # The output data entry must differ from the input one; checked before any file is opened or written
         self.output_entry = legacy_entry_dir(
             output_user_or_path, output_database, shot_number, output_run, output_backend
         )
@@ -148,8 +159,15 @@ class WorkflowDbHelper:
             self.shot_number,
             self.input_run,
             self.input_user_or_path,
+            data_version=self.input_data_version,
         )
         _open_or_create(inputDb, "open", "input database")
+        stored = f"DD {self.input_data_version} entry" if self.input_data_version else "entry"
+        print(
+            f"-- Input {stored} {self.input_entry} read for target DD {self.ddv_backend}",
+            file=sys.stdout,
+            flush=True,
+        )
         return inputDb
 
     def getOutputDatabase(self):

@@ -287,9 +287,10 @@ def setup_databases(config_folder_path):
 
         # Load waveform configurations
         print("[workflow_driver] Loading waveform configurations...")
+        # <system>_waveforms.yaml files; config_file() selects their DD 3 / regression variants
         for filename in os.listdir(config_folder_path):
-            filePath = os.path.join(config_folder_path, filename)
-            if filePath.endswith("waveforms.yaml"):
+            if filename.endswith("waveforms.yaml"):
+                filePath = config_file(os.path.join(config_folder_path, filename))
                 if isWaveformCookerPresent:
                     with _waveform_cooker_imas2_open_compat():
                         idsObject = add_dynamic(filePath)

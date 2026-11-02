@@ -1,0 +1,1966 @@
+{
+ "dd_version": "4.1.1",
+ "values": {
+  "coherent_wave[0]/identifier/type/index": 1,
+  "coherent_wave[0]/wave_solver_type/index": 1,
+  "coherent_wave[0]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[0]/global_quantities[0]/power": 0.0,
+  "coherent_wave[0]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[0]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[0]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[0]/global_quantities[0]/time": 150.0,
+  "coherent_wave[0]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[0]/global_quantities[1]/power": 0.0,
+  "coherent_wave[0]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[0]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[0]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[0]/global_quantities[1]/time": 152.0,
+  "coherent_wave[1]/identifier/type/index": 1,
+  "coherent_wave[1]/wave_solver_type/index": 1,
+  "coherent_wave[1]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[1]/global_quantities[0]/power": 0.0,
+  "coherent_wave[1]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[1]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[1]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[1]/global_quantities[0]/time": 150.0,
+  "coherent_wave[1]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[1]/global_quantities[1]/power": 0.0,
+  "coherent_wave[1]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[1]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[1]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[1]/global_quantities[1]/time": 152.0,
+  "coherent_wave[2]/identifier/type/index": 1,
+  "coherent_wave[2]/wave_solver_type/index": 1,
+  "coherent_wave[2]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[2]/global_quantities[0]/power": 0.0,
+  "coherent_wave[2]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[2]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[2]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[2]/global_quantities[0]/time": 150.0,
+  "coherent_wave[2]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[2]/global_quantities[1]/power": 0.0,
+  "coherent_wave[2]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[2]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[2]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[2]/global_quantities[1]/time": 152.0,
+  "coherent_wave[3]/identifier/type/index": 1,
+  "coherent_wave[3]/wave_solver_type/index": 1,
+  "coherent_wave[3]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[3]/global_quantities[0]/power": 0.0,
+  "coherent_wave[3]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[3]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[3]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[3]/global_quantities[0]/time": 150.0,
+  "coherent_wave[3]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[3]/global_quantities[1]/power": 0.0,
+  "coherent_wave[3]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[3]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[3]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[3]/global_quantities[1]/time": 152.0,
+  "coherent_wave[4]/identifier/type/index": 1,
+  "coherent_wave[4]/wave_solver_type/index": 1,
+  "coherent_wave[4]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[4]/global_quantities[0]/power": 0.0,
+  "coherent_wave[4]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[4]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[4]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[4]/global_quantities[0]/time": 150.0,
+  "coherent_wave[4]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[4]/global_quantities[1]/power": 0.0,
+  "coherent_wave[4]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[4]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[4]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[4]/global_quantities[1]/time": 152.0,
+  "coherent_wave[5]/identifier/type/index": 1,
+  "coherent_wave[5]/wave_solver_type/index": 1,
+  "coherent_wave[5]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[5]/global_quantities[0]/power": 0.0,
+  "coherent_wave[5]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[5]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[5]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[5]/global_quantities[0]/time": 150.0,
+  "coherent_wave[5]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[5]/global_quantities[1]/power": 0.0,
+  "coherent_wave[5]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[5]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[5]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[5]/global_quantities[1]/time": 152.0,
+  "coherent_wave[6]/identifier/type/index": 1,
+  "coherent_wave[6]/wave_solver_type/index": 1,
+  "coherent_wave[6]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[6]/global_quantities[0]/power": 0.0,
+  "coherent_wave[6]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[6]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[6]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[6]/global_quantities[0]/time": 150.0,
+  "coherent_wave[6]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[6]/global_quantities[1]/power": 0.0,
+  "coherent_wave[6]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[6]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[6]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[6]/global_quantities[1]/time": 152.0,
+  "coherent_wave[7]/identifier/type/index": 1,
+  "coherent_wave[7]/wave_solver_type/index": 1,
+  "coherent_wave[7]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[7]/global_quantities[0]/power": 0.0,
+  "coherent_wave[7]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[7]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[7]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[7]/global_quantities[0]/time": 150.0,
+  "coherent_wave[7]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[7]/global_quantities[1]/power": 0.0,
+  "coherent_wave[7]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[7]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[7]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[7]/global_quantities[1]/time": 152.0,
+  "coherent_wave[8]/identifier/type/index": 1,
+  "coherent_wave[8]/wave_solver_type/index": 1,
+  "coherent_wave[8]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[8]/global_quantities[0]/power": 0.0,
+  "coherent_wave[8]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[8]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[8]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[8]/global_quantities[0]/time": 150.0,
+  "coherent_wave[8]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[8]/global_quantities[1]/power": 0.0,
+  "coherent_wave[8]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[8]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[8]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[8]/global_quantities[1]/time": 152.0,
+  "coherent_wave[9]/identifier/type/index": 1,
+  "coherent_wave[9]/wave_solver_type/index": 1,
+  "coherent_wave[9]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[9]/global_quantities[0]/power": 0.0,
+  "coherent_wave[9]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[9]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[9]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[9]/global_quantities[0]/time": 150.0,
+  "coherent_wave[9]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[9]/global_quantities[1]/power": 0.0,
+  "coherent_wave[9]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[9]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[9]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[9]/global_quantities[1]/time": 152.0,
+  "coherent_wave[10]/identifier/type/index": 1,
+  "coherent_wave[10]/wave_solver_type/index": 1,
+  "coherent_wave[10]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[10]/global_quantities[0]/power": 0.0,
+  "coherent_wave[10]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[10]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[10]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[10]/global_quantities[0]/time": 150.0,
+  "coherent_wave[10]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[10]/global_quantities[1]/power": 0.0,
+  "coherent_wave[10]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[10]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[10]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[10]/global_quantities[1]/time": 152.0,
+  "coherent_wave[11]/identifier/type/index": 1,
+  "coherent_wave[11]/wave_solver_type/index": 1,
+  "coherent_wave[11]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[11]/global_quantities[0]/power": 0.0,
+  "coherent_wave[11]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[11]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[11]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[11]/global_quantities[0]/time": 150.0,
+  "coherent_wave[11]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[11]/global_quantities[1]/power": 0.0,
+  "coherent_wave[11]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[11]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[11]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[11]/global_quantities[1]/time": 152.0,
+  "coherent_wave[12]/identifier/type/index": 1,
+  "coherent_wave[12]/wave_solver_type/index": 1,
+  "coherent_wave[12]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[12]/global_quantities[0]/power": 0.0,
+  "coherent_wave[12]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[12]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[12]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[12]/global_quantities[0]/time": 150.0,
+  "coherent_wave[12]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[12]/global_quantities[1]/power": 0.0,
+  "coherent_wave[12]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[12]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[12]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[12]/global_quantities[1]/time": 152.0,
+  "coherent_wave[13]/identifier/type/index": 1,
+  "coherent_wave[13]/wave_solver_type/index": 1,
+  "coherent_wave[13]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[13]/global_quantities[0]/power": 0.0,
+  "coherent_wave[13]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[13]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[13]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[13]/global_quantities[0]/time": 150.0,
+  "coherent_wave[13]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[13]/global_quantities[1]/power": 0.0,
+  "coherent_wave[13]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[13]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[13]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[13]/global_quantities[1]/time": 152.0,
+  "coherent_wave[14]/identifier/type/index": 1,
+  "coherent_wave[14]/wave_solver_type/index": 1,
+  "coherent_wave[14]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[14]/global_quantities[0]/power": 0.0,
+  "coherent_wave[14]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[14]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[14]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[14]/global_quantities[0]/time": 150.0,
+  "coherent_wave[14]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[14]/global_quantities[1]/power": 0.0,
+  "coherent_wave[14]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[14]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[14]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[14]/global_quantities[1]/time": 152.0,
+  "coherent_wave[15]/identifier/type/index": 1,
+  "coherent_wave[15]/wave_solver_type/index": 1,
+  "coherent_wave[15]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[15]/global_quantities[0]/power": 0.0,
+  "coherent_wave[15]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[15]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[15]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[15]/global_quantities[0]/time": 150.0,
+  "coherent_wave[15]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[15]/global_quantities[1]/power": 0.0,
+  "coherent_wave[15]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[15]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[15]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[15]/global_quantities[1]/time": 152.0,
+  "coherent_wave[16]/identifier/type/index": 1,
+  "coherent_wave[16]/wave_solver_type/index": 1,
+  "coherent_wave[16]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[16]/global_quantities[0]/power": 0.0,
+  "coherent_wave[16]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[16]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[16]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[16]/global_quantities[0]/time": 150.0,
+  "coherent_wave[16]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[16]/global_quantities[1]/power": 0.0,
+  "coherent_wave[16]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[16]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[16]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[16]/global_quantities[1]/time": 152.0,
+  "coherent_wave[17]/identifier/type/index": 1,
+  "coherent_wave[17]/wave_solver_type/index": 1,
+  "coherent_wave[17]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[17]/global_quantities[0]/power": 0.0,
+  "coherent_wave[17]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[17]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[17]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[17]/global_quantities[0]/time": 150.0,
+  "coherent_wave[17]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[17]/global_quantities[1]/power": 0.0,
+  "coherent_wave[17]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[17]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[17]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[17]/global_quantities[1]/time": 152.0,
+  "coherent_wave[18]/identifier/type/index": 1,
+  "coherent_wave[18]/wave_solver_type/index": 1,
+  "coherent_wave[18]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[18]/global_quantities[0]/power": 0.0,
+  "coherent_wave[18]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[18]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[18]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[18]/global_quantities[0]/time": 150.0,
+  "coherent_wave[18]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[18]/global_quantities[1]/power": 0.0,
+  "coherent_wave[18]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[18]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[18]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[18]/global_quantities[1]/time": 152.0,
+  "coherent_wave[19]/identifier/type/index": 1,
+  "coherent_wave[19]/wave_solver_type/index": 1,
+  "coherent_wave[19]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[19]/global_quantities[0]/power": 0.0,
+  "coherent_wave[19]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[19]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[19]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[19]/global_quantities[0]/time": 150.0,
+  "coherent_wave[19]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[19]/global_quantities[1]/power": 0.0,
+  "coherent_wave[19]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[19]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[19]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[19]/global_quantities[1]/time": 152.0,
+  "coherent_wave[20]/identifier/type/index": 1,
+  "coherent_wave[20]/wave_solver_type/index": 1,
+  "coherent_wave[20]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[20]/global_quantities[0]/power": 0.0,
+  "coherent_wave[20]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[20]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[20]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[20]/global_quantities[0]/time": 150.0,
+  "coherent_wave[20]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[20]/global_quantities[1]/power": 0.0,
+  "coherent_wave[20]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[20]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[20]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[20]/global_quantities[1]/time": 152.0,
+  "coherent_wave[21]/identifier/type/index": 1,
+  "coherent_wave[21]/wave_solver_type/index": 1,
+  "coherent_wave[21]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[21]/global_quantities[0]/power": 0.0,
+  "coherent_wave[21]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[21]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[21]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[21]/global_quantities[0]/time": 150.0,
+  "coherent_wave[21]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[21]/global_quantities[1]/power": 0.0,
+  "coherent_wave[21]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[21]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[21]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[21]/global_quantities[1]/time": 152.0,
+  "coherent_wave[22]/identifier/type/index": 1,
+  "coherent_wave[22]/wave_solver_type/index": 1,
+  "coherent_wave[22]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[22]/global_quantities[0]/power": 0.0,
+  "coherent_wave[22]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[22]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[22]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[22]/global_quantities[0]/time": 150.0,
+  "coherent_wave[22]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[22]/global_quantities[1]/power": 0.0,
+  "coherent_wave[22]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[22]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[22]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[22]/global_quantities[1]/time": 152.0,
+  "coherent_wave[23]/identifier/type/index": 1,
+  "coherent_wave[23]/wave_solver_type/index": 1,
+  "coherent_wave[23]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[23]/global_quantities[0]/power": 0.0,
+  "coherent_wave[23]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[23]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[23]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[23]/global_quantities[0]/time": 150.0,
+  "coherent_wave[23]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[23]/global_quantities[1]/power": 0.0,
+  "coherent_wave[23]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[23]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[23]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[23]/global_quantities[1]/time": 152.0,
+  "coherent_wave[24]/identifier/type/index": 1,
+  "coherent_wave[24]/wave_solver_type/index": 1,
+  "coherent_wave[24]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[24]/global_quantities[0]/power": 0.0,
+  "coherent_wave[24]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[24]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[24]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[24]/global_quantities[0]/time": 150.0,
+  "coherent_wave[24]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[24]/global_quantities[1]/power": 0.0,
+  "coherent_wave[24]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[24]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[24]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[24]/global_quantities[1]/time": 152.0,
+  "coherent_wave[25]/identifier/type/index": 1,
+  "coherent_wave[25]/wave_solver_type/index": 1,
+  "coherent_wave[25]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[25]/global_quantities[0]/power": 0.0,
+  "coherent_wave[25]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[25]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[25]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[25]/global_quantities[0]/time": 150.0,
+  "coherent_wave[25]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[25]/global_quantities[1]/power": 0.0,
+  "coherent_wave[25]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[25]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[25]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[25]/global_quantities[1]/time": 152.0,
+  "coherent_wave[26]/identifier/type/index": 1,
+  "coherent_wave[26]/wave_solver_type/index": 1,
+  "coherent_wave[26]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[26]/global_quantities[0]/power": 0.0,
+  "coherent_wave[26]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[26]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[26]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[26]/global_quantities[0]/time": 150.0,
+  "coherent_wave[26]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[26]/global_quantities[1]/power": 0.0,
+  "coherent_wave[26]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[26]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[26]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[26]/global_quantities[1]/time": 152.0,
+  "coherent_wave[27]/identifier/type/index": 1,
+  "coherent_wave[27]/wave_solver_type/index": 1,
+  "coherent_wave[27]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[27]/global_quantities[0]/power": 0.0,
+  "coherent_wave[27]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[27]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[27]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[27]/global_quantities[0]/time": 150.0,
+  "coherent_wave[27]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[27]/global_quantities[1]/power": 0.0,
+  "coherent_wave[27]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[27]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[27]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[27]/global_quantities[1]/time": 152.0,
+  "coherent_wave[28]/identifier/type/index": 1,
+  "coherent_wave[28]/wave_solver_type/index": 1,
+  "coherent_wave[28]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[28]/global_quantities[0]/power": 0.0,
+  "coherent_wave[28]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[28]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[28]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[28]/global_quantities[0]/time": 150.0,
+  "coherent_wave[28]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[28]/global_quantities[1]/power": 0.0,
+  "coherent_wave[28]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[28]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[28]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[28]/global_quantities[1]/time": 152.0,
+  "coherent_wave[29]/identifier/type/index": 1,
+  "coherent_wave[29]/wave_solver_type/index": 1,
+  "coherent_wave[29]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[29]/global_quantities[0]/power": 0.0,
+  "coherent_wave[29]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[29]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[29]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[29]/global_quantities[0]/time": 150.0,
+  "coherent_wave[29]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[29]/global_quantities[1]/power": 0.0,
+  "coherent_wave[29]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[29]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[29]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[29]/global_quantities[1]/time": 152.0,
+  "coherent_wave[30]/identifier/type/index": 1,
+  "coherent_wave[30]/wave_solver_type/index": 1,
+  "coherent_wave[30]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[30]/global_quantities[0]/power": 0.0,
+  "coherent_wave[30]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[30]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[30]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[30]/global_quantities[0]/time": 150.0,
+  "coherent_wave[30]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[30]/global_quantities[1]/power": 0.0,
+  "coherent_wave[30]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[30]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[30]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[30]/global_quantities[1]/time": 152.0,
+  "coherent_wave[31]/identifier/type/index": 1,
+  "coherent_wave[31]/wave_solver_type/index": 1,
+  "coherent_wave[31]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[31]/global_quantities[0]/power": 0.0,
+  "coherent_wave[31]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[31]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[31]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[31]/global_quantities[0]/time": 150.0,
+  "coherent_wave[31]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[31]/global_quantities[1]/power": 0.0,
+  "coherent_wave[31]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[31]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[31]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[31]/global_quantities[1]/time": 152.0,
+  "coherent_wave[32]/identifier/type/index": 1,
+  "coherent_wave[32]/wave_solver_type/index": 1,
+  "coherent_wave[32]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[32]/global_quantities[0]/power": 0.0,
+  "coherent_wave[32]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[32]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[32]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[32]/global_quantities[0]/time": 150.0,
+  "coherent_wave[32]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[32]/global_quantities[1]/power": 0.0,
+  "coherent_wave[32]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[32]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[32]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[32]/global_quantities[1]/time": 152.0,
+  "coherent_wave[33]/identifier/type/index": 1,
+  "coherent_wave[33]/wave_solver_type/index": 1,
+  "coherent_wave[33]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[33]/global_quantities[0]/power": 0.0,
+  "coherent_wave[33]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[33]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[33]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[33]/global_quantities[0]/time": 150.0,
+  "coherent_wave[33]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[33]/global_quantities[1]/power": 0.0,
+  "coherent_wave[33]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[33]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[33]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[33]/global_quantities[1]/time": 152.0,
+  "coherent_wave[34]/identifier/type/index": 1,
+  "coherent_wave[34]/wave_solver_type/index": 1,
+  "coherent_wave[34]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[34]/global_quantities[0]/power": 0.0,
+  "coherent_wave[34]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[34]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[34]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[34]/global_quantities[0]/time": 150.0,
+  "coherent_wave[34]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[34]/global_quantities[1]/power": 0.0,
+  "coherent_wave[34]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[34]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[34]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[34]/global_quantities[1]/time": 152.0,
+  "coherent_wave[35]/identifier/type/index": 1,
+  "coherent_wave[35]/wave_solver_type/index": 1,
+  "coherent_wave[35]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[35]/global_quantities[0]/power": 0.0,
+  "coherent_wave[35]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[35]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[35]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[35]/global_quantities[0]/time": 150.0,
+  "coherent_wave[35]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[35]/global_quantities[1]/power": 0.0,
+  "coherent_wave[35]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[35]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[35]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[35]/global_quantities[1]/time": 152.0,
+  "coherent_wave[36]/identifier/type/index": 1,
+  "coherent_wave[36]/wave_solver_type/index": 1,
+  "coherent_wave[36]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[36]/global_quantities[0]/power": 0.0,
+  "coherent_wave[36]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[36]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[36]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[36]/global_quantities[0]/time": 150.0,
+  "coherent_wave[36]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[36]/global_quantities[1]/power": 0.0,
+  "coherent_wave[36]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[36]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[36]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[36]/global_quantities[1]/time": 152.0,
+  "coherent_wave[37]/identifier/type/index": 1,
+  "coherent_wave[37]/wave_solver_type/index": 1,
+  "coherent_wave[37]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[37]/global_quantities[0]/power": 0.0,
+  "coherent_wave[37]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[37]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[37]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[37]/global_quantities[0]/time": 150.0,
+  "coherent_wave[37]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[37]/global_quantities[1]/power": 0.0,
+  "coherent_wave[37]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[37]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[37]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[37]/global_quantities[1]/time": 152.0,
+  "coherent_wave[38]/identifier/type/index": 1,
+  "coherent_wave[38]/wave_solver_type/index": 1,
+  "coherent_wave[38]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[38]/global_quantities[0]/power": 0.0,
+  "coherent_wave[38]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[38]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[38]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[38]/global_quantities[0]/time": 150.0,
+  "coherent_wave[38]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[38]/global_quantities[1]/power": 0.0,
+  "coherent_wave[38]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[38]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[38]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[38]/global_quantities[1]/time": 152.0,
+  "coherent_wave[39]/identifier/type/index": 1,
+  "coherent_wave[39]/wave_solver_type/index": 1,
+  "coherent_wave[39]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[39]/global_quantities[0]/power": 0.0,
+  "coherent_wave[39]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[39]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[39]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[39]/global_quantities[0]/time": 150.0,
+  "coherent_wave[39]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[39]/global_quantities[1]/power": 0.0,
+  "coherent_wave[39]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[39]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[39]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[39]/global_quantities[1]/time": 152.0,
+  "coherent_wave[40]/identifier/type/index": 1,
+  "coherent_wave[40]/wave_solver_type/index": 1,
+  "coherent_wave[40]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[40]/global_quantities[0]/power": 0.0,
+  "coherent_wave[40]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[40]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[40]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[40]/global_quantities[0]/time": 150.0,
+  "coherent_wave[40]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[40]/global_quantities[1]/power": 0.0,
+  "coherent_wave[40]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[40]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[40]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[40]/global_quantities[1]/time": 152.0,
+  "coherent_wave[41]/identifier/type/index": 1,
+  "coherent_wave[41]/wave_solver_type/index": 1,
+  "coherent_wave[41]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[41]/global_quantities[0]/power": 0.0,
+  "coherent_wave[41]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[41]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[41]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[41]/global_quantities[0]/time": 150.0,
+  "coherent_wave[41]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[41]/global_quantities[1]/power": 0.0,
+  "coherent_wave[41]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[41]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[41]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[41]/global_quantities[1]/time": 152.0,
+  "coherent_wave[42]/identifier/type/index": 1,
+  "coherent_wave[42]/wave_solver_type/index": 1,
+  "coherent_wave[42]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[42]/global_quantities[0]/power": 0.0,
+  "coherent_wave[42]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[42]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[42]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[42]/global_quantities[0]/time": 150.0,
+  "coherent_wave[42]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[42]/global_quantities[1]/power": 0.0,
+  "coherent_wave[42]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[42]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[42]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[42]/global_quantities[1]/time": 152.0,
+  "coherent_wave[43]/identifier/type/index": 1,
+  "coherent_wave[43]/wave_solver_type/index": 1,
+  "coherent_wave[43]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[43]/global_quantities[0]/power": 0.0,
+  "coherent_wave[43]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[43]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[43]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[43]/global_quantities[0]/time": 150.0,
+  "coherent_wave[43]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[43]/global_quantities[1]/power": 0.0,
+  "coherent_wave[43]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[43]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[43]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[43]/global_quantities[1]/time": 152.0,
+  "coherent_wave[44]/identifier/type/index": 1,
+  "coherent_wave[44]/wave_solver_type/index": 1,
+  "coherent_wave[44]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[44]/global_quantities[0]/power": 0.0,
+  "coherent_wave[44]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[44]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[44]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[44]/global_quantities[0]/time": 150.0,
+  "coherent_wave[44]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[44]/global_quantities[1]/power": 0.0,
+  "coherent_wave[44]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[44]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[44]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[44]/global_quantities[1]/time": 152.0,
+  "coherent_wave[45]/identifier/type/index": 1,
+  "coherent_wave[45]/wave_solver_type/index": 1,
+  "coherent_wave[45]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[45]/global_quantities[0]/power": 0.0,
+  "coherent_wave[45]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[45]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[45]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[45]/global_quantities[0]/time": 150.0,
+  "coherent_wave[45]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[45]/global_quantities[1]/power": 0.0,
+  "coherent_wave[45]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[45]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[45]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[45]/global_quantities[1]/time": 152.0,
+  "coherent_wave[46]/identifier/type/index": 1,
+  "coherent_wave[46]/wave_solver_type/index": 1,
+  "coherent_wave[46]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[46]/global_quantities[0]/power": 0.0,
+  "coherent_wave[46]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[46]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[46]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[46]/global_quantities[0]/time": 150.0,
+  "coherent_wave[46]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[46]/global_quantities[1]/power": 0.0,
+  "coherent_wave[46]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[46]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[46]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[46]/global_quantities[1]/time": 152.0,
+  "coherent_wave[47]/identifier/type/index": 1,
+  "coherent_wave[47]/wave_solver_type/index": 1,
+  "coherent_wave[47]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[47]/global_quantities[0]/power": 0.0,
+  "coherent_wave[47]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[47]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[47]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[47]/global_quantities[0]/time": 150.0,
+  "coherent_wave[47]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[47]/global_quantities[1]/power": 0.0,
+  "coherent_wave[47]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[47]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[47]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[47]/global_quantities[1]/time": 152.0,
+  "coherent_wave[48]/identifier/type/index": 1,
+  "coherent_wave[48]/wave_solver_type/index": 1,
+  "coherent_wave[48]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[48]/global_quantities[0]/power": 0.0,
+  "coherent_wave[48]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[48]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[48]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[48]/global_quantities[0]/time": 150.0,
+  "coherent_wave[48]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[48]/global_quantities[1]/power": 0.0,
+  "coherent_wave[48]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[48]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[48]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[48]/global_quantities[1]/time": 152.0,
+  "coherent_wave[49]/identifier/type/index": 1,
+  "coherent_wave[49]/wave_solver_type/index": 1,
+  "coherent_wave[49]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[49]/global_quantities[0]/power": 0.0,
+  "coherent_wave[49]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[49]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[49]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[49]/global_quantities[0]/time": 150.0,
+  "coherent_wave[49]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[49]/global_quantities[1]/power": 0.0,
+  "coherent_wave[49]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[49]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[49]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[49]/global_quantities[1]/time": 152.0,
+  "coherent_wave[50]/identifier/type/index": 1,
+  "coherent_wave[50]/wave_solver_type/index": 1,
+  "coherent_wave[50]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[50]/global_quantities[0]/power": 0.0,
+  "coherent_wave[50]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[50]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[50]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[50]/global_quantities[0]/time": 150.0,
+  "coherent_wave[50]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[50]/global_quantities[1]/power": 0.0,
+  "coherent_wave[50]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[50]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[50]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[50]/global_quantities[1]/time": 152.0,
+  "coherent_wave[51]/identifier/type/index": 1,
+  "coherent_wave[51]/wave_solver_type/index": 1,
+  "coherent_wave[51]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[51]/global_quantities[0]/power": 0.0,
+  "coherent_wave[51]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[51]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[51]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[51]/global_quantities[0]/time": 150.0,
+  "coherent_wave[51]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[51]/global_quantities[1]/power": 0.0,
+  "coherent_wave[51]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[51]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[51]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[51]/global_quantities[1]/time": 152.0,
+  "coherent_wave[52]/identifier/type/index": 1,
+  "coherent_wave[52]/wave_solver_type/index": 1,
+  "coherent_wave[52]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[52]/global_quantities[0]/power": 0.0,
+  "coherent_wave[52]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[52]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[52]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[52]/global_quantities[0]/time": 150.0,
+  "coherent_wave[52]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[52]/global_quantities[1]/power": 0.0,
+  "coherent_wave[52]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[52]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[52]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[52]/global_quantities[1]/time": 152.0,
+  "coherent_wave[53]/identifier/type/index": 1,
+  "coherent_wave[53]/wave_solver_type/index": 1,
+  "coherent_wave[53]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[53]/global_quantities[0]/power": 0.0,
+  "coherent_wave[53]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[53]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[53]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[53]/global_quantities[0]/time": 150.0,
+  "coherent_wave[53]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[53]/global_quantities[1]/power": 0.0,
+  "coherent_wave[53]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[53]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[53]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[53]/global_quantities[1]/time": 152.0,
+  "coherent_wave[54]/identifier/type/index": 1,
+  "coherent_wave[54]/wave_solver_type/index": 1,
+  "coherent_wave[54]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[54]/global_quantities[0]/power": 0.0,
+  "coherent_wave[54]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[54]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[54]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[54]/global_quantities[0]/time": 150.0,
+  "coherent_wave[54]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[54]/global_quantities[1]/power": 0.0,
+  "coherent_wave[54]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[54]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[54]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[54]/global_quantities[1]/time": 152.0,
+  "coherent_wave[55]/identifier/type/index": 1,
+  "coherent_wave[55]/wave_solver_type/index": 1,
+  "coherent_wave[55]/global_quantities[0]/n_phi": [
+   0
+  ],
+  "coherent_wave[55]/global_quantities[0]/power": 0.0,
+  "coherent_wave[55]/global_quantities[0]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[55]/global_quantities[0]/current_phi": 0.0,
+  "coherent_wave[55]/global_quantities[0]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[55]/global_quantities[0]/time": 150.0,
+  "coherent_wave[55]/global_quantities[1]/n_phi": [
+   0
+  ],
+  "coherent_wave[55]/global_quantities[1]/power": 0.0,
+  "coherent_wave[55]/global_quantities[1]/power_n_phi": [
+   0.0
+  ],
+  "coherent_wave[55]/global_quantities[1]/current_phi": 0.0,
+  "coherent_wave[55]/global_quantities[1]/current_phi_n_phi": [
+   0.0
+  ],
+  "coherent_wave[55]/global_quantities[1]/time": 152.0,
+  "coherent_wave[56]/identifier/type/index": 3,
+  "coherent_wave[56]/identifier/index_in_antenna": 1,
+  "coherent_wave[56]/global_quantities[0]/frequency": 53000000.0,
+  "coherent_wave[56]/global_quantities[0]/n_phi": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16,
+   18,
+   20,
+   22,
+   24,
+   26,
+   28,
+   30,
+   32,
+   34,
+   36,
+   38,
+   40,
+   42,
+   44,
+   46,
+   48,
+   50
+  ],
+  "coherent_wave[56]/global_quantities[0]/power": 19777039.913840488,
+  "coherent_wave[56]/global_quantities[0]/electrons/power_thermal": 8639189.474988166,
+  "coherent_wave[56]/global_quantities[0]/electrons/distribution_assumption": 0,
+  "coherent_wave[56]/global_quantities[0]/ion[0]/element[0]/a": 3.0,
+  "coherent_wave[56]/global_quantities[0]/ion[0]/element[0]/z_n": 2,
+  "coherent_wave[56]/global_quantities[0]/ion[0]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[0]/z_ion": 2.0,
+  "coherent_wave[56]/global_quantities[0]/ion[0]/power_thermal": 10280262.01368759,
+  "coherent_wave[56]/global_quantities[0]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[0]/ion[0]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[1]/element[0]/a": 3.0,
+  "coherent_wave[56]/global_quantities[0]/ion[1]/element[0]/z_n": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[1]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[1]/z_ion": 1.0,
+  "coherent_wave[56]/global_quantities[0]/ion[1]/power_thermal": 857588.4251647292,
+  "coherent_wave[56]/global_quantities[0]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[0]/ion[1]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[2]/element[0]/a": 2.0,
+  "coherent_wave[56]/global_quantities[0]/ion[2]/element[0]/z_n": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[2]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[2]/z_ion": 1.0,
+  "coherent_wave[56]/global_quantities[0]/ion[2]/power_thermal": 0.0,
+  "coherent_wave[56]/global_quantities[0]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[0]/ion[2]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[3]/element[0]/a": 9.0,
+  "coherent_wave[56]/global_quantities[0]/ion[3]/element[0]/z_n": 4,
+  "coherent_wave[56]/global_quantities[0]/ion[3]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[3]/z_ion": 4.0,
+  "coherent_wave[56]/global_quantities[0]/ion[3]/power_thermal": 0.0,
+  "coherent_wave[56]/global_quantities[0]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[0]/ion[3]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[56]/global_quantities[0]/ion[4]/element[0]/z_n": 2,
+  "coherent_wave[56]/global_quantities[0]/ion[4]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[4]/z_ion": 2.0,
+  "coherent_wave[56]/global_quantities[0]/ion[4]/power_thermal": 0.0,
+  "coherent_wave[56]/global_quantities[0]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[0]/ion[4]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[5]/element[0]/a": 16.0,
+  "coherent_wave[56]/global_quantities[0]/ion[5]/element[0]/z_n": 8,
+  "coherent_wave[56]/global_quantities[0]/ion[5]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[0]/ion[5]/z_ion": 8.0,
+  "coherent_wave[56]/global_quantities[0]/ion[5]/power_thermal": 0.0,
+  "coherent_wave[56]/global_quantities[0]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[0]/ion[5]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[1]/frequency": 53000000.0,
+  "coherent_wave[56]/global_quantities[1]/n_phi": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16,
+   18,
+   20,
+   22,
+   24,
+   26,
+   28,
+   30,
+   32,
+   34,
+   36,
+   38,
+   40,
+   42,
+   44,
+   46,
+   48,
+   50
+  ],
+  "coherent_wave[56]/global_quantities[1]/power": 20229177.042138472,
+  "coherent_wave[56]/global_quantities[1]/electrons/power_thermal": 8639189.474988166,
+  "coherent_wave[56]/global_quantities[1]/electrons/distribution_assumption": 0,
+  "coherent_wave[56]/global_quantities[1]/ion[0]/element[0]/a": 3.0,
+  "coherent_wave[56]/global_quantities[1]/ion[0]/element[0]/z_n": 2,
+  "coherent_wave[56]/global_quantities[1]/ion[0]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[0]/z_ion": 2.0,
+  "coherent_wave[56]/global_quantities[1]/ion[0]/power_thermal": 10731032.958749373,
+  "coherent_wave[56]/global_quantities[1]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[1]/ion[0]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[1]/element[0]/a": 3.0,
+  "coherent_wave[56]/global_quantities[1]/ion[1]/element[0]/z_n": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[1]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[1]/z_ion": 1.0,
+  "coherent_wave[56]/global_quantities[1]/ion[1]/power_thermal": 858954.6084009323,
+  "coherent_wave[56]/global_quantities[1]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[1]/ion[1]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[2]/element[0]/a": 2.0,
+  "coherent_wave[56]/global_quantities[1]/ion[2]/element[0]/z_n": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[2]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[2]/z_ion": 1.0,
+  "coherent_wave[56]/global_quantities[1]/ion[2]/power_thermal": 0.0,
+  "coherent_wave[56]/global_quantities[1]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[1]/ion[2]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[3]/element[0]/a": 9.0,
+  "coherent_wave[56]/global_quantities[1]/ion[3]/element[0]/z_n": 4,
+  "coherent_wave[56]/global_quantities[1]/ion[3]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[3]/z_ion": 4.0,
+  "coherent_wave[56]/global_quantities[1]/ion[3]/power_thermal": 0.0,
+  "coherent_wave[56]/global_quantities[1]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[1]/ion[3]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[56]/global_quantities[1]/ion[4]/element[0]/z_n": 2,
+  "coherent_wave[56]/global_quantities[1]/ion[4]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[4]/z_ion": 2.0,
+  "coherent_wave[56]/global_quantities[1]/ion[4]/power_thermal": 0.0,
+  "coherent_wave[56]/global_quantities[1]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[1]/ion[4]/distribution_assumption": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[5]/element[0]/a": 16.0,
+  "coherent_wave[56]/global_quantities[1]/ion[5]/element[0]/z_n": 8,
+  "coherent_wave[56]/global_quantities[1]/ion[5]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/global_quantities[1]/ion[5]/z_ion": 8.0,
+  "coherent_wave[56]/global_quantities[1]/ion[5]/power_thermal": 0.0,
+  "coherent_wave[56]/global_quantities[1]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[56]/global_quantities[1]/ion[5]/distribution_assumption": 1,
+  "coherent_wave[56]/profiles_1d[0]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.42394256615921927,
+    "rms": 0.500231272132314
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 2.7759760189220035,
+    "mean": 1.1768543970582477,
+    "rms": 1.3886300153541502
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/grid/psi": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -0.0,
+    "max": 84.19352455401648,
+    "mean": 28.20483072559552,
+    "rms": 37.93413972017346
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/grid/volume": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 843.2264849545522,
+    "mean": 225.2410121223894,
+    "rms": 317.15948025462615
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/grid/area": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 22.368865024211253,
+    "mean": 5.785936813569868,
+    "rms": 8.212110028952992
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/power_density": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 160.0006907038786,
+    "max": 532171.9744040464,
+    "mean": 107679.18272766814,
+    "rms": 196517.9760291022
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/electrons/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 3.0156338065671733e-06,
+    "max": 49606.7042310265,
+    "mean": 21920.67925475642,
+    "rms": 26571.318528649506
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/ion[0]/element[0]/a": 3.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[0]/element[0]/z_n": 2,
+  "coherent_wave[56]/profiles_1d[0]/ion[0]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[0]/ion[0]/z_ion": 2.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[0]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 157.63736635075173,
+    "max": 459922.61631086544,
+    "mean": 79353.08664878402,
+    "rms": 163827.87612894853
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[0]/ion[1]/element[0]/a": 3.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[1]/element[0]/z_n": 1,
+  "coherent_wave[56]/profiles_1d[0]/ion[1]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[0]/ion[1]/z_ion": 1.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[1]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 2.363321337493061,
+    "max": 35660.99842083927,
+    "mean": 6405.416824127694,
+    "rms": 12876.28893024873
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[0]/ion[2]/element[0]/a": 2.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[2]/element[0]/z_n": 1,
+  "coherent_wave[56]/profiles_1d[0]/ion[2]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[0]/ion[2]/z_ion": 1.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[2]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[0]/ion[3]/element[0]/a": 9.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[3]/element[0]/z_n": 4,
+  "coherent_wave[56]/profiles_1d[0]/ion[3]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[0]/ion[3]/z_ion": 4.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[3]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[0]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[4]/element[0]/z_n": 2,
+  "coherent_wave[56]/profiles_1d[0]/ion[4]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[0]/ion[4]/z_ion": 2.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[4]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[0]/ion[5]/element[0]/a": 16.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[5]/element[0]/z_n": 8,
+  "coherent_wave[56]/profiles_1d[0]/ion[5]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[0]/ion[5]/z_ion": 8.0,
+  "coherent_wave[56]/profiles_1d[0]/ion[5]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[56]/profiles_1d[0]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[1]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.4238683561169139,
+    "rms": 0.5001985114981122
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 2.775961605848559,
+    "mean": 1.1766422825146974,
+    "rms": 1.3885318632213586
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/grid/psi": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -0.0,
+    "max": 84.1098930474824,
+    "mean": 28.176814170906603,
+    "rms": 37.896458802660185
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/grid/volume": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 843.2141548381713,
+    "mean": 225.21141579050456,
+    "rms": 317.1843194186243
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/grid/area": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 22.36854995986901,
+    "mean": 5.785263325563913,
+    "rms": 8.212966594144154
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/power_density": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 107.61750495961135,
+    "max": 433204.616591887,
+    "mean": 99705.33703643085,
+    "rms": 170989.90953947947
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/electrons/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 4.975587790684884e-06,
+    "max": 46750.69514786186,
+    "mean": 20615.643524263152,
+    "rms": 24807.052673604765
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/ion[0]/element[0]/a": 3.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[0]/element[0]/z_n": 2,
+  "coherent_wave[56]/profiles_1d[1]/ion[0]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[1]/ion[0]/z_ion": 2.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[0]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 106.13900500769438,
+    "max": 365187.3536890501,
+    "mean": 72560.04021498463,
+    "rms": 138834.09225868632
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[1]/ion[1]/element[0]/a": 3.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[1]/element[0]/z_n": 1,
+  "coherent_wave[56]/profiles_1d[1]/ion[1]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[1]/ion[1]/z_ion": 1.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[1]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 1.4784949763291833,
+    "max": 36914.33587853706,
+    "mean": 6529.653297183064,
+    "rms": 13214.254377628
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[1]/ion[2]/element[0]/a": 2.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[2]/element[0]/z_n": 1,
+  "coherent_wave[56]/profiles_1d[1]/ion[2]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[1]/ion[2]/z_ion": 1.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[2]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[1]/ion[3]/element[0]/a": 9.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[3]/element[0]/z_n": 4,
+  "coherent_wave[56]/profiles_1d[1]/ion[3]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[1]/ion[3]/z_ion": 4.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[3]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[1]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[4]/element[0]/z_n": 2,
+  "coherent_wave[56]/profiles_1d[1]/ion[4]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[1]/ion[4]/z_ion": 2.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[4]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[56]/profiles_1d[1]/ion[5]/element[0]/a": 16.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[5]/element[0]/z_n": 8,
+  "coherent_wave[56]/profiles_1d[1]/ion[5]/element[0]/atoms_n": 1,
+  "coherent_wave[56]/profiles_1d[1]/ion[5]/z_ion": 8.0,
+  "coherent_wave[56]/profiles_1d[1]/ion[5]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[56]/profiles_1d[1]/ion[5]/multiple_states_flag": 0,
+  "vacuum_toroidal_field/r0": 6.26689965544739,
+  "vacuum_toroidal_field/b0": [
+   -5.247761897934811,
+   -5.247756238792089
+  ],
+  "time": [
+   150.0,
+   152.0
+  ]
+ }
+}

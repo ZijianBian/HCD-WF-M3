@@ -53,6 +53,15 @@ Global workflow settings:
 * ``version`` - IDS version
 * ``verbose`` - Enable verbose logging (true/false)
 
+Input Entry and DD Version
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The workflow writes its outputs in the DD of its environment (``IMAS_VERSION``) and reads every input
+IDS in its stored DD, converting it to that DD. With DD 4, when the input entry
+(``input_user_or_path``, ``input_database``, ``shot_nr``, ``run_in``) does not exist under the
+version folder 4 (``<database>/4/<pulse>/<run>``), the entry of the same database, pulse and run
+under the version folder 3 is read. The workflow prints the entry it reads.
+
 Actor Configuration
 ~~~~~~~~~~~~~~~~~~~
 
@@ -313,18 +322,27 @@ TORBEAM
        <parameter name="mode">X</parameter>
    </parameters>
 
-Regression Variants
--------------------
+DD 3 Variants and Regression Variants
+-------------------------------------
 
-A configuration folder may hold regression variants of its configuration files: ``<name>_reg.xml``
-next to ``input_workflow.xml`` or next to an actor code-parameter file ``input_<actor>.xml``. They
-carry degraded, faster settings (for example fewer time slices or a coarser actor resolution) for
-the regression tests and are copies of the normal files in which only these parameters differ.
+The configuration files of a folder (``input_workflow.xml``, the actor code-parameter files
+``input_<actor>.xml`` and the waveform files ``<system>_waveforms.yaml`` given to the Waveform-Cooker)
+hold the content for Data Dictionary 4. A file whose content depends on the DD has a DD 3 variant
+``<name>_dd3.<ext>`` next to it: a copy in which only the DD-dependent entries differ (for example
+``beam[i].mode`` in ``ec_waveforms_dd3.yaml`` where ``ec_waveforms.yaml`` sets
+``beam[i].polarization.o_mode_fraction``). Files valid for both DDs have no variant.
 
-The variants are read only when the environment variable ``HCDWF_TEST_MODE`` is ``1`` (or
-``true``); otherwise, and for every file without a variant, the normal file is read. The selection
-is made in ``hcdworkflow/config_files.py`` for every reader of these files (``hcd_nogui``,
-``hcd_gui`` runs, ``hcdslice_nogui``, the actor code parameters and the values that
+A configuration folder may also hold regression variants ``<name>_reg.<ext>`` (and
+``<name>_reg_dd3.<ext>`` for a DD-dependent file). They carry degraded, faster settings (for example
+fewer time slices or a coarser actor resolution) for the regression tests and are copies of the
+normal files in which only these parameters differ.
+
+The file read for ``<name>.<ext>`` is the first existing file of ``<name>_reg_dd3`` (regression mode,
+DD 3), ``<name>_dd3`` (DD 3), ``<name>_reg`` (regression mode) and ``<name>``. The DD is the target DD
+of the workflow (``IMAS_VERSION``); regression mode is selected by the environment variable
+``HCDWF_TEST_MODE`` set to ``1`` (or ``true``). The selection is made in
+``hcdworkflow/config_files.py`` for every reader of these files (``hcd_nogui``, ``hcd_gui`` runs,
+``hcdslice_nogui``, the actor code parameters, the waveform files and the values that
 ``workflow/ids_prep.py`` takes from them), and the workflow prints the file it reads. The GUI
 editors open and save the normal files only. A workflow-specific variable is used so that actors
 running in the workflow process are not switched by their own test variables (``MS_TEST_MODE``).

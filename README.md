@@ -43,7 +43,9 @@ The scripts take no argument; the DD version is chosen by the file. Each script 
 - Purge the loaded modules and load the 2023b modules of its DD version
 - Set `IMAS_VERSION` to the DD version of the loaded IMAS-Fortran module (`pkg-config --modversion al-fortran`);
   an `IMAS_VERSION` set before sourcing must match it, else the script stops. The workflow writes its outputs in
-  this DD version (`input_workflow.xml` has no DD setting); the input entry's DD version is read from its stored version
+  this DD version (`input_workflow.xml` has no DD setting); the input entry's DD version is read from its stored version.
+  With DD 4, an input entry that exists only for DD 3 (`<database>/3/<pulse>/<run>`) is read and converted to DD 4;
+  the workflow prints the entry it reads
 - Put the repository and `ACTOR_FOLDER` on `PYTHONPATH` (`config_hcd_iter_sdcc.sh` defaults
   `ACTOR_FOLDER` to `PYTHON_ACTORS` in the repository); use iWrap actors built for the same DD version
 - Create (with `--system-site-packages`) and activate a virtual environment, `devenv_dd410` for
@@ -222,12 +224,16 @@ The workflow is configured using a main XML file and optional YAML waveform file
   - `lh_waveforms.yaml` – LHCD waveforms
 - Place these files in your configuration folder if your simulation requires time-dependent input.
 
-### Regression Variants (`HCDWF_TEST_MODE`)
-- A configuration folder may hold regression variants `<name>_reg.xml` next to `input_workflow.xml` and the
-  actor code-parameter files `input_<actor>.xml`, with degraded, faster settings for the regression tests.
-- They are used only when the environment variable `HCDWF_TEST_MODE=1` is set (`ci-sdcc/st03-regression.sh`
-  sets it); a file without a variant is read as usual. The workflow prints which file it reads.
-- A variant is a copy of the normal file in which only the degraded parameters differ.
+### DD 3 Variants and Regression Variants (`HCDWF_TEST_MODE`)
+- The configuration files (`input_workflow.xml`, the actor code-parameter files `input_<actor>.xml`, the
+  waveform files `<system>_waveforms.yaml`) hold the content for DD 4. A file whose content depends on the DD
+  (e.g. `ec_launchers` names in `ec_waveforms.yaml`) has a DD 3 variant `<name>_dd3.<ext>` next to it, a copy in
+  which only the DD-dependent entries differ; files valid for both DDs have no variant.
+- A configuration folder may hold regression variants `<name>_reg.<ext>` with degraded, faster settings for the
+  regression tests (and `<name>_reg_dd3.<ext>` for a DD-dependent file); they are used only when the environment
+  variable `HCDWF_TEST_MODE=1` is set (`ci-sdcc/st03-regression.sh` sets it).
+- The workflow reads the first existing file of `<name>_reg_dd3` (regression mode, DD 3), `<name>_dd3` (DD 3),
+  `<name>_reg` (regression mode), `<name>`, the DD being that of `IMAS_VERSION`, and prints which file it reads.
 
 ### Example Configuration Folder
 A typical configuration folder (e.g., `tests/data/GRAY_PION`) contains:
