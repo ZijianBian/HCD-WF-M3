@@ -2,8 +2,9 @@
 # Removes an older set of H&CD EasyBuild modules (<CODE>/<old-version>-intel-<tc>-DD-<dd><old-suffix>)
 # from the user module tree once its replacement <CODE>/<new-version>-intel-<tc>-DD-<dd> (no suffix,
 # the naming of build_hcd_modules.sh) is installed and the latest real (non-dry-run) build job of that
-# code and flavour reported "eb: rc=0" and "test: rc=0" in its summary file. Documentation:
-# tools/README_modules.md, section "Replacing an older set of modules".
+# code and flavour reported "eb: rc=0", "test: rc=0" and "rpath: rc=0" in its summary file (summaries
+# without an "rpath:" line: tools/check_modules_rpath.sh is run on the new install instead).
+# Documentation: tools/README_modules.md, section "Replacing an older set of modules".
 #
 # Usage: cleanup_old_modules.sh [--dry-run] [--yes] [--old-version V] [--old-suffix S]
 #                               [--new-version V] [--prefix DIR] [--work DIR]
@@ -44,7 +45,7 @@ while [[ $# -gt 0 ]]; do
                 --work) WORK=$2 ;;
             esac
             shift ;;
-        -h|--help) sed -n 2,19p "$0"; exit 0 ;;
+        -h|--help) sed -n 2,20p "$0"; exit 0 ;;
         *) echo "unknown option: $1" >&2; exit 2 ;;
     esac
     shift
@@ -150,6 +151,11 @@ for lua in "$MOD"/*/"$OLD_DATE"-intel-*"$OLD_SUFFIX".lua; do
             reason="latest build not eb rc=0 ($(basename "$latest"))"
         elif ! grep -qE '^test: rc=0(,|$)' "$latest"; then
             reason="latest build not test rc=0 ($(basename "$latest"))"
+        elif grep -q '^rpath: ' "$latest"; then
+            grep -qE '^rpath: rc=0(,|$)' "$latest" \
+                || reason="latest build not rpath rc=0 ($(basename "$latest"))"
+        elif ! bash "$HERE/check_modules_rpath.sh" --prefix "$STACK" "$code/$new" > /dev/null 2>&1; then
+            reason="library check failed (tools/check_modules_rpath.sh $code/$new)"
         fi
     fi
 

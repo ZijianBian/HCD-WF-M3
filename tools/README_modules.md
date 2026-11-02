@@ -129,8 +129,10 @@ current shell.
 ## Following the jobs
 
 - `squeue -u $USER`; Slurm log `<work>/logs/hcd_<CODE>_<flavour>_<jobid>.log`.
-- `<work>/logs/summary_<CODE>_<flavour>_<jobid>.txt`: easyconfig, module, `eb: rc=...`, test results;
-  the last line is `test: rc=<n>` (0 = passed; `test: skipped` without test or with `--no-test`).
+- `<work>/logs/summary_<CODE>_<flavour>_<jobid>.txt`: easyconfig, module, `eb: rc=...`, the library
+  check `rpath: rc=<n>, build-tree-rpath=N notfound=N module-ldpath=N, log ...` (see "Checking the
+  libraries of a module"), test results; the last line is `test: rc=<n>` (0 = passed; `test: skipped`
+  without test or with `--no-test`). The job fails if the build, the library check or the test fails.
 - EasyBuild log `<work>/logs/eb_<CODE>_<flavour>_<jobid>.log`; test log
   `<work>/tests/<CODE>_<flavour>_<jobid>/test.log` (the test's run directory and outputs are next to it).
 
@@ -139,6 +141,32 @@ and `/work/projects/pds/stack/modules/all`) and runs `easyconfigs/<CODE>/test_mo
 <summary>` under `timeout 30m`: usually the code's CI case `ci-sdcc/st03-run-actor.sh` (iWrap and MUSCLE3
 actor) from a run directory made by `<code>_run_setup`, otherwise the documented user sequence
 (`run_<code>.py` / `./run_muscle`) with output checks.
+
+## Checking the libraries of a module
+
+`tools/check_modules_rpath.sh` checks installed modules read-only (login node is fine) and is run by
+every build job on its new install (`<work>/logs/rpath_<CODE>_<flavour>_<jobid>.log`):
+
+    bash tools/check_modules_rpath.sh                     # newest version of every code of the tree
+    bash tools/check_modules_rpath.sh GRAY RISK           # newest version label, all three flavours
+    bash tools/check_modules_rpath.sh --version 2026.10.22 PION
+    bash tools/check_modules_rpath.sh GRAY/2026.11.02.1-intel-2025b-DD-4.1.1   # one module
+
+For each ELF file of an install directory (outside `run_kit/`) it reports `RPATH` lines for RPATH/RUNPATH
+entries into a build tree (`*/eb_build/*`, `*/eb_tmp/*`, `/tmp/*`) and `NOTFOUND` lines for libraries
+that `ldd` cannot resolve with the module loaded in a clean module environment (site tree +
+`<prefix>/modules/all`). Libraries found only through the `LD_LIBRARY_PATH` of the module and its
+dependencies (MKL, NAG, Intel runtime, MUSCLE3 for PION; the Intel runtime for RABBIT 2023b and for the
+HDF5 `extra-libs` of ASCOT 2023b) are listed as `LDPATH` lines, for information. One line
+`SUMMARY <CODE> <dir> build-tree-rpath=N notfound=N module-ldpath=N` per install directory; the exit
+status is 1 if any `build-tree-rpath` or `notfound` count is non-zero. `--no-module-env` evaluates
+`ldd` without `LD_LIBRARY_PATH` for every install. Options: `--prefix` (`EB_PREFIX`, else
+`/work/projects/pds/stack`), `--version` (`CHECK_VERSION`, else the newest label per code by version
+sort); `HCD_SITE_MODULES` (default `/work/imas/etc/modules/all`).
+
+CHEASE `2026.10.22`: `chease_m3/bin/chease.exe` carries an RPATH entry into the EasyBuild build tree
+(`.../eb_build/<job>/CHEASE/.../m3pkg/chease//extra-libs/`); every library still resolves (`notfound=0`),
+but the check reports it and fails until CHEASE is rebuilt without it.
 
 ## Using a module
 
@@ -228,7 +256,8 @@ Options (defaults): `--old-version` (`2026.10.21`), `--old-suffix` (`-pds`, may 
 For each old module `<CODE>/<old-version>-intel-<tc>-DD-<dd><old-suffix>` it deletes the old install
 directory and `.lua` only when all of these hold: the new `<CODE>/<new-version>-intel-<tc>-DD-<dd>.lua`
 and the new install directory exist, and the newest non-dry-run `logs/summary_<CODE>_<flavour>_*.txt`
-of the work directory has `eb: rc=0` and `test: rc=0`. Before each `rm`, the path must match the exact
+of the work directory has `eb: rc=0`, `test: rc=0` and `rpath: rc=0` (a summary written before the
+library check existed has no `rpath:` line: `tools/check_modules_rpath.sh` is then run on the new module). Before each `rm`, the path must match the exact
 old name pattern under `<prefix>/software` or `<prefix>/modules/all` and be a real directory / regular
 file (no symlink); otherwise it is refused. Code folders left empty are removed with `rmdir`. It never
 touches `<prefix>/ebfiles_repo`, the new modules, other versions, or modules with an unexpected name, and

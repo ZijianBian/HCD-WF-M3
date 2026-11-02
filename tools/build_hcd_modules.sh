@@ -1,9 +1,10 @@
 #!/bin/bash
 # Builds the H&CD actor modules with EasyBuild into the user module tree /work/projects/pds/stack
 # (software in /work/projects/pds/stack/software, modules in /work/projects/pds/stack/modules/all),
-# one module per code and flavour, and tests each new module in a clean environment. Installs are
-# readable by all and writable by the owner only (umask 022). Single place of the method:
-# build_modules.sbatch only calls this script. Documentation: tools/README_modules.md.
+# one module per code and flavour, checks its libraries (tools/check_modules_rpath.sh: no build-tree
+# RPATH, no unresolved library; "rpath:" line of the job summary) and tests each new module in a clean
+# environment. Installs are readable by all and writable by the owner only (umask 022). Single place
+# of the method: build_modules.sbatch only calls this script. Documentation: tools/README_modules.md.
 #
 #   build_hcd_modules.sh [options] <code|all> [<flavour|all>]
 #
@@ -16,7 +17,7 @@
 #   --make-sources  (re)creates the missing source archives in <work>/sources with git archive from the
 #                   local clones (gen_easyconfigs.py --sources-only) and checks them against
 #                   easyconfigs/sources.sha256; no build; fine on the login node
-#   --no-test       skip the post-install test
+#   --no-test       skip the post-install test (the library check still runs)
 #   --rebuild       eb --rebuild (replaces an existing module of the same name)
 #   --list          print the code -> easyconfig table and exit
 #
@@ -225,9 +226,18 @@ build_one() {
         grep -m5 -E 'ERROR|FAILED' "$eblog" | cut -c1-300 | tee -a "$summary"
         return $rc
     fi
-    if [[ $dry == 1 || $notest == 1 || ! -f "$EC_ROOT/$code/test_module.sh" ]]; then
+    if [[ $dry == 1 ]]; then
         say "test: skipped"
         return 0
+    fi
+
+    # library check of the new install: no build-tree RPATH, every library resolved with the module loaded
+    local rplog=$BASE/logs/rpath_${code}_${flavour}_${job}.log rp_rc=0
+    bash "$HERE/check_modules_rpath.sh" --prefix "$PREFIX" "$modname" > "$rplog" 2>&1 || rp_rc=$?
+    say "rpath: rc=$rp_rc, $(grep -m1 '^SUMMARY ' "$rplog" | cut -d' ' -f4-), log $rplog"
+    if [[ $notest == 1 || ! -f "$EC_ROOT/$code/test_module.sh" ]]; then
+        say "test: skipped"
+        return $rp_rc
     fi
 
     # post-install test: new module loaded in a clean environment, run from a scratch copy
@@ -251,7 +261,8 @@ build_one() {
             bash '"$EC_ROOT/$code"'/test_module.sh '"$work"' '"$summary"'
         ' > "$work/test.log" 2>&1 || test_rc=$?
     say "test: rc=$test_rc, log $work/test.log"
-    return $test_rc
+    [[ $test_rc -ne 0 ]] && return $test_rc
+    return $rp_rc
 }
 
 status=0
