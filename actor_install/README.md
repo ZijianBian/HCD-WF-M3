@@ -57,11 +57,12 @@ with environment variables:
 If an override doesn't match any `DIR` (a typo, usually), the run fails rather than quietly building
 the default version.
 
-In Bamboo, define `MODULES` and `ACTOR_VERSIONS` as plan variables and pass them through:
+In CI, `ci-sdcc/st02-build-actors.sh` loads the modules of one combination of `deps.yaml` (`COMBO`, e.g.
+`intel-2025b-dd4`), takes the version of each source from the `components` of `deps.yaml` and calls this script
+with `--skipModules` and one `-V DIR=<commit>` per source:
 
 ```bash
-MODULES="$bamboo_MODULES" ACTOR_VERSIONS="$bamboo_ACTOR_VERSIONS" \
-    python actor_install/actor_install.py -p grayscale.yml hcd_mergers.yml
+COMBO=intel-2025b-dd4 ACTORS="grayscale hcd_mergers" bash ci-sdcc/st02-build-actors.sh
 ```
 
 ## Options

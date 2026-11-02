@@ -2,9 +2,12 @@
 # Bamboo CI script to build the actors needed by the regression tests, or reuse them from the cache
 # Execute script from root directory
 #
-#   MODULES          modules used to build and run all actors (required)
-#   ACTORS           actor_install YAML names, e.g. "grayscale hcd_mergers" (required)
-#   ACTOR_VERSIONS   optional DIR=VERSION overrides, e.g. "grayscale=develop"
+#   COMBO            combination of deps.yaml whose modules build and run all actors (required)
+#   ACTORS           actor_install YAML names, e.g. "grayscale hcd_mergers"; when empty, the actors
+#                    selected by the input_workflow.xml of the TESTS cases, plus hcd_mergers
+#   TESTS            see st03-regression.sh, read when ACTORS is empty
+#   ACTOR_VERSIONS   optional DIR=VERSION overrides applied on top of the components of deps.yaml,
+#                    e.g. "grayscale=develop"
 #   ACTOR_CACHE_ROOT cache location (default: /mnt/bamboo_deploy/HCD-WF/actor-cache on Bamboo,
 #                    ~/.cache/hcd-wf-actors otherwise)
 #   FORCE_REBUILD    set to 1 to rebuild even if the actor is cached
@@ -12,8 +15,10 @@
 #                    When set, the ssh://git@git.iter.org/ URLs of the actor YAMLs are cloned over HTTPS,
 #                    for agents without an SSH key
 #
-# An actor is cached per module list, actor YAML content and resolved source commit, so a new
-# commit on the branch or a different MODULES triggers a rebuild of that actor only.
+# The source of each actor is components.<DIR> of deps.yaml (repo + ref); a source DIR without a
+# component keeps the VERSION of its actor_install YAML.
+# An actor is cached per combination and module list, actor YAML content and resolved source commit,
+# so a new commit on the branch or a different module list triggers a rebuild of that actor only.
 # Writes actor_paths.env with the actor folders to put on PYTHONPATH.
 
 source ./ci-sdcc/st00-header.sh || exit 1
@@ -23,9 +28,48 @@ if [[ -n "${bamboo_buildKey:-}" ]]; then
     set -e -u -o pipefail
 fi
 
+ROOT_DIR=$(pwd)
+DEPS_YAML="${DEPS_FILE:-$ROOT_DIR/deps.yaml}"
+
 if [[ -z "${ACTORS:-}" ]]; then
-    echo "ERROR: Set ACTORS to a space-separated list of actor_install YAML names." >&2
-    exit 1
+    if [[ -z "${TESTS:-}" ]]; then
+        echo "ERROR: Set ACTORS to a space-separated list of actor_install YAML names, or TESTS." >&2
+        exit 1
+    fi
+    # The codes selected in the input_workflow.xml (input_workflow_reg.xml when HCDWF_TEST_MODE=1 and it
+    # exists) of each case: setting value N > 0 picks the N-th name of its "list" attribute
+    ACTORS=$(python3 - "$ROOT_DIR" "${HCDWF_TEST_MODE:-1}" $TESTS <<'EOF'
+import os, sys
+import xml.etree.ElementTree as ET
+root, test_mode, tests = sys.argv[1], sys.argv[2], sys.argv[3:]
+aliases = {"ascot_serial": "ascot", "ascot_parallel": "ascot", "bbnbi_serial": "ascot",
+           "bbnbi_parallel": "ascot", "afsi": "ascot"}
+actors = []
+for test in tests:
+    case = test.split(":", 1)[0]
+    xml_file = os.path.join(root, "tests", "data", case, "input_workflow.xml")
+    reg_file = xml_file[: -len(".xml")] + "_reg.xml"
+    if test_mode == "1" and os.path.exists(reg_file):
+        xml_file = reg_file
+    for elem in ET.parse(xml_file).iter():
+        names = elem.get("list")
+        value = (elem.text or "").strip()
+        if not names or not value.isdigit() or int(value) == 0:
+            continue
+        name = names.split()[int(value) - 1]
+        name = aliases.get(name, name)
+        if not os.path.exists(os.path.join(root, "actor_install", name + ".yml")):
+            name = name.replace("_", "-")
+        if not os.path.exists(os.path.join(root, "actor_install", name + ".yml")):
+            sys.exit(f"ERROR: no actor_install YAML for {elem.tag}={value} ({name}) of {xml_file}")
+        if name not in actors:
+            actors.append(name)
+if "hcd_mergers" not in actors:
+    actors.append("hcd_mergers")
+print(" ".join(actors))
+EOF
+) || exit 1
+    echo "> ACTORS derived from TESTS: $ACTORS"
 fi
 
 if [[ -n "${bamboo_buildKey:-}" ]]; then
@@ -33,7 +77,6 @@ if [[ -n "${bamboo_buildKey:-}" ]]; then
 else
     ACTOR_CACHE_ROOT="${ACTOR_CACHE_ROOT:-${XDG_CACHE_HOME:-$HOME/.cache}/hcd-wf-actors}"
 fi
-ROOT_DIR=$(pwd)
 
 # Clone over HTTPS with a token instead of SSH. GIT_CONFIG_* applies to every git command of this
 # script and of actor_install.py, without writing the token to a git config file
@@ -52,19 +95,34 @@ unset GIT_HTTP_TOKEN
 
 umask 002
 
-MODULES_HASH=$(tr ' ' '\n' <<< "$MODULES" | sed '/^$/d' | sort | sha256sum | cut -c1-12)
-CACHE_DIR="$ACTOR_CACHE_ROOT/$MODULES_HASH"
+# Modules loaded by st00 (ci-deps/env.sh written by ci-sdcc/resolve_deps.sh)
+LOADED_MODULES=$(sed -n 's/^module load //p' "${CI_DEPS_DIR:-$ROOT_DIR/ci-deps}/env.sh" | LC_ALL=C sort)
+if [[ -z "$LOADED_MODULES" ]]; then
+    echo "ERROR: no module list in ${CI_DEPS_DIR:-$ROOT_DIR/ci-deps}/env.sh" >&2
+    exit 1
+fi
+MODULES_HASH=$(sha256sum <<< "$LOADED_MODULES" | cut -c1-12)
+CACHE_DIR="$ACTOR_CACHE_ROOT/$COMBO-$MODULES_HASH"
 mkdir -p "$CACHE_DIR"
-tr ' ' '\n' <<< "$MODULES" | sed '/^$/d' > "$CACHE_DIR/modules.txt"
+echo "$LOADED_MODULES" > "$CACHE_DIR/modules.txt"
 echo "> Actor cache: $CACHE_DIR"
 
-# Print "DIR VCS REPO VERSION" for each source of a YAML, with ACTOR_VERSIONS applied
+# Print "DIR VCS REPO VERSION" for each source of a YAML, with the components of deps.yaml and
+# then ACTOR_VERSIONS applied
 list_sources() {
-    python3 - "$1" <<'EOF'
+    python3 - "$1" "$DEPS_YAML" <<'EOF'
 import os, sys, yaml
+components = yaml.safe_load(open(sys.argv[2])).get("components") or {}
 overrides = dict(s.split("=", 1) for s in os.environ.get("ACTOR_VERSIONS", "").split())
 for s in yaml.safe_load(open(sys.argv[1])).get("SOURCES") or []:
-    print(s["DIR"], s["VCS"].lower(), s["REPO"], overrides.get(s["DIR"], s["VERSION"]))
+    version = s["VERSION"]
+    component = components.get(s["DIR"])
+    if component:
+        if component.get("repo") and component["repo"] != s["REPO"]:
+            sys.exit(f"ERROR: components.{s['DIR']}.repo of {sys.argv[2]} is {component['repo']}, "
+                     f"{sys.argv[1]} builds {s['REPO']}")
+        version = str(component.get("ref") or version)
+    print(s["DIR"], s["VCS"].lower(), s["REPO"], overrides.get(s["DIR"], version))
 EOF
 }
 
@@ -100,6 +158,7 @@ for actor in $ACTORS; do
     # Pin every git source to a commit so the build matches the cache key
     key_input="$(sha256sum "$yml" | cut -d' ' -f1)"
     pins=()
+    sources=$(list_sources "$yml") || exit 1
     while read -r src_dir vcs repo version; do
         if [[ "$vcs" == "git" ]]; then
             commit=$(resolve_commit "$repo" "$version") || exit 1
@@ -109,7 +168,7 @@ for actor in $ACTORS; do
         else
             key_input+=" $src_dir=$version"
         fi
-    done < <(list_sources "$yml")
+    done <<< "$sources"
 
     dest="$CACHE_DIR/$actor-$(sha256sum <<< "$key_input" | cut -c1-12)"
 
@@ -118,7 +177,8 @@ for actor in $ACTORS; do
     (
         # Only one build of the same actor at a time, a parallel job waits and reuses it
         flock 9 || exit 1
-        if [[ -f "$dest/.complete" && -n "$(ls -A "$dest/actors" 2>/dev/null)" && -z "${FORCE_REBUILD:-}" ]]; then
+        if [[ -f "$dest/.complete" && -n "$(ls -A "$dest/actors" 2>/dev/null)" &&
+              ! "${FORCE_REBUILD:-}" =~ ^([Tt]rue|1)$ ]]; then
             echo "> $actor: using cached build $dest"
             exit 0
         fi

@@ -1,0 +1,119 @@
+# deps.yaml - external dependencies of the HCD workflow CI, read by ci-sdcc/resolve_deps.sh
+# (modules) and ci-sdcc/st02-build-actors.sh (actor sources).
+#
+# Every module dependency is a module: official (site tree /work/imas/etc/modules/all, searched first)
+# or built by us into the user tree (module_paths, searched after the site tree; a user-built module
+# never reuses an official name).
+# Every key outside `interactive:` is used by both CI and interactive runs; CI never builds modules.
+#
+# Keys
+#   module_paths                         user module trees, appended after the site tree (module use -a)
+#   combinations.<combo>.modules         modules loaded in the listed order; they build and run all
+#                                        actors of actor_install/ used by the CI cases
+#   combinations.<combo>.interactive_modules
+#                                        interactive tools loaded after them (interactive runs only;
+#                                        a missing one gives a warning)
+#   checks                               commands run once the environment is complete (a failure is an error)
+#   components.<DIR>.{repo,ref}          source of each actor built by ci-sdcc/st02-build-actors.sh:
+#                                        <DIR> is the SOURCES DIR of the actor_install/*.yml files, repo must
+#                                        equal their REPO, ref (branch, tag or commit) replaces their VERSION
+#   interactive.easybuild_module         module providing eb when it is not already available
+#   interactive.easyconfigs              <module name>: <recipe>; a missing module with a recipe is built
+#                                        into the user tree, then loaded
+#   interactive.src_overrides.<VAR>      when VAR is exported, the source tree it names replaces the
+#                                        modules of family `replaces` (tree on PYTHONPATH, root_env=<tree>)
+#
+# Environment variables
+#   COMBO          both         combination to use (CI: set in the task)
+#   DEPS_MODE      both         'interactive' for interactive runs, unset (= CI) everywhere else
+#   MODULES        CI only      transition: module list passed by old plans, replaces the modules of
+#                               the families it names
+#   ACTOR_VERSIONS both         optional DIR=REF pairs applied on top of components (local tests)
+#   DEPS_FILE      both         manifest path (default: the nearest deps.yaml at or above ci-sdcc/)
+#   CI_DEPS_DIR    both         directory of env.sh (default ./ci-deps)
+
+module_paths:
+  - /work/projects/pds/stack/modules/all
+
+combinations:
+  intel-2025b-dd4:
+    modules:
+      - IMAS-Python/2.3.0-intel-2025b
+      - IMAS-Fortran/5.6.0-intel-2025b-DD-4.1.1
+      - iWrap/2.0.0-intel-2025b
+      - XMLlib/3.3.2-intel-compilers-2025.2.0
+      - lxml/6.0.0-GCCcore-14.3.0
+      - INTERPOS/9.2.3-iimkl-2025b
+      - NAG/26-intel-compilers-2025.2.0
+      - Fundamental-Constants/0.2.1
+      - IDStools/2.5.0-intel-2025b
+      - MUSCLE3/0.10.0-intel-2025b
+      - Waveform-Cooker/1.10.0-GCCcore-14.3.0
+  intel-2025b-dd3:
+    modules:
+      - IMAS-Python/2.3.0-intel-2025b
+      - IMAS-Fortran/5.6.0-intel-2025b-DD-3.42.2
+      - iWrap/2.0.0-intel-2025b
+      - XMLlib/3.3.2-intel-compilers-2025.2.0
+      - lxml/6.0.0-GCCcore-14.3.0
+      - INTERPOS/9.2.3-iimkl-2025b
+      - NAG/26-intel-compilers-2025.2.0
+      - Fundamental-Constants/0.2.1
+      - IDStools/2.5.0-intel-2025b
+      - MUSCLE3/0.10.0-intel-2025b
+      - Waveform-Cooker/1.10.0-GCCcore-14.3.0
+  intel-2023b-dd3:
+    modules:
+      - IMAS-Fortran/5.6.0-intel-2023b-DD-3.42.2
+      - IMAS-Python/2.3.0-intel-2023b
+      - XMLlib/3.3.2-intel-compilers-2023.2.1
+      - iWrap/2.0.0-intel-2023b
+      - lxml/4.9.3-GCCcore-13.2.0
+      - IMAS-Core/5.7.1-intel-2023b
+      - INTERPOS/9.2.0-iimkl-2023b
+      - NAG/26-intel-compilers-2023.2.1
+      - Fundamental-Constants/0.2.1
+      - IDStools/2.5.0-intel-2023b
+      - MUSCLE3/0.8.0-intel-2023b
+      - Waveform-Cooker/1.10.0-GCCcore-13.2.0
+
+checks:
+  - python -c "import imas, lxml, yaml, waveform_cooker; print('imas', imas.__version__)"
+
+# Actor sources built by ci-sdcc/st02-build-actors.sh, keyed by the SOURCES DIR of actor_install/<actor>.yml
+components:
+  cyrano:
+    repo: ssh://git@git.iter.org/heat/cyrano.git
+    ref: feature/DD3_and_DD4
+  fopla:
+    repo: ssh://git@git.iter.org/heat/fopla.git
+    ref: feature/DD3_and_DD4
+  gray:
+    repo: ssh://git@git.iter.org/heat/gray.git
+    ref: feature/DD3_and_DD4
+  grayscale:
+    repo: ssh://git@git.iter.org/heat/grayscale.git
+    ref: feature/DD3_and_DD4
+  hcd2core-sources:
+    repo: ssh://git@git.iter.org/heat/hcd2core-sources.git
+    ref: feature/DD3_and_DD4
+  hcd_mergers:
+    repo: ssh://git@git.iter.org/heat/hcd-mergers.git
+    ref: feature/DD3_and_DD4
+  nemo:
+    repo: ssh://git@git.iter.org/heat/nemo.git
+    ref: feature/DD3_and_DD4
+  pion:
+    repo: ssh://git@git.iter.org/heat/pion.git
+    ref: feature/DD3_and_DD4
+  risk:
+    repo: ssh://git@git.iter.org/heat/risk.git
+    ref: feature/DD3_and_DD4
+  torbeam:
+    repo: ssh://git@git.iter.org/heat/torbeam.git
+    ref: feature/DD3_and_DD4
+
+interactive:
+  easybuild_module: EasyBuild/5.4.1
+  easyconfigs: {}
+  src_overrides: {}

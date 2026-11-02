@@ -54,3 +54,4 @@ hcdworkflow/_version.py
 ci_regression/
 actor_paths.env
 virtualenvdir/
+ci-deps/

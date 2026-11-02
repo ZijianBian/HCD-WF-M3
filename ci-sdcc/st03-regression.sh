@@ -2,19 +2,20 @@
 # Bamboo CI script to run the regression tests with the actors from st02-build-actors.sh
 # Execute script from root directory, after st01-create-distribution.sh
 #
-#   MODULES   modules used to build and run all actors (required)
+#   COMBO     combination of deps.yaml whose modules build and run all actors (required)
 #   TESTS     space-separated CASE:IDS,IDS entries, CASE being a folder of tests/data and IDS the
 #             IDSs the actors must write, e.g. "GRAYSCALE:waves" (required)
-#   ACTORS    see st02-build-actors.sh, only needed when actor_paths.env does not exist yet
+#   ACTORS    see st02-build-actors.sh, only read when actor_paths.env does not exist yet
 #   UPDATE_REFERENCE  set to 1 to write the reference values from this run instead of comparing
 #   RTOL      relative tolerance of the value comparison (default: 1e-6)
 #   HCDWF_TEST_MODE   1 (default) uses the regression variants <name>_reg.xml of the configuration
 #             files where a case has them, 0 the normal files
 #
-# Each case runs on copies of its configuration writing HDF5 output to ci_regression/<CASE>/{full,slice},
-# so runs do not touch the user database and can run in parallel.
+# Each case runs on copies of its configuration writing HDF5 output to the database HCDWF_CI under
+# ci_regression/<CASE>/{full,slice}/imasdb, so runs do not touch the user database and can run in parallel.
 # The values of each IDS are compared with tests/reference/<CASE>/dd-<IMAS_VERSION>/<IDS>.json
-# when that file exists.
+# when that file exists; when the subdirectory dd-<IMAS_VERSION>/<REF_COMPILER>/ exists (REF_COMPILER
+# defaults to FC, e.g. ifx), its files are used instead (and written with UPDATE_REFERENCE=1).
 
 source ./ci-sdcc/st00-header.sh || exit 1
 
@@ -77,17 +78,18 @@ rm -rf "$RESULTS_DIR"
 mkdir -p "$RESULTS_DIR"
 
 # Point the output of a configuration copy (input_workflow.xml and its regression variant
-# input_workflow_reg.xml when present) to a local HDF5 database
+# input_workflow_reg.xml when present) to the local HDF5 database HCDWF_CI.
 set_local_output() {
     python3 - "$1" "$2" <<'EOF'
 import os, re, sys
 work_dir, output_path = sys.argv[1], sys.argv[2]
+settings = (("output_user_or_path", output_path), ("output_database", "HCDWF_CI"), ("output_backend", "HDF5"))
 for name in ("input_workflow.xml", "input_workflow_reg.xml"):
     xml_file = os.path.join(work_dir, name)
     if name == "input_workflow_reg.xml" and not os.path.exists(xml_file):
         continue
     text = open(xml_file).read()
-    for tag, value in (("output_user_or_path", output_path), ("output_backend", "HDF5")):
+    for tag, value in settings:
         text, count = re.subn(rf"(<{tag}\b[^>]*>)[^<]*(</{tag}>)", rf"\g<1>{value}\g<2>", text)
         if count != 1:
             sys.exit(f"{tag} not found in {xml_file}")
@@ -133,7 +135,9 @@ for test in $TESTS; do
     work="$RESULTS_DIR/$case_name/full"
     run_step "hcd_nogui" "$work/hcd_nogui.log" hcd_nogui -c "$work" || FAILED+=("$case_name:hcd_nogui")
     if [[ -n "$expected_ids" ]]; then
-        check_args=(--reference-dir "$ROOT_DIR/tests/reference/$case_name/dd-${IMAS_VERSION:-unknown}")
+        ref_dir="$ROOT_DIR/tests/reference/$case_name/dd-${IMAS_VERSION:-unknown}"
+        [[ -d "$ref_dir/${REF_COMPILER:-$FC}" ]] && ref_dir="$ref_dir/${REF_COMPILER:-$FC}"
+        check_args=(--reference-dir "$ref_dir")
         check_args+=(--rtol "${RTOL:-1e-6}")
         [[ "${UPDATE_REFERENCE:-}" =~ ^([Tt]rue|1)$ ]] && check_args+=(--update)
         # shellcheck disable=SC2086
