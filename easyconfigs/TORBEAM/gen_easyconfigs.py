@@ -16,10 +16,10 @@ sys.path.insert(0, os.path.join(HERE, '..', '_lib'))
 import hcd_ec as hcd  # noqa: E402
 
 # Version label = build date of the module; the commit it is built from is COMMIT
-# (origin/feature/DD3_and_DD4, git describe 3.8.0-182-gc0c8081).
+# (origin/feature/DD3_and_DD4, git describe DESCRIBE).
 VERSION = hcd.version_of('TORBEAM')
-COMMIT = '6bac997a7edb00d935f21263ac3eb118ccbf4311'
-DESCRIBE = '3.8.0-183-g6bac997'
+COMMIT = 'f78a57d08aabb729830d4162ce6321dbf3e102d3'
+DESCRIBE = '3.8.0-190-gf78a57d'
 REPO = hcd.repo('torbeam', 'TORBEAM')
 
 FLAVOURS = {
@@ -139,11 +139,15 @@ local_env = ' && '.join([
 local_env += ' && export ACTORS_COPY_DIR=none'
 
 # st01-build-code.sh: cmake of the repository root from tests/test_imas/build, then the IMAS
-# library and the MUSCLE3 executable
+# library and the MUSCLE3 executable. torbeam_m3.exe links the shared libtorbeamIMAS.so of
+# tests/test_imas/build/lib: CMAKE_BUILD_RPATH_USE_ORIGIN gives it the relative RPATH $ORIGIN/../lib
+# instead of the absolute build directory, and libtorbeamIMAS.so is installed in lib/ next to bin/,
+# so that every copy of the executable (bin/, torbeam/, test_imas/build/bin/) finds it in the module.
 prebuildopts = ' && '.join([
     local_env,
     'cd tests/test_imas/build',
-    'cmake ../../.. -DUSE_PERF=ON -DUSE_LAGR_INTERPOL=ON -DUSE_XHOST=@XHOST@ -DUSE_OPENMP=ON',
+    'cmake ../../.. -DUSE_PERF=ON -DUSE_LAGR_INTERPOL=ON -DUSE_XHOST=@XHOST@ -DUSE_OPENMP=ON'
+    ' -DCMAKE_BUILD_RPATH_USE_ORIGIN=ON',
     '',
 ])
 build_cmd_targets = 'torbeam_imas torbeam_m3.exe'
@@ -151,7 +155,7 @@ maxparallel = 4
 
 files_to_copy = [
     (['tests/test_imas/build/bin/torbeam_m3.exe'], 'bin'),
-    (['tests/test_imas/build/lib/libtorbeam_imas.a'], 'lib'),
+    (['tests/test_imas/build/lib/libtorbeam_imas.a', 'tests/test_imas/build/lib/libtorbeamIMAS.so'], 'lib'),
     (['tests/test_imas/build/lib/*.mod'], 'include/torbeam'),
 ]
 
@@ -191,7 +195,8 @@ modluafooter = 'execute{cmd="ulimit -Ss unlimited 2>/dev/null || true", modeA={"
 
 sanity_check_paths = {
     'files': [
-        'bin/torbeam_m3.exe', 'bin/torbeam_run_setup', 'lib/libtorbeam_imas.a', 'include/torbeam/torbeam_iwrap.mod',
+        'bin/torbeam_m3.exe', 'bin/torbeam_run_setup', 'lib/libtorbeam_imas.a', 'lib/libtorbeamIMAS.so',
+        'include/torbeam/torbeam_iwrap.mod',
         'torbeam/actor.py', 'torbeam/lib/libtorbeam.so', 'torbeam/bin/torbeam_main.exe', 'torbeam/torbeam_m3.exe',
         'torbeam/doc/input-output.pdf',
         'test_imas/build/.build_combo', 'test_imas/build/bin/torbeam_m3.exe', 'test_imas/build/lib/libtorbeam_imas.a',
@@ -206,6 +211,12 @@ sanity_check_commands = [
     "python -c 'import waveform_cooker, ymmsl, libmuscle'",
     "! ldd %(installdir)s/bin/torbeam_m3.exe | grep 'not found'",
     "! ldd %(installdir)s/torbeam/bin/torbeam_main.exe | grep 'not found'",
+    # the executables find libtorbeamIMAS.so in the module, not in the build directory
+    "! env -u LD_LIBRARY_PATH ldd %(installdir)s/torbeam/torbeam_m3.exe | grep 'not found'",
+    "! env -u LD_LIBRARY_PATH ldd %(installdir)s/test_imas/build/bin/torbeam_m3.exe | grep 'not found'",
+    "! readelf -d %(installdir)s/bin/torbeam_m3.exe %(installdir)s/torbeam/torbeam_m3.exe"
+    " %(installdir)s/test_imas/build/bin/torbeam_m3.exe %(installdir)s/lib/libtorbeamIMAS.so"
+    " | grep -E 'R(UN)?PATH' | grep -F '%(builddir)s'",
     "ldd %(installdir)s/bin/torbeam_m3.exe | grep -q libmuscle",
     'test "$IMAS_VERSION" = "$(pkg-config --modversion al-fortran | cut -d- -f1)"',
     'bash %(installdir)s/test_imas/ci-sdcc/build_stamp.sh check %(installdir)s/test_imas/build torbeam',

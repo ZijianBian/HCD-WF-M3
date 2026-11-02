@@ -41,6 +41,8 @@ VERSION = '2026.10.22'
 VERSION_OVERRIDES = {
     'FoPla': '2026.10.26',
     'HCD2CORE_SOURCES': '2026.10.27',
+    'RISK': '2026.11.02',
+    'TORBEAM': '2026.11.02',
 }
 SITE_MODULES = '/work/imas/etc/modules/all'
 

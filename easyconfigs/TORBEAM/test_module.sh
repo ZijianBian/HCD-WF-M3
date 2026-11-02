@@ -61,7 +61,8 @@ for label, path in zip(("iwrap", "muscle3"), sys.argv[1:]):
     try:
         with imas.DBEntry(f"imas:hdf5?path={path}", "r") as db:
             waves = db.get("waves", autoconvert=False)
-        tot = sum(float(gq.electrons.power_thermal) for cw in waves.coherent_wave for gq in cw.global_quantities[:1])
+        tot = sum(float(cw.global_quantities[0].electrons.power_thermal) for cw in waves.coherent_wave
+                  if len(cw.global_quantities) > 0)
         res[label] = tot
         print(f"{label}: {len(waves.coherent_wave)} beams, electrons power_thermal (first time) = {tot:.6e} W")
     except Exception as exc:

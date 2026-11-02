@@ -21,8 +21,8 @@ import hcd_ec as hcd  # noqa: E402
 # git describe DESCRIBE). The modified configuration files of the clone (input/input_chease.xml,
 # input/scenario.yaml, env files) are not part of it.
 VERSION = hcd.version_of('RISK')
-COMMIT = '34e56cac760a990eba9f23a8e9612ac9f300ad4b'
-DESCRIBE = '2.2.0-12-g34e56ca'
+COMMIT = '2d4ff1d75808e6d58f3f77e6648e1127f17f423a'
+DESCRIBE = '2.2.0-14-g2d4ff1d'
 REPO = hcd.repo('risk', 'RISK')
 HELPER = 'risk_run_setup.sh'
 

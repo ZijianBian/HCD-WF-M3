@@ -161,7 +161,10 @@ build. The module sets `IMAS_VERSION`, `COMBO` and `<NAME>_RUN_KIT` and raises t
   (`sed`, then a check that no ` -xHost ` is left), because the module is shared by all node types
   (rigel has no AVX-512). The module sets `OMP_STACKSIZE=64M` (stack of the OpenMP threads).
 - TORBEAM: `-DUSE_XHOST=OFF` for intel-2023b (with ifort it adds `-ipo -xHost`); with ifx it adds no flag.
-  Dependencies from `tests/test_imas/deps.yaml`.
+  Dependencies from `tests/test_imas/deps.yaml`. `torbeam_m3.exe` links the shared `libtorbeamIMAS.so`:
+  the module installs it in `lib/`, and `-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON` gives the executables the
+  relative RPATH `$ORIGIN/../lib` instead of the build directory (sanity check: no RPATH into the build
+  directory, `ldd` without `LD_LIBRARY_PATH` resolves every library).
 - NEMO: the run kit keeps the build tree, so the library is at `obj_<FC>/libnemo.a` there (`lib/libnemo.a`
   in the module).
 - TORAY: pinned at 13c359b (origin/feature/DD3_and_DD4).
@@ -207,7 +210,7 @@ other codes keep theirs.
    changed.
 4. `--make-sources <CODE>`, `--dry-run <CODE> all`, `--submit <CODE> all`.
 
-Current overrides: FoPla `2026.10.26`, HCD2CORE_SOURCES `2026.10.27`.
+Current overrides: FoPla `2026.10.26`, HCD2CORE_SOURCES `2026.10.27`, RISK `2026.11.02`, TORBEAM `2026.11.02`.
 
 ## Replacing an older set of modules
 
