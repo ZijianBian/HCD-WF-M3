@@ -40,6 +40,7 @@ VERSION = '2026.10.22'
 # tools/build_hcd_modules.sh.
 VERSION_OVERRIDES = {
     'FoPla': '2026.10.26',
+    'GRAY': '2026.11.02',
     'HCD2CORE_SOURCES': '2026.10.27',
     'RISK': '2026.11.02',
     'TORBEAM': '2026.11.02',
@@ -590,7 +591,7 @@ def generate(code, here):
         sanity_dirs = ['%s/bin' % actor, '%s/lib' % actor, 'run_kit/ci-sdcc'] + code.get('sanity_dirs', [])
         cmds = ["python -c 'from %s.actor import %s as actor; print(actor)'" % (actor, actor),
                 "python -c 'import ymmsl, libmuscle'"]
-        if cooker:
+        if any(m.startswith('Waveform-Cooker/') for m in all_mods):
             api = code.get('cooker_api', {}).get(combo, 'add_dynamic')
             cmds.append("python -c 'from waveform_cooker import %s'" % api)
         cmds += ["! ldd %%(installdir)s/bin/%s | grep 'not found'" % m3name,

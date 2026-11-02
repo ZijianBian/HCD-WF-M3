@@ -93,8 +93,8 @@ CODE = dict(
     repo=hcd.repo('nolicense/gray', 'GRAY'), repo_name='gray',
     git_base='ssh://git@git.iter.org/heat',
     homepage='https://git.iter.org/projects/HEAT/repos/gray',
-    # origin/feature/DD3_and_DD4 (local HEAD == origin, 0/0, fetched 2026-10-22)
-    commit='9792659ddb9d67561d0b6d9a16acaf5d022022af', describe='1.0.0-7-g9792659',
+    # origin/feature/DD3_and_DD4 (local HEAD == origin, 0/0, fetched 2026-11-02)
+    commit='978034a9eb3575923765f60af477502e394aecb8', describe='1.0.0-9-g978034a',
     description='GRAY quasi-optical beam-tracing code for electron cyclotron heating and current drive.',
     contents=('Fortran library (lib/libgray.a, include/gray), MUSCLE3 actor executable (bin/gray_m3.exe, also '
               'gray/gray_m3.exe), iWrap actor package gray (on PYTHONPATH), and the run kit run_kit (run_gray.py, '
@@ -114,11 +114,8 @@ CODE = dict(
     sanity_dirs=['run_kit/inputs'],
     run_lines=['python run_gray.py      # iWrap actor (inputs/scenario[_dd3].yaml: output_user_or_path, run_out)',
                './run_muscle            # MUSCLE3 actor (coupling.ymmsl)'],
-    # deps.yaml names the user-tree build 14.4.0.dev1: replaced by the official 1.10.0 (same mirror-steering
-    # API, ec_mirror_add_dynamic)
-    cooker_map={'Waveform-Cooker/14.4.0.dev1': 'Waveform-Cooker/1.10.0-GCCcore-{gcc}'},
-    cooker_note='official 1.10.0 for DD4 where deps.yaml names the user build 14.4.0.dev1: mirror steering '
-                'ec_mirror_add_dynamic; 1.9.0 as in deps.yaml for DD3',
+    # Waveform-Cooker comes from the combination modules of deps.yaml (1.10.0 for DD4 with the mirror-steering
+    # API ec_mirror_add_dynamic, 1.9.0 for DD3); the sanity check imports this API
     cooker_api={'intel-2025b-dd4': 'add_dynamic, ec_mirror_add_dynamic',
                 'intel-2025b-dd3': 'add_dynamic, ec_add_dynamic, ec_adjust',
                 'intel-2023b-dd3': 'add_dynamic, ec_add_dynamic, ec_adjust'},
