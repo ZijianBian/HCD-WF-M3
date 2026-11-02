@@ -1,0 +1,510 @@
+{
+ "dd_version": "3.42.2",
+ "values": {
+  "coherent_wave[0]/identifier/type/index": 3,
+  "coherent_wave[0]/identifier/index_in_antenna": 1,
+  "coherent_wave[0]/global_quantities[0]/frequency": 53000000.0,
+  "coherent_wave[0]/global_quantities[0]/n_phi": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16,
+   18,
+   20,
+   22,
+   24,
+   26,
+   28,
+   30,
+   32,
+   34,
+   36,
+   38,
+   40,
+   42,
+   44,
+   46,
+   48,
+   50
+  ],
+  "coherent_wave[0]/global_quantities[0]/power": 19777039.913826898,
+  "coherent_wave[0]/global_quantities[0]/electrons/power_thermal": 8639189.474558208,
+  "coherent_wave[0]/global_quantities[0]/electrons/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/element[0]/a": 3.0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/z_ion": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/power_thermal": 10280262.014065355,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/element[0]/a": 3.0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/z_ion": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/power_thermal": 857588.4252033321,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/element[0]/a": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/z_ion": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/element[0]/a": 9.0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/element[0]/z_n": 4.0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/z_ion": 4.0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/z_ion": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/element[0]/a": 16.0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/element[0]/z_n": 8.0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/z_ion": 8.0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[1]/frequency": 53000000.0,
+  "coherent_wave[0]/global_quantities[1]/n_phi": [
+   0,
+   2,
+   4,
+   6,
+   8,
+   10,
+   12,
+   14,
+   16,
+   18,
+   20,
+   22,
+   24,
+   26,
+   28,
+   30,
+   32,
+   34,
+   36,
+   38,
+   40,
+   42,
+   44,
+   46,
+   48,
+   50
+  ],
+  "coherent_wave[0]/global_quantities[1]/power": 20229177.045585144,
+  "coherent_wave[0]/global_quantities[1]/electrons/power_thermal": 8639189.474558208,
+  "coherent_wave[0]/global_quantities[1]/electrons/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[1]/ion[0]/element[0]/a": 3.0,
+  "coherent_wave[0]/global_quantities[1]/ion[0]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/global_quantities[1]/ion[0]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[0]/z_ion": 2.0,
+  "coherent_wave[0]/global_quantities[1]/ion[0]/power_thermal": 10731032.960869366,
+  "coherent_wave[0]/global_quantities[1]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[1]/ion[0]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[1]/element[0]/a": 3.0,
+  "coherent_wave[0]/global_quantities[1]/ion[1]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/global_quantities[1]/ion[1]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[1]/z_ion": 1.0,
+  "coherent_wave[0]/global_quantities[1]/ion[1]/power_thermal": 858954.6101575701,
+  "coherent_wave[0]/global_quantities[1]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[1]/ion[1]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[2]/element[0]/a": 2.0,
+  "coherent_wave[0]/global_quantities[1]/ion[2]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/global_quantities[1]/ion[2]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[2]/z_ion": 1.0,
+  "coherent_wave[0]/global_quantities[1]/ion[2]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[1]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[1]/ion[2]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[3]/element[0]/a": 9.0,
+  "coherent_wave[0]/global_quantities[1]/ion[3]/element[0]/z_n": 4.0,
+  "coherent_wave[0]/global_quantities[1]/ion[3]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[3]/z_ion": 4.0,
+  "coherent_wave[0]/global_quantities[1]/ion[3]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[1]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[1]/ion[3]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[0]/global_quantities[1]/ion[4]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/global_quantities[1]/ion[4]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[4]/z_ion": 2.0,
+  "coherent_wave[0]/global_quantities[1]/ion[4]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[1]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[1]/ion[4]/distribution_assumption": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[5]/element[0]/a": 16.0,
+  "coherent_wave[0]/global_quantities[1]/ion[5]/element[0]/z_n": 8.0,
+  "coherent_wave[0]/global_quantities[1]/ion[5]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/global_quantities[1]/ion[5]/z_ion": 8.0,
+  "coherent_wave[0]/global_quantities[1]/ion[5]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[1]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[1]/ion[5]/distribution_assumption": 1,
+  "coherent_wave[0]/profiles_1d[0]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.42394256615921927,
+    "rms": 0.500231272132314
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 2.7759760189220035,
+    "mean": 1.1768543970582477,
+    "rms": 1.3886300153541502
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/grid/psi": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -84.19352455401648,
+    "max": 0.0,
+    "mean": -28.20483072559552,
+    "rms": 37.93413972017346
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/grid/volume": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 843.2264849545522,
+    "mean": 225.2410121223894,
+    "rms": 317.15948025462615
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/grid/area": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 22.368865024211253,
+    "mean": 5.785936813569868,
+    "rms": 8.212110028952992
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/power_density": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 160.0006906914403,
+    "max": 532171.9743324077,
+    "mean": 107679.18272465696,
+    "rms": 196517.97601946417
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/electrons/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 3.0156338065125434e-06,
+    "max": 49606.70423202281,
+    "mean": 21920.679248389544,
+    "rms": 26571.318520276818
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/element[0]/a": 3.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/z_ion": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 157.63736633846898,
+    "max": 459922.6163181609,
+    "mean": 79353.08665187976,
+    "rms": 163827.87613509243
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/element[0]/a": 3.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 2.3633213373375335,
+    "max": 35660.99842112333,
+    "mean": 6405.41682438764,
+    "rms": 12876.288930732197
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/element[0]/a": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/element[0]/a": 9.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/element[0]/z_n": 4.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/z_ion": 4.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/z_ion": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/element[0]/a": 16.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/element[0]/z_n": 8.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/z_ion": 8.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[1]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.4238683561169139,
+    "rms": 0.5001985114981122
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 2.775961605848559,
+    "mean": 1.1766422825146974,
+    "rms": 1.3885318632213586
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/grid/psi": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -84.1098930474824,
+    "max": 0.0,
+    "mean": -28.176814170906603,
+    "rms": 37.896458802660185
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/grid/volume": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 843.2141548381713,
+    "mean": 225.21141579050456,
+    "rms": 317.1843194186243
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/grid/area": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 22.36854995986901,
+    "mean": 5.785263325563913,
+    "rms": 8.212966594144154
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/power_density": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 107.61750496153351,
+    "max": 433204.61549074546,
+    "mean": 99705.33698119274,
+    "rms": 170989.90937488724
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/electrons/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 4.975587789130501e-06,
+    "max": 46750.69518801558,
+    "mean": 20615.643475897887,
+    "rms": 24807.05261693931
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/ion[0]/element[0]/a": 3.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[0]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[0]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[1]/ion[0]/z_ion": 2.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[0]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 106.13900500958619,
+    "max": 365187.3532631128,
+    "mean": 72560.04020029827,
+    "rms": 138834.09220113527
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[1]/ion[1]/element[0]/a": 3.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[1]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[1]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[1]/ion[1]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[1]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 1.4784949763595412,
+    "max": 36914.33587681506,
+    "mean": 6529.653304996576,
+    "rms": 13214.254386457045
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[1]/ion[2]/element[0]/a": 2.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[2]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[2]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[1]/ion[2]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[2]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[1]/ion[3]/element[0]/a": 9.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[3]/element[0]/z_n": 4.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[3]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[1]/ion[3]/z_ion": 4.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[3]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[1]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[4]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[4]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[1]/ion[4]/z_ion": 2.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[4]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[1]/ion[5]/element[0]/a": 16.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[5]/element[0]/z_n": 8.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[5]/element[0]/atoms_n": 1,
+  "coherent_wave[0]/profiles_1d[1]/ion[5]/z_ion": 8.0,
+  "coherent_wave[0]/profiles_1d[1]/ion[5]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[1]/ion[5]/multiple_states_flag": 0,
+  "vacuum_toroidal_field/r0": 6.26689965544739,
+  "vacuum_toroidal_field/b0": [
+   -5.247761897934811,
+   -5.247756238792089
+  ],
+  "time": [
+   149.98919999999998,
+   153.70143
+  ]
+ }
+}

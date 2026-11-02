@@ -4,19 +4,15 @@
   "vacuum_toroidal_field/r0": 6.26689965544739,
   "vacuum_toroidal_field/b0": [
    -5.247761897934811,
-   -5.247756238792089,
    -5.247756238792089
   ],
   "source[0]/identifier/index": 3,
-  "source[0]/global_quantities[0]/power": 19986086.716531564,
-  "source[0]/global_quantities[0]/electrons/power": 19986086.716531564,
-  "source[0]/global_quantities[0]/current_parallel": -452418.29541935836,
-  "source[0]/global_quantities[1]/power": 19986101.460902773,
-  "source[0]/global_quantities[1]/electrons/power": 19986101.460902773,
-  "source[0]/global_quantities[1]/current_parallel": -452345.80128274846,
-  "source[0]/global_quantities[2]/power": 19986101.460902773,
-  "source[0]/global_quantities[2]/electrons/power": 19986101.460902773,
-  "source[0]/global_quantities[2]/current_parallel": -452345.80128274846,
+  "source[0]/global_quantities[0]/power": 19986095.22308831,
+  "source[0]/global_quantities[0]/electrons/power": 19986095.22308831,
+  "source[0]/global_quantities[0]/current_parallel": -452370.98368242267,
+  "source[0]/global_quantities[1]/power": 19986070.40264276,
+  "source[0]/global_quantities[1]/electrons/power": 19986070.40264276,
+  "source[0]/global_quantities[1]/current_parallel": -452296.28746660525,
   "source[0]/profiles_1d[0]/grid/rho_tor_norm": {
    "summary": {
     "shape": [
@@ -77,10 +73,10 @@
     "shape": [
      300
     ],
-    "min": -6.7065266776925e-11,
-    "max": 471797.2562647214,
-    "mean": 30530.21550305692,
-    "rms": 67543.26356131301
+    "min": -1.715133705248711e-10,
+    "max": 471752.8905234644,
+    "mean": 30529.764136196525,
+    "rms": 67538.01286357125
    }
   },
   "source[0]/profiles_1d[0]/j_parallel": {
@@ -88,10 +84,10 @@
     "shape": [
      300
     ],
-    "min": -653108.5653550511,
-    "max": 1.5477109606858215e-05,
-    "mean": -33305.89647089121,
-    "rms": 84350.94833307141
+    "min": -652875.1215655757,
+    "max": 1.545950199602065e-05,
+    "mean": -33301.97534930914,
+    "rms": 84334.17104829574
    }
   },
   "source[0]/profiles_1d[0]/ion[0]/element[0]/a": 1.0,
@@ -178,10 +174,10 @@
     "shape": [
      300
     ],
-    "min": -4.473625853501595e-11,
-    "max": 463882.9617554626,
-    "mean": 30467.378853886257,
-    "rms": 67453.67503447892
+    "min": -4.499633452979183e-11,
+    "max": 463604.279815773,
+    "mean": 30466.773535689594,
+    "rms": 67449.66638583965
    }
   },
   "source[0]/profiles_1d[1]/j_parallel": {
@@ -189,10 +185,10 @@
     "shape": [
      300
     ],
-    "min": -637803.0787909843,
-    "max": 1.560972352779855e-05,
-    "mean": -33196.08199618595,
-    "rms": 84059.51990755745
+    "min": -637284.617374731,
+    "max": 1.559237876596876e-05,
+    "mean": -33191.93180690505,
+    "rms": 84044.331651414
    }
   },
   "source[0]/profiles_1d[1]/ion[0]/element[0]/a": 1.0,
@@ -219,107 +215,6 @@
   "source[0]/profiles_1d[1]/ion[7]/element[0]/a": 183.84,
   "source[0]/profiles_1d[1]/ion[7]/element[0]/z_n": 74.0,
   "source[0]/profiles_1d[1]/ion[7]/z_ion": 74.0,
-  "source[0]/profiles_1d[2]/grid/rho_tor_norm": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0,
-    "max": 1.0,
-    "mean": 0.46922927402437475,
-    "rms": 0.5469830515083272
-   }
-  },
-  "source[0]/profiles_1d[2]/grid/rho_tor": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0,
-    "max": 2.7682194139051544,
-    "mean": 1.2989295859268957,
-    "rms": 1.5141691022624344
-   }
-  },
-  "source[0]/profiles_1d[2]/grid/psi": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": -102.14596165824777,
-    "max": -18.31531370760501,
-    "mean": -50.60093826835896,
-    "rms": 57.31858415982935
-   }
-  },
-  "source[0]/profiles_1d[2]/grid/volume": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0,
-    "max": 843.02347139719,
-    "mean": 268.2960805704613,
-    "rms": 363.77748508162097
-   }
-  },
-  "source[0]/profiles_1d[2]/grid/area": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0,
-    "max": 22.364484837913785,
-    "mean": 6.915703781466902,
-    "rms": 9.446700900111852
-   }
-  },
-  "source[0]/profiles_1d[2]/electrons/energy": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": -4.473625853501595e-11,
-    "max": 463882.9617554626,
-    "mean": 30467.378853886257,
-    "rms": 67453.67503447892
-   }
-  },
-  "source[0]/profiles_1d[2]/j_parallel": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": -637803.0787909843,
-    "max": 1.560972352779855e-05,
-    "mean": -33196.08199618595,
-    "rms": 84059.51990755745
-   }
-  },
-  "source[0]/profiles_1d[2]/ion[0]/element[0]/a": 1.0,
-  "source[0]/profiles_1d[2]/ion[0]/element[0]/z_n": 1.0,
-  "source[0]/profiles_1d[2]/ion[0]/z_ion": 1.0,
-  "source[0]/profiles_1d[2]/ion[1]/element[0]/a": 2.0,
-  "source[0]/profiles_1d[2]/ion[1]/element[0]/z_n": 1.0,
-  "source[0]/profiles_1d[2]/ion[1]/z_ion": 1.0,
-  "source[0]/profiles_1d[2]/ion[2]/element[0]/a": 3.0,
-  "source[0]/profiles_1d[2]/ion[2]/element[0]/z_n": 1.0,
-  "source[0]/profiles_1d[2]/ion[2]/z_ion": 1.0,
-  "source[0]/profiles_1d[2]/ion[3]/element[0]/a": 3.0,
-  "source[0]/profiles_1d[2]/ion[3]/element[0]/z_n": 2.0,
-  "source[0]/profiles_1d[2]/ion[3]/z_ion": 2.0,
-  "source[0]/profiles_1d[2]/ion[4]/element[0]/a": 4.0,
-  "source[0]/profiles_1d[2]/ion[4]/element[0]/z_n": 2.0,
-  "source[0]/profiles_1d[2]/ion[4]/z_ion": 2.0,
-  "source[0]/profiles_1d[2]/ion[5]/element[0]/a": 9.01,
-  "source[0]/profiles_1d[2]/ion[5]/element[0]/z_n": 4.0,
-  "source[0]/profiles_1d[2]/ion[5]/z_ion": 4.0,
-  "source[0]/profiles_1d[2]/ion[6]/element[0]/a": 16.0,
-  "source[0]/profiles_1d[2]/ion[6]/element[0]/z_n": 8.0,
-  "source[0]/profiles_1d[2]/ion[6]/z_ion": 8.0,
-  "source[0]/profiles_1d[2]/ion[7]/element[0]/a": 183.84,
-  "source[0]/profiles_1d[2]/ion[7]/element[0]/z_n": 74.0,
-  "source[0]/profiles_1d[2]/ion[7]/z_ion": 74.0,
   "source[1]/identifier/index": 5,
   "source[1]/global_quantities[0]/power": 19979479.14559739,
   "source[1]/global_quantities[0]/total_ion_power": 10850279.996257808,
@@ -327,9 +222,6 @@
   "source[1]/global_quantities[1]/power": 20182456.104847264,
   "source[1]/global_quantities[1]/total_ion_power": 11348274.206827277,
   "source[1]/global_quantities[1]/electrons/power": 8834181.898019986,
-  "source[1]/global_quantities[2]/power": 20194815.306530483,
-  "source[1]/global_quantities[2]/total_ion_power": 11371573.19256198,
-  "source[1]/global_quantities[2]/electrons/power": 8823242.113968505,
   "source[1]/profiles_1d[0]/grid/rho_tor_norm": {
    "summary": {
     "shape": [
@@ -642,165 +534,8 @@
   "source[1]/profiles_1d[1]/ion[7]/element[0]/a": 183.84,
   "source[1]/profiles_1d[1]/ion[7]/element[0]/z_n": 74.0,
   "source[1]/profiles_1d[1]/ion[7]/z_ion": 74.0,
-  "source[1]/profiles_1d[2]/grid/rho_tor_norm": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0,
-    "max": 1.0,
-    "mean": 0.46922927402437475,
-    "rms": 0.5469830515083272
-   }
-  },
-  "source[1]/profiles_1d[2]/grid/rho_tor": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0,
-    "max": 2.7682194139051544,
-    "mean": 1.2989295859268957,
-    "rms": 1.5141691022624344
-   }
-  },
-  "source[1]/profiles_1d[2]/grid/psi": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": -102.14596165824777,
-    "max": -18.31531370760501,
-    "mean": -50.60093826835896,
-    "rms": 57.31858415982935
-   }
-  },
-  "source[1]/profiles_1d[2]/grid/volume": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0,
-    "max": 843.02347139719,
-    "mean": 268.2960805704613,
-    "rms": 363.77748508162097
-   }
-  },
-  "source[1]/profiles_1d[2]/grid/area": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0,
-    "max": 22.364484837913785,
-    "mean": 6.915703781466902,
-    "rms": 9.446700900111852
-   }
-  },
-  "source[1]/profiles_1d[2]/electrons/energy": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 62.66261434406212,
-    "max": 55280.103868776976,
-    "mean": 21084.30257722179,
-    "rms": 27525.535296920356
-   }
-  },
-  "source[1]/profiles_1d[2]/ion[0]/element[0]/a": 1.0,
-  "source[1]/profiles_1d[2]/ion[0]/element[0]/z_n": 1.0,
-  "source[1]/profiles_1d[2]/ion[0]/z_ion": 1.0,
-  "source[1]/profiles_1d[2]/ion[1]/element[0]/a": 2.0,
-  "source[1]/profiles_1d[2]/ion[1]/element[0]/z_n": 1.0,
-  "source[1]/profiles_1d[2]/ion[1]/z_ion": 1.0,
-  "source[1]/profiles_1d[2]/ion[1]/energy": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 4.980225785547977,
-    "max": 171206.90263004432,
-    "mean": 30212.799192545855,
-    "rms": 61063.27607377363
-   }
-  },
-  "source[1]/profiles_1d[2]/ion[2]/element[0]/a": 3.0,
-  "source[1]/profiles_1d[2]/ion[2]/element[0]/z_n": 1.0,
-  "source[1]/profiles_1d[2]/ion[2]/z_ion": 1.0,
-  "source[1]/profiles_1d[2]/ion[2]/energy": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 4.985362005283467,
-    "max": 171383.47218712888,
-    "mean": 30243.95833677287,
-    "rms": 61126.252013673504
-   }
-  },
-  "source[1]/profiles_1d[2]/ion[3]/element[0]/a": 3.0,
-  "source[1]/profiles_1d[2]/ion[3]/element[0]/z_n": 2.0,
-  "source[1]/profiles_1d[2]/ion[3]/z_ion": 2.0,
-  "source[1]/profiles_1d[2]/ion[3]/energy": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.4995905235670597,
-    "max": 17174.59203769484,
-    "mean": 3030.7919393298625,
-    "rms": 6125.552410222484
-   }
-  },
-  "source[1]/profiles_1d[2]/ion[4]/element[0]/a": 4.0,
-  "source[1]/profiles_1d[2]/ion[4]/element[0]/z_n": 2.0,
-  "source[1]/profiles_1d[2]/ion[4]/z_ion": 2.0,
-  "source[1]/profiles_1d[2]/ion[4]/energy": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.032449525018613,
-    "max": 1115.5282731007176,
-    "mean": 196.85673410976722,
-    "rms": 397.8683678171711
-   }
-  },
-  "source[1]/profiles_1d[2]/ion[5]/element[0]/a": 9.01,
-  "source[1]/profiles_1d[2]/ion[5]/element[0]/z_n": 4.0,
-  "source[1]/profiles_1d[2]/ion[5]/z_ion": 4.0,
-  "source[1]/profiles_1d[2]/ion[5]/energy": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.1703032121598523,
-    "max": 5854.571000877759,
-    "mean": 1033.1533091877893,
-    "rms": 2088.112569226352
-   }
-  },
-  "source[1]/profiles_1d[2]/ion[6]/element[0]/a": 16.0,
-  "source[1]/profiles_1d[2]/ion[6]/element[0]/z_n": 8.0,
-  "source[1]/profiles_1d[2]/ion[6]/z_ion": 8.0,
-  "source[1]/profiles_1d[2]/ion[6]/energy": {
-   "summary": {
-    "shape": [
-     300
-    ],
-    "min": 0.0017030321216134922,
-    "max": 58.54571000877759,
-    "mean": 10.331533091877892,
-    "rms": 20.881125692263524
-   }
-  },
-  "source[1]/profiles_1d[2]/ion[7]/element[0]/a": 183.84,
-  "source[1]/profiles_1d[2]/ion[7]/element[0]/z_n": 74.0,
-  "source[1]/profiles_1d[2]/ion[7]/z_ion": 74.0,
   "time": [
    149.98919999999998,
-   153.70143,
    153.70143
   ]
  }

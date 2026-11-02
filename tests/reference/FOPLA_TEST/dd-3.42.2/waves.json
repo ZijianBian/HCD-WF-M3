@@ -1,0 +1,1194 @@
+{
+ "dd_version": "3.42.2",
+ "values": {
+  "coherent_wave[0]/identifier/type/index": 3,
+  "coherent_wave[0]/identifier/index_in_antenna": 1,
+  "coherent_wave[0]/wave_solver_type/index": 2,
+  "coherent_wave[0]/global_quantities[0]/frequency": 40000000.0,
+  "coherent_wave[0]/global_quantities[0]/n_phi": [
+   35
+  ],
+  "coherent_wave[0]/global_quantities[0]/power": 10000000.0,
+  "coherent_wave[0]/global_quantities[0]/power_n_phi": [
+   10000000.0
+  ],
+  "coherent_wave[0]/global_quantities[0]/current_phi": 127829.7391150887,
+  "coherent_wave[0]/global_quantities[0]/current_phi_n_phi": [
+   127829.7391150887
+  ],
+  "coherent_wave[0]/global_quantities[0]/electrons/power_thermal": 3584014.8079610653,
+  "coherent_wave[0]/global_quantities[0]/electrons/power_thermal_n_phi": [
+   3584014.8079610653
+  ],
+  "coherent_wave[0]/global_quantities[0]/electrons/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/element[0]/a": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/z_ion": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/power_thermal": 0.0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/power_thermal_n_phi": [
+   0.0
+  ],
+  "coherent_wave[0]/global_quantities[0]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[0]/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/element[0]/a": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/z_ion": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/power_thermal": 4944392.5920308065,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/power_thermal_n_phi": [
+   4944392.5920308065
+  ],
+  "coherent_wave[0]/global_quantities[0]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[1]/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/element[0]/a": 3.0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/z_ion": 1.0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/power_thermal": 1141.1724820661866,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/power_thermal_n_phi": [
+   1141.1724820661866
+  ],
+  "coherent_wave[0]/global_quantities[0]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[2]/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/element[0]/a": 3.0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/z_ion": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/power_thermal": 1.0554359003638296e-41,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/power_thermal_n_phi": [
+   1.0554359003638296e-41
+  ],
+  "coherent_wave[0]/global_quantities[0]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[3]/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/z_ion": 2.0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/power_thermal": 2815.5413185494353,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/power_thermal_n_phi": [
+   2815.5413185494353
+  ],
+  "coherent_wave[0]/global_quantities[0]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[4]/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/element[0]/a": 9.01,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/element[0]/z_n": 4.0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/z_ion": 4.0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/power_thermal": 1435803.2242987228,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/power_thermal_n_phi": [
+   1435803.2242987228
+  ],
+  "coherent_wave[0]/global_quantities[0]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[5]/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[6]/element[0]/a": 16.0,
+  "coherent_wave[0]/global_quantities[0]/ion[6]/element[0]/z_n": 8.0,
+  "coherent_wave[0]/global_quantities[0]/ion[6]/z_ion": 8.0,
+  "coherent_wave[0]/global_quantities[0]/ion[6]/power_thermal": 11627.458998380698,
+  "coherent_wave[0]/global_quantities[0]/ion[6]/power_thermal_n_phi": [
+   11627.458998380698
+  ],
+  "coherent_wave[0]/global_quantities[0]/ion[6]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[6]/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[7]/element[0]/a": 183.84,
+  "coherent_wave[0]/global_quantities[0]/ion[7]/element[0]/z_n": 74.0,
+  "coherent_wave[0]/global_quantities[0]/ion[7]/z_ion": 74.0,
+  "coherent_wave[0]/global_quantities[0]/ion[7]/power_thermal": 20205.20291040936,
+  "coherent_wave[0]/global_quantities[0]/ion[7]/power_thermal_n_phi": [
+   20205.20291040936
+  ],
+  "coherent_wave[0]/global_quantities[0]/ion[7]/multiple_states_flag": 0,
+  "coherent_wave[0]/global_quantities[0]/ion[7]/distribution_assumption": 0,
+  "coherent_wave[0]/global_quantities[0]/time": 268.78056,
+  "coherent_wave[0]/profiles_1d[0]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.4260352701933989,
+    "rms": 0.5026834769295084
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 2.69866,
+    "mean": 1.149724342260118,
+    "rms": 1.356571791850587
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/grid/psi": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -87.8718,
+    "max": 0.0,
+    "mean": -29.59792567774888,
+    "rms": 39.715307938326184
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/grid/volume": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 861.561,
+    "mean": 225.04595160162538,
+    "rms": 318.7354630151711
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/grid/area": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 21.8416,
+    "mean": 5.670455417295835,
+    "rms": 8.04565704651833
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/n_phi": [
+   35
+  ],
+  "coherent_wave[0]/profiles_1d[0]/power_density": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 397376.3431108561,
+    "mean": 52073.1303760423,
+    "rms": 100148.92778614418
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/power_density_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 397376.3431108561,
+    "mean": 52073.1303760423,
+    "rms": 100148.92778614418
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/power_inside": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 10000000.0,
+    "mean": 6300988.776018068,
+    "rms": 6978291.887607419
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/power_inside_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 10000000.0,
+    "mean": 6300988.776018068,
+    "rms": 6978291.887607419
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/current_phi_inside": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 127829.7391150887,
+    "mean": 89943.77086983167,
+    "rms": 98359.42621944734
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/current_phi_inside_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 127829.7391150887,
+    "mean": 89943.77086983167,
+    "rms": 98359.42621944734
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/current_parallel_density": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.013479960795636375,
+    "max": 207628.45475809966,
+    "mean": 30754.38916600122,
+    "rms": 61263.32741025613
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/current_parallel_density_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.013479960795636375,
+    "max": 207628.45475809966,
+    "mean": 30754.38916600122,
+    "rms": 61263.32741025613
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/e_field_n_phi[0]/plus/amplitude": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 45.989139874350876,
+    "max": 193.61532328771554,
+    "mean": 114.74600102616014,
+    "rms": 121.04419609062236
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/e_field_n_phi[0]/plus/phase": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -1.1442074616796023,
+    "max": 1.2452977808510504,
+    "mean": 0.00401178467196955,
+    "rms": 0.5612793131257539
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/e_field_n_phi[0]/minus/amplitude": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 705.7407235031611,
+    "max": 3862.311603812351,
+    "mean": 1326.3956233735232,
+    "rms": 1552.1971843723443
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/e_field_n_phi[0]/minus/phase": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -1.835217305312284,
+    "max": 1.431975835605328,
+    "mean": -0.09185028611719384,
+    "rms": 0.6731759625615213
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/e_field_n_phi[0]/parallel/amplitude": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 10.00689151900098,
+    "mean": 2.235257113678708,
+    "rms": 3.2838821606179667
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/e_field_n_phi[0]/parallel/phase": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -2.6256699999999853,
+    "max": 1.8441553122363576,
+    "mean": 0.00796972657995845,
+    "rms": 0.7475258173096687
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/k_perpendicular": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 12.511183250969664,
+    "max": 80.9656014817831,
+    "mean": 35.446491905157494,
+    "rms": 36.15586902207074
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/electrons/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 61609.372262938414,
+    "mean": 13405.807316893348,
+    "rms": 20686.939296638848
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/electrons/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 61609.372262938414,
+    "mean": 13405.807316893348,
+    "rms": 20686.939296638848
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/electrons/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 3584014.8079610653,
+    "mean": 2097213.1227309005,
+    "rms": 2430986.3731072303
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/electrons/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 3584014.8079610653,
+    "mean": 2097213.1227309005,
+    "rms": 2430986.3731072303
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/element[0]/a": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 0.0,
+    "mean": 0.0,
+    "rms": 0.0
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/element[0]/a": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 335731.2853811736,
+    "mean": 34709.35466206646,
+    "rms": 78323.93322758925
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 335731.2853811736,
+    "mean": 34709.35466206646,
+    "rms": 78323.93322758925
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 4944392.5920308065,
+    "mean": 3300080.675279591,
+    "rms": 3550676.8567976397
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 4944392.5920308065,
+    "mean": 3300080.675279591,
+    "rms": 3550676.8567976397
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/element[0]/a": 3.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 10.116224039938018,
+    "mean": 0.4157457079184821,
+    "rms": 1.7018382434419523
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 10.116224039938018,
+    "mean": 0.4157457079184821,
+    "rms": 1.7018382434419523
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 1141.1724820661866,
+    "mean": 51.07079441261278,
+    "rms": 212.41202027144894
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 1141.1724820661866,
+    "mean": 51.07079441261278,
+    "rms": 212.41202027144894
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/element[0]/a": 3.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/z_ion": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 3.1020841850753903e-43,
+    "mean": 1.5636993331029663e-44,
+    "rms": 5.353742336898737e-44
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 3.1020841850753903e-43,
+    "mean": 1.5636993331029663e-44,
+    "rms": 5.353742336898737e-44
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 1.0554359003638296e-41,
+    "mean": 4.689173536159009e-42,
+    "rms": 6.87948638163675e-42
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 1.0554359003638296e-41,
+    "mean": 4.689173536159009e-42,
+    "rms": 6.87948638163675e-42
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/z_ion": 2.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 178.75189329007878,
+    "mean": 19.526226277481655,
+    "rms": 43.476574112537996
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 178.75189329007878,
+    "mean": 19.526226277481655,
+    "rms": 43.476574112537996
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 2815.5413185494353,
+    "mean": 1880.1669155922846,
+    "rms": 2018.964383772969
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 2815.5413185494353,
+    "mean": 1880.1669155922846,
+    "rms": 2018.964383772969
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/element[0]/a": 9.01,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/element[0]/z_n": 4.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/z_ion": 4.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 75932.20524142649,
+    "mean": 3853.8253191122244,
+    "rms": 12364.163338300987
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 75932.20524142649,
+    "mean": 3853.8253191122244,
+    "rms": 12364.163338300987
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 1435803.2242987228,
+    "mean": 886047.172044255,
+    "rms": 1023538.7874571374
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 1435803.2242987228,
+    "mean": 886047.172044255,
+    "rms": 1023538.7874571374
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[6]/element[0]/a": 16.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[6]/element[0]/z_n": 8.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[6]/z_ion": 8.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[6]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 478.85284813604943,
+    "mean": 57.18385905674386,
+    "rms": 127.88448225152214
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[6]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 478.85284813604943,
+    "mean": 57.18385905674386,
+    "rms": 127.88448225152214
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[6]/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": 0.0,
+    "max": 11627.458998380698,
+    "mean": 7666.30060532869,
+    "rms": 8296.610653650641
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[6]/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": 0.0,
+    "max": 11627.458998380698,
+    "mean": 7666.30060532869,
+    "rms": 8296.610653650641
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[6]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/ion[7]/element[0]/a": 183.84,
+  "coherent_wave[0]/profiles_1d[0]/ion[7]/element[0]/z_n": 74.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[7]/z_ion": 74.0,
+  "coherent_wave[0]/profiles_1d[0]/ion[7]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -8.106242732227522e-06,
+    "max": 1002.1997193052747,
+    "mean": 26.99819960820455,
+    "rms": 135.70636084141032
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[7]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": -8.106242732227522e-06,
+    "max": 1002.1997193052747,
+    "mean": 26.99819960820455,
+    "rms": 135.70636084141032
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[7]/power_inside_thermal": {
+   "summary": {
+    "shape": [
+     101
+    ],
+    "min": -2.5934882984511665e-05,
+    "max": 20205.20291040936,
+    "mean": 8050.267647986769,
+    "rms": 12457.400945131316
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[7]/power_inside_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     1
+    ],
+    "min": -2.5934882984511665e-05,
+    "max": 20205.20291040936,
+    "mean": 8050.267647986769,
+    "rms": 12457.400945131316
+   }
+  },
+  "coherent_wave[0]/profiles_1d[0]/ion[7]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_1d[0]/time": 268.78056,
+  "coherent_wave[0]/profiles_2d[0]/grid/r": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 4.19734075088363,
+    "max": 8.20968075088363,
+    "mean": 6.200204269019341,
+    "rms": 6.251175075336122
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/grid/z": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -3.6248282028,
+    "max": 3.6248282028,
+    "mean": -2.495831242575875e-13,
+    "rms": 1.2019077870623078
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/grid/theta_geometric": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 0.0,
+    "max": 6.283185307,
+    "mean": 3.1415926535,
+    "rms": 3.629369584573894
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/grid/rho_tor_norm": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.42603527019339893,
+    "rms": 0.5026834769295084
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/grid/rho_tor": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 0.0,
+    "max": 2.69866,
+    "mean": 1.1497243422601182,
+    "rms": 1.356571791850587
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/n_phi": [
+   35
+  ],
+  "coherent_wave[0]/profiles_2d[0]/power_density": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -268.8197350942259,
+    "max": 1368564.3766733697,
+    "mean": 73813.63423249054,
+    "rms": 183488.20274456538
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/power_density_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": -268.8197350942259,
+    "max": 1368564.3766733697,
+    "mean": 73813.63423249054,
+    "rms": 183488.20274456538
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/e_field_n_phi[0]/plus/amplitude": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 0.27288597423102684,
+    "max": 816.9879641023837,
+    "mean": 114.78496253886178,
+    "rms": 166.2514978908737
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/e_field_n_phi[0]/plus/phase": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -3.1414412045595754,
+    "max": 3.1415257809565835,
+    "mean": 0.004011784671969505,
+    "rms": 1.8460119416959944
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/e_field_n_phi[0]/minus/amplitude": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 1.744699488758675,
+    "max": 5734.23130633981,
+    "mean": 1300.5522721647828,
+    "rms": 1837.539104026166
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/e_field_n_phi[0]/minus/phase": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -3.14156077942192,
+    "max": 3.14154116701626,
+    "mean": -0.09185028611719391,
+    "rms": 1.8384678426552152
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/e_field_n_phi[0]/parallel/amplitude": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 0.0,
+    "max": 16.01036596386974,
+    "mean": 2.239823338586777,
+    "rms": 3.650924122654718
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/e_field_n_phi[0]/parallel/phase": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -3.1414219320649837,
+    "max": 3.1414854635960365,
+    "mean": 0.007969726579958345,
+    "rms": 1.7848882824659429
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/electrons/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -601415.2625833842,
+    "max": 105974210.84527811,
+    "mean": 15914479.791122021,
+    "rms": 24557752.3852063
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/electrons/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": -601415.2625833842,
+    "max": 105974210.84527811,
+    "mean": 15914479.791122021,
+    "rms": 24557752.3852063
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[0]/element[0]/a": 1.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[0]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[0]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[0]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 0.0,
+    "max": 3781.582151984146,
+    "mean": 149.63910315068645,
+    "rms": 751.9272508382874
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[0]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": 0.0,
+    "max": 3781.582151984146,
+    "mean": 149.63910315068645,
+    "rms": 751.9272508382874
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[0]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_2d[0]/ion[1]/element[0]/a": 2.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[1]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[1]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[1]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -1238343.5159377772,
+    "max": 449791262.43797547,
+    "mean": 58862702.873268016,
+    "rms": 100107177.58149678
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[1]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": -1238343.5159377772,
+    "max": 449791262.43797547,
+    "mean": 58862702.873268016,
+    "rms": 100107177.58149678
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[1]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_2d[0]/ion[2]/element[0]/a": 3.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[2]/element[0]/z_n": 1.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[2]/z_ion": 1.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[2]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 3.8750392463038976e-62,
+    "max": 3781.582151984146,
+    "mean": 149.63910315068645,
+    "rms": 751.9272508382874
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[2]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": 3.8750392463038976e-62,
+    "max": 3781.582151984146,
+    "mean": 149.63910315068645,
+    "rms": 751.9272508382874
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[2]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_2d[0]/ion[3]/element[0]/a": 3.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[3]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[3]/z_ion": 2.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[3]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -2.8387407318619175e-63,
+    "max": 3781.582151984146,
+    "mean": 149.63910315068645,
+    "rms": 751.9272508382874
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[3]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": -2.8387407318619175e-63,
+    "max": 3781.582151984146,
+    "mean": 149.63910315068645,
+    "rms": 751.9272508382874
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[3]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_2d[0]/ion[4]/element[0]/a": 4.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[4]/element[0]/z_n": 2.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[4]/z_ion": 2.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[4]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -734.4225813374786,
+    "max": 256326.26381488275,
+    "mean": 32806.71813357953,
+    "rms": 59489.82397694776
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[4]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": -734.4225813374786,
+    "max": 256326.26381488275,
+    "mean": 32806.71813357953,
+    "rms": 59489.82397694776
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[4]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_2d[0]/ion[5]/element[0]/a": 9.01,
+  "coherent_wave[0]/profiles_2d[0]/ion[5]/element[0]/z_n": 4.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[5]/z_ion": 4.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[5]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -27502.402831330215,
+    "max": 441703398.7718731,
+    "mean": 5299116.860493743,
+    "rms": 34021695.58531277
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[5]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": -27502.402831330215,
+    "max": 441703398.7718731,
+    "mean": 5299116.860493743,
+    "rms": 34021695.58531277
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[5]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_2d[0]/ion[6]/element[0]/a": 16.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[6]/element[0]/z_n": 8.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[6]/z_ion": 8.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[6]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": -6738.119011707255,
+    "max": 1516571.384587473,
+    "mean": 98387.93421677565,
+    "rms": 243708.433424168
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[6]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": -6738.119011707255,
+    "max": 1516571.384587473,
+    "mean": 98387.93421677565,
+    "rms": 243708.433424168
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[6]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_2d[0]/ion[7]/element[0]/a": 183.84,
+  "coherent_wave[0]/profiles_2d[0]/ion[7]/element[0]/z_n": 74.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[7]/z_ion": 74.0,
+  "coherent_wave[0]/profiles_2d[0]/ion[7]/power_density_thermal": {
+   "summary": {
+    "shape": [
+     101,
+     513
+    ],
+    "min": 0.0,
+    "max": 3781.582151984146,
+    "mean": 149.63910315068645,
+    "rms": 751.9272508382874
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[7]/power_density_thermal_n_phi": {
+   "summary": {
+    "shape": [
+     101,
+     513,
+     1
+    ],
+    "min": 0.0,
+    "max": 3781.582151984146,
+    "mean": 149.63910315068645,
+    "rms": 751.9272508382874
+   }
+  },
+  "coherent_wave[0]/profiles_2d[0]/ion[7]/multiple_states_flag": 0,
+  "coherent_wave[0]/profiles_2d[0]/time": 268.78056,
+  "time": [
+   268.78056
+  ]
+ }
+}
