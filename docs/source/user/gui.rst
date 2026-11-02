@@ -50,6 +50,12 @@ Workflow Parameters
 | single_time_slice (0/1)    | Run single time slice or full evolution.       |
 +----------------------------+------------------------------------------------+
 
+The output data entry must differ from the input one: the workflow resolves both
+entries as the Access Layer does (user or path, database, shot, run, DD major
+version, symbolic links included) and stops with an error naming both when they
+are the same; change ``output_user_or_path``, ``output_database`` or ``run_out``
+in that case.
+
 GUI Functions
 -------------
 

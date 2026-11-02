@@ -1,6 +1,9 @@
 import os
+import pwd
+import re
 import sys
 from contextlib import suppress
+from urllib.parse import urlparse
 
 import imas
 from imas.exception import DataEntryException
@@ -32,6 +35,58 @@ def _open_or_create(entry, operation, description):
         raise RuntimeError(f"Could not {operation} {description}: {error}") from error
 
 
+def legacy_uri(user_or_path, database, pulse, run, backend="HDF5"):
+    """URI that the Access Layer builds from the legacy arguments, as imas.DBEntry does for
+    DBEntry(backend, database, pulse, run, user_or_path) in this environment (DD version of the
+    IMAS-Python factory)."""
+    from imas.backends.imas_core.imas_interface import ll_interface
+
+    status, uri = ll_interface.build_uri_from_legacy_parameters(
+        getattr(imas.ids_defs, f"{backend}_BACKEND"),
+        int(pulse),
+        int(run),
+        str(user_or_path),
+        str(database),
+        imas.IDSFactory().dd_version,
+        "",
+    )
+    if status != 0:
+        raise RuntimeError(f"Could not build the IMAS URI of {user_or_path}/{database}/{pulse}/{run} (status {status})")
+    return uri
+
+
+def legacy_entry_dir(user_or_path, database, pulse, run, backend="HDF5"):
+    """Directory of the data entry given by the legacy arguments, resolved as the Access Layer does:
+    <base>/<database>/<version>/<pulse>/<run>, with <version> taken from the URI (DD major version) and
+    <base> = user_or_path when it is an absolute path, $IMAS_HOME/shared/imasdb for "public", and
+    <home directory of the user>/public/imasdb for a user name."""
+    uri = legacy_uri(user_or_path, database, pulse, run, backend)
+    query = dict(item.split("=", 1) for item in re.split("[;&]", urlparse(uri).query) if "=" in item)
+    user = query["user"]
+    if user.startswith("/"):
+        base = user
+    elif user == "public":
+        if not os.getenv("IMAS_HOME"):
+            raise RuntimeError(f"{uri}: IMAS_HOME is not set, the public database cannot be located")
+        base = os.path.join(os.environ["IMAS_HOME"], "shared", "imasdb")
+    else:
+        try:
+            base = os.path.join(pwd.getpwnam(user).pw_dir, "public", "imasdb")
+        except KeyError as error:
+            raise RuntimeError(f"{uri}: unknown user {user!r}") from error
+    return os.path.join(base, query["database"], query["version"], query["pulse"], query["run"])
+
+
+def check_distinct_entries(input_entry, output_entry):
+    """Stop when the output data entry is the input one (same directory after resolving symbolic links)."""
+    if os.path.realpath(input_entry) == os.path.realpath(output_entry):
+        raise ValueError(
+            f"The output data entry {output_entry} is the input data entry {input_entry} "
+            f"({os.path.realpath(input_entry)}): change output_user_or_path, output_database or run_out "
+            "in input_workflow.xml."
+        )
+
+
 class WorkflowDbHelper:
     def __init__(
         self,
@@ -53,6 +108,13 @@ class WorkflowDbHelper:
         # DEFAULT OUTPUT LOCAL DB NAME IS EQUAL TO THE INPUT ONE
         if output_database == "default":
             output_database = input_database
+
+        # The output data entry must differ from the input one; checked before any file is opened or written
+        self.input_entry = legacy_entry_dir(input_user_or_path, input_database, shot_number, input_run, input_backend)
+        self.output_entry = legacy_entry_dir(
+            output_user_or_path, output_database, shot_number, output_run, output_backend
+        )
+        check_distinct_entries(self.input_entry, self.output_entry)
 
         # IF THE OUTPUT DATABASE DOES NOT EXIST: CREATE IT
         if output_user_or_path == os.getenv("USER"):
@@ -100,17 +162,10 @@ class WorkflowDbHelper:
             self.output_user_or_path,
         )
 
-        h5_master_file = (
-            os.getenv("HOME")
-            + "/public/imasdb/"
-            + self.output_database
-            + "/3/"
-            + str(self.shot_number)
-            + "/"
-            + str(self.output_run)
-            + "/master.h5"
-        )
-        if os.path.isfile(h5_master_file):  # IMAS-5428 still not fixed!!!
+        # HDF5 backend: the master file of an existing output entry is removed before the entry is created
+        # again (IMAS-5428); only the resolved output entry is touched
+        h5_master_file = os.path.join(self.output_entry, "master.h5")
+        if self.output_backend == "HDF5" and os.path.isfile(h5_master_file):
             os.remove(h5_master_file)
 
         _open_or_create(outputDb, "create", "output database")
