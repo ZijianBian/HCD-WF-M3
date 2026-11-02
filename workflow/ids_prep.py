@@ -270,52 +270,6 @@ def _fixup_core_profiles(cp):
     return cp
 
 
-# Equilibrium extension outside the LCFS (workflow/extend_equilibrium.py, matched scheme), set from the
-# workflow parameters by configure_equilibrium_extension(); off until enabled there
-_EQ_EXTENSION = {"enabled": False, "box": None, "source": ""}
-
-
-def configure_equilibrium_extension(wf_parameters):
-    """Enable the equilibrium extension from the workflow parameters of input_workflow.xml.
-
-    extend_equilibrium: 0 (off, also when absent) or 1 (on);
-    extend_equilibrium_box: "Rmin,Rmax,Zmin,Zmax" in m, covered by the extended profiles_2d grid
-    (absent: DEFAULT_BOX of extend_equilibrium.py).
-    """
-    _EQ_EXTENSION["enabled"] = int(wf_parameters.get("extend_equilibrium", [0])[0]) == 1
-    if not _EQ_EXTENSION["enabled"]:
-        return
-    from workflow.extend_equilibrium import DEFAULT_BOX
-
-    box = wf_parameters.get("extend_equilibrium_box", [None])[0]
-    _EQ_EXTENSION["box"] = DEFAULT_BOX if box is None else [float(x) for x in str(box).split(",")]
-    _EQ_EXTENSION["source"] = "{}/{}/{} ({})".format(
-        wf_parameters["input_database"][0],
-        wf_parameters["shot_nr"][0],
-        wf_parameters["run_in"][0],
-        wf_parameters["input_user_or_path"][0],
-    )
-    print(
-        "[ids_prep] Equilibrium extension outside the LCFS enabled, box [Rmin, Rmax, Zmin, Zmax] = "
-        f"{list(_EQ_EXTENSION['box'])}",
-        flush=True,
-    )
-
-
-def _eq_extend(eq, ts):
-    """Extend psi and B outside the LCFS and the profiles_2d grid of ts to the configured box, in place
-    (extend_equilibrium.py, matched scheme), when enabled by configure_equilibrium_extension()."""
-    if not _EQ_EXTENSION["enabled"] or len(ts.profiles_2d) == 0:
-        return
-    from workflow.extend_equilibrium import append_caveat, extend_slice, format_info
-
-    info, _ = extend_slice(ts, _EQ_EXTENSION["box"])
-    if not np.isfinite(info["t"]) and len(eq.time) > 0:
-        info["t"] = float(eq.time[0])
-    append_caveat(eq, source=_EQ_EXTENSION["source"])
-    print("  [equilibrium] Equilibrium extended outside the LCFS: " + format_info(info), flush=True)
-
-
 def _eq_fill_psi_axis(ts):
     """Fill the axis poloidal flux from profiles_1d.psi[0] when missing (CHEASE/DINA workaround).
 
@@ -599,7 +553,6 @@ def _fixup_equilibrium(eq):
 
     _eq_fill_psi_axis(ts)
     _eq_complete_bfield(eq, ts)
-    _eq_extend(eq, ts)
     _eq_replace_nan_2d(eq, ts)
     _eq_rename_b_field_tor(ts)
     _eq_fill_vacuum_field(eq, ts)

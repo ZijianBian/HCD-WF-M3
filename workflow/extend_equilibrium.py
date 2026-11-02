@@ -43,7 +43,8 @@ for the HCD actors to trace the beams and nothing else. The caveat is appended
 to ids_properties.comment of the extended IDS.
 
 Library use (in-memory IMAS-Python equilibrium, DD 4):
-  from extend_equilibrium import extend_equilibrium_ids, extend_slice
+  from extend_equilibrium import extend_equilibrium_ids, extend_slice, needs_extension
+  extend, reason = needs_extension(eq.time_slice[0])                # auto rule of HCDWorkflow.run()
   infos = extend_equilibrium_ids(eq, box=DEFAULT_BOX, source=uri)  # all time slices + comment
   info, diag = extend_slice(eq.time_slice[0], box)                 # one time slice, in place
 
@@ -67,6 +68,10 @@ TWOPI = 2.0 * np.pi
 # |psi_N - 1| below which psi counts as clamped to psi_boundary. The clamped value of
 # JETTO/ESCO outputs is not exactly psi_boundary (|psi_N - 1| up to ~5e-6 seen in SRO case 4.1)
 CLAMP_TOL = 1e-4
+# needs_extension(): original grid nodes with dx > DX_OUTSIDE count as clearly outside the LCFS; the slice
+# needs the extension when more than CLAMP_FRACTION of them have |psi_N - 1| < CLAMP_TOL, or when there is none
+DX_OUTSIDE = 1.02
+CLAMP_FRACTION = 0.5
 # Rmin, Rmax, Zmin, Zmax [m] covered by the extended grid: ITER EC equatorial and upper launchers
 DEFAULT_BOX = (3.9, 10.6, -4.6, 4.9)
 MODES = ("matched",)
@@ -178,6 +183,32 @@ def extend_theta(theta_old, R, Z, r0, z0, sl, inside_old):
     theta = THETA_CONVENTIONS[best](R, Z, r0, z0)
     theta[sl][inside_old] = theta_old[inside_old]
     return theta, best, dev[best][0], False
+
+
+def needs_extension(ts):
+    """(extend, reason) for the equilibrium time slice ts, from the original profiles_2d[0] grid: the nodes
+    with dx > DX_OUTSIDE (dx as in extend_slice: distance from the magnetic axis over the LCFS distance at
+    the same poloidal angle) are clearly outside the LCFS; extend is True when there is no such node (grid
+    stopping at the plasma) or when more than CLAMP_FRACTION of them have psi clamped to the boundary value
+    (|psi_N - 1| < CLAMP_TOL); otherwise (free-boundary or already extended equilibrium) False."""
+    if len(ts.profiles_2d) == 0:
+        return False, "no profiles_2d"
+    p2 = ts.profiles_2d[0]
+    gq = ts.global_quantities
+    psi_ax = float(getattr(gq, dd.PSI_MAGNETIC_AXIS))
+    psi_b = float(dd.psi_boundary(ts))
+    r0, z0 = float(gq.magnetic_axis.r), float(gq.magnetic_axis.z)
+    R, Z = np.meshgrid(np.array(p2.grid.dim1, dtype=float), np.array(p2.grid.dim2, dtype=float), indexing="ij")
+    psin = (np.array(p2.psi, dtype=float) - psi_ax) / (psi_b - psi_ax)
+    rb = boundary_radius(ts, r0, z0)
+    theta = np.arctan2(Z - z0, R - r0)
+    dx = np.hypot(R - r0, Z - z0) / rb(theta)
+    outside = dx > DX_OUTSIDE
+    n_out = int(outside.sum())
+    if n_out == 0:
+        return True, f"no grid node with dx>{DX_OUTSIDE}"
+    frac = float(np.mean(np.abs(psin[outside] - 1.0) < CLAMP_TOL))
+    return frac > CLAMP_FRACTION, f"clamped fraction {frac:.3f} of {n_out} nodes with dx>{DX_OUTSIDE}"
 
 
 def extend_slice(ts, box=DEFAULT_BOX, mode="matched"):

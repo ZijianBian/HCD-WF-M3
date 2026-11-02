@@ -19,7 +19,6 @@ from workflow.ids_prep import (
     _create_ids,
     _get_target_dd_version,
     _smart_convert,
-    configure_equilibrium_extension,
     get_backend,
     get_empty_int,
     stabilize_selected_hcd_outputs,
@@ -208,7 +207,6 @@ def setup_databases(config_folder_path):
     inputworkflow_xml = os.path.join(config_folder_path, "input_workflow.xml")
     print(f"[workflow_driver] Loading config from: {inputworkflow_xml}")
     wf_parameters = create_workflow_param_from_file(inputworkflow_xml)["workflow_parameters"][0]
-    configure_equilibrium_extension(wf_parameters)
     param_process = {
         node.tag: int(node.text) for node in ET.parse(inputworkflow_xml).findall("./actor_selection/*/*/*")
     }

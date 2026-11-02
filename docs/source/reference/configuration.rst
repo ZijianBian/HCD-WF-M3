@@ -115,24 +115,72 @@ Configure time loop execution:
 Equilibrium Preparation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+``HCDWorkflow.run()`` (``hcdworkflow/hcd_workflow.py``) prepares the input
+equilibrium for the actors with ``hcdworkflow/equilibrium_extension.py``: psi
+and B outside the LCFS and the ``profiles_2d`` grid are extended with
+``workflow/extend_equilibrium.py`` (matched scheme), so that ray- and
+beam-tracing actors see a smooth psi and B field from the launchers to the
+plasma. Every entry point goes through ``HCDWorkflow.run()``: the stand-alone
+Legacy driver (``hcd_nogui``, ``hcd_gui``), the Hybrid MUSCLE3 micro model and
+JINTRAC, which calls ``HCDWorkflow.run()`` directly with the JETTO equilibrium,
+so the same rule applies everywhere.
+
 Optional entries of ``workflow_parameters``:
 
-``extend_equilibrium``
-   ``0`` (default, also when absent) or ``1``. ``1`` extends psi and B outside
-   the LCFS and the ``profiles_2d`` grid of the input equilibrium with
-   ``workflow/extend_equilibrium.py`` (matched scheme), for fixed-boundary
-   equilibria whose psi is clamped outside the LCFS or whose grid stops close
-   to the plasma. It runs in the equilibrium fix-ups of
-   ``workflow/ids_prep.py``, after the completion of ``b_field_r/z/phi`` and
-   before the NaN replacement, when ``workflow/workflow_driver.py`` reads the
-   input database (``hcd_nogui``, ``hcd_gui``). The result is not a
-   reconstructed equilibrium outside the LCFS; the caveat is appended to
-   ``ids_properties.comment``.
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
 
-``extend_equilibrium_box``
-   Optional ``Rmin,Rmax,Zmin,Zmax`` in m, covered by the extended grid; when
-   absent, the default box of ``extend_equilibrium.py`` (ITER EC launchers,
-   ``3.9,10.6,-4.6,4.9``).
+   * - Parameter
+     - Values
+   * - ``eq_extension``
+     - ``auto`` (default when neither ``eq_extension`` nor ``extend_equilibrium``
+       is given), ``forced`` or ``disabled``. ``1`` and ``matched`` select
+       ``auto``; ``0`` and ``none`` select ``disabled``. Values are
+       case-insensitive; any other value stops the workflow with an error
+       listing the accepted ones.
+   * - ``extend_equilibrium``
+     - Read when ``eq_extension`` is absent, with the same values.
+   * - ``extend_equilibrium_box``
+     - ``Rmin,Rmax,Zmin,Zmax`` in m, covered by the extended grid; when absent,
+       the default box of ``extend_equilibrium.py`` (ITER EC launchers,
+       ``3.9,10.6,-4.6,4.9``).
+
+``auto`` decides per time slice from the equilibrium data
+(``needs_extension()`` in ``extend_equilibrium.py``). The grid nodes of the
+original ``profiles_2d`` grid with ``dx > 1.02`` are clearly outside the LCFS,
+where ``dx`` is the normalised distance of the matched scheme (distance from the
+magnetic axis divided by the distance of the LCFS at the same poloidal angle).
+The slice is extended when
+
+* more than 50 % of these nodes have psi clamped to the boundary value,
+  ``|psi_N - 1| < 1e-4`` with ``psi_N = (psi - psi_axis) / (psi_boundary - psi_axis)``; or
+* there is no such node (the grid stops at the plasma).
+
+Otherwise, for instance for a free-boundary equilibrium whose psi varies outside
+the LCFS, the slice is left unchanged; a slice without ``profiles_2d`` is also
+left unchanged. ``forced`` extends every slice, e.g. to replace the extension
+made by the equilibrium code itself; ``disabled`` never extends.
+
+``HCDWorkflow.initialize()`` prints the setting used and where it comes from,
+e.g. ``[equilibrium] extension setting: auto (extend_equilibrium = 1)``.
+``HCDWorkflow.run()`` prints exactly one line per time slice, in every mode, e.g.
+``[equilibrium] t=60.4064s extension: applied (auto: clamped fraction 1.000 of
+808 nodes with dx>1.02): ...`` (JETTO), ``[equilibrium] t=199.9376s extension: not
+applied (auto: clamped fraction 0.000 of 5834 nodes with dx>1.02, not needed)``
+(DINA) or ``... extension: not applied (disabled)``; within JINTRAC this stdout
+line is the record of the decision. JINTRAC initialises the workflow from
+``Ext_HCD_WF_config``, so the setting is read from
+``Ext_HCD_WF_config/input_workflow.xml``.
+
+The actors receive an extended copy of the equilibrium; the equilibrium object
+passed to ``HCDWorkflow.run()`` is not modified, and the stand-alone driver
+writes the input equilibrium unchanged to the output entry. The extended copy is
+not a reconstructed equilibrium outside the LCFS; the caveat is appended to its
+``ids_properties.comment``.
+
+``HCDWorkflow.run()`` also accepts the keywords ``eq_extension`` and
+``eq_extension_box``, which take precedence over the workflow parameters.
 
 Global Lists (YAML)
 --------------------

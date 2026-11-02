@@ -3,6 +3,7 @@ import logging
 
 import numpy as np
 
+from hcdworkflow.equilibrium_extension import mode_from_parameters, prepare_equilibrium
 from hcdworkflow.workflow_base import WorkflowBase
 from hcdworkflow.workflow_data import WorkflowData
 from hcdworkflow.workflow_executor import WorkflowExecutor
@@ -23,6 +24,10 @@ class HCDWorkflow(WorkflowBase):
 
     def initialize(self, workflowConfigPath: str):
         self.workflowData = WorkflowData(workflowConfigPath)
+        parameters = self.workflowData.workflowParameters
+        self.eq_extension, origin = mode_from_parameters(parameters)
+        self.eq_extension_box = parameters.get("extend_equilibrium_box")
+        print(f"[equilibrium] extension setting: {self.eq_extension} ({origin})", flush=True)
         self.__initialized = True
 
     def __call__(self, *args):
@@ -33,8 +38,22 @@ class HCDWorkflow(WorkflowBase):
             message = "Workflow is not initialized. Initialize workflow by calling workflow.initialize() method"
             raise RuntimeError(message)
 
-    def run(self, equilibrium, core_profiles, workflow, **kwargs):
+    def run(self, equilibrium, core_profiles, workflow, eq_extension=None, eq_extension_box=None, **kwargs):
+        """Run the H&CD actors on one time slice and return their output IDSs by name.
+
+        The actors receive the equilibrium prepared by equilibrium_extension.prepare_equilibrium():
+        an extended copy when a slice is extended, else the equilibrium itself; the caller's
+        equilibrium object is not modified. eq_extension (auto / forced / disabled, or an alias of
+        equilibrium_extension.ALIASES) and eq_extension_box ("Rmin,Rmax,Zmin,Zmax" in m) take
+        precedence over the setting read from input_workflow.xml by initialize(). The other keyword
+        arguments are input IDSs.
+        """
         # self.check_is_initialized()
+        parameters = self.workflowData.workflowParameters
+        mode = self.eq_extension if eq_extension is None else eq_extension
+        box = self.eq_extension_box if eq_extension_box is None else eq_extension_box
+        source = "/".join(str(parameters[key]) for key in ("input_database", "shot_nr", "run_in") if key in parameters)
+        equilibrium = prepare_equilibrium(equilibrium, mode, box, source)
         inputIDSes = {
             "equilibrium": equilibrium,
             "core_profiles": core_profiles,
