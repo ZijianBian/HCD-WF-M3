@@ -1299,6 +1299,9 @@ def _ensure_waves_placeholders(input_slices, output_ids, param_process, timenow,
     if not expected:
         return
 
+    # No wave solver output at this time: store no waves slice.
+    if _ids_needs_placeholder(output_ids.get("waves")):
+        return
     waves = _ensure_output_slice(output_ids, "waves", timenow)
     missing = _align_wave_slots(waves, expected, input_slices)
     active_sources = _active_wave_sources(input_slices)
@@ -1489,6 +1492,11 @@ def _ensure_core_sources_placeholders(input_slices, output_ids, param_process, t
     if not expected:
         return
 
+    # No source in the core_sources output at this time: the workflow driver skips
+    # storing it (HDF5 schema), so it gets no placeholder sources either.
+    existing = output_ids.get("core_sources")
+    if _ids_needs_placeholder(existing) or _safe_len(getattr(existing, "source", [])) == 0:
+        return
     core_sources = _ensure_output_slice(output_ids, "core_sources", timenow)
     names = [_source_name(source) for source in core_sources.source]
     blank_indices = [idx for idx, name in enumerate(names) if not name]
