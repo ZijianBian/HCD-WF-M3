@@ -164,9 +164,9 @@ status is 1 if any `build-tree-rpath` or `notfound` count is non-zero. `--no-mod
 `/work/projects/pds/stack`), `--version` (`CHECK_VERSION`, else the newest label per code by version
 sort); `HCD_SITE_MODULES` (default `/work/imas/etc/modules/all`).
 
-CHEASE `2026.10.22`: `chease_m3/bin/chease.exe` carries an RPATH entry into the EasyBuild build tree
-(`.../eb_build/<job>/CHEASE/.../m3pkg/chease//extra-libs/`); every library still resolves (`notfound=0`),
-but the check reports it and fails until CHEASE is rebuilt without it.
+CHEASE: the Makefile of the iWrap MUSCLE3 actor package links `chease.exe` with
+`-rpath $(WRAPPER_DIR)/extra-libs/` (the package directory); the easyconfig relinks `chease.exe` in the
+installed package `chease_m3/`, so that this entry points into the module, not into the build tree.
 
 ## Using a module
 
@@ -238,7 +238,7 @@ other codes keep theirs.
    changed.
 4. `--make-sources <CODE>`, `--dry-run <CODE> all`, `--submit <CODE> all`.
 
-Current overrides: FoPla `2026.10.26`, GRAY `2026.11.02.1`, HCD2CORE_SOURCES `2026.10.27`, RISK `2026.11.02`, TORBEAM `2026.11.02`.
+Current overrides: CHEASE `2026.11.02.1`, FoPla `2026.10.26`, GRAY `2026.11.02.1`, HCD2CORE_SOURCES `2026.10.27`, RISK `2026.11.02`, TORBEAM `2026.11.02`.
 
 ## Replacing an older set of modules
 

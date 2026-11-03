@@ -26,8 +26,8 @@ import hcd_ec as hcd  # noqa: E402
 # Version label = build date of the module; built from COMMIT (origin/feature/DD3_and_DD4,
 # git describe DESCRIBE).
 VERSION = hcd.version_of('CHEASE')
-COMMIT = '834d4a516b07893d85e64554ae6654082b32096a'
-DESCRIBE = 'crpptbx-9.6.0-deployed-crpptbx-release-v15.1.1-38-g834d4a5'
+COMMIT = '1363a89de5de82889940ea8279d8d295cfcb67e6'
+DESCRIBE = 'crpptbx-9.6.0-deployed-crpptbx-release-v15.1.1-39-g1363a89'
 REPO = hcd.repo('chease', 'CHEASE')
 HELPER = 'chease_run_setup.sh'
 
@@ -135,6 +135,9 @@ postinstallcmds = [
     # installed as chease_m3, then the iWrap Python actor package chease in %(installdir)s
     local_env + ' && cd %(start_dir)s && iwrap -f iwrap/chease_choices_M3.yaml -i %(builddir)s/m3pkg'
     ' && cp -rp %(builddir)s/m3pkg/chease %(installdir)s/chease_m3',
+    # relink chease.exe in the installed package: the link rule of its Makefile adds
+    # -rpath $(WRAPPER_DIR)/extra-libs/ with WRAPPER_DIR = the package directory, which then lies in the module
+    local_env + ' && cd %(installdir)s/chease_m3 && rm -f bin/chease.exe && make',
     local_env + ' && cd %(start_dir)s && iwrap -f iwrap/chease_choices.yaml -i %(installdir)s',
     # MUSCLE3 executable in the HCD-WF layout <actor>/<actor>_m3.exe
     'ln -sfn ../chease_m3/bin/chease.exe %(installdir)s/chease/chease_m3.exe',
@@ -178,6 +181,8 @@ sanity_check_commands = [
     "python -c 'import ymmsl, libmuscle'",
     "! ldd %(installdir)s/chease_m3/bin/chease.exe | grep 'not found'",
     "ldd %(installdir)s/chease_m3/bin/chease.exe | grep -q libmuscle",
+    # chease.exe has no RPATH into the build directory
+    "! readelf -d %(installdir)s/chease_m3/bin/chease.exe | grep -E 'R(UN)?PATH' | grep -F '%(builddir)s'",
     "grep -Eq '<cocos_in>[[:space:]]*%s[[:space:]]*</cocos_in>' %%(installdir)s/codeparam/chease_input_choices.xml" % (
         '17' if local_dd.startswith('4') else '11'),
     'test "$IMAS_VERSION" = "$(pkg-config --modversion al-fortran | cut -d- -f1)"',

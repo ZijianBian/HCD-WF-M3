@@ -39,6 +39,7 @@ VERSION = '2026.10.22'
 # use VERSION. Read through version_of(name) by the writers, the template generators and
 # tools/build_hcd_modules.sh.
 VERSION_OVERRIDES = {
+    'CHEASE': '2026.11.02.1',
     'FoPla': '2026.10.26',
     'GRAY': '2026.11.02.1',
     'HCD2CORE_SOURCES': '2026.10.27',
