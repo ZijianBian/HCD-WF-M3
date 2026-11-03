@@ -358,6 +358,16 @@ def _valid_output_slice(ids_data):
     )
 
 
+def _actor_output_time(output_ids, timenow):
+    """Time the actors wrote into waves or core_sources (the time of the input
+    slice they read); timenow when neither holds a valid slice."""
+    for ids_name in ("waves", "core_sources"):
+        ids_data = output_ids.get(ids_name)
+        if _valid_output_slice(ids_data):
+            return float(ids_data.time[0])
+    return timenow
+
+
 def store_ids_slices(
     outputDb, inputMds, input_slices, output_ids, param_process=None, timenow=None, config_folder_path=None
 ):
@@ -365,13 +375,14 @@ def store_ids_slices(
 
     Write each IDS once per slice. Preserve the input core_profiles when no
     actor produces a valid replacement; writing both versions at the same time
-    corrupts the HDF5 group index on subsequent put_slice calls.
+    corrupts the HDF5 group index on subsequent put_slice calls. The outputs
+    keep the time written by the actors, also where placeholders are added.
     """
     stabilize_selected_hcd_outputs(
         input_slices,
         output_ids,
         param_process,
-        timenow,
+        None if timenow is None else _actor_output_time(output_ids, timenow),
         config_folder_path=config_folder_path,
     )
 

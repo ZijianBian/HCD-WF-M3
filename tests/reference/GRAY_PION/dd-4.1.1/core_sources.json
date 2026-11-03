@@ -11,12 +11,12 @@
   "source[0]/global_quantities[0]/total_ion_power": 0.0,
   "source[0]/global_quantities[0]/electrons/power": 19986095.22308802,
   "source[0]/global_quantities[0]/current_parallel": -452370.98368241475,
-  "source[0]/global_quantities[0]/time": 150.0,
+  "source[0]/global_quantities[0]/time": 149.98919999999998,
   "source[0]/global_quantities[1]/power": 19986070.402796976,
   "source[0]/global_quantities[1]/total_ion_power": 0.0,
   "source[0]/global_quantities[1]/electrons/power": 19986070.402796976,
   "source[0]/global_quantities[1]/current_parallel": -452296.288527833,
-  "source[0]/global_quantities[1]/time": 152.0,
+  "source[0]/global_quantities[1]/time": 153.70143,
   "source[0]/profiles_1d[0]/grid/rho_tor_norm": {
    "summary": {
     "shape": [
@@ -240,12 +240,12 @@
   "source[1]/global_quantities[0]/total_ion_power": 10850279.996878464,
   "source[1]/global_quantities[0]/electrons/power": 9129199.146973498,
   "source[1]/global_quantities[0]/current_parallel": 0.0,
-  "source[1]/global_quantities[0]/time": 150.0,
+  "source[1]/global_quantities[0]/time": 149.98919999999998,
   "source[1]/global_quantities[1]/power": 20182456.103136536,
   "source[1]/global_quantities[1]/total_ion_power": 11348274.203104662,
   "source[1]/global_quantities[1]/electrons/power": 8834181.900031874,
   "source[1]/global_quantities[1]/current_parallel": 0.0,
-  "source[1]/global_quantities[1]/time": 152.0,
+  "source[1]/global_quantities[1]/time": 153.70143,
   "source[1]/profiles_1d[0]/grid/rho_tor_norm": {
    "summary": {
     "shape": [
@@ -481,7 +481,7 @@
    }
   },
   "source[1]/profiles_1d[0]/ion[7]/multiple_states_flag": 0,
-  "source[1]/profiles_1d[0]/time": 150.0,
+  "source[1]/profiles_1d[0]/time": 149.98919999999998,
   "source[1]/profiles_1d[1]/grid/rho_tor_norm": {
    "summary": {
     "shape": [
@@ -717,10 +717,10 @@
    }
   },
   "source[1]/profiles_1d[1]/ion[7]/multiple_states_flag": 0,
-  "source[1]/profiles_1d[1]/time": 152.0,
+  "source[1]/profiles_1d[1]/time": 153.70143,
   "time": [
-   150.0,
-   152.0
+   149.98919999999998,
+   153.70143
   ]
  }
 }

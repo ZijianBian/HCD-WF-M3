@@ -14,7 +14,7 @@
   "coherent_wave[0]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[0]/global_quantities[0]/time": 150.0,
+  "coherent_wave[0]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[0]/global_quantities[1]/n_phi": [
    0
   ],
@@ -26,7 +26,7 @@
   "coherent_wave[0]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[0]/global_quantities[1]/time": 152.0,
+  "coherent_wave[0]/global_quantities[1]/time": 153.70143,
   "coherent_wave[1]/identifier/type/index": 1,
   "coherent_wave[1]/wave_solver_type/index": 1,
   "coherent_wave[1]/global_quantities[0]/n_phi": [
@@ -40,7 +40,7 @@
   "coherent_wave[1]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[1]/global_quantities[0]/time": 150.0,
+  "coherent_wave[1]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[1]/global_quantities[1]/n_phi": [
    0
   ],
@@ -52,7 +52,7 @@
   "coherent_wave[1]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[1]/global_quantities[1]/time": 152.0,
+  "coherent_wave[1]/global_quantities[1]/time": 153.70143,
   "coherent_wave[2]/identifier/type/index": 1,
   "coherent_wave[2]/wave_solver_type/index": 1,
   "coherent_wave[2]/global_quantities[0]/n_phi": [
@@ -66,7 +66,7 @@
   "coherent_wave[2]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[2]/global_quantities[0]/time": 150.0,
+  "coherent_wave[2]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[2]/global_quantities[1]/n_phi": [
    0
   ],
@@ -78,7 +78,7 @@
   "coherent_wave[2]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[2]/global_quantities[1]/time": 152.0,
+  "coherent_wave[2]/global_quantities[1]/time": 153.70143,
   "coherent_wave[3]/identifier/type/index": 1,
   "coherent_wave[3]/wave_solver_type/index": 1,
   "coherent_wave[3]/global_quantities[0]/n_phi": [
@@ -92,7 +92,7 @@
   "coherent_wave[3]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[3]/global_quantities[0]/time": 150.0,
+  "coherent_wave[3]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[3]/global_quantities[1]/n_phi": [
    0
   ],
@@ -104,7 +104,7 @@
   "coherent_wave[3]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[3]/global_quantities[1]/time": 152.0,
+  "coherent_wave[3]/global_quantities[1]/time": 153.70143,
   "coherent_wave[4]/identifier/type/index": 1,
   "coherent_wave[4]/wave_solver_type/index": 1,
   "coherent_wave[4]/global_quantities[0]/n_phi": [
@@ -118,7 +118,7 @@
   "coherent_wave[4]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[4]/global_quantities[0]/time": 150.0,
+  "coherent_wave[4]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[4]/global_quantities[1]/n_phi": [
    0
   ],
@@ -130,7 +130,7 @@
   "coherent_wave[4]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[4]/global_quantities[1]/time": 152.0,
+  "coherent_wave[4]/global_quantities[1]/time": 153.70143,
   "coherent_wave[5]/identifier/type/index": 1,
   "coherent_wave[5]/wave_solver_type/index": 1,
   "coherent_wave[5]/global_quantities[0]/n_phi": [
@@ -144,7 +144,7 @@
   "coherent_wave[5]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[5]/global_quantities[0]/time": 150.0,
+  "coherent_wave[5]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[5]/global_quantities[1]/n_phi": [
    0
   ],
@@ -156,7 +156,7 @@
   "coherent_wave[5]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[5]/global_quantities[1]/time": 152.0,
+  "coherent_wave[5]/global_quantities[1]/time": 153.70143,
   "coherent_wave[6]/identifier/type/index": 1,
   "coherent_wave[6]/wave_solver_type/index": 1,
   "coherent_wave[6]/global_quantities[0]/n_phi": [
@@ -170,7 +170,7 @@
   "coherent_wave[6]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[6]/global_quantities[0]/time": 150.0,
+  "coherent_wave[6]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[6]/global_quantities[1]/n_phi": [
    0
   ],
@@ -182,7 +182,7 @@
   "coherent_wave[6]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[6]/global_quantities[1]/time": 152.0,
+  "coherent_wave[6]/global_quantities[1]/time": 153.70143,
   "coherent_wave[7]/identifier/type/index": 1,
   "coherent_wave[7]/wave_solver_type/index": 1,
   "coherent_wave[7]/global_quantities[0]/n_phi": [
@@ -196,7 +196,7 @@
   "coherent_wave[7]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[7]/global_quantities[0]/time": 150.0,
+  "coherent_wave[7]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[7]/global_quantities[1]/n_phi": [
    0
   ],
@@ -208,7 +208,7 @@
   "coherent_wave[7]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[7]/global_quantities[1]/time": 152.0,
+  "coherent_wave[7]/global_quantities[1]/time": 153.70143,
   "coherent_wave[8]/identifier/type/index": 1,
   "coherent_wave[8]/wave_solver_type/index": 1,
   "coherent_wave[8]/global_quantities[0]/n_phi": [
@@ -222,7 +222,7 @@
   "coherent_wave[8]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[8]/global_quantities[0]/time": 150.0,
+  "coherent_wave[8]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[8]/global_quantities[1]/n_phi": [
    0
   ],
@@ -234,7 +234,7 @@
   "coherent_wave[8]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[8]/global_quantities[1]/time": 152.0,
+  "coherent_wave[8]/global_quantities[1]/time": 153.70143,
   "coherent_wave[9]/identifier/type/index": 1,
   "coherent_wave[9]/wave_solver_type/index": 1,
   "coherent_wave[9]/global_quantities[0]/n_phi": [
@@ -248,7 +248,7 @@
   "coherent_wave[9]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[9]/global_quantities[0]/time": 150.0,
+  "coherent_wave[9]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[9]/global_quantities[1]/n_phi": [
    0
   ],
@@ -260,7 +260,7 @@
   "coherent_wave[9]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[9]/global_quantities[1]/time": 152.0,
+  "coherent_wave[9]/global_quantities[1]/time": 153.70143,
   "coherent_wave[10]/identifier/type/index": 1,
   "coherent_wave[10]/wave_solver_type/index": 1,
   "coherent_wave[10]/global_quantities[0]/n_phi": [
@@ -274,7 +274,7 @@
   "coherent_wave[10]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[10]/global_quantities[0]/time": 150.0,
+  "coherent_wave[10]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[10]/global_quantities[1]/n_phi": [
    0
   ],
@@ -286,7 +286,7 @@
   "coherent_wave[10]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[10]/global_quantities[1]/time": 152.0,
+  "coherent_wave[10]/global_quantities[1]/time": 153.70143,
   "coherent_wave[11]/identifier/type/index": 1,
   "coherent_wave[11]/wave_solver_type/index": 1,
   "coherent_wave[11]/global_quantities[0]/n_phi": [
@@ -300,7 +300,7 @@
   "coherent_wave[11]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[11]/global_quantities[0]/time": 150.0,
+  "coherent_wave[11]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[11]/global_quantities[1]/n_phi": [
    0
   ],
@@ -312,7 +312,7 @@
   "coherent_wave[11]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[11]/global_quantities[1]/time": 152.0,
+  "coherent_wave[11]/global_quantities[1]/time": 153.70143,
   "coherent_wave[12]/identifier/type/index": 1,
   "coherent_wave[12]/wave_solver_type/index": 1,
   "coherent_wave[12]/global_quantities[0]/n_phi": [
@@ -326,7 +326,7 @@
   "coherent_wave[12]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[12]/global_quantities[0]/time": 150.0,
+  "coherent_wave[12]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[12]/global_quantities[1]/n_phi": [
    0
   ],
@@ -338,7 +338,7 @@
   "coherent_wave[12]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[12]/global_quantities[1]/time": 152.0,
+  "coherent_wave[12]/global_quantities[1]/time": 153.70143,
   "coherent_wave[13]/identifier/type/index": 1,
   "coherent_wave[13]/wave_solver_type/index": 1,
   "coherent_wave[13]/global_quantities[0]/n_phi": [
@@ -352,7 +352,7 @@
   "coherent_wave[13]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[13]/global_quantities[0]/time": 150.0,
+  "coherent_wave[13]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[13]/global_quantities[1]/n_phi": [
    0
   ],
@@ -364,7 +364,7 @@
   "coherent_wave[13]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[13]/global_quantities[1]/time": 152.0,
+  "coherent_wave[13]/global_quantities[1]/time": 153.70143,
   "coherent_wave[14]/identifier/type/index": 1,
   "coherent_wave[14]/wave_solver_type/index": 1,
   "coherent_wave[14]/global_quantities[0]/n_phi": [
@@ -378,7 +378,7 @@
   "coherent_wave[14]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[14]/global_quantities[0]/time": 150.0,
+  "coherent_wave[14]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[14]/global_quantities[1]/n_phi": [
    0
   ],
@@ -390,7 +390,7 @@
   "coherent_wave[14]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[14]/global_quantities[1]/time": 152.0,
+  "coherent_wave[14]/global_quantities[1]/time": 153.70143,
   "coherent_wave[15]/identifier/type/index": 1,
   "coherent_wave[15]/wave_solver_type/index": 1,
   "coherent_wave[15]/global_quantities[0]/n_phi": [
@@ -404,7 +404,7 @@
   "coherent_wave[15]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[15]/global_quantities[0]/time": 150.0,
+  "coherent_wave[15]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[15]/global_quantities[1]/n_phi": [
    0
   ],
@@ -416,7 +416,7 @@
   "coherent_wave[15]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[15]/global_quantities[1]/time": 152.0,
+  "coherent_wave[15]/global_quantities[1]/time": 153.70143,
   "coherent_wave[16]/identifier/type/index": 1,
   "coherent_wave[16]/wave_solver_type/index": 1,
   "coherent_wave[16]/global_quantities[0]/n_phi": [
@@ -430,7 +430,7 @@
   "coherent_wave[16]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[16]/global_quantities[0]/time": 150.0,
+  "coherent_wave[16]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[16]/global_quantities[1]/n_phi": [
    0
   ],
@@ -442,7 +442,7 @@
   "coherent_wave[16]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[16]/global_quantities[1]/time": 152.0,
+  "coherent_wave[16]/global_quantities[1]/time": 153.70143,
   "coherent_wave[17]/identifier/type/index": 1,
   "coherent_wave[17]/wave_solver_type/index": 1,
   "coherent_wave[17]/global_quantities[0]/n_phi": [
@@ -456,7 +456,7 @@
   "coherent_wave[17]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[17]/global_quantities[0]/time": 150.0,
+  "coherent_wave[17]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[17]/global_quantities[1]/n_phi": [
    0
   ],
@@ -468,7 +468,7 @@
   "coherent_wave[17]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[17]/global_quantities[1]/time": 152.0,
+  "coherent_wave[17]/global_quantities[1]/time": 153.70143,
   "coherent_wave[18]/identifier/type/index": 1,
   "coherent_wave[18]/wave_solver_type/index": 1,
   "coherent_wave[18]/global_quantities[0]/n_phi": [
@@ -482,7 +482,7 @@
   "coherent_wave[18]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[18]/global_quantities[0]/time": 150.0,
+  "coherent_wave[18]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[18]/global_quantities[1]/n_phi": [
    0
   ],
@@ -494,7 +494,7 @@
   "coherent_wave[18]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[18]/global_quantities[1]/time": 152.0,
+  "coherent_wave[18]/global_quantities[1]/time": 153.70143,
   "coherent_wave[19]/identifier/type/index": 1,
   "coherent_wave[19]/wave_solver_type/index": 1,
   "coherent_wave[19]/global_quantities[0]/n_phi": [
@@ -508,7 +508,7 @@
   "coherent_wave[19]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[19]/global_quantities[0]/time": 150.0,
+  "coherent_wave[19]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[19]/global_quantities[1]/n_phi": [
    0
   ],
@@ -520,7 +520,7 @@
   "coherent_wave[19]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[19]/global_quantities[1]/time": 152.0,
+  "coherent_wave[19]/global_quantities[1]/time": 153.70143,
   "coherent_wave[20]/identifier/type/index": 1,
   "coherent_wave[20]/wave_solver_type/index": 1,
   "coherent_wave[20]/global_quantities[0]/n_phi": [
@@ -534,7 +534,7 @@
   "coherent_wave[20]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[20]/global_quantities[0]/time": 150.0,
+  "coherent_wave[20]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[20]/global_quantities[1]/n_phi": [
    0
   ],
@@ -546,7 +546,7 @@
   "coherent_wave[20]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[20]/global_quantities[1]/time": 152.0,
+  "coherent_wave[20]/global_quantities[1]/time": 153.70143,
   "coherent_wave[21]/identifier/type/index": 1,
   "coherent_wave[21]/wave_solver_type/index": 1,
   "coherent_wave[21]/global_quantities[0]/n_phi": [
@@ -560,7 +560,7 @@
   "coherent_wave[21]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[21]/global_quantities[0]/time": 150.0,
+  "coherent_wave[21]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[21]/global_quantities[1]/n_phi": [
    0
   ],
@@ -572,7 +572,7 @@
   "coherent_wave[21]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[21]/global_quantities[1]/time": 152.0,
+  "coherent_wave[21]/global_quantities[1]/time": 153.70143,
   "coherent_wave[22]/identifier/type/index": 1,
   "coherent_wave[22]/wave_solver_type/index": 1,
   "coherent_wave[22]/global_quantities[0]/n_phi": [
@@ -586,7 +586,7 @@
   "coherent_wave[22]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[22]/global_quantities[0]/time": 150.0,
+  "coherent_wave[22]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[22]/global_quantities[1]/n_phi": [
    0
   ],
@@ -598,7 +598,7 @@
   "coherent_wave[22]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[22]/global_quantities[1]/time": 152.0,
+  "coherent_wave[22]/global_quantities[1]/time": 153.70143,
   "coherent_wave[23]/identifier/type/index": 1,
   "coherent_wave[23]/wave_solver_type/index": 1,
   "coherent_wave[23]/global_quantities[0]/n_phi": [
@@ -612,7 +612,7 @@
   "coherent_wave[23]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[23]/global_quantities[0]/time": 150.0,
+  "coherent_wave[23]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[23]/global_quantities[1]/n_phi": [
    0
   ],
@@ -624,7 +624,7 @@
   "coherent_wave[23]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[23]/global_quantities[1]/time": 152.0,
+  "coherent_wave[23]/global_quantities[1]/time": 153.70143,
   "coherent_wave[24]/identifier/type/index": 1,
   "coherent_wave[24]/wave_solver_type/index": 1,
   "coherent_wave[24]/global_quantities[0]/n_phi": [
@@ -638,7 +638,7 @@
   "coherent_wave[24]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[24]/global_quantities[0]/time": 150.0,
+  "coherent_wave[24]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[24]/global_quantities[1]/n_phi": [
    0
   ],
@@ -650,7 +650,7 @@
   "coherent_wave[24]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[24]/global_quantities[1]/time": 152.0,
+  "coherent_wave[24]/global_quantities[1]/time": 153.70143,
   "coherent_wave[25]/identifier/type/index": 1,
   "coherent_wave[25]/wave_solver_type/index": 1,
   "coherent_wave[25]/global_quantities[0]/n_phi": [
@@ -664,7 +664,7 @@
   "coherent_wave[25]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[25]/global_quantities[0]/time": 150.0,
+  "coherent_wave[25]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[25]/global_quantities[1]/n_phi": [
    0
   ],
@@ -676,7 +676,7 @@
   "coherent_wave[25]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[25]/global_quantities[1]/time": 152.0,
+  "coherent_wave[25]/global_quantities[1]/time": 153.70143,
   "coherent_wave[26]/identifier/type/index": 1,
   "coherent_wave[26]/wave_solver_type/index": 1,
   "coherent_wave[26]/global_quantities[0]/n_phi": [
@@ -690,7 +690,7 @@
   "coherent_wave[26]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[26]/global_quantities[0]/time": 150.0,
+  "coherent_wave[26]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[26]/global_quantities[1]/n_phi": [
    0
   ],
@@ -702,7 +702,7 @@
   "coherent_wave[26]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[26]/global_quantities[1]/time": 152.0,
+  "coherent_wave[26]/global_quantities[1]/time": 153.70143,
   "coherent_wave[27]/identifier/type/index": 1,
   "coherent_wave[27]/wave_solver_type/index": 1,
   "coherent_wave[27]/global_quantities[0]/n_phi": [
@@ -716,7 +716,7 @@
   "coherent_wave[27]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[27]/global_quantities[0]/time": 150.0,
+  "coherent_wave[27]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[27]/global_quantities[1]/n_phi": [
    0
   ],
@@ -728,7 +728,7 @@
   "coherent_wave[27]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[27]/global_quantities[1]/time": 152.0,
+  "coherent_wave[27]/global_quantities[1]/time": 153.70143,
   "coherent_wave[28]/identifier/type/index": 1,
   "coherent_wave[28]/wave_solver_type/index": 1,
   "coherent_wave[28]/global_quantities[0]/n_phi": [
@@ -742,7 +742,7 @@
   "coherent_wave[28]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[28]/global_quantities[0]/time": 150.0,
+  "coherent_wave[28]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[28]/global_quantities[1]/n_phi": [
    0
   ],
@@ -754,7 +754,7 @@
   "coherent_wave[28]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[28]/global_quantities[1]/time": 152.0,
+  "coherent_wave[28]/global_quantities[1]/time": 153.70143,
   "coherent_wave[29]/identifier/type/index": 1,
   "coherent_wave[29]/wave_solver_type/index": 1,
   "coherent_wave[29]/global_quantities[0]/n_phi": [
@@ -768,7 +768,7 @@
   "coherent_wave[29]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[29]/global_quantities[0]/time": 150.0,
+  "coherent_wave[29]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[29]/global_quantities[1]/n_phi": [
    0
   ],
@@ -780,7 +780,7 @@
   "coherent_wave[29]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[29]/global_quantities[1]/time": 152.0,
+  "coherent_wave[29]/global_quantities[1]/time": 153.70143,
   "coherent_wave[30]/identifier/type/index": 1,
   "coherent_wave[30]/wave_solver_type/index": 1,
   "coherent_wave[30]/global_quantities[0]/n_phi": [
@@ -794,7 +794,7 @@
   "coherent_wave[30]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[30]/global_quantities[0]/time": 150.0,
+  "coherent_wave[30]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[30]/global_quantities[1]/n_phi": [
    0
   ],
@@ -806,7 +806,7 @@
   "coherent_wave[30]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[30]/global_quantities[1]/time": 152.0,
+  "coherent_wave[30]/global_quantities[1]/time": 153.70143,
   "coherent_wave[31]/identifier/type/index": 1,
   "coherent_wave[31]/wave_solver_type/index": 1,
   "coherent_wave[31]/global_quantities[0]/n_phi": [
@@ -820,7 +820,7 @@
   "coherent_wave[31]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[31]/global_quantities[0]/time": 150.0,
+  "coherent_wave[31]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[31]/global_quantities[1]/n_phi": [
    0
   ],
@@ -832,7 +832,7 @@
   "coherent_wave[31]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[31]/global_quantities[1]/time": 152.0,
+  "coherent_wave[31]/global_quantities[1]/time": 153.70143,
   "coherent_wave[32]/identifier/type/index": 1,
   "coherent_wave[32]/wave_solver_type/index": 1,
   "coherent_wave[32]/global_quantities[0]/n_phi": [
@@ -846,7 +846,7 @@
   "coherent_wave[32]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[32]/global_quantities[0]/time": 150.0,
+  "coherent_wave[32]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[32]/global_quantities[1]/n_phi": [
    0
   ],
@@ -858,7 +858,7 @@
   "coherent_wave[32]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[32]/global_quantities[1]/time": 152.0,
+  "coherent_wave[32]/global_quantities[1]/time": 153.70143,
   "coherent_wave[33]/identifier/type/index": 1,
   "coherent_wave[33]/wave_solver_type/index": 1,
   "coherent_wave[33]/global_quantities[0]/n_phi": [
@@ -872,7 +872,7 @@
   "coherent_wave[33]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[33]/global_quantities[0]/time": 150.0,
+  "coherent_wave[33]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[33]/global_quantities[1]/n_phi": [
    0
   ],
@@ -884,7 +884,7 @@
   "coherent_wave[33]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[33]/global_quantities[1]/time": 152.0,
+  "coherent_wave[33]/global_quantities[1]/time": 153.70143,
   "coherent_wave[34]/identifier/type/index": 1,
   "coherent_wave[34]/wave_solver_type/index": 1,
   "coherent_wave[34]/global_quantities[0]/n_phi": [
@@ -898,7 +898,7 @@
   "coherent_wave[34]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[34]/global_quantities[0]/time": 150.0,
+  "coherent_wave[34]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[34]/global_quantities[1]/n_phi": [
    0
   ],
@@ -910,7 +910,7 @@
   "coherent_wave[34]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[34]/global_quantities[1]/time": 152.0,
+  "coherent_wave[34]/global_quantities[1]/time": 153.70143,
   "coherent_wave[35]/identifier/type/index": 1,
   "coherent_wave[35]/wave_solver_type/index": 1,
   "coherent_wave[35]/global_quantities[0]/n_phi": [
@@ -924,7 +924,7 @@
   "coherent_wave[35]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[35]/global_quantities[0]/time": 150.0,
+  "coherent_wave[35]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[35]/global_quantities[1]/n_phi": [
    0
   ],
@@ -936,7 +936,7 @@
   "coherent_wave[35]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[35]/global_quantities[1]/time": 152.0,
+  "coherent_wave[35]/global_quantities[1]/time": 153.70143,
   "coherent_wave[36]/identifier/type/index": 1,
   "coherent_wave[36]/wave_solver_type/index": 1,
   "coherent_wave[36]/global_quantities[0]/n_phi": [
@@ -950,7 +950,7 @@
   "coherent_wave[36]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[36]/global_quantities[0]/time": 150.0,
+  "coherent_wave[36]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[36]/global_quantities[1]/n_phi": [
    0
   ],
@@ -962,7 +962,7 @@
   "coherent_wave[36]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[36]/global_quantities[1]/time": 152.0,
+  "coherent_wave[36]/global_quantities[1]/time": 153.70143,
   "coherent_wave[37]/identifier/type/index": 1,
   "coherent_wave[37]/wave_solver_type/index": 1,
   "coherent_wave[37]/global_quantities[0]/n_phi": [
@@ -976,7 +976,7 @@
   "coherent_wave[37]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[37]/global_quantities[0]/time": 150.0,
+  "coherent_wave[37]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[37]/global_quantities[1]/n_phi": [
    0
   ],
@@ -988,7 +988,7 @@
   "coherent_wave[37]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[37]/global_quantities[1]/time": 152.0,
+  "coherent_wave[37]/global_quantities[1]/time": 153.70143,
   "coherent_wave[38]/identifier/type/index": 1,
   "coherent_wave[38]/wave_solver_type/index": 1,
   "coherent_wave[38]/global_quantities[0]/n_phi": [
@@ -1002,7 +1002,7 @@
   "coherent_wave[38]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[38]/global_quantities[0]/time": 150.0,
+  "coherent_wave[38]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[38]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1014,7 +1014,7 @@
   "coherent_wave[38]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[38]/global_quantities[1]/time": 152.0,
+  "coherent_wave[38]/global_quantities[1]/time": 153.70143,
   "coherent_wave[39]/identifier/type/index": 1,
   "coherent_wave[39]/wave_solver_type/index": 1,
   "coherent_wave[39]/global_quantities[0]/n_phi": [
@@ -1028,7 +1028,7 @@
   "coherent_wave[39]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[39]/global_quantities[0]/time": 150.0,
+  "coherent_wave[39]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[39]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1040,7 +1040,7 @@
   "coherent_wave[39]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[39]/global_quantities[1]/time": 152.0,
+  "coherent_wave[39]/global_quantities[1]/time": 153.70143,
   "coherent_wave[40]/identifier/type/index": 1,
   "coherent_wave[40]/wave_solver_type/index": 1,
   "coherent_wave[40]/global_quantities[0]/n_phi": [
@@ -1054,7 +1054,7 @@
   "coherent_wave[40]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[40]/global_quantities[0]/time": 150.0,
+  "coherent_wave[40]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[40]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1066,7 +1066,7 @@
   "coherent_wave[40]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[40]/global_quantities[1]/time": 152.0,
+  "coherent_wave[40]/global_quantities[1]/time": 153.70143,
   "coherent_wave[41]/identifier/type/index": 1,
   "coherent_wave[41]/wave_solver_type/index": 1,
   "coherent_wave[41]/global_quantities[0]/n_phi": [
@@ -1080,7 +1080,7 @@
   "coherent_wave[41]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[41]/global_quantities[0]/time": 150.0,
+  "coherent_wave[41]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[41]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1092,7 +1092,7 @@
   "coherent_wave[41]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[41]/global_quantities[1]/time": 152.0,
+  "coherent_wave[41]/global_quantities[1]/time": 153.70143,
   "coherent_wave[42]/identifier/type/index": 1,
   "coherent_wave[42]/wave_solver_type/index": 1,
   "coherent_wave[42]/global_quantities[0]/n_phi": [
@@ -1106,7 +1106,7 @@
   "coherent_wave[42]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[42]/global_quantities[0]/time": 150.0,
+  "coherent_wave[42]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[42]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1118,7 +1118,7 @@
   "coherent_wave[42]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[42]/global_quantities[1]/time": 152.0,
+  "coherent_wave[42]/global_quantities[1]/time": 153.70143,
   "coherent_wave[43]/identifier/type/index": 1,
   "coherent_wave[43]/wave_solver_type/index": 1,
   "coherent_wave[43]/global_quantities[0]/n_phi": [
@@ -1132,7 +1132,7 @@
   "coherent_wave[43]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[43]/global_quantities[0]/time": 150.0,
+  "coherent_wave[43]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[43]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1144,7 +1144,7 @@
   "coherent_wave[43]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[43]/global_quantities[1]/time": 152.0,
+  "coherent_wave[43]/global_quantities[1]/time": 153.70143,
   "coherent_wave[44]/identifier/type/index": 1,
   "coherent_wave[44]/wave_solver_type/index": 1,
   "coherent_wave[44]/global_quantities[0]/n_phi": [
@@ -1158,7 +1158,7 @@
   "coherent_wave[44]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[44]/global_quantities[0]/time": 150.0,
+  "coherent_wave[44]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[44]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1170,7 +1170,7 @@
   "coherent_wave[44]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[44]/global_quantities[1]/time": 152.0,
+  "coherent_wave[44]/global_quantities[1]/time": 153.70143,
   "coherent_wave[45]/identifier/type/index": 1,
   "coherent_wave[45]/wave_solver_type/index": 1,
   "coherent_wave[45]/global_quantities[0]/n_phi": [
@@ -1184,7 +1184,7 @@
   "coherent_wave[45]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[45]/global_quantities[0]/time": 150.0,
+  "coherent_wave[45]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[45]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1196,7 +1196,7 @@
   "coherent_wave[45]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[45]/global_quantities[1]/time": 152.0,
+  "coherent_wave[45]/global_quantities[1]/time": 153.70143,
   "coherent_wave[46]/identifier/type/index": 1,
   "coherent_wave[46]/wave_solver_type/index": 1,
   "coherent_wave[46]/global_quantities[0]/n_phi": [
@@ -1210,7 +1210,7 @@
   "coherent_wave[46]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[46]/global_quantities[0]/time": 150.0,
+  "coherent_wave[46]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[46]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1222,7 +1222,7 @@
   "coherent_wave[46]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[46]/global_quantities[1]/time": 152.0,
+  "coherent_wave[46]/global_quantities[1]/time": 153.70143,
   "coherent_wave[47]/identifier/type/index": 1,
   "coherent_wave[47]/wave_solver_type/index": 1,
   "coherent_wave[47]/global_quantities[0]/n_phi": [
@@ -1236,7 +1236,7 @@
   "coherent_wave[47]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[47]/global_quantities[0]/time": 150.0,
+  "coherent_wave[47]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[47]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1248,7 +1248,7 @@
   "coherent_wave[47]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[47]/global_quantities[1]/time": 152.0,
+  "coherent_wave[47]/global_quantities[1]/time": 153.70143,
   "coherent_wave[48]/identifier/type/index": 1,
   "coherent_wave[48]/wave_solver_type/index": 1,
   "coherent_wave[48]/global_quantities[0]/n_phi": [
@@ -1262,7 +1262,7 @@
   "coherent_wave[48]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[48]/global_quantities[0]/time": 150.0,
+  "coherent_wave[48]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[48]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1274,7 +1274,7 @@
   "coherent_wave[48]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[48]/global_quantities[1]/time": 152.0,
+  "coherent_wave[48]/global_quantities[1]/time": 153.70143,
   "coherent_wave[49]/identifier/type/index": 1,
   "coherent_wave[49]/wave_solver_type/index": 1,
   "coherent_wave[49]/global_quantities[0]/n_phi": [
@@ -1288,7 +1288,7 @@
   "coherent_wave[49]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[49]/global_quantities[0]/time": 150.0,
+  "coherent_wave[49]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[49]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1300,7 +1300,7 @@
   "coherent_wave[49]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[49]/global_quantities[1]/time": 152.0,
+  "coherent_wave[49]/global_quantities[1]/time": 153.70143,
   "coherent_wave[50]/identifier/type/index": 1,
   "coherent_wave[50]/wave_solver_type/index": 1,
   "coherent_wave[50]/global_quantities[0]/n_phi": [
@@ -1314,7 +1314,7 @@
   "coherent_wave[50]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[50]/global_quantities[0]/time": 150.0,
+  "coherent_wave[50]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[50]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1326,7 +1326,7 @@
   "coherent_wave[50]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[50]/global_quantities[1]/time": 152.0,
+  "coherent_wave[50]/global_quantities[1]/time": 153.70143,
   "coherent_wave[51]/identifier/type/index": 1,
   "coherent_wave[51]/wave_solver_type/index": 1,
   "coherent_wave[51]/global_quantities[0]/n_phi": [
@@ -1340,7 +1340,7 @@
   "coherent_wave[51]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[51]/global_quantities[0]/time": 150.0,
+  "coherent_wave[51]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[51]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1352,7 +1352,7 @@
   "coherent_wave[51]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[51]/global_quantities[1]/time": 152.0,
+  "coherent_wave[51]/global_quantities[1]/time": 153.70143,
   "coherent_wave[52]/identifier/type/index": 1,
   "coherent_wave[52]/wave_solver_type/index": 1,
   "coherent_wave[52]/global_quantities[0]/n_phi": [
@@ -1366,7 +1366,7 @@
   "coherent_wave[52]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[52]/global_quantities[0]/time": 150.0,
+  "coherent_wave[52]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[52]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1378,7 +1378,7 @@
   "coherent_wave[52]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[52]/global_quantities[1]/time": 152.0,
+  "coherent_wave[52]/global_quantities[1]/time": 153.70143,
   "coherent_wave[53]/identifier/type/index": 1,
   "coherent_wave[53]/wave_solver_type/index": 1,
   "coherent_wave[53]/global_quantities[0]/n_phi": [
@@ -1392,7 +1392,7 @@
   "coherent_wave[53]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[53]/global_quantities[0]/time": 150.0,
+  "coherent_wave[53]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[53]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1404,7 +1404,7 @@
   "coherent_wave[53]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[53]/global_quantities[1]/time": 152.0,
+  "coherent_wave[53]/global_quantities[1]/time": 153.70143,
   "coherent_wave[54]/identifier/type/index": 1,
   "coherent_wave[54]/wave_solver_type/index": 1,
   "coherent_wave[54]/global_quantities[0]/n_phi": [
@@ -1418,7 +1418,7 @@
   "coherent_wave[54]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[54]/global_quantities[0]/time": 150.0,
+  "coherent_wave[54]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[54]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1430,7 +1430,7 @@
   "coherent_wave[54]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[54]/global_quantities[1]/time": 152.0,
+  "coherent_wave[54]/global_quantities[1]/time": 153.70143,
   "coherent_wave[55]/identifier/type/index": 1,
   "coherent_wave[55]/wave_solver_type/index": 1,
   "coherent_wave[55]/global_quantities[0]/n_phi": [
@@ -1444,7 +1444,7 @@
   "coherent_wave[55]/global_quantities[0]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[55]/global_quantities[0]/time": 150.0,
+  "coherent_wave[55]/global_quantities[0]/time": 149.98919999999998,
   "coherent_wave[55]/global_quantities[1]/n_phi": [
    0
   ],
@@ -1456,7 +1456,7 @@
   "coherent_wave[55]/global_quantities[1]/current_phi_n_phi": [
    0.0
   ],
-  "coherent_wave[55]/global_quantities[1]/time": 152.0,
+  "coherent_wave[55]/global_quantities[1]/time": 153.70143,
   "coherent_wave[56]/identifier/type/index": 3,
   "coherent_wave[56]/identifier/index_in_antenna": 1,
   "coherent_wave[56]/global_quantities[0]/frequency": 53000000.0,
@@ -1959,8 +1959,8 @@
    -5.247756238792089
   ],
   "time": [
-   150.0,
-   152.0
+   149.98919999999998,
+   153.70143
   ]
  }
 }
